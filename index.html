@@ -118,6 +118,29 @@ header{
   text-transform:uppercase;letter-spacing:.12em;
   margin-bottom:.6rem;padding:0 .25rem;
 }
+.gtab-strip{
+  display:flex;flex-direction:column;gap:2px;
+}
+.gtab{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;background:none;border:none;border-left:2px solid transparent;
+  color:var(--text3);font-family:'Inter',sans-serif;
+  font-size:.78rem;font-weight:500;
+  padding:.4rem .6rem .4rem .75rem;
+  cursor:pointer;transition:all .12s;text-align:left;
+  border-radius:0 6px 6px 0;
+}
+.gtab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.gtab.active{
+  color:var(--text);font-weight:600;
+  border-left-color:var(--accent);
+  background:rgba(255,255,255,.06);
+}
+.gtab-count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;color:var(--text3);
+}
+.gtab.active .gtab-count{color:var(--text2)}
 .g-btn{
   display:flex;align-items:center;gap:.65rem;
   width:100%;background:none;border:none;
@@ -676,6 +699,7 @@ header{
 }
 
 /* ── TABLET ── */
+/* ── TABLET ── */
 @media(max-width:900px){
   .sidebar{display:none}
   .stats-row{grid-template-columns:repeat(2,1fr)}
@@ -684,27 +708,39 @@ header{
 }
 /* ── MOBILE ── */
 @media(max-width:600px){
-  header{padding:0 .9rem;height:48px}
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  header{padding:0 .75rem;height:48px}
   .logo{font-size:.75rem}
   .logo-icon{width:24px;height:24px;font-size:.58rem}
   .hdr-center{display:none}
-  .page{height:calc(100vh - 48px)}
+  .page{height:calc(100dvh - 48px)}
+  .page-explore{width:100%;max-width:100%;overflow-x:hidden}
+  .content{width:100%;max-width:100%;overflow-x:hidden}
   .stats-row{grid-template-columns:repeat(2,1fr)}
-  .stat-cell{padding:.65rem .85rem}
+  .stat-cell{padding:.65rem .75rem}
   .stat-cell-val{font-size:1.1rem}
   .stat-cell-sub{display:none}
-  .topbar{padding:.6rem .9rem;gap:.4rem}
-  .search-box{flex:1 1 100%}
-  .grid-wrap{padding:.75rem .9rem}
-  .grid{grid-template-columns:repeat(3,1fr);gap:.5rem}
-  .card-info{padding:.5rem .55rem}
-  .card-name{font-size:.68rem}
+  .topbar{padding:.5rem .75rem;gap:.4rem;flex-wrap:wrap}
+  .search-box{flex:1 1 100%;min-width:0}
+  .grid-wrap{padding:.6rem .75rem;width:100%;box-sizing:border-box}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+    gap:.5rem;
+    width:100%;
+  }
+  .card{width:100%;min-width:0;box-sizing:border-box}
+  .card-img-box{width:100%}
+  .card-info{padding:.45rem .5rem}
+  .card-name{font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .card-meta{font-size:.56rem}
+  .card-tags{display:none}
   .vw-pill{font-size:.52rem;padding:2px 5px;bottom:4px;left:4px}
   .fav-btn{width:22px;height:22px;top:4px;right:4px}
   .bdg{font-size:.46rem;padding:1px 4px}
+  .list-wrap{width:100%;overflow-x:auto}
   .modal-bg{padding:0;align-items:flex-end}
-  .modal{border-radius:20px 20px 0 0;max-height:95vh;width:100%}
+  .modal{border-radius:20px 20px 0 0;max-height:92dvh;width:100%;box-sizing:border-box}
   .modal-hero{height:200px}
   .modal-name{font-size:1.2rem}
   .modal-stats{grid-template-columns:repeat(2,1fr)}
@@ -713,17 +749,20 @@ header{
   .btn-visit,.btn-fav{font-size:.75rem;padding:.65rem .85rem}
   .model-search-box{flex-direction:column}
   .model-search-box button{width:100%}
-  .model-report{padding:1rem .9rem}
+  .model-report{padding:1rem .75rem;width:100%;box-sizing:border-box}
   .model-hero{padding:1rem;gap:.85rem}
   .model-hero-img{width:60px;height:60px}
   .model-hero-name{font-size:1rem}
   .report-grid{grid-template-columns:repeat(2,1fr)}
   .toast{bottom:1rem;left:50%;right:auto;transform:translateX(-50%) translateY(80px)}
   .toast.show{transform:translateX(-50%) translateY(0)}
+  #model-banner{margin:.75rem .75rem 0;padding:1rem}
+  #model-banner a{width:100%;text-align:center;box-sizing:border-box}
 }
-/* ── MÓVIL PEQUEÑO ── */
-@media(max-width:380px){
-  .grid{grid-template-columns:repeat(2,1fr)}
+/* ── MÓVIL MUY PEQUEÑO (< 360px) ── */
+@media(max-width:360px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+  .stat-cell-val{font-size:1rem}
 }
 </style>
 </head>
@@ -762,44 +801,21 @@ header{
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-section">
+    <div class="sidebar-section" style="padding-bottom:.5rem">
       <div class="sidebar-label">Género</div>
-      <button class="g-btn active" data-g="" id="gb-all">
-        <span class="g-dot" style="background:var(--text3)"></span>
-        Todos
-        <span class="g-count" id="gc-all">—</span>
-      </button>
-      <button class="g-btn" data-g="f" id="gb-f">
-        <span class="g-dot" style="background:var(--female)"></span>
-        Mujeres
-        <span class="g-count" id="gc-f">—</span>
-      </button>
-      <button class="g-btn" data-g="m" id="gb-m">
-        <span class="g-dot" style="background:var(--male)"></span>
-        Hombres
-        <span class="g-count" id="gc-m">—</span>
-      </button>
-      <button class="g-btn" data-g="c" id="gb-c">
-        <span class="g-dot" style="background:var(--couple)"></span>
-        Parejas
-        <span class="g-count" id="gc-c">—</span>
-      </button>
-      <button class="g-btn" data-g="t" id="gb-t">
-        <span class="g-dot" style="background:var(--trans)"></span>
-        Trans
-        <span class="g-count" id="gc-t">—</span>
-      </button>
+      <div class="gtab-strip">
+        <button class="gtab active" data-g="" id="gb-all">Todos<span class="gtab-count" id="gc-all"></span></button>
+        <button class="gtab" data-g="f" id="gb-f">Mujeres<span class="gtab-count" id="gc-f"></span></button>
+        <button class="gtab" data-g="m" id="gb-m">Hombres<span class="gtab-count" id="gc-m"></span></button>
+        <button class="gtab" data-g="c" id="gb-c">Parejas<span class="gtab-count" id="gc-c"></span></button>
+        <button class="gtab" data-g="t" id="gb-t">Trans<span class="gtab-count" id="gc-t"></span></button>
+      </div>
     </div>
 
     <div class="sidebar-divider"></div>
 
     <div class="sidebar-section">
       <div class="sidebar-label">Filtros</div>
-      <button class="g-btn" id="sb-co">
-        <span style="font-size:.8rem">🇨🇴</span>
-        Colombia
-        <span class="g-count" id="gc-co">—</span>
-      </button>
       <button class="g-btn" id="sb-fv">
         <span style="font-size:.75rem;color:var(--female)">♥</span>
         Favoritas
@@ -810,6 +826,26 @@ header{
         Solo HD
         <span class="g-count" id="gc-hd">—</span>
       </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">País</div>
+      <div id="country-filter-list" style="display:flex;flex-direction:column;gap:3px;margin-top:.25rem"></div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Edad</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.25rem">
+        <span class="tag-filter-pill" id="age-18" onclick="setAgeFilter('18-21')">18–21</span>
+        <span class="tag-filter-pill" id="age-22" onclick="setAgeFilter('22-25')">22–25</span>
+        <span class="tag-filter-pill" id="age-26" onclick="setAgeFilter('26-30')">26–30</span>
+        <span class="tag-filter-pill" id="age-31" onclick="setAgeFilter('31-40')">31–40</span>
+        <span class="tag-filter-pill" id="age-40" onclick="setAgeFilter('40+')">40+</span>
+      </div>
     </div>
 
     <div class="sidebar-divider"></div>
@@ -1090,7 +1126,7 @@ header{
 const API_ENDPOINT = '/api/rooms';
 
 let rooms=[], favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
-let gender='', onlyCol=false, onlyFavs=false, onlyHD=false, activeTag='';
+let gender='', onlyCol=false, onlyFavs=false, onlyHD=false, activeTag='', activeCountry='', ageRange='';
 let sort='viewers', view='grid', maxV=1, active=null;
 
 const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n);
@@ -1230,11 +1266,16 @@ function getFiltered() {
   // Las destacadas siempre pasan todos los filtros
   const isFeatured = x => FEATURED.includes(x.username);
   if(gender) r=r.filter(x=>isFeatured(x)||x.gender===gender);
-  if(onlyCol) r=r.filter(x=>isFeatured(x)||x.country==='CO');
+  if(onlyCol) r=r.filter(x=>isFeatured(x)||x.country==='CO'); // legacy
   if(onlyFavs) r=r.filter(x=>isFeatured(x)||favs.includes(x.username));
   if(onlyHD) r=r.filter(x=>isFeatured(x)||x.is_hd);
   if(q) r=r.filter(x=>isFeatured(x)||(x.username||'').toLowerCase().includes(q)||(x.display_name||'').toLowerCase().includes(q));
   if(activeTag) r=r.filter(x=>isFeatured(x)||(x.tags||[]).map(t=>String(t).toLowerCase()).includes(activeTag));
+  if(activeCountry) r=r.filter(x=>isFeatured(x)||(x.country||'')=== activeCountry);
+  if(ageRange){
+    const [lo,hi]=ageRange==='40+'?[40,99]:ageRange.split('-').map(Number);
+    r=r.filter(x=>isFeatured(x)||(x.age&&x.age>=lo&&x.age<=hi));
+  }
   r.sort((a,b)=>{
     if(sort==='viewers') return (b.num_users||0)-(a.num_users||0);
     if(sort==='followers') return (b.num_followers||0)-(a.num_followers||0);
@@ -1267,7 +1308,7 @@ function updateAll() {
   document.getElementById('gc-m').textContent=fmt(counts.m);
   document.getElementById('gc-c').textContent=fmt(counts.c);
   document.getElementById('gc-t').textContent=fmt(counts.t);
-  document.getElementById('gc-co').textContent=fmt(co);
+  // gc-co removed
   document.getElementById('gc-fv').textContent=favs.length;
   document.getElementById('gc-hd').textContent=fmt(hd);
 
@@ -1277,6 +1318,7 @@ function updateAll() {
     `<div class="dist-seg" style="flex:${n};background:${colors[g]}"></div>`).join('');
 
   updateTagFilter();
+  updateCountryFilter();
   render();
 }
 
@@ -1298,6 +1340,39 @@ function setTagFilter(tag) {
   activeTag = activeTag === tag ? '' : tag;
   updateTagFilter();
   render();
+}
+
+function setCountryFilter(code) {
+  activeCountry = activeCountry === code ? '' : code;
+  updateCountryFilter();
+  render();
+}
+
+function setAgeFilter(range) {
+  ageRange = ageRange === range ? '' : range;
+  // update age pills
+  ['18-21','22-25','26-30','31-40','40+'].forEach(r => {
+    const el = document.getElementById('age-'+r.split('-')[0]);
+    if(el) el.classList.toggle('active', ageRange === r);
+  });
+  render();
+}
+
+function updateCountryFilter() {
+  const FLAGS = {US:'🇺🇸',CO:'🇨🇴',MX:'🇲🇽',BR:'🇧🇷',RO:'🇷🇴',DE:'🇩🇪',ES:'🇪🇸',RU:'🇷🇺',PL:'🇵🇱',CZ:'🇨🇿',HU:'🇭🇺',UA:'🇺🇦',IT:'🇮🇹',FR:'🇫🇷',GB:'🇬🇧',AR:'🇦🇷',CA:'🇨🇦',AU:'🇦🇺',NL:'🇳🇱',SE:'🇸🇪',VE:'🇻🇪',PE:'🇵🇪',PH:'🇵🇭',TH:'🇹🇭'};
+  const counts = {};
+  rooms.forEach(r => { if(r.country) counts[r.country]=(counts[r.country]||0)+1; });
+  const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const el = document.getElementById('country-filter-list');
+  if(!el) return;
+  el.innerHTML = top.map(([code,cnt])=>`
+    <button class="g-btn${activeCountry===code?' active':''}" onclick="setCountryFilter('${code}')" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:.8rem">${FLAGS[code]||'🌐'}</span>
+        <span>${code}</span>
+      </span>
+      <span class="g-count">${cnt}</span>
+    </button>`).join('');
 }
 
 function render() {
@@ -1513,7 +1588,7 @@ document.querySelectorAll('[data-g]').forEach(b=>{
   b.addEventListener('click',()=>{
     gender=b.dataset.g;
     // sidebar
-    document.querySelectorAll('.g-btn[data-g]').forEach(x=>{
+    document.querySelectorAll('.gtab[data-g]').forEach(x=>{
       x.classList.toggle('active',x.dataset.g===gender);
     });
     // mobile
@@ -1536,10 +1611,10 @@ function setupToggle(btnId, varSetter, chip=false){
   });
 }
 
-document.getElementById('sb-co').addEventListener('click',function(){onlyCol=!onlyCol;this.classList.toggle('active');render()});
+// sb-co removed — replaced by dynamic country filter
 document.getElementById('sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active');render()});
 document.getElementById('sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active');render()});
-document.getElementById('tb-co').addEventListener('click',function(){onlyCol=!onlyCol;this.classList.toggle('on-co');render()});
+document.getElementById('tb-co').addEventListener('click',function(){setCountryFilter('CO');this.classList.toggle('on-co');});
 document.getElementById('tb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('on-fv');render()});
 document.getElementById('tb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('on');render()});
 
