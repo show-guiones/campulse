@@ -1559,14 +1559,15 @@ async function loadModelReport(room) {
     [gls[room.gender]||'', room.country||'', room.age?room.age+'a':''].filter(Boolean).join(' · ');
   document.getElementById('rp-link').href = `https://chaturbate.com/in/?tour=Jrvi&campaign=rI8z3&track=default&room=${u}`;
 
-  // Estado online
-  const isOnline = rooms.find(r => r.username === u);
+  // Estado online — solo si tiene viewers reales (no es objeto forzado sin viewers)
+  const roomData = rooms.find(r => r.username === u);
+  const isOnline = roomData && !roomData._forced && (roomData.num_users || 0) > 0;
   document.getElementById('rp-status-dot').style.background = isOnline ? 'var(--green)' : 'var(--text3)';
   document.getElementById('rp-status-txt').textContent = isOnline ? 'Online ahora' : 'Offline';
 
-  // KPIs
-  document.getElementById('rp-viewers').textContent = fmt(room.num_users||0);
-  document.getElementById('rp-followers').textContent = fmt(room.num_followers||0);
+  // KPIs — si es objeto forzado (offline) mostrar guión en lugar de 0
+  document.getElementById('rp-viewers').textContent = room._forced ? '—' : fmt(room.num_users||0);
+  document.getElementById('rp-followers').textContent = (room._forced && !room.num_followers) ? '—' : fmt(room.num_followers||0);
 
   // Ranking viewers actuales
   if (rooms.length) {
