@@ -1069,26 +1069,36 @@ async function fetchRoom(username) {
     } catch(e) { break; }
   }
 
-  // Estrategia 2: construir objeto mínimo con la imagen pública (siempre funciona)
-  console.log('[CAMPULSE] fetchRoom no encontró a', username, '— usando perfil público');
-  const thumbUrl = 'https://roomimg.stream.highwebmedia.com/ri/'+username+'.jpg';
-  // Verificar si está online consultando su thumbnail (si carga = online)
+  // Estrategia 2: obtener datos reales del perfil desde la API de Chaturbate
+  // La imagen del perfil usa esta URL estática que siempre funciona
+  try {
+    const profileRes = await fetch('https://api.allorigins.win/raw?url='+
+      encodeURIComponent('https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=1000&offset=0'));
+    const profileData = await profileRes.json();
+    // Buscar en lista extendida
+    const found = (profileData.results||[]).find(r => r.username === username);
+    if (found) return found;
+  } catch(e) {}
+
+  // Estrategia 3: objeto mínimo con imagen de perfil estática de Chaturbate
+  // Chaturbate guarda fotos en thumb.live.mmcdn.com con el formato:
+  // https://thumb.live.mmcdn.com/ri/{username}.jpg  (online)
+  // https://thumb.live.mmcdn.com/riw/{username}.jpg (perfil)
   return {
-    username:     username,
-    display_name: username,
-    gender:       'f',
-    country:      '',
-    num_users:    0,
+    username:      username,
+    display_name:  username,
+    gender:        'f',
+    country:       '',
+    num_users:     0,
     num_followers: 0,
-    age:          null,
-    is_hd:        false,
-    is_new:       false,
-    current_show: 'public',
-    tags:         [],
+    age:           null,
+    is_hd:         false,
+    is_new:        false,
+    current_show:  'offline',
+    tags:          [],
     seconds_online: 0,
-    image_url:    thumbUrl,
-    room_url:     'https://chaturbate.com/'+username+'/',
-    _forced:      true  // marcador de que fue inyectada manualmente
+    image_url:     'https://thumb.live.mmcdn.com/riw/'+username+'.jpg',
+    _forced:       true
   };
 }
 
@@ -1236,7 +1246,17 @@ function renderGrid(r) {
     const fv=favs.includes(x.username);
     const img=x.image_url
       ?`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}"
-          onerror="this.outerHTML='<div class=card-img style=background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)>👤</div>'">`
+          onerror="
+            const u='${x.username}';
+            const srcs=[
+              'https://thumb.live.mmcdn.com/riw/'+u+'.jpg',
+              'https://thumb.live.mmcdn.com/ri/'+u+'.jpg',
+              'https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'
+            ];
+            const tried=parseInt(this.dataset.tried||0);
+            if(tried<srcs.length){this.dataset.tried=tried+1;this.src=srcs[tried];}
+            else{this.outerHTML='<div class=card-img style=background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)>👤</div>';}
+          ">`
       :`<div class="card-img" style="background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)">👤</div>`;
     return `<div class="card" onclick="openMod('${x.username}')">
       <div class="card-img-box">
