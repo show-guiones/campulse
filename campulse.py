@@ -1,9 +1,13 @@
+import os
 import requests
 from datetime import datetime
 
 CHATURBATE_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=500"
-SUPABASE_URL = "https://upwjwuikaxuelczlrewk.supabase.co"
-SUPABASE_KEY = "sb_secret_UE20hu_rXvq0vPLNfeAM-A_799VJ2tJ"
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("Faltan variables de entorno: SUPABASE_URL y SUPABASE_KEY son requeridas")
 
 def get_rooms():
     print("[" + str(datetime.now()) + "] Llamando a Chaturbate API...")
