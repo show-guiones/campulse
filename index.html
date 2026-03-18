@@ -484,9 +484,7 @@ tr{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-const AFF = 'rI8z3';
-const CB_URL = `https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=${AFF}&client_ip=request_ip&format=json&limit=500`;
-const PROXY = 'https://corsproxy.io/?url=';
+// Proxy propio via Vercel Edge Function
 
 let rooms=[], favs=JSON.parse(localStorage.getItem('cp2_favs')||'[]');
 let gender='', country='', onlyFavs=false, onlyHD=false;
@@ -506,7 +504,7 @@ async function load() {
   btn.classList.add('spin');
   skeleton();
   try {
-    const res = await fetch(PROXY + encodeURIComponent(CB_URL));
+    const res = await fetch(API_ENDPOINT);
     const data = await res.json();
     rooms = data.results||[];
     maxV = Math.max(...rooms.map(r=>r.num_users||0),1);
