@@ -6,416 +6,498 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#08060f">
-<title>CampulseHub — Live Cam Stats</title>
+<meta name="theme-color" content="#0a0010">
+<!-- SEO / Traffic metrics para APIs -->
+<meta name="description" content="CampulseHub — Rankings en vivo, stats y top modelos de webcam. Descubre quién está en vivo ahora.">
+<meta property="og:title" content="CampulseHub — Live Cam Rankings">
+<meta property="og:description" content="Top modelos en vivo, viewers en tiempo real, rankings y estadísticas.">
+<meta property="og:type" content="website">
+<meta name="robots" content="index, follow">
+<title>CampulseHub — Top Modelos en Vivo | Live Cam Rankings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ══════════════════════════════════════════
+   TOKENS DE DISEÑO — PALETA DOPAMINA
+   Rojo/naranja = urgencia, escasez, acción
+   Rosa/magenta = deseo, atracción
+   Verde = recompensa, logro, online
+   Dorado = estatus, exclusividad, premium
+   Fondo ultra-oscuro = túnel de atención
+══════════════════════════════════════════ */
 :root {
-  --bg:        #08060f;
-  --bg2:       #0e0b1a;
-  --surface:   #120f20;
-  --surface2:  #1a1628;
-  --surface3:  #231d35;
-  --border:    rgba(255,255,255,.06);
-  --border2:   rgba(255,255,255,.11);
-  --text:      #f0ecff;
-  --text2:     #9189b3;
-  --text3:     #4e4668;
-  --gold:      #f0c060;
-  --gold2:     #ffdc8a;
-  --rose:      #ff5fa0;
-  --violet:    #9b72ff;
-  --violet2:   #c4a8ff;
-  --cyan:      #4ddfce;
-  --green:     #3dfca0;
-  --red:       #ff4d6d;
-  --amber:     #ffaa40;
-  --female:    #ff6eb8;
-  --male:      #6eb4ff;
-  --couple:    #b89bff;
-  --trans:     #6effd5;
-  --r10:       10px;
-  --r14:       14px;
-  --r18:       18px;
-  --r24:       24px;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--text);
-  font-family:'DM Sans',sans-serif;font-size:14px;
-  min-height:100vh;overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
+  --bg:        #0a0010;
+  --bg2:       #0f000a;
+  --surface:   #160020;
+  --surface2:  #1e0530;
+  --surface3:  #2a0a40;
+  --border:    rgba(255,255,255,.055);
+  --border2:   rgba(255,100,200,.15);
+
+  --text:      #fff0f8;
+  --text2:     #b89ac8;
+  --text3:     #6a5580;
+
+  /* Dopamina primarios */
+  --hot:       #ff2d55;   /* rojo-rosa — urgencia */
+  --hot2:      #ff6080;
+  --fire:      #ff6b00;   /* naranja — acción */
+  --fire2:     #ffaa40;
+  --gold:      #ffd700;   /* dorado — exclusividad */
+  --gold2:     #ffe566;
+  --neon:      #ff3cac;   /* magenta neon — atracción */
+  --neon2:     #ff80cc;
+  --violet:    #9b30ff;   /* violeta — marca */
+  --violet2:   #c87eff;
+  --green:     #00ff88;   /* verde — online/reward */
+  --green2:    #00cc66;
+  --cyan:      #00e5ff;
+
+  /* Géneros */
+  --female:    #ff3cac;
+  --male:      #3cb0ff;
+  --couple:    #c87eff;
+  --trans:     #00ffcc;
+
+  --r8:8px; --r12:12px; --r16:16px; --r20:20px; --r24:24px;
 }
 
-/* ─── SCROLLBAR ─── */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;
+  min-height:100vh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+}
+
+/* Radial ambient glow — foco visual */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255,45,85,.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 30% at 80% 110%, rgba(155,48,255,.1) 0%, transparent 60%);
+}
+
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
 
-/* ─── NOISE TEXTURE ─── */
-body::before{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity:.6;
-}
-
-/* ─── HEADER ─── */
+/* ══ HEADER ══ */
 header{
-  position:sticky;top:0;z-index:300;
-  height:54px;padding:0 1rem 0 .85rem;
+  position:sticky;top:0;z-index:400;
+  height:52px;padding:0 .9rem;
   display:flex;align-items:center;justify-content:space-between;
-  background:rgba(8,6,15,.88);
-  border-bottom:1px solid rgba(155,114,255,.12);
-  backdrop-filter:blur(24px) saturate(1.6);
-  -webkit-backdrop-filter:blur(24px) saturate(1.6);
+  background:rgba(10,0,16,.92);
+  border-bottom:1px solid rgba(255,45,85,.12);
+  backdrop-filter:blur(28px) saturate(1.8);
+  -webkit-backdrop-filter:blur(28px) saturate(1.8);
+  position:relative;z-index:400;
 }
-.logo{
-  display:flex;align-items:center;gap:9px;
-  text-decoration:none;
-}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
 .logo-mark{
-  width:30px;height:30px;border-radius:9px;flex-shrink:0;
-  background:linear-gradient(135deg,#9b72ff 0%,#ff6eb8 100%);
+  width:28px;height:28px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--hot) 0%,var(--neon) 50%,var(--violet) 100%);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 16px rgba(155,114,255,.45);
+  box-shadow:0 0 14px rgba(255,45,85,.5),0 0 28px rgba(255,45,85,.2);
   position:relative;overflow:hidden;
 }
-.logo-mark::after{
+.logo-mark::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,transparent 60%);
+  background:linear-gradient(135deg,rgba(255,255,255,.25) 0%,transparent 55%);
 }
-.logo-mark svg{width:16px;height:16px;fill:#fff;position:relative;z-index:1}
+.logo-mark svg{width:15px;height:15px;fill:#fff;position:relative;z-index:1}
 .logo-text{
-  font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;
-  letter-spacing:.06em;color:var(--text);
+  font-family:'Syne',sans-serif;font-size:.76rem;font-weight:800;
+  letter-spacing:.04em;color:var(--text);
 }
-.logo-text span{color:var(--violet2)}
+.logo-text em{font-style:normal;color:var(--neon2)}
 
-.live-badge{
+.live-pill{
   display:flex;align-items:center;gap:5px;
-  background:rgba(61,252,160,.08);border:1px solid rgba(61,252,160,.18);
-  padding:3px 9px;border-radius:20px;
-  font-family:'DM Sans',monospace;font-size:.6rem;font-weight:500;
-  color:var(--green);letter-spacing:.05em;
+  background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);
+  padding:3px 10px 3px 8px;border-radius:20px;
+  font-size:.6rem;font-weight:600;color:var(--green);letter-spacing:.04em;
 }
 .live-dot{
-  width:5px;height:5px;border-radius:50%;background:var(--green);
-  animation:pulse 1.8s ease-in-out infinite;
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px var(--green);
+  animation:livepulse 1.6s ease-in-out infinite;
 }
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
-.hdr-right{display:flex;align-items:center;gap:.5rem}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
 
-.icon-btn{
-  width:34px;height:34px;border-radius:9px;
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text2);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;
-}
-.icon-btn svg{width:15px;height:15px}
-.icon-btn:hover{color:var(--text);border-color:var(--border2)}
-.icon-btn.spin svg{animation:rot .7s linear infinite}
-@keyframes rot{to{transform:rotate(360deg)}}
-
-.nav-pills{
+.hdr-r{display:flex;align-items:center;gap:.4rem}
+.nav-tabs{
   display:flex;gap:2px;background:var(--surface2);
   border:1px solid var(--border);border-radius:10px;padding:3px;
 }
-.np{
+.nt{
   background:none;border:none;color:var(--text3);
-  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:500;
-  padding:.3rem .65rem;border-radius:8px;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.68rem;font-weight:600;
+  padding:.28rem .65rem;border-radius:8px;cursor:pointer;
   transition:all .15s;display:flex;align-items:center;gap:4px;white-space:nowrap;
 }
-.np svg{width:12px;height:12px}
-.np:hover{color:var(--text2)}
-.np.active{background:var(--surface3);color:var(--text)}
+.nt svg{width:12px;height:12px;flex-shrink:0}
+.nt:hover{color:var(--text2)}
+.nt.active{
+  background:linear-gradient(135deg,var(--hot),var(--neon));
+  color:#fff;box-shadow:0 2px 10px rgba(255,45,85,.35);
+}
+.icon-btn{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.icon-btn svg{width:14px;height:14px}
+.icon-btn:hover{color:var(--text);border-color:rgba(255,45,85,.3)}
+.icon-btn.spin svg{animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
 
-/* ─── PAGE ─── */
-.page{display:flex;height:calc(100vh - 54px)}
+/* ══ PÁGINA ══ */
+.page{display:flex;height:calc(100vh - 52px)}
 
-/* ─── SIDEBAR (Desktop) ─── */
+/* ══ SIDEBAR ══ */
 .sidebar{
-  width:210px;min-width:210px;
+  width:200px;min-width:200px;
   background:var(--bg2);
   border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  overflow-y:auto;
+  display:flex;flex-direction:column;overflow-y:auto;
 }
-.sb-section{padding:1.1rem .85rem .65rem}
-.sb-label{
+.sb-sec{padding:1rem .8rem .6rem}
+.sb-lbl{
   font-family:'Syne',sans-serif;
-  font-size:.56rem;font-weight:700;color:var(--text3);
-  text-transform:uppercase;letter-spacing:.15em;
-  margin-bottom:.55rem;padding:0 .2rem;
+  font-size:.55rem;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.16em;
+  margin-bottom:.5rem;padding:0 .2rem;
 }
-.sb-divider{height:1px;background:var(--border);margin:.2rem .85rem}
+.sb-div{height:1px;background:var(--border);margin:.15rem .8rem}
 
-/* Gender tabs in sidebar */
 .gtab-strip{display:flex;flex-direction:column;gap:1px}
 .gtab{
   display:flex;align-items:center;justify-content:space-between;
   width:100%;background:none;border:none;border-left:2px solid transparent;
-  color:var(--text3);font-family:'DM Sans',sans-serif;
-  font-size:.76rem;font-weight:400;
-  padding:.38rem .55rem .38rem .7rem;
-  cursor:pointer;transition:all .12s;text-align:left;
-  border-radius:0 7px 7px 0;
+  color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:.74rem;font-weight:500;
+  padding:.36rem .5rem .36rem .65rem;
+  cursor:pointer;transition:all .12s;text-align:left;border-radius:0 6px 6px 0;
 }
 .gtab:hover{color:var(--text2);background:rgba(255,255,255,.03)}
-.gtab.active{color:var(--text);font-weight:600;border-left-color:var(--violet);background:rgba(155,114,255,.08)}
-.gtab-count{font-family:'DM Sans',monospace;font-size:.6rem;color:var(--text3);font-variant-numeric:tabular-nums}
-.gtab.active .gtab-count{color:var(--text2)}
+.gtab.active{color:var(--text);font-weight:700;border-left-color:var(--hot);background:rgba(255,45,85,.07)}
+.gtab-cnt{font-size:.58rem;color:var(--text3);font-variant-numeric:tabular-nums}
+.gtab.active .gtab-cnt{color:var(--text2)}
 
 .g-btn{
-  display:flex;align-items:center;gap:.55rem;
+  display:flex;align-items:center;gap:.5rem;
   width:100%;background:none;border:none;
-  color:var(--text2);font-family:'DM Sans',sans-serif;
-  font-size:.76rem;font-weight:400;
-  padding:.45rem .55rem;border-radius:8px;
-  cursor:pointer;transition:all .15s;
+  color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:.74rem;font-weight:500;
+  padding:.42rem .5rem;border-radius:7px;cursor:pointer;transition:all .15s;
 }
 .g-btn:hover{background:var(--surface);color:var(--text)}
 .g-btn.active{background:var(--surface2);color:var(--text)}
-.g-count{margin-left:auto;font-size:.62rem;color:var(--text3);font-variant-numeric:tabular-nums}
-.g-btn.active .g-count{color:var(--text2)}
+.g-cnt{margin-left:auto;font-size:.6rem;color:var(--text3);font-variant-numeric:tabular-nums}
+.g-btn.active .g-cnt{color:var(--text2)}
 
-.mini-stats{padding:.7rem .85rem 1rem}
-.mini-stat{display:flex;justify-content:space-between;align-items:center;padding:.35rem .2rem}
-.mini-stat-lbl{font-size:.68rem;color:var(--text3)}
-.mini-stat-val{font-size:.75rem;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
-.dist-bar{margin:.2rem 1.05rem 0;height:3px;border-radius:2px;display:flex;gap:2px;overflow:hidden}
+/* Mini stats sidebar */
+.mini-stats{padding:.65rem .8rem .9rem}
+.mini-stat{display:flex;justify-content:space-between;align-items:center;padding:.32rem .2rem}
+.mini-stat-l{font-size:.67rem;color:var(--text3)}
+.mini-stat-v{font-size:.73rem;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+.dist-bar{margin:.2rem 1rem 0;height:3px;border-radius:2px;display:flex;gap:2px;overflow:hidden}
 .dist-seg{border-radius:2px;transition:width .7s ease}
 
-.tag-filter-pill{
-  font-size:.64rem;color:var(--text2);
-  background:rgba(255,255,255,.05);border:1px solid transparent;
-  border-radius:6px;padding:3px 8px;cursor:pointer;transition:all .15s;line-height:1.5;
+.tag-pill{
+  font-size:.62rem;color:var(--text2);
+  background:rgba(255,255,255,.04);border:1px solid transparent;
+  border-radius:6px;padding:3px 7px;cursor:pointer;transition:all .14s;line-height:1.5;
 }
-.tag-filter-pill:hover{background:rgba(255,255,255,.1)}
-.tag-filter-pill.active{background:var(--violet);color:#fff;border-color:var(--violet)}
+.tag-pill:hover{background:rgba(255,255,255,.09)}
+.tag-pill.active{background:var(--hot);color:#fff;border-color:var(--hot)}
 
-/* ─── CONTENT ─── */
-.content{flex:1;overflow-y:auto;display:flex;flex-direction:column;position:relative}
+/* ══ CONTENT ══ */
+.content{flex:1;overflow-y:auto;display:flex;flex-direction:column;position:relative;z-index:1}
 
-/* ─── HOT ZONE — TOP MODELS STRIP ─── */
+/* ══ HOT ZONE ══ */
 .hot-zone{
-  background:linear-gradient(180deg,rgba(155,114,255,.1) 0%,rgba(8,6,15,0) 100%);
-  border-bottom:1px solid rgba(155,114,255,.12);
-  padding:.85rem .9rem .7rem;
-  position:sticky;top:0;z-index:100;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  background-color:rgba(8,6,15,.92);
+  padding:.75rem .9rem .65rem;
+  background:linear-gradient(180deg,rgba(255,45,85,.08) 0%,rgba(10,0,16,0) 100%);
+  border-bottom:1px solid rgba(255,45,85,.1);
+  position:relative;
 }
-
 .hz-head{
   display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:.6rem;
+  margin-bottom:.55rem;
 }
 .hz-title{
   display:flex;align-items:center;gap:6px;
-  font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
-  color:var(--gold);letter-spacing:.05em;text-transform:uppercase;
+  font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;
+  color:var(--gold);letter-spacing:.03em;text-transform:uppercase;
 }
-.hz-title-icon{font-size:.8rem}
-.hz-count{font-size:.58rem;color:var(--text3);font-family:'DM Sans',monospace}
+.hz-sub{font-size:.58rem;color:var(--text3)}
+.hz-viewers-total{
+  font-size:.62rem;color:var(--hot2);font-weight:600;
+  background:rgba(255,45,85,.1);border:1px solid rgba(255,45,85,.2);
+  padding:2px 8px;border-radius:20px;
+}
 
+/* Scroll hint: última card cortada a la mitad */
 .hz-scroll{
-  display:flex;gap:.55rem;overflow-x:auto;
+  display:flex;gap:.5rem;
+  overflow-x:auto;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  padding-bottom:2px;
+  /* Padding right = que la última card siempre se vea cortada */
+  padding-right:.5rem;
+  padding-bottom:3px;
+  /* Mask para que se desvanezca al borde derecho */
+  -webkit-mask-image:linear-gradient(to right,black 70%,transparent 100%);
+  mask-image:linear-gradient(to right,black 70%,transparent 100%);
 }
 .hz-scroll::-webkit-scrollbar{display:none}
 
+/* ── Hz CARD ── */
 .hz-card{
-  flex-shrink:0;width:72px;cursor:pointer;
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink:0;
+  width:76px; /* ancho fijo — el último visible se corta */
+  cursor:pointer;
   position:relative;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
 }
-.hz-card:hover{transform:translateY(-3px) scale(1.03)}
-.hz-card:active{transform:scale(.97)}
+.hz-card:hover{transform:translateY(-4px) scale(1.04)}
+.hz-card:active{transform:scale(.96)}
 
 .hz-img-wrap{
-  position:relative;width:72px;height:96px;
-  border-radius:var(--r14);overflow:hidden;
-  border:1.5px solid rgba(155,114,255,.25);
-  box-shadow:0 4px 18px rgba(0,0,0,.5);
+  position:relative;width:76px;height:102px;
+  border-radius:var(--r16);overflow:hidden;
+  background:var(--surface2);
+  border:1.5px solid rgba(255,45,85,.2);
+  box-shadow:0 6px 20px rgba(0,0,0,.6);
 }
+/* Rank 1 → borde dorado brillante */
+.hz-card[data-rank="1"] .hz-img-wrap{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold),0 6px 24px rgba(255,215,0,.3);
+}
+.hz-card[data-rank="2"] .hz-img-wrap{border-color:#c0c8d0;box-shadow:0 0 0 1px #c0c8d0,0 4px 14px rgba(0,0,0,.5)}
+.hz-card[data-rank="3"] .hz-img-wrap{border-color:#cd7f32;box-shadow:0 0 0 1px #cd7f32,0 4px 14px rgba(0,0,0,.5)}
+
 .hz-img{width:100%;height:100%;object-fit:cover;display:block}
-.hz-rank{
-  position:absolute;top:4px;left:4px;
-  background:rgba(8,6,15,.85);
-  backdrop-filter:blur(4px);
-  border-radius:6px;padding:1px 5px;
-  font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;
-  color:var(--gold);
+
+/* Placeholder offline */
+.hz-placeholder{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--surface2),var(--surface3));
+  color:var(--text3);gap:4px;
 }
-.hz-rank-1{
-  background:linear-gradient(135deg,rgba(240,192,96,.25),rgba(240,192,96,.1));
-  border:1px solid rgba(240,192,96,.4);
+.hz-placeholder-icon{font-size:1.6rem;opacity:.5}
+.hz-placeholder-txt{font-size:.48rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+
+.hz-rank-badge{
+  position:absolute;top:5px;left:5px;
+  font-family:'Syne',sans-serif;font-size:.52rem;font-weight:800;
+  padding:2px 5px;border-radius:5px;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--text2);letter-spacing:.04em;
 }
-.hz-rank-2{
-  background:rgba(8,6,15,.85);border:1px solid rgba(200,200,200,.3);
-  color:#ccc;
-}
-.hz-rank-3{
-  background:rgba(8,6,15,.85);border:1px solid rgba(205,127,50,.3);
-  color:#cd7f32;
-}
-.hz-vw-badge{
-  position:absolute;bottom:4px;left:0;right:0;
-  display:flex;justify-content:center;
+.hz-card[data-rank="1"] .hz-rank-badge{background:rgba(255,215,0,.2);border-color:var(--gold);color:var(--gold)}
+.hz-card[data-rank="2"] .hz-rank-badge{color:#c0c8d0;border-color:#c0c8d0}
+.hz-card[data-rank="3"] .hz-rank-badge{color:#cd7f32;border-color:#cd7f32}
+
+.hz-crown{
+  position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  font-size:.85rem;filter:drop-shadow(0 0 5px var(--gold));
 }
 .hz-vw{
-  background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
+  position:absolute;bottom:4px;inset-x:0;
+  display:flex;justify-content:center;
+}
+.hz-vw-inner{
+  background:rgba(0,0,0,.78);backdrop-filter:blur(4px);
   border-radius:10px;padding:2px 6px;
   display:flex;align-items:center;gap:3px;
-  font-size:.54rem;color:#fff;font-weight:500;
+  font-size:.54rem;color:#fff;font-weight:600;
 }
-.hz-vw-dot{width:4px;height:4px;border-radius:50%;background:var(--green)}
-.hz-crown{
-  position:absolute;top:-7px;left:50%;transform:translateX(-50%);
-  font-size:.75rem;filter:drop-shadow(0 0 4px var(--gold));
-}
-.hz-name{
-  font-size:.58rem;font-weight:500;color:var(--text2);
-  text-align:center;margin-top:4px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.hz-gender-dot{
-  position:absolute;top:4px;right:4px;
-  width:7px;height:7px;border-radius:50%;
-  border:1.5px solid rgba(8,6,15,.8);
+.hz-vw-dot{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green)}
+.hz-gstrip{height:2px;border-radius:1px;margin-top:2px}
+.hz-name{font-size:.57rem;font-weight:600;color:var(--text2);text-align:center;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Flecha de scroll hint */
+.hz-scroll-hint{
+  position:absolute;right:0;top:50%;transform:translateY(50%);
+  width:24px;height:100%;
+  display:flex;align-items:center;justify-content:flex-end;
+  pointer-events:none;
 }
 
-/* ─── STATS BAR ─── */
+/* ══ STATS BAR ══ */
 .stats-bar{
   display:grid;grid-template-columns:repeat(4,1fr);
   gap:1px;background:var(--border);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
-.sb-stat{
-  background:var(--bg);padding:.7rem .75rem;
+.stat-cell{
+  background:var(--bg);padding:.65rem .8rem;
   display:flex;flex-direction:column;gap:1px;
 }
-.sb-stat-lbl{font-size:.56rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
-.sb-stat-val{font-size:1.15rem;font-weight:700;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
-.sb-stat:nth-child(1) .sb-stat-val{color:var(--text)}
-.sb-stat:nth-child(2) .sb-stat-val{color:var(--violet2)}
-.sb-stat:nth-child(3) .sb-stat-val{color:var(--rose)}
-.sb-stat:nth-child(4) .sb-stat-val{color:var(--cyan)}
-.sb-stat-sub{font-size:.6rem;color:var(--text3)}
+.stat-lbl{font-size:.55rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif}
+.stat-val{font-size:1.1rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;font-family:'Syne',sans-serif}
+.stat-sub{font-size:.58rem;color:var(--text3)}
+.stat-cell:nth-child(1) .stat-val{color:var(--text)}
+.stat-cell:nth-child(2) .stat-val{color:var(--hot)}
+.stat-cell:nth-child(3) .stat-val{color:var(--neon2)}
+.stat-cell:nth-child(4) .stat-val{color:var(--cyan)}
 
-/* ─── FILTER BAR ─── */
+/* ══ FILTER BAR ══ 
+   Diseño: scroll horizontal sin wrap, no tapa cards
+   Los filtros ESTÁN EN LA MISMA LÍNEA que search
+*/
 .filter-bar{
-  padding:.55rem .9rem;
-  display:flex;align-items:center;gap:.4rem;
-  flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+  display:flex;align-items:center;gap:.35rem;
+  padding:.5rem .9rem;
+  overflow-x:auto;scrollbar-width:none;
   border-bottom:1px solid var(--border);
-  background:rgba(8,6,15,.96);
-  position:sticky;top:0;z-index:99;
+  background:rgba(10,0,16,.97);
+  flex-shrink:0;
+  /* sticky relativo al content scroll */
 }
 .filter-bar::-webkit-scrollbar{display:none}
 
-.search-wrap{
+/* Search */
+.srch{
   position:relative;flex-shrink:0;
-  width:100%;min-width:120px;max-width:200px;
 }
-.search-wrap input{
-  width:100%;background:var(--surface);
-  border:1px solid var(--border);border-radius:9px;
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.75rem;
-  padding:.42rem .8rem .42rem 2rem;outline:none;
-  transition:border-color .2s;
+.srch input{
+  width:150px;
+  background:var(--surface);border:1px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.72rem;
+  padding:.4rem .75rem .4rem 1.9rem;outline:none;transition:border-color .2s,width .25s;
 }
-.search-wrap input:focus{border-color:rgba(155,114,255,.5)}
-.search-wrap input::placeholder{color:var(--text3)}
-.search-icon{
-  position:absolute;left:.65rem;top:50%;transform:translateY(-50%);
-  color:var(--text3);pointer-events:none;
-}
-.search-icon svg{width:13px;height:13px}
+.srch input:focus{border-color:rgba(255,45,85,.4);width:190px}
+.srch input::placeholder{color:var(--text3)}
+.srch-ico{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.srch-ico svg{width:12px;height:12px}
 
-.chip{
+/* Divider */
+.fb-div{width:1px;height:20px;background:var(--border);flex-shrink:0}
+
+/* Gender pills — compactos */
+.gf-wrap{display:flex;gap:2px;flex-shrink:0}
+.gf-btn{
+  background:none;border:1px solid var(--border);
+  color:var(--text3);border-radius:7px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.68rem;font-weight:600;
+  padding:.3rem .55rem;cursor:pointer;transition:all .14s;white-space:nowrap;
+}
+.gf-btn:hover{color:var(--text2);border-color:rgba(255,255,255,.15)}
+.gf-btn.on-all{background:rgba(255,45,85,.15);border-color:var(--hot);color:var(--hot2)}
+.gf-btn.on-f{background:rgba(255,60,172,.15);border-color:var(--female);color:var(--female)}
+.gf-btn.on-m{background:rgba(60,176,255,.12);border-color:var(--male);color:var(--male)}
+.gf-btn.on-c{background:rgba(200,126,255,.12);border-color:var(--couple);color:var(--couple)}
+.gf-btn.on-t{background:rgba(0,255,204,.1);border-color:var(--trans);color:var(--trans)}
+
+/* Quick chips */
+.qchip{
   display:flex;align-items:center;gap:3px;flex-shrink:0;
   background:var(--surface);border:1px solid var(--border);
-  color:var(--text3);border-radius:8px;
-  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:500;
-  padding:.38rem .65rem;cursor:pointer;transition:all .15s;white-space:nowrap;
+  color:var(--text3);border-radius:7px;
+  font-size:.68rem;font-weight:600;
+  padding:.3rem .6rem;cursor:pointer;transition:all .14s;white-space:nowrap;
 }
-.chip:hover{color:var(--text2);border-color:var(--border2)}
-.chip.on{
-  background:rgba(155,114,255,.15);border-color:rgba(155,114,255,.4);
-  color:var(--violet2);
-}
-.chip.on-rose{
-  background:rgba(255,95,160,.12);border-color:rgba(255,95,160,.35);color:var(--rose);
-}
-.chip.on-gold{
-  background:rgba(240,192,96,.1);border-color:rgba(240,192,96,.3);color:var(--gold);
-}
+.qchip:hover{color:var(--text2);border-color:rgba(255,255,255,.12)}
+.qchip.on{background:rgba(255,45,85,.15);border-color:var(--hot);color:var(--hot2)}
+.qchip.on-g{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4);color:var(--gold)}
+.qchip.on-v{background:rgba(155,48,255,.15);border-color:var(--violet);color:var(--violet2)}
 
-.sort-select{
+/* Sort */
+.sort-sel{
   background:var(--surface);border:1px solid var(--border);
   border-radius:8px;color:var(--text2);
-  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:500;
-  padding:.38rem .65rem;outline:none;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.68rem;font-weight:600;
+  padding:.3rem .55rem;outline:none;cursor:pointer;
   transition:border-color .2s;flex-shrink:0;
   appearance:none;-webkit-appearance:none;
-  padding-right:1.5rem;
-  background-image:url("data:image/svg+xml,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%234e4668' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right .5rem center;
+  padding-right:1.4rem;
+  background-image:url("data:image/svg+xml,%3Csvg width='9' height='6' viewBox='0 0 9 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4.5 4.5L8 1' stroke='%236a5580' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right .45rem center;
 }
-.sort-select:focus{border-color:rgba(155,114,255,.4)}
+.sort-sel:focus{border-color:rgba(255,45,85,.35)}
 
-.vtog{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:2px;flex-shrink:0}
-.vbtn{background:none;border:none;color:var(--text3);padding:.3rem .45rem;border-radius:7px;cursor:pointer;transition:all .15s;display:flex;align-items:center}
-.vbtn svg{width:14px;height:14px}
+/* View toggle */
+.vtog{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:2px;flex-shrink:0}
+.vbtn{background:none;border:none;color:var(--text3);padding:.28rem .42rem;border-radius:6px;cursor:pointer;transition:all .14s;display:flex;align-items:center}
+.vbtn svg{width:13px;height:13px}
 .vbtn.on{background:var(--surface2);color:var(--text)}
 
-.mob-filter-btn{
-  display:none;align-items:center;gap:4px;flex-shrink:0;
+/* Mobile filter btn */
+.mob-fb{
+  display:none;align-items:center;gap:3px;flex-shrink:0;
   background:var(--surface);border:1px solid var(--border);
-  color:var(--text2);border-radius:8px;
-  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:500;
-  padding:.38rem .65rem;cursor:pointer;transition:all .15s;white-space:nowrap;
+  color:var(--text2);border-radius:7px;
+  font-size:.68rem;font-weight:600;
+  padding:.3rem .6rem;cursor:pointer;white-space:nowrap;
 }
-.mob-filter-btn.has-active{border-color:var(--violet);color:var(--violet2)}
-.mob-filter-btn svg{width:13px;height:13px}
+.mob-fb svg{width:12px;height:12px}
+.mob-fb.active{border-color:var(--hot);color:var(--hot2)}
 
-/* ─── GRID ─── */
-.grid-wrap{padding:.85rem .9rem;flex:1}
+/* ══ GRID ══ */
+.grid-wrap{padding:.8rem .9rem;flex:1}
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
-  gap:.7rem;
+  grid-template-columns:repeat(auto-fill,minmax(145px,1fr));
+  gap:.65rem;
 }
 
 .card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r18);overflow:hidden;cursor:pointer;
-  transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;
+  border-radius:var(--r20);overflow:hidden;cursor:pointer;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),
+             border-color .2s,box-shadow .2s;
   position:relative;
 }
 .card:hover{
-  transform:translateY(-6px) scale(1.015);
-  border-color:rgba(155,114,255,.25);
-  box-shadow:0 20px 50px rgba(0,0,0,.65),0 0 0 1px rgba(155,114,255,.12);
+  transform:translateY(-7px) scale(1.015);
+  border-color:rgba(255,45,85,.3);
+  box-shadow:0 22px 55px rgba(0,0,0,.7),0 0 0 1px rgba(255,45,85,.12),
+             0 0 30px rgba(255,45,85,.08);
 }
-.card:active{transform:translateY(-2px) scale(1)}
+.card:active{transform:translateY(-2px)}
 
 .card-img-box{
   position:relative;overflow:hidden;
   aspect-ratio:3/4;background:var(--surface2);
 }
 .card-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
-.card:hover .card-img{transform:scale(1.08)}
+.card:hover .card-img{transform:scale(1.09)}
 
-/* Gradient overlay at bottom */
+/* Placeholder cuando no hay imagen (offline) */
+.card-placeholder{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--surface2) 0%,var(--surface3) 100%);
+  gap:8px;
+}
+.card-placeholder-avatar{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--surface3);border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;color:var(--text3);
+}
+.card-placeholder-name{font-size:.6rem;color:var(--text3);font-weight:600;letter-spacing:.05em}
+.card-placeholder-status{
+  font-size:.52rem;color:var(--text3);
+  background:rgba(255,255,255,.05);
+  padding:2px 8px;border-radius:10px;
+  display:flex;align-items:center;gap:3px;
+}
+
+/* Gradient sobre imagen */
 .card-grad{
   position:absolute;inset:0;
-  background:linear-gradient(to top, rgba(8,6,15,.9) 0%,rgba(8,6,15,.4) 35%, transparent 65%);
+  background:linear-gradient(to top, rgba(10,0,16,.95) 0%,rgba(10,0,16,.4) 40%, transparent 70%);
   opacity:0;transition:opacity .25s;
 }
 .card:hover .card-grad{opacity:1}
@@ -425,452 +507,436 @@ header{
   display:flex;flex-direction:column;gap:3px;
 }
 .bdg{
-  font-size:.5rem;font-weight:700;font-family:'DM Sans',monospace;
-  padding:2px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.06em;
+  font-size:.48rem;font-weight:800;
+  padding:2px 6px;border-radius:5px;
+  text-transform:uppercase;letter-spacing:.07em;
+  font-family:'Syne',sans-serif;
 }
-.bdg-hd{background:rgba(77,223,206,.9);color:#03221e}
-.bdg-new{background:rgba(61,252,160,.9);color:#022b18}
-.bdg-top{background:linear-gradient(90deg,#f0c060,#ff9d40);color:#1a0900;letter-spacing:.08em}
+.bdg-top{
+  background:linear-gradient(90deg,var(--gold),var(--fire2));
+  color:#1a0800;
+}
+.bdg-hot{
+  background:linear-gradient(90deg,var(--hot),var(--neon));
+  color:#fff;
+  box-shadow:0 2px 8px rgba(255,45,85,.4);
+}
+.bdg-hd{background:rgba(0,229,255,.9);color:#00141a}
+.bdg-new{background:rgba(0,255,136,.9);color:#001a0a}
 
+/* Viewer pill */
 .vw-pill{
   position:absolute;bottom:7px;left:7px;
-  background:rgba(0,0,0,.72);color:#fff;
-  font-size:.58rem;font-weight:500;
-  padding:2px 7px;border-radius:20px;
+  background:rgba(0,0,0,.78);color:#fff;
+  font-size:.57rem;font-weight:700;
+  padding:3px 7px;border-radius:20px;
   display:flex;align-items:center;gap:3px;
   backdrop-filter:blur(6px);
+  font-variant-numeric:tabular-nums;
 }
-.vw-dot{width:4px;height:4px;border-radius:50%;background:var(--green)}
+.vw-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
 
 .fav-btn{
   position:absolute;top:7px;right:7px;
-  width:28px;height:28px;border-radius:50%;
-  background:rgba(0,0,0,.5);border:none;cursor:pointer;
+  width:27px;height:27px;border-radius:50%;
+  background:rgba(0,0,0,.55);border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:transform .2s,background .15s;
-  backdrop-filter:blur(4px);color:rgba(255,255,255,.3);font-size:.72rem;
+  backdrop-filter:blur(4px);color:rgba(255,255,255,.35);font-size:.75rem;
 }
-.fav-btn:hover{transform:scale(1.2);background:rgba(0,0,0,.75)}
-.fav-btn.on{color:var(--rose)}
+.fav-btn:hover{transform:scale(1.25);background:rgba(0,0,0,.8)}
+.fav-btn.on{color:var(--hot);text-shadow:0 0 8px var(--hot)}
 
 /* Gender stripe */
 .g-stripe{height:2px;width:100%}
-.gs-f{background:linear-gradient(90deg,var(--female),rgba(255,110,184,0))}
-.gs-m{background:linear-gradient(90deg,var(--male),rgba(110,180,255,0))}
-.gs-c{background:linear-gradient(90deg,var(--couple),rgba(184,155,255,0))}
-.gs-t{background:linear-gradient(90deg,var(--trans),rgba(110,255,213,0))}
+.gs-f{background:linear-gradient(90deg,var(--female),transparent)}
+.gs-m{background:linear-gradient(90deg,var(--male),transparent)}
+.gs-c{background:linear-gradient(90deg,var(--couple),transparent)}
+.gs-t{background:linear-gradient(90deg,var(--trans),transparent)}
 
-.card-info{padding:.55rem .7rem .7rem}
-.card-name{font-size:.76rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;color:var(--text)}
-.card-meta{font-size:.6rem;color:var(--text3);font-variant-numeric:tabular-nums}
+.card-info{padding:.5rem .65rem .65rem}
+.card-name{font-size:.73rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);margin-bottom:2px}
+.card-meta{font-size:.58rem;color:var(--text3);font-variant-numeric:tabular-nums}
 .card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
-.card-tag{font-size:.56rem;color:var(--text3);background:rgba(255,255,255,.05);border-radius:4px;padding:1px 5px;line-height:1.6}
+.card-tag{font-size:.54rem;color:var(--text3);background:rgba(255,255,255,.05);border-radius:4px;padding:1px 5px;line-height:1.6}
 
-/* ─── LIST VIEW ─── */
-.list-wrap{display:none;flex:1;overflow-x:auto}
+/* ══ LIST ══ */
+.list-wrap{display:none;flex:1}
 .list-wrap.show{display:block}
 .grid-wrap.hide{display:none}
-.list-tbl{width:100%;border-collapse:collapse;min-width:540px}
+.list-tbl{width:100%;border-collapse:collapse;min-width:520px}
 .list-tbl th{
-  text-align:left;font-size:.58rem;font-weight:600;color:var(--text3);
-  text-transform:uppercase;letter-spacing:.09em;
-  padding:.6rem .9rem;border-bottom:1px solid var(--border);
-  position:sticky;top:0;background:var(--bg);cursor:pointer;white-space:nowrap;
-  transition:color .15s;font-family:'Syne',sans-serif;
+  text-align:left;font-size:.56rem;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif;
+  padding:.58rem .9rem;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--bg);cursor:pointer;white-space:nowrap;transition:color .14s;
 }
 .list-tbl th:hover{color:var(--text2)}
-.list-tbl th.sort-active{color:var(--violet2)}
-.list-tbl td{padding:.55rem .9rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.list-tbl th.sa{color:var(--hot2)}
+.list-tbl td{padding:.52rem .9rem;border-bottom:1px solid var(--border);vertical-align:middle}
 .list-tbl tr{cursor:pointer;transition:background .1s}
 .list-tbl tr:hover td{background:var(--surface)}
-.l-av{width:34px;height:34px;border-radius:9px;object-fit:cover;background:var(--surface2);display:block}
-.l-av-ph{width:34px;height:34px;border-radius:9px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--text3)}
-.l-name{font-size:.78rem;font-weight:600;color:var(--text)}
-.l-sub{font-size:.6rem;color:var(--text3);font-variant-numeric:tabular-nums}
-.gpill{font-size:.58rem;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
-.gp-f{background:rgba(255,110,184,.12);color:var(--female)}
-.gp-m{background:rgba(110,180,255,.12);color:var(--male)}
-.gp-c{background:rgba(184,155,255,.12);color:var(--couple)}
-.gp-t{background:rgba(110,255,213,.12);color:var(--trans)}
-.vbar-w{width:70px;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:5px}
-.vbar-f{height:100%;background:var(--violet);border-radius:2px}
+.l-av{width:32px;height:32px;border-radius:8px;object-fit:cover;background:var(--surface2);display:block}
+.l-av-ph{width:32px;height:32px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--text3)}
+.l-name{font-size:.76rem;font-weight:700;color:var(--text)}
+.l-sub{font-size:.58rem;color:var(--text3)}
+.gpill{font-size:.56rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;font-family:'Syne',sans-serif}
+.gp-f{background:rgba(255,60,172,.12);color:var(--female)}
+.gp-m{background:rgba(60,176,255,.1);color:var(--male)}
+.gp-c{background:rgba(200,126,255,.1);color:var(--couple)}
+.gp-t{background:rgba(0,255,204,.08);color:var(--trans)}
+.vbar-w{width:65px;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:5px}
+.vbar-f{height:100%;background:var(--hot);border-radius:2px}
 .mono{font-size:.7rem;color:var(--text2);font-variant-numeric:tabular-nums}
 
-/* ─── EMPTY / SKELETON ─── */
-.empty{
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:4rem 2rem;gap:.7rem;
-  color:var(--text3);text-align:center;grid-column:1/-1;
-}
-.empty-icon{font-size:2.5rem;margin-bottom:.25rem}
+/* ══ EMPTY / SKELETON ══ */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:.7rem;color:var(--text3);text-align:center;grid-column:1/-1}
+.empty-ico{font-size:2.5rem}
 
 @keyframes sh{0%{background:var(--surface)}60%{background:var(--surface2)}100%{background:var(--surface)}}
-.sk{border-radius:var(--r18);overflow:hidden;background:var(--surface);border:1px solid var(--border)}
+.sk{border-radius:var(--r20);overflow:hidden;background:var(--surface);border:1px solid var(--border)}
 .sk-img{aspect-ratio:3/4;animation:sh 1.5s ease infinite}
-.sk-body{padding:.55rem .7rem}
+.sk-body{padding:.5rem .65rem}
 .sk-line{height:8px;border-radius:4px;animation:sh 1.5s ease infinite;margin-bottom:5px}
 
-/* ─── MODAL ─── */
+/* ══ MODAL ══ */
 .modal-bg{
   display:none;position:fixed;inset:0;z-index:1000;
-  background:rgba(4,3,10,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(4,0,10,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   align-items:center;justify-content:center;padding:1rem;
 }
 .modal-bg.open{display:flex}
 .modal{
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--r24);width:100%;max-width:700px;
+  background:var(--surface);border:1px solid rgba(255,45,85,.15);
+  border-radius:var(--r24);width:100%;max-width:680px;
   max-height:92vh;overflow:hidden;position:relative;
-  animation:mIn .24s cubic-bezier(.34,1.56,.64,1);
+  animation:mIn .22s cubic-bezier(.34,1.56,.64,1);
   display:flex;flex-direction:column;
-  box-shadow:0 40px 100px rgba(0,0,0,.8),0 0 0 1px rgba(155,114,255,.1);
+  box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 1px rgba(255,45,85,.1),
+             0 0 60px rgba(255,45,85,.06);
 }
-@keyframes mIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:none}}
-.modal-hero{position:relative;height:260px;overflow:hidden;flex-shrink:0}
+@keyframes mIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}
+.modal-hero{position:relative;height:250px;overflow:hidden;flex-shrink:0}
 .live-preview-wrap{position:relative;width:100%;height:100%;overflow:hidden;background:var(--surface2);cursor:pointer}
 .live-preview-img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .4s ease}
 .live-preview-img.loading{opacity:.4}
+
+/* Modal hero placeholder */
+.modal-hero-placeholder{
+  width:100%;height:100%;
+  background:linear-gradient(160deg,var(--surface2),var(--surface3));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+}
+.mhp-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--surface3);border:2px solid rgba(255,45,85,.2);
+  display:flex;align-items:center;justify-content:center;font-size:2.2rem;
+}
+.mhp-txt{font-size:.75rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.mhp-offline{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.05);padding:4px 12px;border-radius:20px;
+  font-size:.62rem;color:var(--text3);
+}
+
 .live-refresh-badge{
   position:absolute;top:10px;left:10px;
   display:flex;align-items:center;gap:5px;
-  background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
+  background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.1);border-radius:20px;
-  padding:3px 9px;font-size:.58rem;font-weight:600;
-  color:var(--green);letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 9px;font-size:.58rem;font-weight:700;
+  color:var(--green);letter-spacing:.05em;text-transform:uppercase;
 }
-.live-refresh-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.4s ease-in-out infinite}
+.live-refresh-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 1.4s ease infinite}
 .live-refresh-timer{color:rgba(255,255,255,.4);margin-left:2px}
-.live-fullscreen-btn{
+.modal-live-btn{
   position:absolute;bottom:10px;right:10px;
-  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.75);border-radius:8px;
-  padding:5px 9px;cursor:pointer;font-size:.62rem;
-  backdrop-filter:blur(6px);transition:all .15s;
+  background:linear-gradient(135deg,var(--hot),var(--neon));
+  border:none;color:#fff;border-radius:9px;
+  padding:6px 12px;cursor:pointer;font-size:.65rem;font-weight:700;
   display:flex;align-items:center;gap:4px;
+  box-shadow:0 4px 16px rgba(255,45,85,.4);
+  transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;
 }
-.live-fullscreen-btn:hover{background:rgba(0,0,0,.85);color:#fff}
-.live-preview-overlay{
+.modal-live-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,45,85,.5)}
+.live-overlay{
   position:absolute;inset:0;
-  background:rgba(0,0,0,.5);
+  background:rgba(0,0,0,.45);
   display:flex;align-items:center;justify-content:center;
   opacity:0;transition:opacity .2s;pointer-events:none;
 }
-.live-preview-wrap:hover .live-preview-overlay{opacity:1}
-.live-play-icon{
-  width:52px;height:52px;border-radius:50%;
-  background:rgba(155,114,255,.25);border:2px solid rgba(155,114,255,.5);
+.live-preview-wrap:hover .live-overlay{opacity:1}
+.play-circle{
+  width:54px;height:54px;border-radius:50%;
+  background:rgba(255,45,85,.25);border:2px solid rgba(255,45,85,.5);
   display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);
 }
-.live-play-icon svg{width:22px;height:22px;fill:white;margin-left:3px}
+.play-circle svg{width:22px;height:22px;fill:white;margin-left:3px}
+
 .modal-hero-grad{
   position:absolute;inset:0;
   background:linear-gradient(to bottom,transparent 30%,var(--surface) 100%);
 }
 .modal-hero-info{
-  position:absolute;bottom:1.1rem;left:1.4rem;right:1.4rem;
-  display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;
+  position:absolute;bottom:1rem;left:1.3rem;right:1.3rem;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:.75rem;
 }
 .modal-name{
-  font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:700;letter-spacing:-.025em;
-  line-height:1.1;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5);
+  font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.02em;
+  line-height:1.1;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.7);
 }
-.modal-disp{font-size:.75rem;color:rgba(255,255,255,.55);margin-top:2px}
+.modal-sub{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:2px}
 .modal-close{
-  position:absolute;top:.85rem;right:.85rem;z-index:5;
+  position:absolute;top:.8rem;right:.8rem;z-index:5;
   width:30px;height:30px;border-radius:50%;
-  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.7);cursor:pointer;font-size:.8rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;backdrop-filter:blur(6px);
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.7);cursor:pointer;font-size:.78rem;
+  display:flex;align-items:center;justify-content:center;transition:all .14s;backdrop-filter:blur(6px);
 }
-.modal-close:hover{background:rgba(0,0,0,.8);color:#fff}
-.modal-body{padding:0 1.4rem 1.4rem;overflow-y:auto;flex:1}
+.modal-close:hover{background:rgba(255,45,85,.4);color:#fff;border-color:var(--hot)}
+.modal-body{padding:0 1.3rem 1.3rem;overflow-y:auto;flex:1}
 .modal-stats{
   display:grid;grid-template-columns:repeat(4,1fr);
-  gap:1px;background:var(--border);border-radius:12px;
-  overflow:hidden;margin:.45rem 0 1.1rem;
+  gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin:.4rem 0 1rem;
 }
-.ms-cell{background:var(--surface2);padding:.7rem;text-align:center}
-.ms-val{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.ms-lbl{font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-.modal-subject{
-  font-size:.75rem;color:var(--text2);line-height:1.65;
-  padding:.7rem .9rem;background:var(--surface2);
-  border-radius:10px;margin-bottom:.9rem;border:1px solid var(--border);font-style:italic;
-}
-.modal-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.1rem}
-.tag{
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text3);font-size:.6rem;
-  padding:3px 8px;border-radius:20px;transition:all .15s;cursor:default;
-}
-.tag:hover{color:var(--text2);border-color:var(--border2)}
-.modal-actions{display:flex;gap:.55rem}
-.btn-visit{
-  flex:1;background:linear-gradient(135deg,var(--violet),#7c5cff);color:#fff;border:none;
-  border-radius:10px;padding:.7rem 1.1rem;
-  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;
+.ms-cell{background:var(--surface2);padding:.65rem .75rem;text-align:center}
+.ms-val{font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;font-family:'Syne',sans-serif}
+.ms-lbl{font-size:.56rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.modal-subj{font-size:.73rem;color:var(--text2);line-height:1.65;padding:.65rem .85rem;background:var(--surface2);border-radius:9px;margin-bottom:.9rem;border:1px solid var(--border);font-style:italic}
+.modal-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1rem}
+.m-tag{background:var(--surface2);border:1px solid var(--border);color:var(--text3);font-size:.58rem;padding:3px 8px;border-radius:20px;transition:all .14s;cursor:default}
+.m-tag:hover{color:var(--text2);border-color:rgba(255,45,85,.2)}
+.modal-acts{display:flex;gap:.5rem}
+.btn-go{
+  flex:1;background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;
+  border-radius:10px;padding:.68rem 1.1rem;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:700;
   cursor:pointer;text-decoration:none;text-align:center;
   display:flex;align-items:center;justify-content:center;gap:5px;
-  transition:opacity .15s,transform .1s;
-  box-shadow:0 4px 16px rgba(155,114,255,.35);
+  transition:opacity .14s,transform .1s;
+  box-shadow:0 4px 18px rgba(255,45,85,.4);
 }
-.btn-visit:hover{opacity:.9;transform:translateY(-1px)}
-.btn-visit:active{transform:translateY(0)}
-.btn-fav{
+.btn-go:hover{opacity:.9;transform:translateY(-1px)}
+.btn-fav2{
   background:var(--surface2);border:1px solid var(--border);
-  color:var(--text2);border-radius:10px;padding:.7rem 1rem;
-  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;
+  color:var(--text2);border-radius:10px;padding:.68rem 1rem;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:700;
+  cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:4px;
 }
-.btn-fav:hover{border-color:var(--rose);color:var(--rose)}
-.btn-fav.on{background:rgba(255,95,160,.1);border-color:rgba(255,95,160,.35);color:var(--rose)}
+.btn-fav2:hover{border-color:var(--hot);color:var(--hot)}
+.btn-fav2.on{background:rgba(255,45,85,.1);border-color:rgba(255,45,85,.35);color:var(--hot)}
 
-/* ─── TOAST ─── */
+/* ══ TOAST ══ */
 .toast{
-  position:fixed;bottom:1.25rem;left:50%;
+  position:fixed;bottom:1.2rem;left:50%;
   transform:translateX(-50%) translateY(80px);
-  background:var(--surface2);border:1px solid var(--border2);
-  color:var(--text);font-size:.72rem;
-  padding:.55rem 1.1rem;border-radius:24px;z-index:3000;
+  background:var(--surface2);border:1px solid rgba(255,45,85,.2);
+  color:var(--text);font-size:.7rem;font-weight:600;
+  padding:.52rem 1.1rem;border-radius:24px;z-index:3000;
   opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);
   pointer-events:none;white-space:nowrap;
-  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  box-shadow:0 8px 28px rgba(0,0,0,.6);
 }
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* ─── FILTER DRAWER (Mobile) ─── */
-.filter-drawer-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);
-  z-index:400;backdrop-filter:blur(5px);
-}
-.filter-drawer-overlay.open{display:block}
-.filter-drawer{
-  position:fixed;left:0;bottom:0;top:0;
-  width:270px;max-width:85vw;
+/* ══ FILTER DRAWER ══ */
+.fd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;backdrop-filter:blur(5px)}
+.fd-overlay.open{display:block}
+.fd{
+  position:fixed;left:0;bottom:0;top:0;width:260px;max-width:85vw;
   background:var(--bg2);border-right:1px solid var(--border);
   z-index:401;display:flex;flex-direction:column;
-  transform:translateX(-100%);transition:transform .26s ease;
-  overflow-y:auto;
+  transform:translateX(-100%);transition:transform .25s ease;overflow-y:auto;
 }
-.filter-drawer.open{transform:translateX(0)}
-.filter-drawer-head{
+.fd.open{transform:translateX(0)}
+.fd-head{
   display:flex;align-items:center;justify-content:space-between;
-  padding:.9rem .85rem .55rem;border-bottom:1px solid var(--border);
-  font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;
+  padding:.85rem .8rem .5rem;border-bottom:1px solid var(--border);
+  font-family:'Syne',sans-serif;font-size:.78rem;font-weight:800;
   color:var(--text);flex-shrink:0;letter-spacing:.04em;
 }
-.fd-close{
-  background:none;border:none;color:var(--text3);
-  font-size:1.1rem;cursor:pointer;padding:4px 8px;border-radius:6px;
-}
-.fd-close:hover{background:var(--surface2);color:var(--text)}
+.fd-cls{background:none;border:none;color:var(--text3);font-size:1.1rem;cursor:pointer;padding:3px 7px;border-radius:5px}
+.fd-cls:hover{background:var(--surface2);color:var(--text)}
 
-/* ─── MODEL REPORT ─── */
+/* ══ MODEL REPORT ══ */
 .model-view{display:none;flex:1;overflow-y:auto}
 .model-view.show{display:block}
 .page-explore{display:flex;flex:1;overflow:hidden}
 .page-explore.hide{display:none}
+
 .model-search-screen{
   display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:4rem 2rem;gap:1.5rem;min-height:60vh;
+  justify-content:center;padding:4rem 2rem;gap:1.4rem;min-height:60vh;
 }
-.model-search-title{
-  font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:700;
-  letter-spacing:-.02em;color:var(--text);text-align:center;
+.ms-title{
+  font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;
+  letter-spacing:-.025em;color:var(--text);text-align:center;
+  background:linear-gradient(135deg,var(--text),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.model-search-sub{font-size:.82rem;color:var(--text3);text-align:center;max-width:400px;line-height:1.65}
-.model-search-box{display:flex;gap:.5rem;width:100%;max-width:460px}
-.model-search-box input{
+.ms-sub{font-size:.82rem;color:var(--text3);text-align:center;max-width:400px;line-height:1.65}
+.ms-box{display:flex;gap:.45rem;width:100%;max-width:440px}
+.ms-box input{
   flex:1;background:var(--surface);border:1px solid var(--border2);
-  border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;
-  font-size:.85rem;padding:.72rem 1rem;outline:none;transition:border-color .2s;
+  border-radius:10px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:.85rem;padding:.7rem 1rem;outline:none;transition:border-color .2s;
 }
-.model-search-box input:focus{border-color:rgba(155,114,255,.5)}
-.model-search-box input::placeholder{color:var(--text3)}
-.model-search-box button{
-  background:linear-gradient(135deg,var(--violet),#7c5cff);color:#fff;border:none;
-  border-radius:10px;padding:.72rem 1.1rem;
-  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;
-  cursor:pointer;transition:opacity .15s;white-space:nowrap;
-  box-shadow:0 4px 14px rgba(155,114,255,.35);
+.ms-box input:focus{border-color:rgba(255,45,85,.45)}
+.ms-box input::placeholder{color:var(--text3)}
+.ms-box button{
+  background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;
+  border-radius:10px;padding:.7rem 1.1rem;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.82rem;font-weight:700;
+  cursor:pointer;transition:opacity .14s;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(255,45,85,.4);
 }
-.model-search-box button:hover{opacity:.88}
+.ms-box button:hover{opacity:.88}
 
-.model-report{display:none;padding:1.5rem}
+.model-report{display:none;padding:1.4rem}
 .model-report.show{display:block}
-.model-hero{
-  display:flex;align-items:center;gap:1.25rem;
+.mrep-hero{
+  display:flex;align-items:center;gap:1.2rem;
   background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r18);padding:1.25rem;margin-bottom:1.1rem;
+  border-radius:var(--r20);padding:1.2rem;margin-bottom:1rem;
 }
-.model-hero-img{width:72px;height:72px;border-radius:12px;object-fit:cover;background:var(--surface2);flex-shrink:0}
-.model-hero-name{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;letter-spacing:-.02em;margin-bottom:3px}
-.model-hero-meta{font-size:.72rem;color:var(--text3);font-variant-numeric:tabular-nums}
-.model-hero-status{display:flex;align-items:center;gap:5px;font-size:.68rem;font-weight:600}
-.model-status-online{color:var(--green)}
-.model-status-offline{color:var(--text3)}
-.income-badge{
+.mrep-img{width:70px;height:70px;border-radius:12px;object-fit:cover;background:var(--surface2);flex-shrink:0}
+.mrep-name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:3px}
+.mrep-meta{font-size:.7rem;color:var(--text3);font-variant-numeric:tabular-nums}
+.mrep-status{display:flex;align-items:center;gap:5px;font-size:.67rem;font-weight:600}
+.online-c{color:var(--green)}
+.offline-c{color:var(--text3)}
+.income-bdg{
   display:inline-flex;align-items:center;gap:5px;
-  background:rgba(61,252,160,.08);border:1px solid rgba(61,252,160,.2);
-  border-radius:10px;padding:.45rem .9rem;
-  font-size:.76rem;font-weight:600;color:var(--green);font-variant-numeric:tabular-nums;
+  background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);
+  border-radius:9px;padding:.42rem .85rem;
+  font-size:.74rem;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;
 }
-.report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.1rem}
-.report-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r14);padding:1rem 1.1rem}
-.report-card-lbl{font-size:.58rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem;font-family:'Syne',sans-serif}
-.report-card-val{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
-.report-card-sub{font-size:.62rem;color:var(--text3);margin-top:2px}
-.report-card-trend{display:inline-flex;align-items:center;gap:3px;font-size:.62rem;font-weight:600;padding:2px 6px;border-radius:20px;margin-top:4px}
-.trend-up{background:rgba(61,252,160,.1);color:var(--green)}
-.trend-down{background:rgba(255,77,109,.1);color:var(--red)}
-.trend-flat{background:rgba(255,255,255,.05);color:var(--text3)}
-.report-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r14);padding:1.1rem;margin-bottom:1.1rem}
-.report-section-title{
-  font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;
+.rep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1rem}
+.rep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r16);padding:.95rem 1rem}
+.rep-lbl{font-size:.56rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.32rem;font-family:'Syne',sans-serif}
+.rep-val{font-size:1.2rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1;font-family:'Syne',sans-serif}
+.rep-sub{font-size:.6rem;color:var(--text3);margin-top:2px}
+.rep-trend{display:inline-flex;align-items:center;gap:3px;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:20px;margin-top:4px}
+.t-up{background:rgba(0,255,136,.1);color:var(--green)}
+.t-dn{background:rgba(255,45,85,.1);color:var(--hot)}
+.t-fl{background:rgba(255,255,255,.05);color:var(--text3)}
+.rep-sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r16);padding:1rem;margin-bottom:1rem}
+.rep-sec-ttl{
+  font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;
   color:var(--text2);text-transform:uppercase;letter-spacing:.09em;
-  margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem;
+  margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem;
 }
-.report-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
-.heatmap-grid{display:grid;grid-template-columns:40px repeat(24,1fr);gap:2px}
-.heatmap-label,.heatmap-hour-label{font-size:.5rem;color:var(--text3);font-variant-numeric:tabular-nums}
-.heatmap-label{display:flex;align-items:center;justify-content:flex-end;padding-right:5px}
-.heatmap-hour-label{text-align:center}
-.heatmap-cell{aspect-ratio:1;border-radius:2px;background:var(--surface2);transition:transform .1s;cursor:default}
-.heatmap-cell:hover{transform:scale(1.2);z-index:1}
-.rank-bar-wrap{margin-bottom:.7rem}
-.rank-bar-label{display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.28rem}
-.rank-bar-label span:first-child{color:var(--text2)}
-.rank-bar-label span:last-child{color:var(--text3);font-variant-numeric:tabular-nums}
-.rank-bar-track{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.rank-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
-.no-data-msg{text-align:center;padding:2rem;color:var(--text3);font-size:.78rem;line-height:1.65}
+.rep-sec-ttl::after{content:'';flex:1;height:1px;background:var(--border)}
+.rank-bw{margin-bottom:.65rem}
+.rank-bl{display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.26rem}
+.rank-bl span:first-child{color:var(--text2)}
+.rank-bl span:last-child{color:var(--text3);font-variant-numeric:tabular-nums}
+.rank-tr{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.rank-fi{height:100%;border-radius:3px;transition:width 1s ease}
+.no-data{text-align:center;padding:1.75rem;color:var(--text3);font-size:.76rem;line-height:1.65}
+.hm-grid{display:grid;grid-template-columns:38px repeat(24,1fr);gap:2px}
+.hm-lbl{font-size:.5rem;color:var(--text3);display:flex;align-items:center;justify-content:flex-end;padding-right:5px}
+.hm-hlbl{font-size:.48rem;color:var(--text3);text-align:center}
+.hm-cell{aspect-ratio:1;border-radius:2px;background:var(--surface2);transition:transform .1s;cursor:default}
+.hm-cell:hover{transform:scale(1.25);z-index:1}
 
-/* ─── MOBILE GENDER QUICK PILLS ─── */
-#mob-gf{
-  display:none;gap:2px;flex-shrink:0;
-  background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:2px;
-}
-.gq-btn{
-  background:none;border:none;color:var(--text3);
-  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:500;
-  padding:.32rem .55rem;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;
-}
-.gq-btn.on{background:var(--surface2);color:var(--text)}
-
-/* ─── RESPONSIVE ─── */
+/* ══ RESPONSIVE ══ */
 @media(max-width:900px){
   .sidebar{display:none}
   .stats-bar{grid-template-columns:repeat(2,1fr)}
-  .report-grid{grid-template-columns:repeat(2,1fr)}
-  .model-hero{flex-direction:column;text-align:center}
+  .rep-grid{grid-template-columns:repeat(2,1fr)}
 }
-
 @media(max-width:600px){
   html,body{width:100%;max-width:100%;overflow-x:hidden}
   .sidebar{display:none!important}
-  .mob-filter-btn{display:flex!important}
-  #mob-gf{display:flex!important}
-  #desktop-chips{display:none!important}
-  header{padding:0 .75rem 0 .65rem;height:50px}
-  .logo-text{display:none}
-  .hdr-right{gap:.35rem}
-  .np{font-size:.65rem;padding:.28rem .55rem}
-  .page{height:calc(100dvh - 50px)}
-  .page-explore{width:100%;max-width:100%;overflow-x:hidden}
-  .content{width:100%;max-width:100%;overflow-x:hidden}
+  .mob-fb{display:flex!important}
+  header{padding:0 .7rem;height:48px}
+  .logo-text{font-size:.7rem}
+  .hdr-r{gap:.3rem}
+  .nt{font-size:.62rem;padding:.26rem .52rem}
+  .page{height:calc(100dvh - 48px)}
+  .page-explore,.content{width:100%;max-width:100%;overflow-x:hidden}
 
-  /* Hot zone mobile */
-  .hot-zone{padding:.65rem .75rem .55rem}
-  .hz-card{width:64px}
-  .hz-img-wrap{width:64px;height:86px;border-radius:12px}
-  .hz-name{font-size:.54rem}
+  /* Hot zone */
+  .hot-zone{padding:.6rem .75rem .55rem}
+  .hz-card{width:68px}
+  .hz-img-wrap{width:68px;height:92px}
+  .hz-name{font-size:.52rem}
 
-  /* Stats bar mobile */
+  /* Stats */
   .stats-bar{grid-template-columns:repeat(2,1fr)}
-  .sb-stat{padding:.55rem .65rem}
-  .sb-stat-val{font-size:.95rem}
-  .sb-stat-sub{display:none}
+  .stat-cell{padding:.58rem .65rem}
+  .stat-val{font-size:.95rem}
+  .stat-sub{display:none}
 
-  /* Filter bar mobile */
-  .filter-bar{padding:.45rem .75rem;gap:.35rem}
-  .search-wrap{max-width:160px}
-  .search-wrap input{font-size:.7rem;padding:.38rem .7rem .38rem 1.8rem}
+  /* Filter bar — todo en una línea */
+  .filter-bar{padding:.42rem .75rem;gap:.3rem}
+  .srch input{width:120px}
+  .srch input:focus{width:140px}
 
-  /* Grid mobile */
+  /* Grid */
   .grid-wrap{padding:.55rem .75rem}
-  .grid{
-    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-    gap:.45rem;
-  }
+  .grid{grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:.4rem}
   .card-img-box{width:100%}
   .card-info{padding:.38rem .45rem .45rem}
-  .card-name{font-size:.65rem}
-  .card-meta{font-size:.56rem}
+  .card-name{font-size:.63rem}
+  .card-meta{font-size:.54rem}
   .card-tags{display:none}
   .vw-pill{font-size:.5rem;padding:2px 5px;bottom:4px;left:4px}
   .fav-btn{width:22px;height:22px;top:4px;right:4px;font-size:.65rem}
-  .bdg{font-size:.44rem;padding:1px 4px}
 
-  /* Modal mobile */
+  /* Modal */
   .modal-bg{padding:0;align-items:flex-end}
   .modal{border-radius:22px 22px 0 0;max-height:93dvh;width:100%}
-  .modal-hero{height:195px}
-  .modal-name{font-size:1.15rem}
+  .modal-hero{height:190px}
+  .modal-name{font-size:1.1rem}
   .modal-stats{grid-template-columns:repeat(2,1fr)}
-  .modal-body{padding:0 .9rem 1.25rem}
-  .modal-close{top:.65rem;right:.65rem;width:27px;height:27px}
-  .btn-visit,.btn-fav{font-size:.72rem;padding:.62rem .8rem}
+  .modal-body{padding:0 .9rem 1.2rem}
 
-  /* Model report mobile */
+  /* Model report */
   .model-search-box{flex-direction:column}
-  .model-search-box button{width:100%}
-  .model-report{padding:.9rem .75rem;width:100%}
-  .model-hero{padding:.9rem;gap:.75rem}
-  .model-hero-img{width:56px;height:56px}
-  .model-hero-name{font-size:.95rem}
-  .report-grid{grid-template-columns:repeat(2,1fr)}
-
-  .toast{bottom:.9rem}
-  #model-banner{margin:.65rem .75rem 0;padding:.9rem}
-  #model-banner a{width:100%;text-align:center}
+  .ms-box{flex-direction:column}
+  .ms-box button{width:100%}
+  .model-report{padding:.85rem .75rem}
+  .rep-grid{grid-template-columns:repeat(2,1fr)}
+  .mrep-hero{padding:.9rem;gap:.7rem}
+  .mrep-img{width:54px;height:54px}
 }
-
 @media(max-width:360px){
   .grid{grid-template-columns:repeat(auto-fill,minmax(105px,1fr))}
-  .hz-card{width:58px}
-  .hz-img-wrap{width:58px;height:78px}
+  .hz-card{width:60px}
+  .hz-img-wrap{width:60px;height:80px}
 }
 </style>
 </head>
 <body>
 
-<!-- ─── HEADER ─── -->
+<!-- HEADER -->
 <header>
   <a class="logo" href="/">
     <div class="logo-mark">
       <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
         <circle cx="10" cy="10" r="3.5"/>
-        <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12z" opacity=".6"/>
-        <circle cx="10" cy="10" r="1.5" fill="rgba(255,255,255,.5)"/>
+        <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2zm0 13.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z" opacity=".55"/>
+        <circle cx="10" cy="10" r="1.4" fill="rgba(255,255,255,.45)"/>
       </svg>
     </div>
-    <span class="logo-text">Campulse<span>Hub</span></span>
+    <span class="logo-text">Campulse<em>Hub</em></span>
   </a>
 
-  <div class="live-badge">
+  <div class="live-pill">
     <div class="live-dot"></div>
     Live
-    <span id="ts-label" style="color:rgba(255,255,255,.4);margin-left:2px">—</span>
+    <span id="ts-label" style="color:rgba(255,255,255,.35);margin-left:3px">—</span>
   </div>
 
-  <div class="hdr-right">
-    <div class="nav-pills">
-      <button class="np active" id="tab-explore" onclick="switchTab('explore')">
+  <div class="hdr-r">
+    <div class="nav-tabs">
+      <button class="nt active" id="tab-explore" onclick="switchTab('explore')">
         <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
         Explorar
       </button>
-      <button class="np" id="tab-model" onclick="switchTab('model')">
+      <button class="nt" id="tab-model" onclick="switchTab('model')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3 2.7-5 6-5s6 2 6 5"/></svg>
         Reporte
       </button>
@@ -885,284 +951,222 @@ header{
 
 <div class="page-explore" id="page-explore">
 
-  <!-- ─── SIDEBAR ─── -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sb-section" style="padding-bottom:.5rem">
-      <div class="sb-label">Género</div>
+    <div class="sb-sec" style="padding-bottom:.45rem">
+      <div class="sb-lbl">Género</div>
       <div class="gtab-strip">
-        <button class="gtab active" data-g="" id="gb-all">Todos <span class="gtab-count" id="gc-all"></span></button>
-        <button class="gtab" data-g="f" id="gb-f">Mujeres <span class="gtab-count" id="gc-f"></span></button>
-        <button class="gtab" data-g="m" id="gb-m">Hombres <span class="gtab-count" id="gc-m"></span></button>
-        <button class="gtab" data-g="c" id="gb-c">Parejas <span class="gtab-count" id="gc-c"></span></button>
-        <button class="gtab" data-g="t" id="gb-t">Trans <span class="gtab-count" id="gc-t"></span></button>
+        <button class="gtab active" data-g="" id="gb-all">Todos <span class="gtab-cnt" id="gc-all"></span></button>
+        <button class="gtab" data-g="f" id="gb-f">Mujeres <span class="gtab-cnt" id="gc-f"></span></button>
+        <button class="gtab" data-g="m" id="gb-m">Hombres <span class="gtab-cnt" id="gc-m"></span></button>
+        <button class="gtab" data-g="c" id="gb-c">Parejas <span class="gtab-cnt" id="gc-c"></span></button>
+        <button class="gtab" data-g="t" id="gb-t">Trans <span class="gtab-cnt" id="gc-t"></span></button>
       </div>
     </div>
-
-    <div class="sb-divider"></div>
-
-    <div class="sb-section">
-      <div class="sb-label">Filtros</div>
-      <button class="g-btn" id="sb-fv">
-        <span style="font-size:.8rem;color:var(--rose)">♥</span>
-        Favoritas
-        <span class="g-count" id="gc-fv">0</span>
-      </button>
-      <button class="g-btn" id="sb-hd">
-        <span style="font-size:.6rem;font-weight:700;color:var(--cyan);background:rgba(77,223,206,.15);padding:1px 5px;border-radius:4px">HD</span>
-        Solo HD
-        <span class="g-count" id="gc-hd">—</span>
-      </button>
+    <div class="sb-div"></div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Filtros</div>
+      <button class="g-btn" id="sb-fv"><span style="color:var(--hot)">♥</span> Favoritas <span class="g-cnt" id="gc-fv">0</span></button>
+      <button class="g-btn" id="sb-hd"><span style="font-size:.6rem;font-weight:800;color:var(--cyan)">HD</span> Solo HD <span class="g-cnt" id="gc-hd">—</span></button>
     </div>
-
-    <div class="sb-divider"></div>
-
-    <div class="sb-section">
-      <div class="sb-label">País</div>
-      <div id="country-filter-list" style="display:flex;flex-direction:column;gap:2px;margin-top:.2rem"></div>
+    <div class="sb-div"></div>
+    <div class="sb-sec">
+      <div class="sb-lbl">País</div>
+      <div id="country-filter-list" style="display:flex;flex-direction:column;gap:2px;margin-top:.18rem"></div>
     </div>
-
-    <div class="sb-divider"></div>
-
-    <div class="sb-section">
-      <div class="sb-label">Edad</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.2rem">
-        <span class="tag-filter-pill" id="age-18" onclick="setAgeFilter('18-21')">18–21</span>
-        <span class="tag-filter-pill" id="age-22" onclick="setAgeFilter('22-25')">22–25</span>
-        <span class="tag-filter-pill" id="age-26" onclick="setAgeFilter('26-30')">26–30</span>
-        <span class="tag-filter-pill" id="age-31" onclick="setAgeFilter('31-40')">31–40</span>
-        <span class="tag-filter-pill" id="age-40" onclick="setAgeFilter('40+')">40+</span>
+    <div class="sb-div"></div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Edad</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.18rem">
+        <span class="tag-pill" id="age-18" onclick="setAgeFilter('18-21')">18–21</span>
+        <span class="tag-pill" id="age-22" onclick="setAgeFilter('22-25')">22–25</span>
+        <span class="tag-pill" id="age-26" onclick="setAgeFilter('26-30')">26–30</span>
+        <span class="tag-pill" id="age-31" onclick="setAgeFilter('31-40')">31–40</span>
+        <span class="tag-pill" id="age-40" onclick="setAgeFilter('40+')">40+</span>
       </div>
     </div>
-
-    <div class="sb-divider"></div>
-
-    <div class="sb-section">
-      <div class="sb-label">Tags populares</div>
-      <div id="tag-filter-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.2rem"></div>
+    <div class="sb-div"></div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Tags populares</div>
+      <div id="tag-filter-list" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.18rem"></div>
     </div>
-
-    <div class="sb-divider"></div>
-
+    <div class="sb-div"></div>
     <div class="mini-stats">
-      <div class="sb-label" style="padding:0 .2rem;margin-bottom:.45rem">Distribución</div>
+      <div class="sb-lbl" style="padding:0 .2rem;margin-bottom:.42rem">Distribución</div>
       <div class="dist-bar" id="dist-bar"></div>
-      <div style="height:.6rem"></div>
-      <div class="mini-stat"><span class="mini-stat-lbl">Total salas</span><span class="mini-stat-val" id="ms-total">—</span></div>
-      <div class="mini-stat"><span class="mini-stat-lbl">Viewers</span><span class="mini-stat-val" id="ms-views">—</span></div>
-      <div class="mini-stat"><span class="mini-stat-lbl">Promedio</span><span class="mini-stat-val" id="ms-avg">—</span></div>
-      <div class="mini-stat"><span class="mini-stat-lbl">Peak</span><span class="mini-stat-val" id="ms-peak">—</span></div>
+      <div style="height:.55rem"></div>
+      <div class="mini-stat"><span class="mini-stat-l">Total salas</span><span class="mini-stat-v" id="ms-total">—</span></div>
+      <div class="mini-stat"><span class="mini-stat-l">Viewers</span><span class="mini-stat-v" id="ms-views">—</span></div>
+      <div class="mini-stat"><span class="mini-stat-l">Promedio</span><span class="mini-stat-v" id="ms-avg">—</span></div>
+      <div class="mini-stat"><span class="mini-stat-l">Peak</span><span class="mini-stat-v" id="ms-peak">—</span></div>
     </div>
   </aside>
 
-  <!-- ─── MAIN CONTENT ─── -->
+  <!-- CONTENT -->
   <div class="content">
 
-    <!-- ★ HOT ZONE — TOP MODELS WITH MOST VIEWERS ─── -->
-    <div class="hot-zone" id="hot-zone">
+    <!-- ★ HOT ZONE ★ -->
+    <div class="hot-zone">
       <div class="hz-head">
         <div class="hz-title">
-          <span class="hz-title-icon">🔥</span>
-          Top Modelos — Más Viewers
+          <span style="font-size:.95rem">🔥</span>
+          Top en Vivo
         </div>
-        <span class="hz-count" id="hz-count">— en sala</span>
+        <span class="hz-viewers-total" id="hz-total">— viewers</span>
       </div>
-      <div class="hz-scroll" id="hz-scroll">
-        <!-- Populated by JS -->
-      </div>
+      <!-- scroll horizontal, última card cortada = hint de deslizamiento -->
+      <div class="hz-scroll" id="hz-scroll"></div>
     </div>
 
-    <!-- Stats bar -->
+    <!-- STATS BAR -->
     <div class="stats-bar">
-      <div class="sb-stat">
-        <div class="sb-stat-lbl">Salas online</div>
-        <div class="sb-stat-val" id="s-total">—</div>
-        <div class="sb-stat-sub">chaturbate</div>
+      <div class="stat-cell">
+        <div class="stat-lbl">Salas online</div>
+        <div class="stat-val" id="s-total">—</div>
+        <div class="stat-sub">en vivo</div>
       </div>
-      <div class="sb-stat">
-        <div class="sb-stat-lbl">Viewers totales</div>
-        <div class="sb-stat-val" id="s-views">—</div>
-        <div class="sb-stat-sub">en vivo ahora</div>
+      <div class="stat-cell">
+        <div class="stat-lbl">Viewers totales</div>
+        <div class="stat-val" id="s-views">—</div>
+        <div class="stat-sub">ahora mismo</div>
       </div>
-      <div class="sb-stat">
-        <div class="sb-stat-lbl">Favoritas</div>
-        <div class="sb-stat-val" id="s-favs">0</div>
-        <div class="sb-stat-sub">guardadas</div>
+      <div class="stat-cell">
+        <div class="stat-lbl">Favoritas</div>
+        <div class="stat-val" id="s-favs">0</div>
+        <div class="stat-sub">guardadas</div>
       </div>
-      <div class="sb-stat">
-        <div class="sb-stat-lbl">Mostrando</div>
-        <div class="sb-stat-val" id="s-show">—</div>
-        <div class="sb-stat-sub">resultados</div>
+      <div class="stat-cell">
+        <div class="stat-lbl">Mostrando</div>
+        <div class="stat-val" id="s-show">—</div>
+        <div class="stat-sub">resultados</div>
       </div>
     </div>
 
-    <!-- Filter bar -->
+    <!-- FILTER BAR: TODO en una línea, scroll horizontal, no tapa nada -->
     <div class="filter-bar">
       <!-- Search -->
-      <div class="search-wrap">
-        <span class="search-icon">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/>
-          </svg>
-        </span>
-        <input type="text" id="search" placeholder="Buscar modelo...">
+      <div class="srch">
+        <span class="srch-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/></svg></span>
+        <input type="text" id="search" placeholder="Buscar...">
       </div>
 
-      <!-- Mobile: filter drawer trigger -->
-      <button class="mob-filter-btn" id="mob-filter-btn" onclick="openFilterDrawer()">
+      <!-- Mobile: filtros avanzados -->
+      <button class="mob-fb" id="mob-filter-btn" onclick="openFD()">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
         Filtros
-        <span id="mob-filter-count" style="display:none;background:var(--violet);color:#fff;border-radius:99px;font-size:.58rem;padding:0 5px;min-width:15px;text-align:center"></span>
+        <span id="mob-fc" style="display:none;background:var(--hot);color:#fff;border-radius:99px;font-size:.56rem;padding:0 5px;min-width:15px;text-align:center"></span>
       </button>
 
-      <!-- Mobile gender quick buttons -->
-      <div id="mob-gf">
-        <button class="gq-btn on" data-g="">Todas</button>
-        <button class="gq-btn" data-g="f">♀</button>
-        <button class="gq-btn" data-g="m">♂</button>
-        <button class="gq-btn" data-g="c">⚭</button>
-        <button class="gq-btn" data-g="t">⚧</button>
+      <div class="fb-div"></div>
+
+      <!-- Género rápido -->
+      <div class="gf-wrap" id="gf-wrap">
+        <button class="gf-btn on-all" data-g="">Todas</button>
+        <button class="gf-btn" data-g="f">♀</button>
+        <button class="gf-btn" data-g="m">♂</button>
+        <button class="gf-btn" data-g="c">⚭</button>
+        <button class="gf-btn" data-g="t">⚧</button>
       </div>
 
-      <!-- Desktop chips -->
-      <span id="desktop-chips" style="display:contents">
-        <button class="chip" id="tb-co">🇨🇴 Colombia</button>
-        <button class="chip" id="tb-fv">♥ Favs</button>
-        <button class="chip" id="tb-hd">HD</button>
-      </span>
+      <div class="fb-div"></div>
 
-      <select class="sort-select" id="srt">
+      <!-- Quick chips -->
+      <button class="qchip" id="tb-co">🇨🇴</button>
+      <button class="qchip" id="tb-fv">♥ Favs</button>
+      <button class="qchip" id="tb-hd">HD</button>
+
+      <div class="fb-div"></div>
+
+      <select class="sort-sel" id="srt">
         <option value="viewers">↓ Más viewers</option>
-        <option value="followers">↓ Más seguidores</option>
+        <option value="followers">↓ Seguidores</option>
         <option value="age_asc">Más jóvenes</option>
-        <option value="new">Nuevas primero</option>
+        <option value="new">Nuevas</option>
       </select>
 
       <div class="vtog">
-        <button class="vbtn on" id="vg" title="Grid">
+        <button class="vbtn on" id="vg">
           <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
         </button>
-        <button class="vbtn" id="vl" title="Lista">
+        <button class="vbtn" id="vl">
           <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2" rx="1"/><rect x="1" y="7" width="14" height="2" rx="1"/><rect x="1" y="12" width="14" height="2" rx="1"/></svg>
         </button>
       </div>
     </div>
 
-    <!-- Grid -->
+    <!-- GRID -->
     <div class="grid-wrap" id="gw">
       <div class="grid" id="gc-grid"></div>
     </div>
 
-    <!-- List -->
+    <!-- LIST -->
     <div class="list-wrap" id="lw">
       <table class="list-tbl">
         <thead><tr>
-          <th style="width:42px"></th>
+          <th style="width:40px"></th>
           <th>Modelo</th>
           <th>Género</th>
-          <th class="sort-active" id="th-v">Viewers ↓</th>
+          <th class="sa" id="th-v">Viewers ↓</th>
           <th id="th-f">Seguidores</th>
           <th id="th-a">Edad</th>
           <th>País</th>
-          <th style="width:42px"></th>
+          <th style="width:40px"></th>
         </tr></thead>
         <tbody id="lb"></tbody>
       </table>
     </div>
-
   </div>
 </div>
 
-<!-- MODEL REPORT VIEW -->
+<!-- MODEL REPORT -->
 <div class="model-view" id="model-view">
   <div class="model-search-screen" id="model-search-screen">
-    <div style="font-size:3rem;filter:drop-shadow(0 0 16px rgba(155,114,255,.5))">📊</div>
-    <div class="model-search-title">Reporte de Modelo</div>
-    <div class="model-search-sub">Ingresa tu username de Chaturbate para ver estadísticas, historial de viewers, posición en ranking y estimación de ingresos.</div>
-    <div class="model-search-box">
-      <input type="text" id="model-username-input" placeholder="ej: lexy_fox2" onkeydown="if(event.key==='Enter')searchModel()">
+    <div style="font-size:3.5rem;filter:drop-shadow(0 0 20px rgba(255,45,85,.5))">📊</div>
+    <div class="ms-title">Reporte de Modelo</div>
+    <div class="ms-sub">Ingresa el username de Chaturbate para ver estadísticas, historial de viewers, ranking y estimación de ingresos.</div>
+    <div class="ms-box">
+      <input type="text" id="model-username-input" placeholder="ej: ehotlovea" onkeydown="if(event.key==='Enter')searchModel()">
       <button onclick="searchModel()">Ver reporte →</button>
     </div>
-    <div id="model-search-error" style="color:var(--red);font-size:.73rem;display:none"></div>
+    <div id="model-search-error" style="color:var(--hot);font-size:.72rem;display:none"></div>
   </div>
-
   <div class="model-report" id="model-report">
-    <div style="margin-bottom:1.1rem">
-      <button onclick="resetModelSearch()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.76rem;display:flex;align-items:center;gap:4px;padding:0">
-        ← Buscar otra modelo
-      </button>
+    <div style="margin-bottom:1rem">
+      <button onclick="resetModelSearch()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:.74rem;display:flex;align-items:center;gap:4px;padding:0">← Buscar otra modelo</button>
     </div>
-    <div class="model-hero">
-      <img class="model-hero-img" id="rp-img" src="" alt="">
-      <div class="model-hero-info" style="flex:1;min-width:0">
-        <div class="model-hero-name" id="rp-name">—</div>
-        <div class="model-hero-meta" id="rp-meta">—</div>
-        <div style="margin-top:.45rem;display:flex;align-items:center;gap:.65rem;flex-wrap:wrap">
-          <div class="model-hero-status" id="rp-status">
+    <div class="mrep-hero">
+      <img class="mrep-img" id="rp-img" src="" alt="">
+      <div style="flex:1;min-width:0">
+        <div class="mrep-name" id="rp-name">—</div>
+        <div class="mrep-meta" id="rp-meta">—</div>
+        <div style="margin-top:.42rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+          <div class="mrep-status" id="rp-status">
             <span class="live-dot" style="background:var(--text3)" id="rp-status-dot"></span>
             <span id="rp-status-txt">Verificando...</span>
           </div>
-          <div class="income-badge" id="rp-income" style="display:none">
-            <span>💰</span><span id="rp-income-val">—</span><span style="opacity:.6;font-size:.62rem">/hora est.</span>
+          <div class="income-bdg" id="rp-income" style="display:none">
+            <span>💰</span><span id="rp-income-val">—</span><span style="opacity:.6;font-size:.6rem">/hora est.</span>
           </div>
         </div>
       </div>
-      <a id="rp-link" href="#" target="_blank" rel="noopener" style="background:linear-gradient(135deg,var(--violet),#7c5cff);color:#fff;border:none;border-radius:10px;padding:.55rem 1rem;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(155,114,255,.35)">Ver sala ↗</a>
+      <a id="rp-link" href="#" target="_blank" rel="noopener" style="background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;border-radius:10px;padding:.55rem 1rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(255,45,85,.38)">Ver sala ↗</a>
     </div>
-
-    <div class="report-grid">
-      <div class="report-card">
-        <div class="report-card-lbl">Viewers ahora</div>
-        <div class="report-card-val" id="rp-viewers">—</div>
-        <div class="report-card-sub" id="rp-viewers-sub">en vivo</div>
-      </div>
-      <div class="report-card">
-        <div class="report-card-lbl">Seguidores</div>
-        <div class="report-card-val" id="rp-followers">—</div>
-        <div class="report-card-trend trend-flat" id="rp-followers-trend" style="display:none"></div>
-      </div>
-      <div class="report-card">
-        <div class="report-card-lbl">Posición ranking</div>
-        <div class="report-card-val" id="rp-rank">—</div>
-        <div class="report-card-sub" id="rp-rank-sub">de viewers ahora</div>
-      </div>
-      <div class="report-card">
-        <div class="report-card-lbl">Promedio viewers</div>
-        <div class="report-card-val" id="rp-avg">—</div>
-        <div class="report-card-sub">últimos snapshots</div>
-      </div>
+    <div class="rep-grid">
+      <div class="rep-card"><div class="rep-lbl">Viewers ahora</div><div class="rep-val" id="rp-viewers">—</div><div class="rep-sub">en vivo</div></div>
+      <div class="rep-card"><div class="rep-lbl">Seguidores</div><div class="rep-val" id="rp-followers">—</div><div class="rep-trend t-fl" id="rp-followers-trend" style="display:none"></div></div>
+      <div class="rep-card"><div class="rep-lbl">Posición ranking</div><div class="rep-val" id="rp-rank">—</div><div class="rep-sub" id="rp-rank-sub">de viewers</div></div>
+      <div class="rep-card"><div class="rep-lbl">Promedio viewers</div><div class="rep-val" id="rp-avg">—</div><div class="rep-sub">últimos datos</div></div>
     </div>
-
-    <div class="report-section">
-      <div class="report-section-title">Posición en el mercado</div>
-      <div class="rank-bar-wrap">
-        <div class="rank-bar-label"><span>Tu posición</span><span id="rb-pos-val">—</span></div>
-        <div class="rank-bar-track"><div class="rank-bar-fill" id="rb-pos" style="width:0%;background:var(--violet)"></div></div>
-      </div>
-      <div class="rank-bar-wrap">
-        <div class="rank-bar-label"><span>Top 10%</span><span id="rb-top10-val">—</span></div>
-        <div class="rank-bar-track"><div class="rank-bar-fill" id="rb-top10" style="width:10%;background:var(--green)"></div></div>
-      </div>
-      <div class="rank-bar-wrap">
-        <div class="rank-bar-label"><span>Promedio general</span><span id="rb-avg-val">—</span></div>
-        <div class="rank-bar-track"><div class="rank-bar-fill" id="rb-avg" style="width:50%;background:var(--text3)"></div></div>
-      </div>
-      <div style="margin-top:.65rem;font-size:.7rem;color:var(--text3)" id="rb-summary"></div>
+    <div class="rep-sec">
+      <div class="rep-sec-ttl">Posición en el mercado</div>
+      <div class="rank-bw"><div class="rank-bl"><span>Tu posición</span><span id="rb-pos-val">—</span></div><div class="rank-tr"><div class="rank-fi" id="rb-pos" style="width:0%;background:var(--hot)"></div></div></div>
+      <div class="rank-bw"><div class="rank-bl"><span>Top 10%</span><span id="rb-top10-val">—</span></div><div class="rank-tr"><div class="rank-fi" id="rb-top10" style="width:10%;background:var(--green)"></div></div></div>
+      <div class="rank-bw"><div class="rank-bl"><span>Promedio general</span><span id="rb-avg-val">—</span></div><div class="rank-tr"><div class="rank-fi" id="rb-avg" style="width:50%;background:var(--text3)"></div></div></div>
+      <div style="margin-top:.6rem;font-size:.7rem;color:var(--text3)" id="rb-summary"></div>
     </div>
-
-    <div class="report-section">
-      <div class="report-section-title">Historial de viewers — Supabase</div>
-      <div id="heatmap-container"><div class="no-data-msg">Cargando datos históricos...<br><span style="font-size:.68rem">Los datos se acumulan cada hora</span></div></div>
-    </div>
-
-    <div class="report-section">
-      <div class="report-section-title">Crecimiento de seguidores</div>
-      <div id="followers-container"><div class="no-data-msg">Cargando historial...</div></div>
-    </div>
-
-    <div class="report-section">
-      <div class="report-section-title">Perfil</div>
-      <div style="display:flex;flex-wrap:wrap;gap:.45rem" id="rp-tags"></div>
-    </div>
+    <div class="rep-sec"><div class="rep-sec-ttl">Historial de viewers</div><div id="heatmap-container"><div class="no-data">Cargando...</div></div></div>
+    <div class="rep-sec"><div class="rep-sec-ttl">Crecimiento de seguidores</div><div id="followers-container"><div class="no-data">Cargando...</div></div></div>
+    <div class="rep-sec"><div class="rep-sec-ttl">Perfil</div><div style="display:flex;flex-wrap:wrap;gap:.42rem" id="rp-tags"></div></div>
   </div>
 </div>
 
@@ -1174,10 +1178,7 @@ header{
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
       <div class="modal-hero-info">
-        <div>
-          <div class="modal-name" id="m-name"></div>
-          <div class="modal-disp" id="m-disp"></div>
-        </div>
+        <div><div class="modal-name" id="m-name"></div><div class="modal-sub" id="m-disp"></div></div>
         <div id="m-pill"></div>
       </div>
     </div>
@@ -1188,16 +1189,15 @@ header{
         <div class="ms-cell"><div class="ms-val" id="m-ag"></div><div class="ms-lbl">Edad</div></div>
         <div class="ms-cell"><div class="ms-val" id="m-co"></div><div class="ms-lbl">País</div></div>
       </div>
-      <div class="modal-subject" id="m-subj" style="display:none"></div>
+      <div class="modal-subj" id="m-subj" style="display:none"></div>
       <div class="modal-tags" id="m-tags"></div>
-      <div class="modal-actions">
-        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-visit">
+      <div class="modal-acts">
+        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go">
           <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9M10 2h4v4M14 2L7 9"/></svg>
-          Ver sala en Chaturbate
+          Entrar a la sala
         </a>
-        <button class="btn-fav" id="m-fav-btn" onclick="favMod()">
-          <span id="m-fav-icon">♥</span>
-          <span id="m-fav-txt">Guardar</span>
+        <button class="btn-fav2" id="m-fav-btn" onclick="favMod()">
+          <span id="m-fav-icon">♥</span><span id="m-fav-txt">Guardar</span>
         </button>
       </div>
     </div>
@@ -1206,106 +1206,88 @@ header{
 
 <div class="toast" id="toast"></div>
 
-<!-- FILTER DRAWER OVERLAY -->
-<div class="filter-drawer-overlay" id="fd-overlay" onclick="closeFilterDrawer()"></div>
-<div class="filter-drawer" id="filter-drawer">
-  <div class="filter-drawer-head">
-    Filtros
-    <button class="fd-close" onclick="closeFilterDrawer()">✕</button>
-  </div>
-  <div class="sb-section" style="padding-bottom:.5rem">
-    <div class="sb-label">Género</div>
+<!-- FILTER DRAWER -->
+<div class="fd-overlay" id="fd-overlay" onclick="closeFD()"></div>
+<div class="fd" id="fd">
+  <div class="fd-head">Filtros <button class="fd-cls" onclick="closeFD()">✕</button></div>
+  <div class="sb-sec" style="padding-bottom:.45rem">
+    <div class="sb-lbl">Género</div>
     <div class="gtab-strip">
-      <button class="gtab active" data-g="" id="fd-gb-all">Todos <span class="gtab-count" id="fd-gc-all"></span></button>
-      <button class="gtab" data-g="f" id="fd-gb-f">Mujeres <span class="gtab-count" id="fd-gc-f"></span></button>
-      <button class="gtab" data-g="m" id="fd-gb-m">Hombres <span class="gtab-count" id="fd-gc-m"></span></button>
-      <button class="gtab" data-g="c" id="fd-gb-c">Parejas <span class="gtab-count" id="fd-gc-c"></span></button>
-      <button class="gtab" data-g="t" id="fd-gb-t">Trans <span class="gtab-count" id="fd-gc-t"></span></button>
+      <button class="gtab active" data-g="" id="fd-gb-all">Todos <span class="gtab-cnt" id="fd-gc-all"></span></button>
+      <button class="gtab" data-g="f" id="fd-gb-f">Mujeres <span class="gtab-cnt" id="fd-gc-f"></span></button>
+      <button class="gtab" data-g="m" id="fd-gb-m">Hombres <span class="gtab-cnt" id="fd-gc-m"></span></button>
+      <button class="gtab" data-g="c" id="fd-gb-c">Parejas <span class="gtab-cnt" id="fd-gc-c"></span></button>
+      <button class="gtab" data-g="t" id="fd-gb-t">Trans <span class="gtab-cnt" id="fd-gc-t"></span></button>
     </div>
   </div>
-  <div class="sb-divider"></div>
-  <div class="sb-section">
-    <div class="sb-label">Filtros</div>
-    <button class="g-btn" id="fd-sb-fv"><span style="color:var(--rose)">♥</span> Favoritas <span class="g-count" id="fd-gc-fv">0</span></button>
-    <button class="g-btn" id="fd-sb-hd"><span style="font-size:.6rem;font-weight:700;color:var(--cyan)">HD</span> Solo HD <span class="g-count" id="fd-gc-hd">—</span></button>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+    <div class="sb-lbl">Filtros</div>
+    <button class="g-btn" id="fd-sb-fv"><span style="color:var(--hot)">♥</span> Favoritas <span class="g-cnt" id="fd-gc-fv">0</span></button>
+    <button class="g-btn" id="fd-sb-hd"><span style="font-size:.6rem;font-weight:800;color:var(--cyan)">HD</span> Solo HD <span class="g-cnt" id="fd-gc-hd">—</span></button>
   </div>
-  <div class="sb-divider"></div>
-  <div class="sb-section">
-    <div class="sb-label">País</div>
-    <div id="fd-country-filter-list" style="display:flex;flex-direction:column;gap:2px;margin-top:.2rem"></div>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+    <div class="sb-lbl">País</div>
+    <div id="fd-country-filter-list" style="display:flex;flex-direction:column;gap:2px;margin-top:.18rem"></div>
   </div>
-  <div class="sb-divider"></div>
-  <div class="sb-section">
-    <div class="sb-label">Edad</div>
-    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.2rem">
-      <span class="tag-filter-pill" id="fd-age-18" onclick="setAgeFilter('18-21')">18–21</span>
-      <span class="tag-filter-pill" id="fd-age-22" onclick="setAgeFilter('22-25')">22–25</span>
-      <span class="tag-filter-pill" id="fd-age-26" onclick="setAgeFilter('26-30')">26–30</span>
-      <span class="tag-filter-pill" id="fd-age-31" onclick="setAgeFilter('31-40')">31–40</span>
-      <span class="tag-filter-pill" id="fd-age-40" onclick="setAgeFilter('40+')">40+</span>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+    <div class="sb-lbl">Edad</div>
+    <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.18rem">
+      <span class="tag-pill" id="fd-age-18" onclick="setAgeFilter('18-21')">18–21</span>
+      <span class="tag-pill" id="fd-age-22" onclick="setAgeFilter('22-25')">22–25</span>
+      <span class="tag-pill" id="fd-age-26" onclick="setAgeFilter('26-30')">26–30</span>
+      <span class="tag-pill" id="fd-age-31" onclick="setAgeFilter('31-40')">31–40</span>
+      <span class="tag-pill" id="fd-age-40" onclick="setAgeFilter('40+')">40+</span>
     </div>
   </div>
-  <div class="sb-divider"></div>
-  <div class="sb-section">
-    <div class="sb-label">Tags populares</div>
-    <div id="fd-tag-filter-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.2rem"></div>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+    <div class="sb-lbl">Tags populares</div>
+    <div id="fd-tag-filter-list" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.18rem"></div>
   </div>
 </div>
 
 <script>
-const API_ENDPOINT = '/api/rooms';
-const HOT_TOP_N = 12; // number of top models shown in hot zone
+const API = '/api/rooms';
+const HOT_N = 14;
 
 let rooms=[], favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
-let gender='', onlyCol=false, onlyFavs=false, onlyHD=false, activeTag='', activeCountry='', ageRange='';
+let gender='', onlyCol=false, onlyFavs=false, onlyHD=false;
+let activeTag='', activeCountry='', ageRange='';
 let sort='viewers', view='grid', maxV=1, active=null;
 
 const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n);
-const gl={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
-const gColors={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
+const GL={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
+const GC={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
 
-// ─── FEATURED ───
-const FEATURED = ['lexy_fox2'];
+/* ── FEATURED ── */
+const FEATURED = ['ehotlovea'];
 const FEATURED_PROFILES = {
-  'lexy_fox2': {
-    display_name:'Lexy Fox',gender:'f',country:'CO',age:25,is_hd:true,
-    tags:['latina','colombia','lovense','bigass','young'],
-    image_url:'https://thumb.live.mmcdn.com/riw/lexy_fox2.jpg',
+  'ehotlovea':{
+    display_name:'Ehotlovea',gender:'f',country:'RO',age:24,is_hd:true,
+    tags:['lovense','bigass','squirt','anal','latina'],
+    image_url:'https://thumb.live.mmcdn.com/riw/ehotlovea.jpg',
   },
 };
-const FEATURED_SLOTS = 4;
 
-async function fetchRoom(username) {
-  for (let offset=0;offset<=2000;offset+=500) {
-    try{
-      const res=await fetch('/api/rooms?offset='+offset);
-      const d=await res.json();
-      const found=(d.results||[]).find(r=>r.username===username);
-      if(found) return found;
-      if(!d.results||d.results.length<100) break;
-    }catch(e){break;}
-  }
-  const profile=FEATURED_PROFILES[username]||{};
-  return{username,display_name:profile.display_name||username,gender:profile.gender||'f',country:profile.country||'',age:profile.age||null,is_hd:profile.is_hd||false,is_new:false,current_show:'offline',tags:profile.tags||[],num_users:0,num_followers:profile.num_followers||0,seconds_online:0,image_url:profile.image_url||'https://thumb.live.mmcdn.com/riw/'+username+'.jpg',_forced:true};
-}
-
-async function load() {
+/* ── LOAD ── */
+async function load(){
   document.getElementById('ref-btn').classList.add('spin');
   skeleton();
   try{
-    const r=await fetch(API_ENDPOINT);
-    const d=await r.json();
-    rooms=d.results||[];
-    const missing=FEATURED.filter(u=>!rooms.find(x=>x.username===u));
-    if(missing.length){
-      const extra=await Promise.all(missing.map(u=>fetchRoom(u)));
-      extra.forEach(room=>{if(room) rooms.push(room);});
+    const r=await fetch(API); const d=await r.json(); rooms=d.results||[];
+    const miss=FEATURED.filter(u=>!rooms.find(x=>x.username===u));
+    if(miss.length){
+      const ex=await Promise.all(miss.map(u=>fetchRoom(u)));
+      ex.forEach(rm=>{if(rm) rooms.push(rm);});
     }
     maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
     updateAll();
     document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
-    document.getElementById('gc-grid').innerHTML=`<div class="empty"><div class="empty-icon">⚠</div><div style="color:var(--text2)">Error cargando datos</div><button onclick="load()" style="margin-top:.5rem;background:var(--violet);color:#fff;border:none;padding:.42rem 1rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.73rem;font-weight:600">Reintentar</button></div>`;
+    document.getElementById('gc-grid').innerHTML=`<div class="empty"><div class="empty-ico">⚠</div><div style="color:var(--text2)">Error cargando datos</div><button onclick="load()" style="margin-top:.5rem;background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;padding:.42rem 1rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.72rem;font-weight:700">Reintentar</button></div>`;
   }finally{
     document.getElementById('ref-btn').classList.remove('spin');
   }
@@ -1313,75 +1295,67 @@ async function load() {
 
 function skeleton(){
   document.getElementById('gc-grid').innerHTML=Array(24).fill(0).map(()=>`
-    <div class="sk">
-      <div class="sk-img"></div>
-      <div class="sk-body">
-        <div class="sk-line" style="width:62%"></div>
-        <div class="sk-line" style="width:40%"></div>
-      </div>
-    </div>`).join('');
+    <div class="sk"><div class="sk-img"></div>
+    <div class="sk-body"><div class="sk-line" style="width:60%"></div><div class="sk-line" style="width:38%"></div></div></div>`).join('');
 }
 
-// ─── HOT ZONE: render top N rooms by viewers ───
-function renderHotZone() {
-  const top = [...rooms]
-    .filter(r=>r.num_users>0)
-    .sort((a,b)=>(b.num_users||0)-(a.num_users||0))
-    .slice(0,HOT_TOP_N);
+async function fetchRoom(username){
+  for(let o=0;o<=2000;o+=500){
+    try{const r=await fetch('/api/rooms?offset='+o);const d=await r.json();const f=(d.results||[]).find(r=>r.username===username);if(f) return f;if(!d.results||d.results.length<100) break;}catch(e){break;}
+  }
+  const p=FEATURED_PROFILES[username]||{};
+  return{username,display_name:p.display_name||username,gender:p.gender||'f',country:p.country||'',age:p.age||null,is_hd:p.is_hd||false,is_new:false,current_show:'offline',tags:p.tags||[],num_users:0,num_followers:p.num_followers||0,seconds_online:0,image_url:p.image_url||'https://thumb.live.mmcdn.com/riw/'+username+'.jpg',_forced:true};
+}
 
-  const totalViewers = top.reduce((s,r)=>s+(r.num_users||0),0);
-  document.getElementById('hz-count').textContent = fmt(totalViewers)+' en sala';
+/* ── HOT ZONE ── */
+function renderHotZone(){
+  const top=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,HOT_N);
+  const tv=top.reduce((s,r)=>s+(r.num_users||0),0);
+  document.getElementById('hz-total').textContent=fmt(tv)+' viewers';
+  const sc=document.getElementById('hz-scroll');
+  if(!top.length){sc.innerHTML='<span style="color:var(--text3);font-size:.72rem;padding:.5rem 0">Cargando...</span>';return;}
 
-  const scroll = document.getElementById('hz-scroll');
-  if(!top.length){scroll.innerHTML='<span style="color:var(--text3);font-size:.72rem;padding:.5rem 0">Sin datos aún...</span>';return;}
+  sc.innerHTML=top.map((r,i)=>{
+    const rk=i+1;
+    const rkLabel=rk===1?'👑 #1':rk===2?'🥈 #2':rk===3?'🥉 #3':'#'+rk;
+    const crown=rk===1?'<div class="hz-crown">👑</div>':'';
+    const gc=GC[r.gender]||'var(--text3)';
 
-  scroll.innerHTML = top.map((r,i)=>{
-    const rank = i+1;
-    const rankClass = rank===1?'hz-rank-1':rank===2?'hz-rank-2':rank===3?'hz-rank-3':'';
-    const rankLabel = rank===1?'🥇 #1':rank===2?'🥈 #2':rank===3?'🥉 #3':'#'+rank;
-    const crown = rank===1?'<div class="hz-crown">👑</div>':'';
-    const gdColor = gColors[r.gender]||'var(--text3)';
-    const img = r.image_url
-      ?`<img class="hz-img" src="${r.image_url}" loading="lazy" alt="${r.username}"
-          onerror="
-            const u='${r.username}';
-            const srcs=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg'];
-            const t=parseInt(this.dataset.tried||0);
-            if(t<srcs.length){this.dataset.tried=t+1;this.src=srcs[t];}
-            else{this.style.display='none';}
-          ">`
-      :`<div style="width:100%;height:100%;background:var(--surface3);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:1.4rem">👤</div>`;
+    // Imagen: siempre intentar mostrar — placeholder si falla
+    const imgEl=`<img class="hz-img" src="${r.image_url}?t=${Date.now()}" loading="lazy" alt="${r.username}"
+      data-tried="0"
+      onerror="
+        const u='${r.username}';
+        const srcs=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'];
+        const tried=parseInt(this.dataset.tried||0)+1;
+        if(tried<srcs.length){this.dataset.tried=tried;this.src=srcs[tried]+'?t=${Date.now()}';}
+        else{this.outerHTML='<div class=hz-placeholder><div class=hz-placeholder-icon>👤</div><div class=hz-placeholder-txt>${r.username.substring(0,8)}</div></div>';}
+      ">`;
 
-    return `<div class="hz-card" onclick="openInChaturbate('${r.username}')" title="${r.display_name||r.username} — ${fmt(r.num_users)} viewers">
+    return `<div class="hz-card" data-rank="${rk}" onclick="openInCB('${r.username}')" title="${r.display_name||r.username} — ${fmt(r.num_users)} viewers">
       ${crown}
-      <div class="hz-img-wrap">
-        ${img}
-        <div class="hz-rank ${rankClass}">${rankLabel}</div>
-        <div class="hz-gender-dot" style="background:${gdColor}"></div>
-        <div class="hz-vw-badge">
-          <div class="hz-vw"><div class="hz-vw-dot"></div>${fmt(r.num_users)}</div>
-        </div>
+      <div class="hz-img-wrap">${imgEl}
+        <div class="hz-rank-badge">${rkLabel}</div>
+        <div class="hz-vw"><div class="hz-vw-inner"><div class="hz-vw-dot"></div>${fmt(r.num_users)}</div></div>
       </div>
-      <div class="hz-name">${(r.display_name||r.username).substring(0,10)}</div>
+      <div class="hz-gstrip" style="background:${gc}"></div>
+      <div class="hz-name">${(r.display_name||r.username).substring(0,11)}</div>
     </div>`;
   }).join('');
 }
 
-function injectFeatured(filtered) {
-  if(!FEATURED.length) return filtered;
-  const featured=[], rest=[];
-  filtered.forEach(r=>{FEATURED.includes(r.username)?featured.push(r):rest.push(r);});
-  if(!featured.length) return filtered;
+/* ── FILTERS ── */
+function injectFeatured(f){
+  if(!FEATURED.length) return f;
+  const feat=[],rest=[];
+  f.forEach(r=>FEATURED.includes(r.username)?feat.push(r):rest.push(r));
+  if(!feat.length) return f;
   const result=[...rest];
-  featured.forEach(f=>{
-    const maxPos=Math.min(5,result.length);
-    const pos=Math.floor(Math.random()*(maxPos+1));
-    result.splice(pos,0,f);
-  });
+  feat.forEach(ft=>{const mp=Math.min(5,result.length);const pos=Math.floor(Math.random()*(mp+1));result.splice(pos,0,ft);});
   return result;
 }
 
-function getFiltered() {
+function getFiltered(){
   const q=document.getElementById('search').value.toLowerCase();
   let r=[...rooms];
   const isF=x=>FEATURED.includes(x.username);
@@ -1392,10 +1366,7 @@ function getFiltered() {
   if(q) r=r.filter(x=>isF(x)||(x.username||'').toLowerCase().includes(q)||(x.display_name||'').toLowerCase().includes(q));
   if(activeTag) r=r.filter(x=>isF(x)||(x.tags||[]).map(t=>String(t).toLowerCase()).includes(activeTag));
   if(activeCountry) r=r.filter(x=>isF(x)||(x.country||'')===activeCountry);
-  if(ageRange){
-    const[lo,hi]=ageRange==='40+'?[40,99]:ageRange.split('-').map(Number);
-    r=r.filter(x=>isF(x)||(x.age&&x.age>=lo&&x.age<=hi));
-  }
+  if(ageRange){const[lo,hi]=ageRange==='40+'?[40,99]:ageRange.split('-').map(Number);r=r.filter(x=>isF(x)||(x.age&&x.age>=lo&&x.age<=hi));}
   r.sort((a,b)=>{
     if(sort==='viewers') return(b.num_users||0)-(a.num_users||0);
     if(sort==='followers') return(b.num_followers||0)-(a.num_followers||0);
@@ -1406,7 +1377,7 @@ function getFiltered() {
   return r;
 }
 
-function updateAll() {
+function updateAll(){
   const total=rooms.length;
   const views=rooms.reduce((s,r)=>s+(r.num_users||0),0);
   const avg=total?Math.round(views/total):0;
@@ -1422,16 +1393,16 @@ function updateAll() {
   document.getElementById('ms-views').textContent=fmt(views);
   document.getElementById('ms-avg').textContent=fmt(avg);
   document.getElementById('ms-peak').textContent=fmt(peak);
+
   ['all','f','m','c','t'].forEach(g=>{
-    const el=document.getElementById('gc-'+g);
-    if(el) el.textContent=g==='all'?fmt(total):fmt(counts[g]||0);
-    const fd=document.getElementById('fd-gc-'+g);
-    if(fd) fd.textContent=g==='all'?fmt(total):fmt(counts[g]||0);
+    const v=g==='all'?fmt(total):fmt(counts[g]||0);
+    const el=document.getElementById('gc-'+g); if(el) el.textContent=v;
+    const fd=document.getElementById('fd-gc-'+g); if(fd) fd.textContent=v;
   });
-  document.getElementById('gc-fv').textContent=favs.length;
-  document.getElementById('gc-hd').textContent=fmt(hd);
-  const fd_fv=document.getElementById('fd-gc-fv'); if(fd_fv) fd_fv.textContent=favs.length;
-  const fd_hd=document.getElementById('fd-gc-hd'); if(fd_hd) fd_hd.textContent=fmt(hd);
+  const gcfv=document.getElementById('gc-fv'); if(gcfv) gcfv.textContent=favs.length;
+  const gchd=document.getElementById('gc-hd'); if(gchd) gchd.textContent=fmt(hd);
+  const fdcfv=document.getElementById('fd-gc-fv'); if(fdcfv) fdcfv.textContent=favs.length;
+  const fdchd=document.getElementById('fd-gc-hd'); if(fdchd) fdchd.textContent=fmt(hd);
 
   const colors={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
   document.getElementById('dist-bar').innerHTML=Object.entries(counts).map(([g,n])=>
@@ -1440,50 +1411,37 @@ function updateAll() {
   renderHotZone();
   updateTagFilter();
   updateCountryFilter();
-  if(typeof syncDrawerState==='function') syncDrawerState();
   render();
 }
 
-function updateTagFilter() {
-  const counts={};
-  rooms.forEach(r=>(r.tags||[]).forEach(t=>{const tag=String(t).toLowerCase();if(tag&&isNaN(tag))counts[tag]=(counts[tag]||0)+1;}));
-  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,12);
+function updateTagFilter(){
+  const c={};rooms.forEach(r=>(r.tags||[]).forEach(t=>{const tg=String(t).toLowerCase();if(tg&&isNaN(tg))c[tg]=(c[tg]||0)+1;}));
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,12);
   ['tag-filter-list','fd-tag-filter-list'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
+    const el=document.getElementById(id);if(!el) return;
     el.innerHTML=top.map(([tag,cnt])=>
-      `<span class="tag-filter-pill${activeTag===tag?' active':''}" onclick="setTagFilter('${tag}')">${tag} <span style="opacity:.45">${cnt}</span></span>`
-    ).join('');
+      `<span class="tag-pill${activeTag===tag?' active':''}" onclick="setTagFilter('${tag}')">${tag} <span style="opacity:.4">${cnt}</span></span>`).join('');
   });
 }
-
-function setTagFilter(tag){activeTag=activeTag===tag?'':tag;updateTagFilter();render();}
-
-function setCountryFilter(code){activeCountry=activeCountry===code?'':code;updateCountryFilter();render();}
-
-function setAgeFilter(range){
-  ageRange=ageRange===range?'':range;
-  ['18-21','22-25','26-30','31-40','40+'].forEach(r=>{
-    ['age-','fd-age-'].forEach(prefix=>{
-      const el=document.getElementById(prefix+r.split('-')[0]);
-      if(el) el.classList.toggle('active',ageRange===r);
-    });
+function setTagFilter(t){activeTag=activeTag===t?'':t;updateTagFilter();render();}
+function setCountryFilter(c){activeCountry=activeCountry===c?'':c;updateCountryFilter();render();}
+function setAgeFilter(r){
+  ageRange=ageRange===r?'':r;
+  ['18-21','22-25','26-30','31-40','40+'].forEach(rv=>{
+    ['age-','fd-age-'].forEach(p=>{const el=document.getElementById(p+rv.split('-')[0]);if(el) el.classList.toggle('active',ageRange===rv);});
   });
   render();
 }
-
 function updateCountryFilter(){
-  const FLAGS={US:'🇺🇸',CO:'🇨🇴',MX:'🇲🇽',BR:'🇧🇷',RO:'🇷🇴',DE:'🇩🇪',ES:'🇪🇸',RU:'🇷🇺',PL:'🇵🇱',CZ:'🇨🇿',HU:'🇭🇺',UA:'🇺🇦',IT:'🇮🇹',FR:'🇫🇷',GB:'🇬🇧',AR:'🇦🇷',CA:'🇨🇦',AU:'🇦🇺',NL:'🇳🇱',VE:'🇻🇪',PE:'🇵🇪',PH:'🇵🇭'};
-  const counts={};
-  rooms.forEach(r=>{if(r.country)counts[r.country]=(counts[r.country]||0)+1;});
-  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const F={US:'🇺🇸',CO:'🇨🇴',MX:'🇲🇽',BR:'🇧🇷',RO:'🇷🇴',DE:'🇩🇪',ES:'🇪🇸',RU:'🇷🇺',PL:'🇵🇱',CZ:'🇨🇿',HU:'🇭🇺',UA:'🇺🇦',IT:'🇮🇹',FR:'🇫🇷',GB:'🇬🇧',AR:'🇦🇷',CA:'🇨🇦',AU:'🇦🇺',NL:'🇳🇱',VE:'🇻🇪'};
+  const c={};rooms.forEach(r=>{if(r.country)c[r.country]=(c[r.country]||0)+1;});
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,10);
   ['country-filter-list','fd-country-filter-list'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
+    const el=document.getElementById(id);if(!el) return;
     el.innerHTML=top.map(([code,cnt])=>`
       <button class="g-btn${activeCountry===code?' active':''}" onclick="setCountryFilter('${code}')" style="justify-content:space-between">
-        <span style="display:flex;align-items:center;gap:6px"><span>${FLAGS[code]||'🌐'}</span><span>${code}</span></span>
-        <span class="g-count">${cnt}</span>
+        <span style="display:flex;align-items:center;gap:5px"><span>${F[code]||'🌐'}</span><span>${code}</span></span>
+        <span class="g-cnt">${cnt}</span>
       </button>`).join('');
   });
 }
@@ -1491,33 +1449,56 @@ function updateCountryFilter(){
 function render(){
   const r=injectFeatured(getFiltered());
   document.getElementById('s-show').textContent=fmt(r.length);
-  if(view==='grid') renderGrid(r);
-  else renderList(r);
+  view==='grid'?renderGrid(r):renderList(r);
 }
 
+/* ── RENDER GRID con placeholder offline ── */
 function renderGrid(r){
   const c=document.getElementById('gc-grid');
-  if(!r.length){c.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div>Sin resultados</div></div>`;return;}
+  if(!r.length){c.innerHTML=`<div class="empty"><div class="empty-ico">🔍</div><div>Sin resultados</div></div>`;return;}
+  const top3=rooms.filter(x=>x.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,3).map(x=>x.username);
+  const top10=rooms.filter(x=>x.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,10).map(x=>x.username);
+
   c.innerHTML=r.map(x=>{
     if(x._forced&&!x.num_users) return '';
     const fv=favs.includes(x.username);
-    const isTop3=rooms.filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,3).find(r=>r.username===x.username);
-    const img=x.image_url
-      ?`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}"
-          onerror="
-            const u='${x.username}';
-            const srcs=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'];
-            const tried=parseInt(this.dataset.tried||0);
-            if(tried<srcs.length){this.dataset.tried=tried+1;this.src=srcs[tried];}
-            else{this.outerHTML='<div class=card-img style=background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)>👤</div>';}
-          ">`
-      :`<div class="card-img" style="background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)">👤</div>`;
-    return `<div class="card" onclick="openInChaturbate('${x.username}')" style="cursor:pointer">
+    const isTop3=top3.includes(x.username);
+    const isHot=top10.includes(x.username)&&!isTop3;
+    const isOffline=!x.num_users||x.num_users===0;
+
+    // Imagen con fallback a placeholder visual para offline
+    let imgContent;
+    if(x.image_url){
+      imgContent=`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}"
+        data-tried="0"
+        onerror="
+          const u='${x.username}';
+          const srcs=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'];
+          const tried=parseInt(this.dataset.tried||0)+1;
+          if(tried<srcs.length){this.dataset.tried=tried;this.src=srcs[tried];}
+          else{
+            this.outerHTML='<div class=card-placeholder>'
+              +'<div class=card-placeholder-avatar>👤</div>'
+              +'<div class=card-placeholder-name>${(x.display_name||x.username).substring(0,12)}</div>'
+              +'<div class=card-placeholder-status><span style=width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block></span> Offline</div>'
+              +'</div>';
+          }
+        ">`;
+    }else{
+      imgContent=`<div class="card-placeholder">
+        <div class="card-placeholder-avatar">👤</div>
+        <div class="card-placeholder-name">${(x.display_name||x.username).substring(0,12)}</div>
+        <div class="card-placeholder-status"><span style="width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block"></span> Offline</div>
+      </div>`;
+    }
+
+    return `<div class="card" onclick="openInCB('${x.username}')">
       <div class="card-img-box">
-        ${img}
+        ${imgContent}
         <div class="card-grad"></div>
         <div class="card-badges">
           ${isTop3?'<span class="bdg bdg-top">TOP</span>':''}
+          ${isHot?'<span class="bdg bdg-hot">🔥 Hot</span>':''}
           ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
           ${x.is_new?'<span class="bdg bdg-new">New</span>':''}
         </div>
@@ -1536,46 +1517,39 @@ function renderGrid(r){
 
 function renderList(r){
   const b=document.getElementById('lb');
-  if(!r.length){b.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">🔍</div><div>Sin resultados</div></div></td></tr>`;return;}
+  if(!r.length){b.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ico">🔍</div><div>Sin resultados</div></div></td></tr>`;return;}
   b.innerHTML=r.map(x=>`
-    <tr onclick="openInChaturbate('${x.username}')" style="cursor:pointer">
+    <tr onclick="openInCB('${x.username}')">
       <td>${x.image_url?`<img class="l-av" src="${x.image_url}" loading="lazy" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`:`<div class="l-av-ph">👤</div>`}</td>
       <td><div class="l-name">${x.display_name||x.username}</div><div class="l-sub">@${x.username}</div></td>
-      <td><span class="gpill gp-${x.gender}">${gl[x.gender]||'—'}</span></td>
-      <td>
-        <span class="mono">${fmt(x.num_users||0)}</span>
-        <span class="vbar-w"><span class="vbar-f" style="width:${Math.round((x.num_users||0)/maxV*100)}%"></span></span>
-      </td>
+      <td><span class="gpill gp-${x.gender}">${GL[x.gender]||'—'}</span></td>
+      <td><span class="mono">${fmt(x.num_users||0)}</span><span class="vbar-w"><span class="vbar-f" style="width:${Math.round((x.num_users||0)/maxV*100)}%"></span></span></td>
       <td class="mono" style="color:var(--text3)">${fmt(x.num_followers||0)}</td>
       <td class="mono">${x.age||'—'}</td>
-      <td style="font-size:.7rem;color:var(--text3)">${x.country||'—'}</td>
+      <td style="font-size:.68rem;color:var(--text3)">${x.country||'—'}</td>
       <td><button class="fav-btn ${favs.includes(x.username)?'on':''}" style="position:static;width:26px;height:26px;background:var(--surface2)" onclick="toggleFav(event,'${x.username}')">♥</button></td>
     </tr>`).join('');
 }
 
-// ─── MODAL / LIVE PREVIEW ───
+/* ── MODAL ── */
 function openMod(u){
-  const x=rooms.find(r=>r.username===u);
-  if(!x) return;
-  active=x;
-  startLivePreview(x.username);
+  const x=rooms.find(r=>r.username===u);if(!x) return;
+  active=x; startLivePreview(x);
   document.getElementById('m-name').textContent=x.username;
   document.getElementById('m-disp').textContent=x.display_name||'';
-  document.getElementById('m-pill').innerHTML=`<span class="gpill gp-${x.gender}" style="font-size:.62rem;padding:3px 10px">${gl[x.gender]||'—'}</span>`;
+  document.getElementById('m-pill').innerHTML=`<span class="gpill gp-${x.gender}" style="font-size:.6rem;padding:3px 9px">${GL[x.gender]||'—'}</span>`;
   document.getElementById('m-vw').textContent=fmt(x.num_users||0);
   document.getElementById('m-fl').textContent=fmt(x.num_followers||0);
   document.getElementById('m-ag').textContent=x.age||'—';
   document.getElementById('m-co').textContent=x.country||'—';
   const subj=document.getElementById('m-subj');
-  if(x.room_subject){subj.textContent='"'+x.room_subject+'"';subj.style.display='block';}
-  else subj.style.display='none';
-  document.getElementById('m-tags').innerHTML=(x.tags||[]).slice(0,16).map(t=>`<span class="tag">${t}</span>`).join('');
+  if(x.room_subject){subj.textContent='"'+x.room_subject+'"';subj.style.display='block';}else subj.style.display='none';
+  document.getElementById('m-tags').innerHTML=(x.tags||[]).slice(0,16).map(t=>`<span class="m-tag">${t}</span>`).join('');
   document.getElementById('m-link').href=`https://chaturbate.com/${x.username}/?campaign=rI8z3&track=default`;
   updateFavBtn(x.username);
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow='hidden';
 }
-
 function updateFavBtn(u){
   const fv=favs.includes(u);
   document.getElementById('m-fav-btn').classList.toggle('on',fv);
@@ -1583,158 +1557,163 @@ function updateFavBtn(u){
   document.getElementById('m-fav-txt').textContent=fv?'Guardada':'Guardar';
 }
 
-let previewTimer=null,previewCountdown=null,previewSeconds=30;
-function startLivePreview(username){
+let prevTimer=null,prevCd=null,prevSec=30;
+function startLivePreview(x){
   stopLivePreview();
   const wrap=document.getElementById('mhero-img-wrap');
+  const u=x.username;
+  const isOnline=x.num_users>0;
   const srcs=[
-    `https://roomimg.stream.highwebmedia.com/ri/${username}.jpg`,
-    `https://thumb.live.mmcdn.com/ri/${username}.jpg`,
-    `https://thumb.live.mmcdn.com/riw/${username}.jpg`,
+    `https://roomimg.stream.highwebmedia.com/ri/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
   ];
-  wrap.innerHTML=`
-    <div class="live-preview-wrap" onclick="openInChaturbate('${username}')">
-      <img class="live-preview-img" id="live-img" src="${srcs[0]}?t=${Date.now()}" alt="${username}"
-        data-tried="0"
-        onerror="
-          const tried=parseInt(this.dataset.tried||0)+1;
-          const s=${JSON.stringify(srcs)};
-          if(tried<s.length){this.dataset.tried=tried;this.src=s[tried]+'?t='+Date.now();}
-          else{this.style.display='none';this.parentElement.style.background='var(--surface2)';}
-        ">
-      <div class="live-refresh-badge">
-        <div class="live-refresh-dot"></div>Live
-        <span class="live-refresh-timer" id="live-timer">·30s</span>
-      </div>
-      <div class="live-preview-overlay">
-        <div class="live-play-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-      </div>
-      <button class="live-fullscreen-btn" onclick="event.stopPropagation();openInChaturbate('${username}')">↗ Ver en vivo</button>
-    </div>`;
-  previewSeconds=30;
-  previewCountdown=setInterval(()=>{
-    previewSeconds--;
-    const el=document.getElementById('live-timer');
-    if(el) el.textContent='·'+previewSeconds+'s';
-    if(previewSeconds<=0){previewSeconds=30;refreshLivePreview(username);}
-  },1000);
-}
 
-function refreshLivePreview(username){
-  const img=document.getElementById('live-img');
-  if(!img) return;
+  if(isOnline){
+    wrap.innerHTML=`
+      <div class="live-preview-wrap" onclick="openInCB('${u}')">
+        <img class="live-preview-img" id="live-img" src="${srcs[0]}?t=${Date.now()}" alt="${u}"
+          data-tried="0"
+          onerror="
+            const tried=parseInt(this.dataset.tried||0)+1;
+            const s=${JSON.stringify(srcs)};
+            if(tried<s.length){this.dataset.tried=tried;this.src=s[tried]+'?t='+Date.now();}
+            else{this.style.display='none';this.parentElement.style.background='var(--surface2)';}
+          ">
+        <div class="live-refresh-badge">
+          <div class="live-refresh-dot"></div>Live
+          <span class="live-refresh-timer" id="live-timer">·30s</span>
+        </div>
+        <div class="live-overlay"><div class="play-circle"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
+        <button class="modal-live-btn" onclick="event.stopPropagation();openInCB('${u}')">
+          <svg viewBox="0 0 16 16" width="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9M10 2h4v4M14 2L7 9"/></svg>
+          Entrar en vivo
+        </button>
+      </div>`;
+    prevSec=30;
+    prevCd=setInterval(()=>{
+      prevSec--;const el=document.getElementById('live-timer');if(el) el.textContent='·'+prevSec+'s';
+      if(prevSec<=0){prevSec=30;refreshPreview(u);}
+    },1000);
+  }else{
+    // Modelo offline — placeholder con estilo
+    wrap.innerHTML=`
+      <div class="modal-hero-placeholder">
+        <div class="mhp-avatar">👤</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--text2)">${x.display_name||u}</div>
+        <div class="mhp-offline">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--text3);display:inline-block"></span>
+          Offline en este momento
+        </div>
+        <a href="https://chaturbate.com/${u}/?campaign=rI8z3&track=default" target="_blank" rel="noopener"
+          style="margin-top:8px;background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;border-radius:9px;padding:7px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;box-shadow:0 4px 14px rgba(255,45,85,.35)">
+          Ir a su sala ↗
+        </a>
+      </div>`;
+  }
+}
+function refreshPreview(u){
+  const img=document.getElementById('live-img');if(!img) return;
   img.classList.add('loading');
-  const newSrc=`https://roomimg.stream.highwebmedia.com/ri/${username}.jpg?t=${Date.now()}`;
-  const tmp=new Image();
-  tmp.onload=()=>{img.src=newSrc;img.classList.remove('loading');};
-  tmp.onerror=()=>img.classList.remove('loading');
-  tmp.src=newSrc;
+  const ns=`https://roomimg.stream.highwebmedia.com/ri/${u}.jpg?t=${Date.now()}`;
+  const tmp=new Image();tmp.onload=()=>{img.src=ns;img.classList.remove('loading');};tmp.onerror=()=>img.classList.remove('loading');tmp.src=ns;
 }
-function stopLivePreview(){clearInterval(previewTimer);clearInterval(previewCountdown);previewTimer=null;previewCountdown=null;}
+function stopLivePreview(){clearInterval(prevTimer);clearInterval(prevCd);prevTimer=null;prevCd=null;}
 
-function openInChaturbate(u){
-  window.open(`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`,'_blank','noopener');
-}
+function openInCB(u){window.open(`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`,'_blank','noopener');}
 
 function closeMod(e){
   if(!e||e.target===document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
-    document.body.style.overflow='';
-    stopLivePreview();
+    document.body.style.overflow='';stopLivePreview();
   }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
 
 function toggleFav(e,u){
-  e.stopPropagation();
-  const i=favs.indexOf(u);
+  e.stopPropagation();const i=favs.indexOf(u);
   if(i>=0){favs.splice(i,1);toast('Quitada de favoritas');}
   else{favs.push(u);toast('Guardada en favoritas ♥');}
   localStorage.setItem('cp3_favs',JSON.stringify(favs));
   document.getElementById('s-favs').textContent=favs.length;
-  document.getElementById('gc-fv').textContent=favs.length;
+  const gcfv=document.getElementById('gc-fv');if(gcfv) gcfv.textContent=favs.length;
   render();
 }
 function favMod(){if(!active) return;toggleFav({stopPropagation:()=>{}},active.username);updateFavBtn(active.username);}
 
 function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// ─── GENDER TABS ───
+/* ── GENDER TABS & FILTERS ── */
 document.querySelectorAll('[data-g]').forEach(b=>{
   b.addEventListener('click',()=>{
     gender=b.dataset.g;
+    // Sidebar tabs
     document.querySelectorAll('.gtab[data-g]').forEach(x=>x.classList.toggle('active',x.dataset.g===gender));
-    document.querySelectorAll('.gq-btn[data-g]').forEach(x=>{
-      x.classList.toggle('on',x.dataset.g===gender);
+    // Filter bar gender pills
+    document.querySelectorAll('.gf-btn[data-g]').forEach(x=>{
+      x.className='gf-btn';
+      if(x.dataset.g===gender){
+        if(gender==='') x.classList.add('on-all');
+        else if(gender==='f') x.classList.add('on-f');
+        else if(gender==='m') x.classList.add('on-m');
+        else if(gender==='c') x.classList.add('on-c');
+        else if(gender==='t') x.classList.add('on-t');
+      }
     });
     render();
   });
 });
 
-// ─── SPECIAL FILTERS ───
 document.getElementById('sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active');render();});
 document.getElementById('sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active');render();});
-document.getElementById('tb-co').addEventListener('click',function(){setCountryFilter('CO');this.classList.toggle('on-gold');});
-document.getElementById('tb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('on-rose');render();});
-document.getElementById('tb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('on');render();});
 document.getElementById('fd-sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active');render();});
 document.getElementById('fd-sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active');render();});
 
+document.getElementById('tb-co').addEventListener('click',function(){setCountryFilter('CO');this.classList.toggle('on-g');});
+document.getElementById('tb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('on');render();});
+document.getElementById('tb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('on');render();});
 document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;render();});
 document.getElementById('search').addEventListener('input',()=>render());
 document.getElementById('ref-btn').addEventListener('click',load);
-
 document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render();});
 document.getElementById('th-f').addEventListener('click',()=>{sort='followers';render();});
 document.getElementById('th-a').addEventListener('click',()=>{sort='age_asc';render();});
 
-document.getElementById('vg').addEventListener('click',()=>{
-  view='grid';document.getElementById('gw').classList.remove('hide');document.getElementById('lw').classList.remove('show');
-  document.getElementById('vg').classList.add('on');document.getElementById('vl').classList.remove('on');render();
-});
-document.getElementById('vl').addEventListener('click',()=>{
-  view='list';document.getElementById('gw').classList.add('hide');document.getElementById('lw').classList.add('show');
-  document.getElementById('vg').classList.remove('on');document.getElementById('vl').classList.add('on');render();
-});
+document.getElementById('vg').addEventListener('click',()=>{view='grid';document.getElementById('gw').classList.remove('hide');document.getElementById('lw').classList.remove('show');document.getElementById('vg').classList.add('on');document.getElementById('vl').classList.remove('on');render();});
+document.getElementById('vl').addEventListener('click',()=>{view='list';document.getElementById('gw').classList.add('hide');document.getElementById('lw').classList.add('show');document.getElementById('vg').classList.remove('on');document.getElementById('vl').classList.add('on');render();});
 
-// ─── FILTER DRAWER ───
-function openFilterDrawer(){document.getElementById('filter-drawer').classList.add('open');document.getElementById('fd-overlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeFilterDrawer(){document.getElementById('filter-drawer').classList.remove('open');document.getElementById('fd-overlay').classList.remove('open');document.body.style.overflow='';}
+/* ── FILTER DRAWER ── */
+function openFD(){document.getElementById('fd').classList.add('open');document.getElementById('fd-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeFD(){document.getElementById('fd').classList.remove('open');document.getElementById('fd-overlay').classList.remove('open');document.body.style.overflow='';}
 
-// ─── TAB NAVIGATION ───
+/* ── TABS ── */
 function switchTab(tab){
-  const explore=document.getElementById('page-explore');
-  const model=document.getElementById('model-view');
-  const tabEx=document.getElementById('tab-explore');
-  const tabMod=document.getElementById('tab-model');
-  if(tab==='explore'){explore.classList.remove('hide');model.classList.remove('show');tabEx.classList.add('active');tabMod.classList.remove('active');}
-  else{explore.classList.add('hide');model.classList.add('show');tabEx.classList.remove('active');tabMod.classList.add('active');}
+  const explore=document.getElementById('page-explore'),model=document.getElementById('model-view');
+  const tE=document.getElementById('tab-explore'),tM=document.getElementById('tab-model');
+  if(tab==='explore'){explore.classList.remove('hide');model.classList.remove('show');tE.classList.add('active');tM.classList.remove('active');}
+  else{explore.classList.add('hide');model.classList.add('show');tE.classList.remove('active');tM.classList.add('active');}
 }
 
-// ─── MODEL REPORT ───
-let currentModel=null;
+/* ── MODEL REPORT ── */
+let curModel=null;
 function resetModelSearch(){
   document.getElementById('model-search-screen').style.display='flex';
   document.getElementById('model-report').style.display='none';
   document.getElementById('model-username-input').value='';
   document.getElementById('model-search-error').style.display='none';
-  currentModel=null;
+  curModel=null;
 }
 async function searchModel(){
   const u=document.getElementById('model-username-input').value.trim().toLowerCase();
   if(!u) return;
   document.getElementById('model-search-error').style.display='none';
   let room=rooms.find(r=>r.username===u);
-  if(!room){
-    try{const res=await fetch(`/api/rooms?username=${encodeURIComponent(u)}`);const d=await res.json();room=(d.results||[]).find(r=>r.username===u)||null;}catch(e){}
-  }
+  if(!room){try{const res=await fetch(`/api/rooms?username=${encodeURIComponent(u)}`);const d=await res.json();room=(d.results||[]).find(r=>r.username===u)||null;}catch(e){}}
   if(!room) room={username:u,display_name:u,gender:'',country:'',num_users:0,num_followers:0,age:null,is_hd:false,image_url:'',tags:[]};
-  currentModel=room;
-  loadModelReport(room);
+  curModel=room;loadModelReport(room);
 }
 async function loadModelReport(room){
   document.getElementById('model-search-screen').style.display='none';
@@ -1747,8 +1726,8 @@ async function loadModelReport(room){
   const gls={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
   document.getElementById('rp-meta').textContent=[gls[room.gender]||'',room.country||'',room.age?room.age+'a':''].filter(Boolean).join(' · ');
   document.getElementById('rp-link').href=`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`;
-  const roomData=rooms.find(r=>r.username===u);
-  const isOnline=roomData&&!roomData._forced&&(roomData.num_users||0)>0;
+  const rd=rooms.find(r=>r.username===u);
+  const isOnline=rd&&!rd._forced&&(rd.num_users||0)>0;
   document.getElementById('rp-status-dot').style.background=isOnline?'var(--green)':'var(--text3)';
   document.getElementById('rp-status-txt').textContent=isOnline?'Online ahora':'Offline';
   document.getElementById('rp-viewers').textContent=room._forced?'—':fmt(room.num_users||0);
@@ -1758,40 +1737,35 @@ async function loadModelReport(room){
     const rank=sorted.findIndex(r=>r.username===u);
     if(rank>=0){
       document.getElementById('rp-rank').textContent='#'+(rank+1);
-      document.getElementById('rp-rank-sub').textContent=`de ${fmt(rooms.length)} salas activas`;
+      document.getElementById('rp-rank-sub').textContent=`de ${fmt(rooms.length)} activas`;
       const pct=Math.round(((rooms.length-rank)/rooms.length)*100);
       const posEl=document.getElementById('rb-pos');if(posEl) posEl.style.width=pct+'%';
       const posVal=document.getElementById('rb-pos-val');if(posVal) posVal.textContent=`#${rank+1} / ${fmt(rooms.length)}`;
-      const top10idx=Math.floor(rooms.length*0.1);
-      const top10v=sorted[top10idx]?.num_users||0;
+      const top10v=sorted[Math.floor(rooms.length*.1)]?.num_users||0;
       const avgV2=Math.round(rooms.reduce((s,r)=>s+(r.num_users||0),0)/rooms.length);
-      const t10Val=document.getElementById('rb-top10-val');if(t10Val) t10Val.textContent=fmt(top10v)+' viewers';
-      const avgVal2=document.getElementById('rb-avg-val');if(avgVal2) avgVal2.textContent=fmt(avgV2)+' viewers';
-      const avgFill=document.getElementById('rb-avg');if(avgFill) avgFill.style.width=Math.round(avgV2/(sorted[0]?.num_users||1)*100)+'%';
+      const t10v=document.getElementById('rb-top10-val');if(t10v) t10v.textContent=fmt(top10v)+' viewers';
+      const av2=document.getElementById('rb-avg-val');if(av2) av2.textContent=fmt(avgV2)+' viewers';
+      const avf=document.getElementById('rb-avg');if(avf) avf.style.width=Math.round(avgV2/(sorted[0]?.num_users||1)*100)+'%';
       const sumEl=document.getElementById('rb-summary');
-      if(sumEl){const top=100-pct;sumEl.textContent=top<=10?`¡Estás en el top ${top}% — rendimiento excelente!`:top<=30?`Estás en el top ${top}% — por encima del promedio.`:`Estás en el top ${top}% — hay oportunidad de crecer.`;}
-    }else{document.getElementById('rp-rank').textContent='Offline';document.getElementById('rp-rank-sub').textContent='no está en el ranking activo';}
+      if(sumEl){const top=100-pct;sumEl.textContent=top<=10?`¡Top ${top}% — rendimiento excelente!`:top<=30?`Top ${top}% — por encima del promedio.`:`Top ${top}% — hay oportunidad de crecer.`;}
+    }else{document.getElementById('rp-rank').textContent='Offline';document.getElementById('rp-rank-sub').textContent='no en ranking activo';}
   }
   document.getElementById('rp-avg').textContent='—';
-  const tagsEl=document.getElementById('rp-tags');if(tagsEl) tagsEl.innerHTML=(room.tags||[]).slice(0,12).map(t=>`<span class="tag">${t}</span>`).join('');
-  loadHistoricalData(u,room);
-  loadStatbateIncome(u);
+  const tagsEl=document.getElementById('rp-tags');if(tagsEl) tagsEl.innerHTML=(room.tags||[]).slice(0,12).map(t=>`<span class="m-tag">${t}</span>`).join('');
+  loadHistoricalData(u,room);loadStatbateIncome(u);
 }
-
 async function loadHistoricalData(username,room){
-  const SUPA_URL='https://upwjwuikaxuelczlrewk.supabase.co';
-  const SUPA_KEY='sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
-  const headers={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
-  document.getElementById('heatmap-container').innerHTML='<div class="no-data-msg">Cargando datos históricos...</div>';
-  document.getElementById('followers-container').innerHTML='<div class="no-data-msg">Cargando historial...</div>';
+  const SU='https://upwjwuikaxuelczlrewk.supabase.co',SK='sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
+  const H={'apikey':SK,'Authorization':'Bearer '+SK};
+  document.getElementById('heatmap-container').innerHTML='<div class="no-data">Cargando...</div>';
+  document.getElementById('followers-container').innerHTML='<div class="no-data">Cargando...</div>';
   try{
     const since=new Date(Date.now()-30*24*60*60*1000).toISOString();
-    const res=await fetch(`${SUPA_URL}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=1000`,{headers});
+    const res=await fetch(`${SU}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=1000`,{headers:H});
     const data=await res.json();
     if(!data||!data.length){
-      document.getElementById('heatmap-container').innerHTML='<div class="no-data-msg">Sin datos históricos aún.<br><span style="font-size:.68rem">Los datos se acumulan cada hora. Vuelve mañana.</span></div>';
-      document.getElementById('followers-container').innerHTML='<div class="no-data-msg">Sin historial de seguidores aún.</div>';
-      return;
+      document.getElementById('heatmap-container').innerHTML='<div class="no-data">Sin datos aún.<br><span style="font-size:.68rem">Los datos se acumulan cada hora.</span></div>';
+      document.getElementById('followers-container').innerHTML='<div class="no-data">Sin historial aún.</div>';return;
     }
     const viewers=data.map(d=>d.num_users||0).filter(v=>v>0);
     const avg=viewers.length?Math.round(viewers.reduce((a,b)=>a+b,0)/viewers.length):0;
@@ -1800,114 +1774,96 @@ async function loadHistoricalData(username,room){
     if(data.length>=2){
       const first=data[0].num_followers||0,last=data[data.length-1].num_followers||0,diff=last-first;
       const pct=first?((diff/first)*100).toFixed(1):0;
-      const trendEl=document.getElementById('rp-followers-trend');
-      if(trendEl){trendEl.style.display='flex';trendEl.textContent=(diff>=0?'▲ +':'▼ ')+fmt(Math.abs(diff))+` (${pct}%) 30d`;trendEl.className='report-card-trend '+(diff>=0?'trend-up':'trend-down');}
+      const tEl=document.getElementById('rp-followers-trend');
+      if(tEl){tEl.style.display='flex';tEl.textContent=(diff>=0?'▲ +':'▼ ')+fmt(Math.abs(diff))+` (${pct}%) 30d`;tEl.className='rep-trend '+(diff>=0?'t-up':'t-dn');}
     }
-    const byDay={};
-    data.forEach(d=>{const day=d.captured_at.substring(0,10);if(!byDay[day])byDay[day]=[];byDay[day].push(d.num_users||0);});
-    const days=Object.keys(byDay).sort();
-    const dayAvgs=days.map(d=>Math.round(byDay[d].reduce((a,b)=>a+b,0)/byDay[d].length));
+    const byDay={};data.forEach(d=>{const day=d.captured_at.substring(0,10);if(!byDay[day])byDay[day]=[];byDay[day].push(d.num_users||0);});
+    const days=Object.keys(byDay).sort(),dayAvgs=days.map(d=>Math.round(byDay[d].reduce((a,b)=>a+b,0)/byDay[d].length));
     renderHeatmapAndTrend(data,days,dayAvgs,avg,peak);
     renderFollowersChart(data);
-  }catch(e){document.getElementById('heatmap-container').innerHTML='<div class="no-data-msg">Error cargando datos históricos.</div>';}
+  }catch(e){document.getElementById('heatmap-container').innerHTML='<div class="no-data">Error cargando datos.</div>';}
 }
-
 function renderHeatmapAndTrend(data,days,dayAvgs,avg,peak){
   const wrap=document.getElementById('heatmap-container');if(!wrap) return;
-  let statsHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem">
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem;text-align:center">
-      <div style="font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--violet2)">${fmt(avg)}</div>
-      <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Promedio</div>
-    </div>
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem;text-align:center">
-      <div style="font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--green)">${fmt(peak)}</div>
-      <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Peak</div>
-    </div>
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem;text-align:center">
-      <div style="font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--amber)">${data.length}</div>
-      <div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Snapshots</div>
-    </div>
+  let h=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.9rem">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.65rem;text-align:center"><div style="font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--neon2)">${fmt(avg)}</div><div style="font-size:.56rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Promedio</div></div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.65rem;text-align:center"><div style="font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--green)">${fmt(peak)}</div><div style="font-size:.56rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Peak</div></div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.65rem;text-align:center"><div style="font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--fire2)">${data.length}</div><div style="font-size:.56rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Snapshots</div></div>
   </div>`;
-  statsHTML+=`<canvas id="rp-trend-canvas" style="width:100%;height:110px;display:block;margin-bottom:1rem;border-radius:8px"></canvas>`;
-  const matrix={};const daysW=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  data.forEach(d=>{const dt=new Date(d.captured_at);const key=`${dt.getDay()}-${dt.getHours()}`;if(!matrix[key])matrix[key]=[];matrix[key].push(d.num_users||0);});
-  let maxVal=1;Object.values(matrix).forEach(arr=>{const a=arr.reduce((x,y)=>x+y,0)/arr.length;if(a>maxVal)maxVal=a;});
-  statsHTML+='<div style="overflow-x:auto"><div class="heatmap-grid">';
-  statsHTML+='<div class="heatmap-label"></div>';
-  for(let h=0;h<24;h++) statsHTML+=`<div class="heatmap-hour-label">${h}</div>`;
+  h+=`<canvas id="rp-trend-canvas" style="width:100%;height:110px;display:block;margin-bottom:.9rem;border-radius:8px"></canvas>`;
+  const matrix={},dw=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  data.forEach(d=>{const dt=new Date(d.captured_at);const k=`${dt.getDay()}-${dt.getHours()}`;if(!matrix[k])matrix[k]=[];matrix[k].push(d.num_users||0);});
+  let mx=1;Object.values(matrix).forEach(arr=>{const a=arr.reduce((x,y)=>x+y,0)/arr.length;if(a>mx)mx=a;});
+  h+='<div style="overflow-x:auto"><div class="hm-grid">';
+  h+='<div class="hm-lbl"></div>';
+  for(let hh=0;hh<24;hh++) h+=`<div class="hm-hlbl">${hh}</div>`;
   for(let d=0;d<7;d++){
-    statsHTML+=`<div class="heatmap-label">${daysW[d]}</div>`;
-    for(let h=0;h<24;h++){
-      const arr=matrix[`${d}-${h}`]||[];
-      const a=arr.length?arr.reduce((x,y)=>x+y,0)/arr.length:0;
-      const al=(a/maxVal*0.85+0.05).toFixed(2);
-      statsHTML+=`<div class="heatmap-cell" style="background:rgba(155,114,255,${al})" title="${daysW[d]} ${h}h${a>0?' — '+Math.round(a)+' viewers':''}"></div>`;
+    h+=`<div class="hm-lbl">${dw[d]}</div>`;
+    for(let hh=0;hh<24;hh++){
+      const arr=matrix[`${d}-${hh}`]||[];const a=arr.length?arr.reduce((x,y)=>x+y,0)/arr.length:0;
+      const al=(a/mx*.85+.05).toFixed(2);
+      h+=`<div class="hm-cell" style="background:rgba(255,45,85,${al})" title="${dw[d]} ${hh}h${a>0?' — '+Math.round(a)+' viewers':''}"></div>`;
     }
   }
-  statsHTML+='</div></div>';
-  wrap.innerHTML=statsHTML;
+  h+='</div></div>';
+  wrap.innerHTML=h;
   requestAnimationFrame(()=>{
     const canvas=document.getElementById('rp-trend-canvas');if(!canvas||!days.length) return;
-    const W=canvas.offsetWidth;const H=110;canvas.width=W;canvas.height=H;
-    const ctx=canvas.getContext('2d');const maxVc=Math.max(...dayAvgs,1);
-    const pad={l:8,r:8,t:8,b:22};const cW=W-pad.l-pad.r;const cH=H-pad.t-pad.b;
+    const W=canvas.offsetWidth,H=110;canvas.width=W;canvas.height=H;
+    const ctx=canvas.getContext('2d'),maxVc=Math.max(...dayAvgs,1);
+    const pad={l:8,r:8,t:8,b:22},cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
     ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
     [.25,.5,.75,1].forEach(f=>{const y=pad.t+cH*(1-f);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();});
     const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
-    grad.addColorStop(0,'rgba(155,114,255,.4)');grad.addColorStop(1,'rgba(155,114,255,.02)');
+    grad.addColorStop(0,'rgba(255,45,85,.4)');grad.addColorStop(1,'rgba(255,45,85,.02)');
     ctx.fillStyle=grad;ctx.beginPath();
     dayAvgs.forEach((v,i)=>{const x=pad.l+(i/(dayAvgs.length-1||1))*cW;const y=pad.t+cH*(1-v/maxVc);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
     ctx.lineTo(pad.l+cW,H-pad.b);ctx.lineTo(pad.l,H-pad.b);ctx.closePath();ctx.fill();
-    ctx.strokeStyle='#9b72ff';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
+    ctx.strokeStyle='#ff2d55';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
     dayAvgs.forEach((v,i)=>{const x=pad.l+(i/(dayAvgs.length-1||1))*cW;const y=pad.t+cH*(1-v/maxVc);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
     ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px Plus Jakarta Sans,sans-serif';ctx.textAlign='center';
     [0,Math.floor(days.length/2),days.length-1].forEach(i=>{if(days[i]){const x=pad.l+(i/(days.length-1||1))*cW;ctx.fillText(days[i].substring(5),x,H-5);}});
   });
 }
-
 function renderFollowersChart(data){
   const wrap=document.getElementById('followers-container');
-  if(!wrap||data.length<2){if(wrap) wrap.innerHTML='<div class="no-data-msg">Se necesitan más datos para mostrar tendencia.</div>';return;}
+  if(!wrap||data.length<2){if(wrap) wrap.innerHTML='<div class="no-data">Más datos necesarios.</div>';return;}
   const step=Math.max(1,Math.floor(data.length/20));
   const pts=data.filter((_,i)=>i%step===0||i===data.length-1);
   const first=pts[0].num_followers||0,last=pts[pts.length-1].num_followers||0,diff=last-first;
-  const color=diff>=0?'var(--green)':'var(--red)',arrow=diff>=0?'▲':'▼';
+  const color=diff>=0?'var(--green)':'var(--hot)',arrow=diff>=0?'▲':'▼';
   wrap.innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
-      <div style="font-size:.78rem;color:var(--text2)">Últimos 30 días</div>
-      <div style="font-size:.82rem;font-weight:600;color:${color}">${arrow} ${diff>=0?'+':''}${fmt(diff)} seguidores</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+      <div style="font-size:.76rem;color:var(--text2)">Últimos 30 días</div>
+      <div style="font-size:.8rem;font-weight:700;color:${color}">${arrow} ${diff>=0?'+':''}${fmt(diff)} seguidores</div>
     </div>
-    <canvas id="rp-foll-canvas" style="width:100%;height:75px;display:block;border-radius:8px"></canvas>`;
+    <canvas id="rp-foll-canvas" style="width:100%;height:72px;display:block;border-radius:8px"></canvas>`;
   requestAnimationFrame(()=>{
     const canvas=document.getElementById('rp-foll-canvas');if(!canvas) return;
-    const W=canvas.offsetWidth,H=75;canvas.width=W;canvas.height=H;
-    const ctx=canvas.getContext('2d');const vals=pts.map(d=>d.num_followers||0);
+    const W=canvas.offsetWidth,H=72;canvas.width=W;canvas.height=H;
+    const ctx=canvas.getContext('2d'),vals=pts.map(d=>d.num_followers||0);
     const minV=Math.min(...vals),maxV2=Math.max(...vals,minV+1);
-    const pad={l:8,r:8,t:8,b:8};const cW=W-pad.l-pad.r;const cH=H-pad.t-pad.b;
-    const fillColor=diff>=0?'rgba(61,252,160,.28)':'rgba(255,77,109,.28)';
-    const strokeColor=diff>=0?'#3dfca0':'#ff4d6d';
-    const grad2=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
-    grad2.addColorStop(0,fillColor);grad2.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=grad2;ctx.beginPath();
+    const pad={l:8,r:8,t:8,b:8},cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+    const fc=diff>=0?'rgba(0,255,136,.28)':'rgba(255,45,85,.28)',sc=diff>=0?'#00ff88':'#ff2d55';
+    const g2=ctx.createLinearGradient(0,pad.t,0,H-pad.b);g2.addColorStop(0,fc);g2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g2;ctx.beginPath();
     vals.forEach((v,i)=>{const x=pad.l+(i/(vals.length-1||1))*cW;const y=pad.t+cH*(1-(v-minV)/(maxV2-minV));i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
     ctx.lineTo(pad.l+cW,H-pad.b);ctx.lineTo(pad.l,H-pad.b);ctx.closePath();ctx.fill();
-    ctx.strokeStyle=strokeColor;ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
+    ctx.strokeStyle=sc;ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
     vals.forEach((v,i)=>{const x=pad.l+(i/(vals.length-1||1))*cW;const y=pad.t+cH*(1-(v-minV)/(maxV2-minV));i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
     ctx.stroke();
   });
 }
-
 async function loadStatbateIncome(username){
-  const incEl=document.getElementById('rp-income'),incValEl=document.getElementById('rp-income-val');
+  const iE=document.getElementById('rp-income'),iV=document.getElementById('rp-income-val');
   try{
     const res=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent('https://statbate.com/chaturbate/list/'));
     const html=await res.text();
     const re=new RegExp(`/search/1/${username.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}['\"\\s][^>]*>[^<]+</a></td>[\\s\\S]{0,300}?<td>([\\$\\d.,]+)</td>`,'i');
     const m=re.exec(html);
-    if(m){incValEl.textContent=m[1]+'/h';if(incEl) incEl.style.display='flex';}
-    else{if(incEl) incEl.style.display='none';}
-  }catch(e){if(incEl) incEl.style.display='none';}
+    if(m){iV.textContent=m[1]+'/h';if(iE) iE.style.display='flex';}else{if(iE) iE.style.display='none';}
+  }catch(e){if(iE) iE.style.display='none';}
 }
 
 setInterval(load,2*60*1000);
