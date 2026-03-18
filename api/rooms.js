@@ -1,9 +1,15 @@
 export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
+  const { searchParams } = new URL(req.url);
+  const username = searchParams.get('username');
   const AFF = 'rI8z3';
-  const url = `https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=${AFF}&client_ip=request_ip&format=json&limit=500`;
-  
+
+  // Si viene username, buscar esa sala específica
+  const url = username
+    ? `https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=${AFF}&client_ip=request_ip&format=json&limit=500&keywords=${encodeURIComponent(username)}`
+    : `https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=${AFF}&client_ip=request_ip&format=json&limit=500`;
+
   try {
     const res = await fetch(url, {
       headers: {
@@ -17,7 +23,7 @@ export default async function handler(req) {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 's-maxage=60, stale-while-revalidate=30',
+        'Cache-Control': 's-maxage=30, stale-while-revalidate=15',
       }
     });
   } catch (e) {
