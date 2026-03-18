@@ -538,6 +538,139 @@ header{
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* ─── RESPONSIVE ─── */
+.nav-tabs{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:3px}
+.nav-tab{background:none;border:none;color:var(--text3);font-family:'Inter',sans-serif;font-size:.72rem;font-weight:500;padding:.35rem .75rem;border-radius:7px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.nav-tab:hover{color:var(--text2)}
+.nav-tab.active{background:var(--surface3);color:var(--text)}
+
+/* ─── MODEL REPORT ─── */
+.model-view{display:none;flex:1;overflow-y:auto}
+.model-view.show{display:block}
+.page-explore{display:flex;flex:1;overflow:hidden}
+.page-explore.hide{display:none}
+
+.model-search-screen{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:4rem 2rem;gap:1.5rem;
+  min-height:60vh;
+}
+.model-search-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:var(--text);text-align:center}
+.model-search-sub{font-size:.85rem;color:var(--text3);text-align:center;max-width:400px;line-height:1.6}
+.model-search-box{
+  display:flex;gap:.5rem;width:100%;max-width:480px;
+}
+.model-search-box input{
+  flex:1;background:var(--surface2);border:1px solid var(--border2);
+  border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;
+  font-size:.9rem;padding:.75rem 1.1rem;outline:none;
+  transition:border-color .2s;
+}
+.model-search-box input:focus{border-color:var(--accent)}
+.model-search-box input::placeholder{color:var(--text3)}
+.model-search-box button{
+  background:var(--accent);color:#fff;border:none;
+  border-radius:10px;padding:.75rem 1.25rem;
+  font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:opacity .15s;white-space:nowrap;
+}
+.model-search-box button:hover{opacity:.88}
+
+.model-report{display:none;padding:1.5rem}
+.model-report.show{display:block}
+
+.model-hero{
+  display:flex;align-items:center;gap:1.5rem;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;
+}
+.model-hero-img{
+  width:80px;height:80px;border-radius:12px;
+  object-fit:cover;background:var(--surface2);flex-shrink:0;
+}
+.model-hero-info{flex:1;min-width:0}
+.model-hero-name{font-size:1.25rem;font-weight:700;letter-spacing:-.02em;margin-bottom:3px}
+.model-hero-meta{font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.model-hero-status{
+  display:flex;align-items:center;gap:6px;
+  font-size:.7rem;font-weight:600;
+}
+.model-status-online{color:var(--green)}
+.model-status-offline{color:var(--text3)}
+
+.report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.25rem}
+.report-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:1.1rem 1.25rem;
+}
+.report-card-lbl{font-size:.6rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
+.report-card-val{font-size:1.35rem;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em;line-height:1}
+.report-card-sub{font-size:.65rem;color:var(--text3);margin-top:3px}
+.report-card-trend{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:.65rem;font-weight:600;font-family:'JetBrains Mono',monospace;
+  padding:2px 7px;border-radius:20px;margin-top:4px;
+}
+.trend-up{background:rgba(45,213,115,.1);color:var(--green)}
+.trend-down{background:rgba(255,71,87,.1);color:var(--red)}
+.trend-flat{background:rgba(255,255,255,.05);color:var(--text3)}
+
+.report-section{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;
+}
+.report-section-title{
+  font-size:.72rem;font-weight:600;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;
+}
+.report-section-title::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* Heatmap */
+.heatmap-grid{display:grid;grid-template-columns:40px repeat(24,1fr);gap:2px}
+.heatmap-label{font-size:.55rem;color:var(--text3);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
+.heatmap-hour-label{font-size:.5rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-align:center}
+.heatmap-cell{
+  aspect-ratio:1;border-radius:2px;
+  background:var(--surface2);
+  transition:transform .1s;cursor:default;
+}
+.heatmap-cell:hover{transform:scale(1.2);z-index:1}
+
+/* Ranking bar */
+.rank-bar-wrap{margin-bottom:.75rem}
+.rank-bar-label{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:.3rem}
+.rank-bar-label span:first-child{color:var(--text2)}
+.rank-bar-label span:last-child{color:var(--text3);font-family:'JetBrains Mono',monospace}
+.rank-bar-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.rank-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+
+/* Followers chart */
+.followers-chart{height:80px;position:relative}
+.followers-bars{display:flex;align-items:flex-end;gap:3px;height:100%}
+.fbar{flex:1;background:var(--accent);border-radius:2px 2px 0 0;opacity:.6;transition:opacity .15s;min-width:0}
+.fbar:hover{opacity:1}
+
+/* Income estimate */
+.income-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(45,213,115,.08);border:1px solid rgba(45,213,115,.2);
+  border-radius:10px;padding:.5rem 1rem;
+  font-size:.8rem;font-weight:600;color:var(--green);
+  font-family:'JetBrains Mono',monospace;
+}
+
+.no-data-msg{
+  text-align:center;padding:2rem;color:var(--text3);
+  font-size:.8rem;line-height:1.6;
+}
+
+@media(max-width:900px){
+  .report-grid{grid-template-columns:repeat(2,1fr)}
+  .model-hero{flex-direction:column;text-align:center}
+}
+
 @media(max-width:900px){
   .sidebar{display:none}
   .stats-row{grid-template-columns:repeat(2,1fr)}
@@ -566,6 +699,16 @@ header{
     <span id="ts-label">—</span>
   </div>
   <div class="hdr-right">
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tab-explore" onclick="switchTab('explore')">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Explorar
+      </button>
+      <button class="nav-tab" id="tab-model" onclick="switchTab('model')">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3 2.7-5 6-5s6 2 6 5"/></svg>
+        Mi Reporte
+      </button>
+    </div>
     <button class="hdr-btn" id="ref-btn">
       <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
         <path d="M14 8A6 6 0 1 1 8 2c2 0 3.8 1 4.9 2.5M14 2v4h-4"/>
@@ -575,7 +718,7 @@ header{
   </div>
 </header>
 
-<div class="page">
+<div class="page-explore" id="page-explore">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -744,6 +887,114 @@ header{
       </table>
     </div>
 
+  </div>
+</div>
+
+<!-- MODEL REPORT VIEW -->
+<div class="model-view" id="model-view">
+  <!-- Search screen -->
+  <div class="model-search-screen" id="model-search-screen">
+    <div style="font-size:3rem">📊</div>
+    <div class="model-search-title">Reporte de Modelo</div>
+    <div class="model-search-sub">Ingresa tu username de Chaturbate para ver tus estadísticas, historial de viewers, posición en ranking y estimación de ingresos.</div>
+    <div class="model-search-box">
+      <input type="text" id="model-username-input" placeholder="ej: lexy_fox2" onkeydown="if(event.key==='Enter')searchModel()">
+      <button onclick="searchModel()">Ver reporte →</button>
+    </div>
+    <div id="model-search-error" style="color:var(--red);font-size:.75rem;display:none"></div>
+  </div>
+
+  <!-- Report -->
+  <div class="model-report" id="model-report">
+    <!-- Back -->
+    <div style="margin-bottom:1.25rem">
+      <button onclick="resetModelSearch()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;font-size:.78rem;display:flex;align-items:center;gap:4px;padding:0">
+        ← Buscar otra modelo
+      </button>
+    </div>
+
+    <!-- Hero -->
+    <div class="model-hero">
+      <img class="model-hero-img" id="rp-img" src="" alt="">
+      <div class="model-hero-info">
+        <div class="model-hero-name" id="rp-name">—</div>
+        <div class="model-hero-meta" id="rp-meta">—</div>
+        <div style="margin-top:.5rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+          <div class="model-hero-status" id="rp-status">
+            <span class="live-dot" style="background:var(--text3)" id="rp-status-dot"></span>
+            <span id="rp-status-txt">Verificando...</span>
+          </div>
+          <div class="income-badge" id="rp-income" style="display:none">
+            <span>💰</span><span id="rp-income-val">—</span><span style="opacity:.6;font-size:.65rem">/hora est.</span>
+          </div>
+        </div>
+      </div>
+      <a id="rp-link" href="#" target="_blank" rel="noopener" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:.6rem 1.1rem;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap">Ver sala ↗</a>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="report-grid">
+      <div class="report-card">
+        <div class="report-card-lbl">Viewers ahora</div>
+        <div class="report-card-val" id="rp-viewers">—</div>
+        <div class="report-card-sub" id="rp-viewers-sub">en vivo</div>
+      </div>
+      <div class="report-card">
+        <div class="report-card-lbl">Seguidores</div>
+        <div class="report-card-val" id="rp-followers">—</div>
+        <div class="report-card-trend trend-flat" id="rp-followers-trend" style="display:none"></div>
+      </div>
+      <div class="report-card">
+        <div class="report-card-lbl">Posición ranking</div>
+        <div class="report-card-val" id="rp-rank">—</div>
+        <div class="report-card-sub" id="rp-rank-sub">de viewers ahora</div>
+      </div>
+      <div class="report-card">
+        <div class="report-card-lbl">Promedio viewers</div>
+        <div class="report-card-val" id="rp-avg">—</div>
+        <div class="report-card-sub">últimos snapshots</div>
+      </div>
+    </div>
+
+    <!-- Ranking vs competencia -->
+    <div class="report-section">
+      <div class="report-section-title">Posición en el mercado</div>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar-label"><span>Tu posición</span><span id="rb-pos-val">—</span></div>
+        <div class="rank-bar-track"><div class="rank-bar-fill" id="rb-pos" style="width:0%;background:var(--accent)"></div></div>
+      </div>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar-label"><span>Top 10%</span><span id="rb-top10-val">—</span></div>
+        <div class="rank-bar-track"><div class="rank-bar-fill" id="rb-top10" style="width:10%;background:var(--green)"></div></div>
+      </div>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar-label"><span>Promedio general</span><span id="rb-avg-val">—</span></div>
+        <div class="rank-bar-track"><div class="rank-bar-fill" id="rb-avg" style="width:50%;background:var(--text3)"></div></div>
+      </div>
+      <div style="margin-top:.75rem;font-size:.72rem;color:var(--text3)" id="rb-summary"></div>
+    </div>
+
+    <!-- Heatmap -->
+    <div class="report-section">
+      <div class="report-section-title">Historial de viewers — Supabase</div>
+      <div id="heatmap-container">
+        <div class="no-data-msg">Cargando datos históricos...<br><span style="font-size:.7rem">Los datos se acumulan cada hora en Supabase</span></div>
+      </div>
+    </div>
+
+    <!-- Followers history -->
+    <div class="report-section">
+      <div class="report-section-title">Crecimiento de seguidores</div>
+      <div id="followers-container">
+        <div class="no-data-msg">Cargando historial...</div>
+      </div>
+    </div>
+
+    <!-- Tags & info -->
+    <div class="report-section">
+      <div class="report-section-title">Perfil</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem" id="rp-tags"></div>
+    </div>
   </div>
 </div>
 
@@ -1164,6 +1415,390 @@ document.getElementById('vl').addEventListener('click',()=>{
 
 setInterval(load,2*60*1000);
 load();
+
+// ─── TAB NAVIGATION ───
+function switchTab(tab) {
+  const explore = document.getElementById('page-explore');
+  const model   = document.getElementById('model-view');
+  const tabEx   = document.getElementById('tab-explore');
+  const tabMod  = document.getElementById('tab-model');
+  if (tab === 'explore') {
+    explore.classList.remove('hide');
+    model.classList.remove('show');
+    tabEx.classList.add('active');
+    tabMod.classList.remove('active');
+  } else {
+    explore.classList.add('hide');
+    model.classList.add('show');
+    tabEx.classList.remove('active');
+    tabMod.classList.add('active');
+  }
+}
+
+// ─── MODEL REPORT ───
+let currentModel = null;
+
+function resetModelSearch() {
+  document.getElementById('model-search-screen').style.display = 'flex';
+  document.getElementById('model-report').style.display = 'none';
+  document.getElementById('model-username-input').value = '';
+  document.getElementById('model-search-error').style.display = 'none';
+  currentModel = null;
+}
+
+async function searchModel() {
+  const u = document.getElementById('model-username-input').value.trim().toLowerCase();
+  if (!u) return;
+  const errEl = document.getElementById('model-search-error');
+  errEl.style.display = 'none';
+
+  let room = rooms.find(r => r.username === u);
+
+  if (!room) {
+    try {
+      const res = await fetch(`/api/rooms?username=${encodeURIComponent(u)}`);
+      const d = await res.json();
+      room = (d.results||[]).find(r => r.username === u) || null;
+    } catch(e) {}
+  }
+
+  if (!room) {
+    room = { username: u, display_name: u, gender:'', country:'', num_users:0, num_followers:0, age:null, is_hd:false, image_url:'', tags:[] };
+  }
+
+  currentModel = room;
+  loadModelReport(room);
+}
+
+async function loadModelReport(room) {
+  document.getElementById('model-search-screen').style.display = 'none';
+  document.getElementById('model-report').style.display = 'block';
+  const u = room.username;
+
+  // Hero
+  const img = document.getElementById('rp-img');
+  img.src = room.image_url || '';
+  img.onerror = () => { img.style.background='var(--surface2)'; };
+  document.getElementById('rp-name').textContent = room.display_name || u;
+  const gls = {f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
+  document.getElementById('rp-meta').textContent =
+    [gls[room.gender]||'', room.country||'', room.age?room.age+'a':''].filter(Boolean).join(' · ');
+  document.getElementById('rp-link').href = `https://chaturbate.com/${u}/`;
+
+  // Estado online
+  const isOnline = rooms.find(r => r.username === u);
+  document.getElementById('rp-status-dot').style.background = isOnline ? 'var(--green)' : 'var(--text3)';
+  document.getElementById('rp-status-txt').textContent = isOnline ? 'Online ahora' : 'Offline';
+
+  // KPIs
+  document.getElementById('rp-viewers').textContent = fmt(room.num_users||0);
+  document.getElementById('rp-followers').textContent = fmt(room.num_followers||0);
+
+  // Ranking viewers actuales
+  if (rooms.length) {
+    const sorted = [...rooms].sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+    const rank = sorted.findIndex(r=>r.username===u);
+    if (rank >= 0) {
+      document.getElementById('rp-rank').textContent = '#'+(rank+1);
+      document.getElementById('rp-rank-sub').textContent = `de ${fmt(rooms.length)} salas activas`;
+      // Actualizar barra de ranking
+      const pct = Math.round(((rooms.length-rank)/rooms.length)*100);
+      const posEl = document.getElementById('rb-pos');
+      const posVal = document.getElementById('rb-pos-val');
+      if (posEl) { posEl.style.width = pct+'%'; }
+      if (posVal) posVal.textContent = `#${rank+1} / ${fmt(rooms.length)}`;
+
+      // Top 10% threshold
+      const top10idx = Math.floor(rooms.length * 0.1);
+      const top10v = sorted[top10idx]?.num_users || 0;
+      const avgV2 = Math.round(rooms.reduce((s,r)=>s+(r.num_users||0),0)/rooms.length);
+      const t10Val = document.getElementById('rb-top10-val');
+      const avgVal2 = document.getElementById('rb-avg-val');
+      const avgFill = document.getElementById('rb-avg');
+      if (t10Val) t10Val.textContent = fmt(top10v)+' viewers';
+      if (avgVal2) avgVal2.textContent = fmt(avgV2)+' viewers';
+      if (avgFill) avgFill.style.width = Math.round(avgV2/(sorted[0]?.num_users||1)*100)+'%';
+
+      const sumEl = document.getElementById('rb-summary');
+      if (sumEl) {
+        const top = 100-pct;
+        sumEl.textContent = top <= 10
+          ? `¡Estás en el top ${top}% — rendimiento excelente!`
+          : top <= 30
+          ? `Estás en el top ${top}% — por encima del promedio.`
+          : `Estás en el top ${top}% — hay oportunidad de crecer.`;
+      }
+    } else {
+      document.getElementById('rp-rank').textContent = 'Offline';
+      document.getElementById('rp-rank-sub').textContent = 'no está en el ranking activo';
+    }
+  }
+
+  // Promedio viewers de Supabase (provisional)
+  document.getElementById('rp-avg').textContent = '—';
+
+  // Tags
+  const tagsEl = document.getElementById('rp-tags');
+  if (tagsEl) tagsEl.innerHTML = (room.tags||[]).slice(0,12).map(t=>`<span class="tag">${t}</span>`).join('');
+
+  // Cargar datos históricos
+  loadHistoricalData(u, room);
+
+  // Ingresos de Statbate
+  loadStatbateIncome(u);
+}
+
+async function loadHistoricalData(username, room) {
+  const SUPA_URL = 'https://upwjwuikaxuelczlrewk.supabase.co';
+  const SUPA_KEY = 'sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
+  const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer '+SUPA_KEY };
+
+  document.getElementById('heatmap-container').innerHTML =
+    '<div class="no-data-msg">Cargando datos históricos...</div>';
+  document.getElementById('followers-container').innerHTML =
+    '<div class="no-data-msg">Cargando historial...</div>';
+
+  try {
+    const since = new Date(Date.now()-30*24*60*60*1000).toISOString();
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=1000`,
+      { headers }
+    );
+    const data = await res.json();
+
+    if (!data || !data.length) {
+      document.getElementById('heatmap-container').innerHTML =
+        '<div class="no-data-msg">Sin datos históricos aún.<br><span style="font-size:.7rem">Los datos se acumulan cada hora. Vuelve mañana.</span></div>';
+      document.getElementById('followers-container').innerHTML =
+        '<div class="no-data-msg">Sin historial de seguidores aún.</div>';
+      return;
+    }
+
+    // Stats básicas
+    const viewers = data.map(d=>d.num_users||0).filter(v=>v>0);
+    const avg = viewers.length ? Math.round(viewers.reduce((a,b)=>a+b,0)/viewers.length) : 0;
+    const peak = viewers.length ? Math.max(...viewers) : 0;
+    document.getElementById('rp-avg').textContent = fmt(avg);
+
+    // Crecimiento seguidores
+    if (data.length >= 2) {
+      const first = data[0].num_followers||0;
+      const last  = data[data.length-1].num_followers||0;
+      const diff  = last - first;
+      const pct   = first ? ((diff/first)*100).toFixed(1) : 0;
+      const trendEl = document.getElementById('rp-followers-trend');
+      if (trendEl) {
+        trendEl.style.display = 'flex';
+        trendEl.textContent = (diff>=0?'▲ +':'▼ ')+fmt(Math.abs(diff))+` (${pct}%) 30d`;
+        trendEl.className = 'report-card-trend '+(diff>=0?'trend-up':'trend-down');
+      }
+    }
+
+    // Trend chart por día
+    const byDay = {};
+    data.forEach(d => {
+      const day = d.captured_at.substring(0,10);
+      if (!byDay[day]) byDay[day]=[];
+      byDay[day].push(d.num_users||0);
+    });
+    const days    = Object.keys(byDay).sort();
+    const dayAvgs = days.map(d=>Math.round(byDay[d].reduce((a,b)=>a+b,0)/byDay[d].length));
+
+    // Heatmap container
+    renderHeatmapAndTrend(data, days, dayAvgs, avg, peak);
+
+    // Followers chart
+    renderFollowersChart(data);
+
+  } catch(e) {
+    document.getElementById('heatmap-container').innerHTML =
+      '<div class="no-data-msg">Error cargando datos históricos.</div>';
+  }
+}
+
+function renderHeatmapAndTrend(data, days, dayAvgs, avg, peak) {
+  const wrap = document.getElementById('heatmap-container');
+  if (!wrap) return;
+
+  // Stats mini
+  let statsHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem">
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem;text-align:center">
+      <div style="font-size:1.1rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent2)">${fmt(avg)}</div>
+      <div style="font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Promedio</div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem;text-align:center">
+      <div style="font-size:1.1rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--green)">${fmt(peak)}</div>
+      <div style="font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Peak</div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem;text-align:center">
+      <div style="font-size:1.1rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--amber)">${data.length}</div>
+      <div style="font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Snapshots</div>
+    </div>
+  </div>`;
+
+  // Trend chart canvas
+  statsHTML += `<canvas id="rp-trend-canvas" style="width:100%;height:120px;display:block;margin-bottom:1rem;border-radius:8px"></canvas>`;
+
+  // Heatmap
+  const matrix = {};
+  const daysW = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  data.forEach(d => {
+    const dt  = new Date(d.captured_at);
+    const key = `${dt.getDay()}-${dt.getHours()}`;
+    if (!matrix[key]) matrix[key]=[];
+    matrix[key].push(d.num_users||0);
+  });
+  let maxVal = 1;
+  Object.values(matrix).forEach(arr => {
+    const a = arr.reduce((x,y)=>x+y,0)/arr.length;
+    if (a>maxVal) maxVal=a;
+  });
+
+  statsHTML += '<div style="overflow-x:auto"><div class="heatmap-grid">';
+  statsHTML += '<div class="hm-cell hm-corner"></div>';
+  for (let h=0;h<24;h++) statsHTML += `<div class="hm-cell hm-hour">${h}</div>`;
+  for (let d=0;d<7;d++) {
+    statsHTML += `<div class="hm-cell hm-day">${daysW[d]}</div>`;
+    for (let h=0;h<24;h++) {
+      const arr = matrix[`${d}-${h}`]||[];
+      const a   = arr.length ? arr.reduce((x,y)=>x+y,0)/arr.length : 0;
+      const al  = (a/maxVal*0.85+0.05).toFixed(2);
+      const tip = a>0 ? `${daysW[d]} ${h}h — ${Math.round(a)} viewers avg` : '';
+      statsHTML += `<div class="hm-cell hm-data" style="background:rgba(108,92,231,${al})" title="${tip}"></div>`;
+    }
+  }
+  statsHTML += '</div></div>';
+  statsHTML += '<div class="hm-legend"><span>Menos</span><div class="hm-legend-bar"></div><span>Más activa</span></div>';
+
+  wrap.innerHTML = statsHTML;
+
+  // Dibujar canvas después de insertar en DOM
+  requestAnimationFrame(() => {
+    const canvas = document.getElementById('rp-trend-canvas');
+    if (!canvas || !days.length) return;
+    const W = canvas.offsetWidth; const H = 120;
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const maxV = Math.max(...dayAvgs,1);
+    const pad  = {l:8,r:8,t:8,b:24};
+    const cW   = W-pad.l-pad.r; const cH = H-pad.t-pad.b;
+
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
+    [.25,.5,.75,1].forEach(f=>{
+      const y=pad.t+cH*(1-f);
+      ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    });
+
+    // Area
+    const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+    grad.addColorStop(0,'rgba(162,155,254,.4)');
+    grad.addColorStop(1,'rgba(162,155,254,.02)');
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    dayAvgs.forEach((v,i)=>{
+      const x=pad.l+(i/(dayAvgs.length-1||1))*cW;
+      const y=pad.t+cH*(1-v/maxV);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.lineTo(pad.l+cW,H-pad.b);ctx.lineTo(pad.l,H-pad.b);ctx.closePath();ctx.fill();
+
+    // Line
+    ctx.strokeStyle='#a29bfe';ctx.lineWidth=2;ctx.lineJoin='round';
+    ctx.beginPath();
+    dayAvgs.forEach((v,i)=>{
+      const x=pad.l+(i/(dayAvgs.length-1||1))*cW;
+      const y=pad.t+cH*(1-v/maxV);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='10px Inter,sans-serif';ctx.textAlign='center';
+    [0,Math.floor(days.length/2),days.length-1].forEach(i=>{
+      if(days[i]){
+        const x=pad.l+(i/(days.length-1||1))*cW;
+        ctx.fillText(days[i].substring(5),x,H-6);
+      }
+    });
+  });
+}
+
+function renderFollowersChart(data) {
+  const wrap = document.getElementById('followers-container');
+  if (!wrap || data.length < 2) {
+    if(wrap) wrap.innerHTML='<div class="no-data-msg">Se necesitan más datos para mostrar tendencia.</div>';
+    return;
+  }
+
+  // Muestrear puntos clave
+  const step = Math.max(1, Math.floor(data.length/20));
+  const pts   = data.filter((_,i)=>i%step===0||i===data.length-1);
+  const first = pts[0].num_followers||0;
+  const last  = pts[pts.length-1].num_followers||0;
+  const diff  = last - first;
+  const color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+  const arrow = diff >= 0 ? '▲' : '▼';
+
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+      <div style="font-size:.8rem;color:var(--text2)">Últimos 30 días</div>
+      <div style="font-size:.85rem;font-weight:600;color:${color}">${arrow} ${diff>=0?'+':''}${fmt(diff)} seguidores</div>
+    </div>
+    <canvas id="rp-foll-canvas" style="width:100%;height:80px;display:block;border-radius:8px"></canvas>`;
+
+  requestAnimationFrame(() => {
+    const canvas = document.getElementById('rp-foll-canvas');
+    if (!canvas) return;
+    const W = canvas.offsetWidth; const H = 80;
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const vals = pts.map(d=>d.num_followers||0);
+    const minV = Math.min(...vals); const maxV2 = Math.max(...vals,minV+1);
+    const pad = {l:8,r:8,t:8,b:8};
+    const cW = W-pad.l-pad.r; const cH = H-pad.t-pad.b;
+    const fillColor = diff>=0 ? 'rgba(45,213,143,.3)' : 'rgba(255,71,87,.3)';
+    const strokeColor = diff>=0 ? '#2dd98f' : '#ff4757';
+    const grad2 = ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+    grad2.addColorStop(0,fillColor);grad2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grad2;
+    ctx.beginPath();
+    vals.forEach((v,i)=>{
+      const x=pad.l+(i/(vals.length-1||1))*cW;
+      const y=pad.t+cH*(1-(v-minV)/(maxV2-minV));
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.lineTo(pad.l+cW,H-pad.b);ctx.lineTo(pad.l,H-pad.b);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=strokeColor;ctx.lineWidth=2;ctx.lineJoin='round';
+    ctx.beginPath();
+    vals.forEach((v,i)=>{
+      const x=pad.l+(i/(vals.length-1||1))*cW;
+      const y=pad.t+cH*(1-(v-minV)/(maxV2-minV));
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  });
+}
+
+async function loadStatbateIncome(username) {
+  const incEl    = document.getElementById('rp-income');
+  const incValEl = document.getElementById('rp-income-val');
+  try {
+    const res  = await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent('https://statbate.com/chaturbate/list/'));
+    const html = await res.text();
+    // Buscar la fila con el username en el HTML de Statbate
+    const re = new RegExp(`/search/1/${username.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}['"\s][^>]*>[^<]+</a></td>[\s\S]{0,300}?<td>([\$\d.,]+)</td>`, 'i');
+    const m  = re.exec(html);
+    if (m) {
+      incValEl.textContent = m[1]+'/h';
+      if(incEl) incEl.style.display='flex';
+    } else {
+      if(incEl) incEl.style.display='none';
+    }
+  } catch(e) {
+    if(incEl) incEl.style.display='none';
+  }
+}
 </script>
 </body>
 </html>
