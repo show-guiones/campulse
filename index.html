@@ -832,6 +832,40 @@ function skeleton() {
     </div>`).join('');
 }
 
+// ── MODELOS DESTACADAS ──
+// Edita esta lista para cambiar qué modelos aparecen primero.
+// Solo aparecen si están online en ese momento — nunca se fuerza una sala offline.
+const FEATURED = [
+  'lexy_fox2',
+];
+const FEATURED_SLOTS = 4; // cuántas posiciones "reservadas" al inicio
+
+function injectFeatured(filtered) {
+  if (!FEATURED.length) return filtered;
+
+  // Separar destacadas online del resto
+  const featuredOnline = [];
+  const rest = [];
+  filtered.forEach(r => {
+    if (FEATURED.includes(r.username)) featuredOnline.push(r);
+    else rest.push(r);
+  });
+
+  if (!featuredOnline.length) return filtered;
+
+  // Tomar hasta FEATURED_SLOTS modelos del top del resto para mezclar
+  const topRest = rest.splice(0, FEATURED_SLOTS);
+
+  // Mezclar destacadas + topRest de forma aleatoria (shuffle Fisher-Yates)
+  const mixed = [...featuredOnline, ...topRest];
+  for (let i = mixed.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [mixed[i], mixed[j]] = [mixed[j], mixed[i]];
+  }
+
+  return [...mixed, ...rest];
+}
+
 function getFiltered() {
   const q=document.getElementById('search').value.toLowerCase();
   let r=[...rooms];
@@ -885,7 +919,7 @@ function updateAll() {
 }
 
 function render() {
-  const r=getFiltered();
+  const r=injectFeatured(getFiltered());
   document.getElementById('s-show').textContent=fmt(r.length);
   if(view==='grid') renderGrid(r);
   else renderList(r);
