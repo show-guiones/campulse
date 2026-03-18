@@ -1672,13 +1672,21 @@ async function loadModelReport(room) {
 }
 
 async function loadHistoricalData(username, room) {
+  const SUPA_URL = 'https://upwjwuikaxuelczlrewk.supabase.co';
+  const SUPA_KEY = 'sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
+  const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer '+SUPA_KEY };
+
   document.getElementById('heatmap-container').innerHTML =
     '<div class="no-data-msg">Cargando datos históricos...</div>';
   document.getElementById('followers-container').innerHTML =
     '<div class="no-data-msg">Cargando historial...</div>';
 
   try {
-    const res = await fetch(`/api/history?username=${encodeURIComponent(username)}&days=30`);
+    const since = new Date(Date.now()-30*24*60*60*1000).toISOString();
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=1000`,
+      { headers }
+    );
     const data = await res.json();
 
     if (!data || !data.length) {
@@ -1899,13 +1907,10 @@ async function loadStatbateIncome(username) {
   const incEl    = document.getElementById('rp-income');
   const incValEl = document.getElementById('rp-income-val');
   try {
-    const res  = await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent('https://statbate.com/chaturbate/list/'));
-    const html = await res.text();
-    // Buscar la fila con el username en el HTML de Statbate
-    const re = new RegExp(`/search/1/${username.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}['"\s][^>]*>[^<]+</a></td>[\s\S]{0,300}?<td>([\$\d.,]+)</td>`, 'i');
-    const m  = re.exec(html);
-    if (m) {
-      incValEl.textContent = m[1]+'/h';
+    const res  = await fetch(`/api/statbate?username=${encodeURIComponent(username)}&platform=chaturbate`);
+    const data = await res.json();
+    if (data.income) {
+      incValEl.textContent = data.income+'/h';
       if(incEl) incEl.style.display='flex';
     } else {
       if(incEl) incEl.style.display='none';
