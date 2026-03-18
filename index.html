@@ -523,6 +523,11 @@ header{
 }
 .btn-fav:hover{border-color:var(--female);color:var(--female)}
 .btn-fav.on{background:rgba(253,121,168,.1);border-color:rgba(253,121,168,.3);color:var(--female)}
+.card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.card-tag-pill{font-size:.58rem;color:var(--text3);background:rgba(255,255,255,.07);border-radius:4px;padding:1px 5px;line-height:1.6}
+.tag-filter-pill{font-size:.68rem;color:var(--text2);background:rgba(255,255,255,.07);border:1px solid transparent;border-radius:6px;padding:3px 8px;cursor:pointer;transition:all .15s;line-height:1.5}
+.tag-filter-pill:hover{background:rgba(255,255,255,.12)}
+.tag-filter-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .modal-pill{
   display:inline-flex;align-items:center;gap:6px;
   padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:600;
@@ -809,6 +814,13 @@ header{
 
     <div class="sidebar-divider"></div>
 
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tags populares</div>
+      <div id="tag-filter-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.25rem"></div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
     <div class="mini-stats">
       <div class="sidebar-label" style="padding:0 .25rem;margin-bottom:.5rem">Distribución</div>
       <div class="dist-bar" id="dist-bar"></div>
@@ -921,20 +933,6 @@ header{
         <tbody id="lb"></tbody>
       </table>
     </div>
-
-  <!-- Banner captación modelos -->
-  <div id="model-banner" style="margin:1.5rem 1.5rem 0;padding:1.25rem 1.5rem;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border:1px solid rgba(255,255,255,0.08);border-radius:16px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
-    <div style="display:flex;align-items:center;gap:1rem">
-      <div style="font-size:2rem;flex-shrink:0">🎬</div>
-      <div>
-        <div style="font-size:.9rem;font-weight:600;color:#fff;margin-bottom:.2rem">¿Eres modelo? Empieza a ganar en Chaturbate</div>
-        <div style="font-size:.75rem;color:rgba(255,255,255,0.5);line-height:1.4">Regístrate gratis, configura tu sala y empieza a recibir propinas en minutos.</div>
-      </div>
-    </div>
-    <a href="https://chaturbate.com/in/?track=default&tour=grq&campaign=rI8z3&room=" target="_blank" rel="noopener" style="flex-shrink:0;background:#ff6b35;color:#fff;border:none;border-radius:10px;padding:.6rem 1.25rem;font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;display:inline-block">
-      Crear cuenta gratis →
-    </a>
-  </div>
 
   </div>
 </div>
@@ -1092,7 +1090,7 @@ header{
 const API_ENDPOINT = '/api/rooms';
 
 let rooms=[], favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
-let gender='', onlyCol=false, onlyFavs=false, onlyHD=false;
+let gender='', onlyCol=false, onlyFavs=false, onlyHD=false, activeTag='';
 let sort='viewers', view='grid', maxV=1, active=null;
 
 const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n);
@@ -1236,6 +1234,7 @@ function getFiltered() {
   if(onlyFavs) r=r.filter(x=>isFeatured(x)||favs.includes(x.username));
   if(onlyHD) r=r.filter(x=>isFeatured(x)||x.is_hd);
   if(q) r=r.filter(x=>isFeatured(x)||(x.username||'').toLowerCase().includes(q)||(x.display_name||'').toLowerCase().includes(q));
+  if(activeTag) r=r.filter(x=>isFeatured(x)||(x.tags||[]).map(t=>String(t).toLowerCase()).includes(activeTag));
   r.sort((a,b)=>{
     if(sort==='viewers') return (b.num_users||0)-(a.num_users||0);
     if(sort==='followers') return (b.num_followers||0)-(a.num_followers||0);
@@ -1277,6 +1276,27 @@ function updateAll() {
   document.getElementById('dist-bar').innerHTML=Object.entries(counts).map(([g,n])=>
     `<div class="dist-seg" style="flex:${n};background:${colors[g]}"></div>`).join('');
 
+  updateTagFilter();
+  render();
+}
+
+function updateTagFilter() {
+  const counts = {};
+  rooms.forEach(r => (r.tags||[]).forEach(t => {
+    const tag = String(t).toLowerCase();
+    if(tag && isNaN(tag)) counts[tag] = (counts[tag]||0) + 1;
+  }));
+  const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const el = document.getElementById('tag-filter-list');
+  if(!el) return;
+  el.innerHTML = top.map(([tag,cnt])=>
+    `<span class="tag-filter-pill${activeTag===tag?' active':''}" onclick="setTagFilter('${tag}')">${tag} <span style="opacity:.5">${cnt}</span></span>`
+  ).join('');
+}
+
+function setTagFilter(tag) {
+  activeTag = activeTag === tag ? '' : tag;
+  updateTagFilter();
   render();
 }
 
@@ -1308,7 +1328,7 @@ function renderGrid(r) {
       :`<div class="card-img" style="background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)">👤</div>`;
     // Si es destacada forzada y está offline, no mostrarla
     if (x._forced && !x.num_users) return '';
-    return `<div class="card" onclick="openMod('${x.username}')">
+    return `<div class="card" onclick="openInChaturbate('${x.username}')" style="cursor:pointer">
       <div class="card-img-box">
         ${img}
         <div class="card-overlay"></div>
@@ -1323,6 +1343,7 @@ function renderGrid(r) {
       <div class="card-info">
         <div class="card-name">${x.display_name||x.username}</div>
         <div class="card-meta">${x.country||'—'} · ${x.age?x.age+'a':'—'}</div>
+        ${(x.tags||[]).length?`<div class="card-tags">${(x.tags||[]).slice(0,3).map(t=>`<span class="card-tag-pill">${t}</span>`).join('')}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1332,7 +1353,7 @@ function renderList(r) {
   const b=document.getElementById('lb');
   if(!r.length){b.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">🔍</div><div>Sin resultados</div></div></td></tr>`;return;}
   b.innerHTML=r.map(x=>`
-    <tr onclick="openMod('${x.username}')">
+    <tr onclick="openInChaturbate('${x.username}')" style="cursor:pointer">
       <td>${x.image_url
         ?`<img class="l-av" src="${x.image_url}" loading="lazy" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`
         :`<div class="l-av-ph">👤</div>`}
