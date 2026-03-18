@@ -1080,24 +1080,22 @@ async function fetchRoom(username) {
     if (found) return found;
   } catch(e) {}
 
-  // Estrategia 3: objeto mínimo con imagen de perfil estática de Chaturbate
-  // Chaturbate guarda fotos en thumb.live.mmcdn.com con el formato:
-  // https://thumb.live.mmcdn.com/ri/{username}.jpg  (online)
-  // https://thumb.live.mmcdn.com/riw/{username}.jpg (perfil)
+  // Estrategia 3: usar datos del perfil manual si existen, si no objeto mínimo
+  const profile = FEATURED_PROFILES[username] || {};
   return {
     username:      username,
-    display_name:  username,
-    gender:        'f',
-    country:       '',
-    num_users:     0,
-    num_followers: 0,
-    age:           null,
-    is_hd:         false,
+    display_name:  profile.display_name  || username,
+    gender:        profile.gender        || 'f',
+    country:       profile.country       || '',
+    age:           profile.age           || null,
+    is_hd:         profile.is_hd         || false,
     is_new:        false,
     current_show:  'offline',
-    tags:          [],
+    tags:          profile.tags          || [],
+    num_users:     0,
+    num_followers: profile.num_followers || 0,
     seconds_online: 0,
-    image_url:     'https://thumb.live.mmcdn.com/riw/'+username+'.jpg',
+    image_url:     profile.image_url     || 'https://thumb.live.mmcdn.com/riw/'+username+'.jpg',
     _forced:       true
   };
 }
@@ -1149,6 +1147,23 @@ function skeleton() {
 const FEATURED = [
   'lexy_fox2',
 ];
+
+// Datos de perfil para modelos destacadas cuando están offline
+// Edita estos datos para cada modelo que agregues a FEATURED
+const FEATURED_PROFILES = {
+  'lexy_fox2': {
+    display_name:  'Lexy Fox',
+    gender:        'f',
+    country:       'CO',
+    age:           25,
+    is_hd:         true,
+    tags:          ['latina', 'colombia', 'lovense', 'bigass', 'young'],
+    image_url:     'https://thumb.live.mmcdn.com/riw/lexy_fox2.jpg',
+  },
+  // Agrega más modelos aquí siguiendo el mismo formato:
+  // 'username': { display_name: '...', gender: 'f', country: 'CO', age: 25, tags: [], image_url: '...' },
+};
+
 const FEATURED_SLOTS = 4; // cuántas posiciones "reservadas" al inicio
 
 function injectFeatured(filtered) {
