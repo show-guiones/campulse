@@ -2,7 +2,7 @@ import os
 import requests
 from datetime import datetime
 
-CHATURBATE_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=500"
+CHATURBATE_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=1000"
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 
@@ -31,12 +31,16 @@ def save_snapshot(rooms):
             "display_name": r.get("display_name", ""),
             "gender": r.get("gender", ""),
             "country": r.get("country", ""),
+            "location": r.get("location", ""),
             "num_users": r.get("num_users", 0),
             "num_followers": r.get("num_followers", 0),
             "age": r.get("age"),
             "is_hd": r.get("is_hd", False),
             "is_new": r.get("is_new", False),
             "current_show": r.get("current_show", ""),
+            "room_subject": r.get("room_subject", "")[:500] if r.get("room_subject") else "",
+            "spoken_languages": r.get("spoken_languages", ""),
+            "chat_room_url": r.get("chat_room_url", ""),
             "tags": r.get("tags", []) if isinstance(r.get("tags"), list) else [],
             "seconds_online": r.get("seconds_online", 0)
         })
