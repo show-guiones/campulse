@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080808">
 <title>Campulse — Live Cam Stats</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -295,7 +299,7 @@ header{
 .vw-dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
 .fav-btn{
   position:absolute;top:8px;right:8px;
-  width:26px;height:26px;border-radius:50%;
+  width:30px;height:30px;border-radius:50%;
   background:rgba(0,0,0,.55);border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:transform .2s,background .15s;
@@ -666,24 +670,55 @@ header{
   font-size:.8rem;line-height:1.6;
 }
 
-@media(max-width:900px){
-  .report-grid{grid-template-columns:repeat(2,1fr)}
-  .model-hero{flex-direction:column;text-align:center}
-}
-
+/* ── TABLET ── */
 @media(max-width:900px){
   .sidebar{display:none}
   .stats-row{grid-template-columns:repeat(2,1fr)}
+  .report-grid{grid-template-columns:repeat(2,1fr)}
+  .model-hero{flex-direction:column;text-align:center}
 }
+/* ── MOBILE ── */
 @media(max-width:600px){
-  header{padding:0 1rem}
+  header{padding:0 .9rem;height:48px}
+  .logo{font-size:.75rem}
+  .logo-icon{width:24px;height:24px;font-size:.58rem}
   .hdr-center{display:none}
-  .topbar{padding:.75rem 1rem}
+  .page{height:calc(100vh - 48px)}
   .stats-row{grid-template-columns:repeat(2,1fr)}
-  .grid-wrap{padding:.85rem 1rem}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.65rem}
+  .stat-cell{padding:.65rem .85rem}
+  .stat-cell-val{font-size:1.1rem}
+  .stat-cell-sub{display:none}
+  .topbar{padding:.6rem .9rem;gap:.4rem}
+  .search-box{flex:1 1 100%}
+  .grid-wrap{padding:.75rem .9rem}
+  .grid{grid-template-columns:repeat(3,1fr);gap:.5rem}
+  .card-info{padding:.5rem .55rem}
+  .card-name{font-size:.68rem}
+  .card-meta{font-size:.56rem}
+  .vw-pill{font-size:.52rem;padding:2px 5px;bottom:4px;left:4px}
+  .fav-btn{width:22px;height:22px;top:4px;right:4px}
+  .bdg{font-size:.46rem;padding:1px 4px}
+  .modal-bg{padding:0;align-items:flex-end}
+  .modal{border-radius:20px 20px 0 0;max-height:95vh;width:100%}
   .modal-hero{height:200px}
+  .modal-name{font-size:1.2rem}
   .modal-stats{grid-template-columns:repeat(2,1fr)}
+  .modal-body{padding:0 1rem 1.5rem}
+  .modal-close{top:.75rem;right:.75rem}
+  .btn-visit,.btn-fav{font-size:.75rem;padding:.65rem .85rem}
+  .model-search-box{flex-direction:column}
+  .model-search-box button{width:100%}
+  .model-report{padding:1rem .9rem}
+  .model-hero{padding:1rem;gap:.85rem}
+  .model-hero-img{width:60px;height:60px}
+  .model-hero-name{font-size:1rem}
+  .report-grid{grid-template-columns:repeat(2,1fr)}
+  .toast{bottom:1rem;left:50%;right:auto;transform:translateX(-50%) translateY(80px)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+}
+/* ── MÓVIL PEQUEÑO ── */
+@media(max-width:380px){
+  .grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
@@ -1337,11 +1372,24 @@ let previewTimer=null, previewCountdown=null, previewSeconds=30;
 function startLivePreview(username){
   stopLivePreview();
   const wrap=document.getElementById('mhero-img-wrap');
-  const thumbUrl=`https://roomimg.stream.highwebmedia.com/ri/${username}.jpg`;
-  
+  // Fuentes en orden de prioridad: live thumb → profile wide → profile → fallback CDN
+  const srcs=[
+    `https://roomimg.stream.highwebmedia.com/ri/${username}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${username}.jpg`,
+    `https://thumb.live.mmcdn.com/riw/${username}.jpg`,
+  ];
+  const thumbUrl=srcs[0];
+
   wrap.innerHTML=`
     <div class="live-preview-wrap" onclick="openInChaturbate('${username}')">
-      <img class="live-preview-img" id="live-img" src="${thumbUrl}?t=${Date.now()}" alt="${username}">
+      <img class="live-preview-img" id="live-img" src="${thumbUrl}?t=${Date.now()}" alt="${username}"
+        data-tried="0"
+        onerror="
+          const tried=parseInt(this.dataset.tried||0)+1;
+          const s=${JSON.stringify(srcs)};
+          if(tried<s.length){this.dataset.tried=tried;this.src=s[tried]+'?t='+Date.now();}
+          else{this.style.display='none';this.parentElement.style.background='var(--surface2)';}
+        ">
       <div class="live-refresh-badge">
         <div class="live-refresh-dot"></div>
         Live
