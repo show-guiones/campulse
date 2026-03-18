@@ -5,477 +5,730 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Campulse — Live Cam Stats</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #080808;
-  --bg2: #101010;
-  --bg3: #161616;
-  --bg4: #1c1c1c;
-  --border: #1e1e1e;
-  --border2: #282828;
-  --text: #eeebe6;
-  --muted: #555;
-  --muted2: #333;
-  --accent: #e8503a;
-  --accent2: #ff6b52;
-  --green: #2dd98f;
-  --blue: #3d9fff;
-  --amber: #f0a020;
-  --female: #ff5f9e;
-  --male: #3d9fff;
-  --couple: #9d7eff;
-  --trans: #2dd98f;
+  --bg:       #06070a;
+  --surface:  #0d0e12;
+  --surface2: #13151b;
+  --surface3: #1a1d25;
+  --border:   rgba(255,255,255,.06);
+  --border2:  rgba(255,255,255,.1);
+  --text:     #e8e6e0;
+  --text2:    #8a8a8e;
+  --text3:    #4a4a50;
+  --accent:   #6c5ce7;
+  --accent2:  #a29bfe;
+  --red:      #ff4757;
+  --green:    #2ed573;
+  --amber:    #ffa502;
+  --blue:     #54a0ff;
+  --female:   #fd79a8;
+  --male:     #74b9ff;
+  --couple:   #a29bfe;
+  --trans:    #55efc4;
+  --radius:   12px;
+  --radius-lg:18px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
 
-body {
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Syne',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Inter',sans-serif;font-size:14px;
+  min-height:100vh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
 }
 
-/* ── HEADER ── */
-header {
-  position:sticky;top:0;z-index:200;
-  height:56px;padding:0 1.5rem;
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
+
+/* ─── HEADER ─── */
+header{
+  position:sticky;top:0;z-index:300;
+  height:52px;padding:0 1.5rem;
   display:flex;align-items:center;justify-content:space-between;
-  background:rgba(8,8,8,0.92);
+  background:rgba(6,7,10,.9);
   border-bottom:1px solid var(--border);
-  backdrop-filter:blur(16px);
+  backdrop-filter:blur(20px);
 }
-.logo {
+.logo{
   display:flex;align-items:center;gap:10px;
-  font-size:1rem;font-weight:800;letter-spacing:.06em;
-  text-transform:uppercase;
+  font-size:.8rem;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--text);
 }
-.pulse {
-  width:8px;height:8px;border-radius:50%;background:var(--accent);
-  animation:pls 2s ease-in-out infinite;
+.logo-icon{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:800;color:#fff;letter-spacing:.05em;
 }
-@keyframes pls{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.7);opacity:.4}}
-.hdr-r{display:flex;align-items:center;gap:1.25rem;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)}
-.live-tag{display:flex;align-items:center;gap:5px;color:var(--green)}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pls 1.4s ease-in-out infinite}
+.hdr-center{
+  display:flex;align-items:center;gap:6px;
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text3);
+}
+.live-pill{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(46,213,115,.1);
+  border:1px solid rgba(46,213,115,.2);
+  padding:3px 10px;border-radius:20px;
+  color:var(--green);font-size:.62rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.live-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);
+  animation:blink 1.8s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hdr-right{display:flex;align-items:center;gap:.75rem}
+.hdr-btn{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text2);border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:.72rem;font-weight:500;
+  padding:.35rem .75rem;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:5px;
+}
+.hdr-btn:hover{color:var(--text);border-color:var(--border2)}
+.hdr-btn.spin svg{animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+#ts-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3)}
 
-/* ── MAIN ── */
-main{max-width:1440px;margin:0 auto;padding:1.5rem}
+/* ─── LAYOUT ─── */
+.page{display:flex;height:calc(100vh - 52px)}
 
-/* ── STATS ── */
-.stats{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:1px;background:var(--border);
-  border:1px solid var(--border);border-radius:14px;
-  overflow:hidden;margin-bottom:1.5rem;
+/* ─── SIDEBAR ─── */
+.sidebar{
+  width:220px;min-width:220px;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+  transition:width .25s;
 }
-.stat{
-  background:var(--bg2);padding:1.1rem 1.4rem;
-  display:flex;flex-direction:column;gap:3px;
-}
-.stat-lbl{
-  font-size:.6rem;color:var(--muted);
+.sidebar-section{padding:1.25rem 1rem .75rem}
+.sidebar-label{
+  font-size:.6rem;font-weight:600;color:var(--text3);
   text-transform:uppercase;letter-spacing:.12em;
-  font-family:'DM Mono',monospace;
+  margin-bottom:.6rem;padding:0 .25rem;
 }
-.stat-val{
-  font-size:1.5rem;font-weight:800;
-  letter-spacing:-.03em;line-height:1;
+.g-btn{
+  display:flex;align-items:center;gap:.65rem;
+  width:100%;background:none;border:none;
+  color:var(--text2);font-family:'Inter',sans-serif;
+  font-size:.78rem;font-weight:500;
+  padding:.5rem .6rem;border-radius:8px;
+  cursor:pointer;transition:all .15s;
+  position:relative;
 }
-.stat-sub{font-size:.65rem;color:var(--muted);font-family:'DM Mono',monospace}
-.stat:nth-child(1) .stat-val{color:var(--text)}
-.stat:nth-child(2) .stat-val{color:var(--accent)}
-.stat:nth-child(3) .stat-val{color:var(--green)}
-.stat:nth-child(4) .stat-val{color:var(--amber)}
+.g-btn:hover{background:var(--surface2);color:var(--text)}
+.g-btn.active{background:var(--surface3);color:var(--text)}
+.g-btn .g-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.g-count{
+  margin-left:auto;font-family:'JetBrains Mono',monospace;
+  font-size:.65rem;color:var(--text3);
+}
+.g-btn.active .g-count{color:var(--text2)}
+.sidebar-divider{height:1px;background:var(--border);margin:.25rem 1rem}
 
-/* ── GENDER BAR ── */
-.gender-overview{
-  display:flex;gap:1rem;margin-bottom:1.5rem;
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:12px;padding:1rem 1.25rem;
-  align-items:center;flex-wrap:wrap;
+/* stats mini */
+.mini-stats{padding:.75rem 1rem 1rem}
+.mini-stat{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.4rem .25rem;
 }
-.g-bar-wrap{flex:1;min-width:200px}
-.g-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;gap:2px}
-.g-seg{border-radius:3px;transition:width .5s ease}
-.g-legend{display:flex;gap:1rem;margin-top:.6rem;flex-wrap:wrap}
-.g-leg-item{display:flex;align-items:center;gap:5px;font-size:.65rem;font-family:'DM Mono',monospace;color:var(--muted)}
-.g-dot{width:7px;height:7px;border-radius:50%}
-.g-count{color:var(--text);font-weight:500}
+.mini-stat-lbl{font-size:.7rem;color:var(--text3)}
+.mini-stat-val{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;font-weight:500;color:var(--text2);
+}
 
-/* ── CONTROLS ── */
-.controls{
-  display:flex;gap:.6rem;margin-bottom:1.25rem;
-  flex-wrap:wrap;align-items:center;
+/* genre distribution bar */
+.dist-bar{
+  margin:.25rem 1.25rem 0;height:3px;
+  border-radius:2px;display:flex;gap:2px;overflow:hidden;
 }
-.search-wrap{flex:1;min-width:180px;position:relative}
-.search-wrap input{
-  width:100%;background:var(--bg2);border:1px solid var(--border2);
-  border-radius:8px;color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.78rem;
-  padding:.55rem .9rem .55rem 2.2rem;outline:none;
+.dist-seg{border-radius:2px;transition:width .6s ease}
+
+/* ─── CONTENT ─── */
+.content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+/* ─── TOP BAR ─── */
+.topbar{
+  padding:1rem 1.5rem .75rem;
+  display:flex;align-items:center;gap:.65rem;
+  flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  background:rgba(6,7,10,.95);backdrop-filter:blur(12px);
+}
+.search-box{
+  flex:1;min-width:200px;position:relative;
+}
+.search-box input{
+  width:100%;background:var(--surface2);
+  border:1px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:'Inter',sans-serif;font-size:.8rem;
+  padding:.5rem .9rem .5rem 2.2rem;outline:none;
+  transition:border-color .2s,background .2s;
+}
+.search-box input:focus{border-color:var(--accent);background:var(--surface3)}
+.search-box input::placeholder{color:var(--text3)}
+.search-icon{
+  position:absolute;left:.7rem;top:50%;transform:translateY(-50%);
+  color:var(--text3);pointer-events:none;
+}
+.search-icon svg{width:14px;height:14px}
+
+.tb-select{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:9px;color:var(--text2);
+  font-family:'Inter',sans-serif;font-size:.75rem;font-weight:500;
+  padding:.5rem .8rem;outline:none;cursor:pointer;
   transition:border-color .2s;
 }
-.search-wrap input:focus{border-color:var(--accent)}
-.search-wrap input::placeholder{color:var(--muted2)}
-.si{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;pointer-events:none}
+.tb-select:focus{border-color:var(--accent)}
 
-.fg{
-  display:flex;gap:3px;background:var(--bg2);
-  border:1px solid var(--border2);border-radius:8px;padding:3px;
+.tb-chip{
+  display:flex;align-items:center;gap:4px;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text2);border-radius:9px;
+  font-family:'Inter',sans-serif;font-size:.72rem;font-weight:500;
+  padding:.5rem .8rem;cursor:pointer;transition:all .15s;white-space:nowrap;
 }
-.fb{
-  background:none;border:none;color:var(--muted);
-  font-family:'Syne',sans-serif;font-size:.72rem;font-weight:600;
-  padding:.38rem .75rem;border-radius:6px;cursor:pointer;
-  transition:all .15s;white-space:nowrap;
-}
-.fb:hover{color:var(--text);background:var(--border)}
-.fb.on{background:var(--accent);color:#fff}
-.fb.on-f{background:var(--female);color:#fff}
-.fb.on-m{background:var(--male);color:#fff}
-.fb.on-c{background:var(--couple);color:#fff}
-.fb.on-t{background:var(--trans);color:#fff}
+.tb-chip:hover{color:var(--text);border-color:var(--border2)}
+.tb-chip.on{background:rgba(108,92,231,.15);border-color:rgba(108,92,231,.4);color:var(--accent2)}
+.tb-chip.on-co{background:rgba(255,71,87,.1);border-color:rgba(255,71,87,.3);color:#ff6b7a}
+.tb-chip.on-fv{background:rgba(253,121,168,.1);border-color:rgba(253,121,168,.3);color:var(--female)}
 
-.sort-sel{
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:8px;color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.72rem;
-  padding:.55rem .9rem;outline:none;cursor:pointer;
+.vtog{
+  display:flex;gap:2px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:9px;padding:3px;
 }
-.refresh{
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:8px;color:var(--muted);
-  font-family:'Syne',sans-serif;font-size:.72rem;font-weight:600;
-  padding:.55rem .9rem;cursor:pointer;
-  display:flex;align-items:center;gap:5px;transition:all .15s;
+.vbtn{
+  background:none;border:none;color:var(--text3);
+  padding:.35rem .5rem;border-radius:7px;cursor:pointer;
+  transition:all .15s;display:flex;align-items:center;
 }
-.refresh:hover{color:var(--text);border-color:var(--accent)}
-.refresh.spin .ri{display:inline-block;animation:rot .7s linear infinite}
-@keyframes rot{to{transform:rotate(360deg)}}
-.vtoggle{
-  display:flex;gap:3px;background:var(--bg2);
-  border:1px solid var(--border2);border-radius:8px;padding:3px;
-}
-.vb{
-  background:none;border:none;color:var(--muted);
-  padding:.38rem .55rem;border-radius:6px;cursor:pointer;
-  font-size:.85rem;transition:all .15s;
-}
-.vb.on{background:var(--border2);color:var(--text)}
+.vbtn svg{width:15px;height:15px}
+.vbtn.on{background:var(--surface3);color:var(--text)}
 
-.res-info{font-size:.68rem;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:1rem}
+/* ─── STATS ROW ─── */
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--border);
+  border-bottom:1px solid var(--border);
+}
+.stat-cell{
+  background:var(--bg);padding:1rem 1.5rem;
+  display:flex;flex-direction:column;gap:2px;
+}
+.stat-cell-lbl{
+  font-size:.6rem;font-weight:600;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.1em;
+}
+.stat-cell-val{
+  font-size:1.4rem;font-weight:700;
+  letter-spacing:-.03em;line-height:1.1;font-family:'JetBrains Mono',monospace;
+}
+.stat-cell-sub{font-size:.65rem;color:var(--text3);margin-top:1px}
+.stat-cell:nth-child(1) .stat-cell-val{color:var(--text)}
+.stat-cell:nth-child(2) .stat-cell-val{color:var(--accent2)}
+.stat-cell:nth-child(3) .stat-cell-val{color:var(--green)}
+.stat-cell:nth-child(4) .stat-cell-val{color:var(--amber)}
 
-/* ── GRID ── */
+/* ─── GRID ─── */
+.grid-wrap{padding:1.25rem 1.5rem;flex:1}
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:.85rem;
 }
 .card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:12px;overflow:hidden;cursor:pointer;
-  transition:transform .2s,border-color .2s,box-shadow .2s;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;
   position:relative;
 }
 .card:hover{
-  transform:translateY(-4px);
+  transform:translateY(-5px) scale(1.01);
   border-color:var(--border2);
-  box-shadow:0 12px 32px rgba(0,0,0,.5);
+  box-shadow:0 16px 40px rgba(0,0,0,.6),0 0 0 1px rgba(108,92,231,.15);
 }
-.card-img-box{overflow:hidden;position:relative;aspect-ratio:3/4;background:var(--bg3)}
+.card-img-box{
+  position:relative;overflow:hidden;
+  aspect-ratio:3/4;background:var(--surface2);
+}
 .card-img{
   width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .3s;
+  transition:transform .35s ease;
 }
-.card:hover .card-img{transform:scale(1.05)}
-.card-img-box .placeholder{
-  width:100%;height:100%;display:flex;align-items:center;
-  justify-content:center;background:var(--bg3);
-  font-size:2.5rem;color:var(--muted2);
+.card:hover .card-img{transform:scale(1.07)}
+.card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 50%);
+  opacity:0;transition:opacity .2s;
 }
-.badges{position:absolute;top:7px;left:7px;display:flex;flex-direction:column;gap:3px}
+.card:hover .card-overlay{opacity:1}
+.card-badges{
+  position:absolute;top:8px;left:8px;
+  display:flex;flex-direction:column;gap:3px;
+}
 .bdg{
-  font-size:.52rem;font-weight:700;font-family:'DM Mono',monospace;
-  padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;
+  font-size:.5rem;font-weight:700;font-family:'JetBrains Mono',monospace;
+  padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.08em;
 }
-.bdg-hd{background:rgba(61,159,255,.9);color:#fff}
-.bdg-new{background:rgba(45,217,143,.9);color:#fff}
-.vw-badge{
-  position:absolute;bottom:7px;right:7px;
+.bdg-hd{background:rgba(84,160,255,.9);color:#fff}
+.bdg-new{background:rgba(46,213,115,.9);color:#fff}
+.vw-pill{
+  position:absolute;bottom:8px;left:8px;
   background:rgba(0,0,0,.75);color:#fff;
-  font-family:'DM Mono',monospace;font-size:.6rem;
-  padding:3px 7px;border-radius:20px;
-  backdrop-filter:blur(6px);
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:500;
+  padding:3px 8px;border-radius:20px;
   display:flex;align-items:center;gap:4px;
+  backdrop-filter:blur(6px);
 }
 .vw-dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
-.g-line{height:2px;width:100%}
-.g-f{background:var(--female)}.g-m{background:var(--male)}
-.g-c{background:var(--couple)}.g-t{background:var(--trans)}
-.card-body{padding:.65rem .75rem}
-.card-name{font-size:.78rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-.card-meta{font-size:.62rem;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fav-btn{
-  position:absolute;top:7px;right:7px;
-  background:rgba(0,0,0,.6);border:none;
-  width:26px;height:26px;border-radius:50%;cursor:pointer;
+  position:absolute;top:8px;right:8px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(0,0,0,.55);border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  font-size:.7rem;backdrop-filter:blur(4px);
-  transition:transform .2s;color:var(--muted);
+  transition:transform .2s,background .15s;
+  backdrop-filter:blur(4px);color:rgba(255,255,255,.4);font-size:.7rem;
 }
-.fav-btn:hover{transform:scale(1.25)}
-.fav-btn.on{color:#ff4f6d}
+.fav-btn:hover{transform:scale(1.2);background:rgba(0,0,0,.75)}
+.fav-btn.on{color:var(--female)}
+.g-stripe{height:2px;width:100%}
+.gs-f{background:var(--female)}.gs-m{background:var(--male)}
+.gs-c{background:var(--couple)}.gs-t{background:var(--trans)}
+.card-info{padding:.65rem .8rem .8rem}
+.card-name{
+  font-size:.78rem;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:2px;color:var(--text);
+}
+.card-meta{
+  font-size:.63rem;color:var(--text3);
+  font-family:'JetBrains Mono',monospace;
+}
 
-/* ── LIST ── */
-.list-view{display:none}
-.list-view.show{display:block}
-.grid.hide{display:none}
-table{width:100%;border-collapse:collapse;font-size:.78rem}
-th{
-  text-align:left;font-size:.6rem;color:var(--muted);
+/* ─── LIST ─── */
+.list-wrap{display:none;flex:1}
+.list-wrap.show{display:block}
+.grid-wrap.hide{display:none}
+.list-tbl{width:100%;border-collapse:collapse}
+.list-tbl th{
+  text-align:left;font-size:.62rem;font-weight:600;color:var(--text3);
   text-transform:uppercase;letter-spacing:.08em;
-  font-family:'DM Mono',monospace;
-  padding:.45rem .7rem;border-bottom:1px solid var(--border);
-  cursor:pointer;white-space:nowrap;user-select:none;
+  padding:.65rem 1rem;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--bg);cursor:pointer;white-space:nowrap;
+  transition:color .15s;
 }
-th:hover{color:var(--text)}
-td{padding:.55rem .7rem;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:hover td{background:var(--bg2)}
-tr{cursor:pointer}
-.l-av{width:34px;height:34px;border-radius:7px;object-fit:cover;background:var(--bg3);display:block}
-.l-av-ph{width:34px;height:34px;border-radius:7px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--muted2)}
-.l-name{font-weight:600}
-.l-sub{font-size:.62rem;color:var(--muted);font-family:'DM Mono',monospace}
-.vbar-w{width:90px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.vbar-f{height:100%;background:var(--accent);border-radius:2px}
-.gpill{font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:20px;font-family:'DM Mono',monospace}
-.gp-f{background:rgba(255,95,158,.12);color:var(--female)}
-.gp-m{background:rgba(61,159,255,.12);color:var(--male)}
-.gp-c{background:rgba(157,126,255,.12);color:var(--couple)}
-.gp-t{background:rgba(45,217,143,.12);color:var(--trans)}
-
-/* ── MODAL ── */
-.modal-bg{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.88);z-index:1000;
+.list-tbl th:hover{color:var(--text2)}
+.list-tbl th.sort-active{color:var(--accent2)}
+.list-tbl td{
+  padding:.6rem 1rem;border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+.list-tbl tr{cursor:pointer;transition:background .1s}
+.list-tbl tr:hover td{background:var(--surface)}
+.l-av{
+  width:36px;height:36px;border-radius:9px;
+  object-fit:cover;background:var(--surface2);display:block;
+}
+.l-av-ph{
+  width:36px;height:36px;border-radius:9px;
+  background:var(--surface2);display:flex;
   align-items:center;justify-content:center;
-  backdrop-filter:blur(10px);padding:1rem;
+  font-size:.9rem;color:var(--text3);
+}
+.l-name{font-size:.8rem;font-weight:600;color:var(--text)}
+.l-sub{font-size:.63rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.gpill{
+  font-size:.6rem;font-weight:600;padding:2px 8px;
+  border-radius:20px;font-family:'JetBrains Mono',monospace;white-space:nowrap;
+}
+.gp-f{background:rgba(253,121,168,.12);color:var(--female)}
+.gp-m{background:rgba(116,185,255,.12);color:var(--male)}
+.gp-c{background:rgba(162,155,254,.12);color:var(--couple)}
+.gp-t{background:rgba(85,239,196,.12);color:var(--trans)}
+.vbar-w{width:80px;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:6px}
+.vbar-f{height:100%;background:var(--accent);border-radius:2px}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text2)}
+
+/* ─── EMPTY / ERROR ─── */
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:4rem 2rem;gap:.75rem;
+  color:var(--text3);text-align:center;grid-column:1/-1;
+}
+.empty-icon{font-size:2.5rem;margin-bottom:.25rem}
+
+/* ─── SKELETON ─── */
+@keyframes sh{0%{background:var(--surface)}60%{background:var(--surface2)}100%{background:var(--surface)}}
+.sk{border-radius:var(--radius-lg);overflow:hidden;background:var(--surface);border:1px solid var(--border)}
+.sk-img{aspect-ratio:3/4;animation:sh 1.4s ease infinite}
+.sk-body{padding:.65rem .8rem}
+.sk-line{height:9px;border-radius:4px;animation:sh 1.4s ease infinite;margin-bottom:5px}
+
+/* ─── MODAL ─── */
+.modal-bg{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(14px);
+  align-items:center;justify-content:center;padding:1rem;
 }
 .modal-bg.open{display:flex}
 .modal{
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:18px;max-width:680px;width:100%;
-  max-height:92vh;overflow-y:auto;position:relative;
-  animation:mIn .2s ease;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:22px;width:100%;max-width:720px;
+  max-height:92vh;overflow:hidden;position:relative;
+  animation:mIn .22s cubic-bezier(.34,1.56,.64,1);
+  display:flex;flex-direction:column;
 }
-@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:none}}
-.mcx{
-  position:absolute;top:.9rem;right:.9rem;
-  background:var(--border);border:none;color:var(--muted);
-  width:30px;height:30px;border-radius:50%;cursor:pointer;
-  font-size:.9rem;display:flex;align-items:center;justify-content:center;
-  transition:all .15s;z-index:5;
+@keyframes mIn{from{opacity:0;transform:scale(.93) translateY(14px)}to{opacity:1;transform:none}}
+.modal-hero{
+  position:relative;height:260px;overflow:hidden;flex-shrink:0;
 }
-.mcx:hover{background:var(--border2);color:var(--text)}
-.m-top{display:grid;grid-template-columns:220px 1fr}
-.m-img{
-  width:220px;height:290px;object-fit:cover;
-  border-radius:18px 0 0 0;display:block;background:var(--bg3);
+.modal-hero-img{
+  width:100%;height:100%;object-fit:cover;
+  filter:brightness(.7);
+  transition:filter .3s;
 }
-.m-img-ph{
-  width:220px;height:290px;background:var(--bg3);
+.modal-hero:hover .modal-hero-img{filter:brightness(.85)}
+.modal-hero-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 30%,var(--surface) 100%);
+}
+.modal-hero-info{
+  position:absolute;bottom:1.25rem;left:1.5rem;right:1.5rem;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;
+}
+.modal-name{
+  font-size:1.5rem;font-weight:700;letter-spacing:-.025em;
+  line-height:1.1;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5);
+}
+.modal-disp{font-size:.78rem;color:rgba(255,255,255,.6);margin-top:2px}
+.modal-close{
+  position:absolute;top:.9rem;right:.9rem;z-index:5;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.7);cursor:pointer;font-size:.85rem;
   display:flex;align-items:center;justify-content:center;
-  font-size:4rem;color:var(--muted2);border-radius:18px 0 0 0;
+  transition:all .15s;backdrop-filter:blur(6px);
 }
-.m-info{padding:1.4rem;display:flex;flex-direction:column;gap:.7rem}
-.m-name{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;line-height:1.1}
-.m-disp{font-size:.75rem;color:var(--muted)}
-.m-subj{font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.6}
-.m-stats{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:.7rem;padding:1.1rem 1.4rem;
-  border-top:1px solid var(--border);
+.modal-close:hover{background:rgba(0,0,0,.75);color:#fff}
+.modal-body{padding:0 1.5rem 1.5rem;overflow-y:auto;flex:1}
+.modal-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--border);border-radius:12px;
+  overflow:hidden;margin:.5rem 0 1.25rem;
 }
-.ms{text-align:center}
-.ms-v{font-size:1.15rem;font-weight:800;letter-spacing:-.02em}
-.ms-l{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:'DM Mono',monospace;margin-top:2px}
-.m-body{padding:1.1rem 1.4rem;border-top:1px solid var(--border)}
-.m-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1.1rem}
+.ms-cell{
+  background:var(--surface2);padding:.75rem 1rem;text-align:center;
+}
+.ms-val{
+  font-size:1.1rem;font-weight:700;
+  font-family:'JetBrains Mono',monospace;letter-spacing:-.02em;
+}
+.ms-lbl{font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.modal-subject{
+  font-size:.78rem;color:var(--text2);line-height:1.65;
+  padding:.75rem 1rem;background:var(--surface2);
+  border-radius:10px;margin-bottom:1rem;border:1px solid var(--border);
+  font-style:italic;
+}
+.modal-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1.25rem}
 .tag{
-  background:var(--bg3);border:1px solid var(--border);
-  color:var(--muted);font-size:.62rem;font-family:'DM Mono',monospace;
-  padding:3px 9px;border-radius:20px;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text3);font-size:.62rem;font-family:'JetBrains Mono',monospace;
+  padding:3px 9px;border-radius:20px;transition:all .15s;cursor:default;
 }
-.m-acts{display:flex;gap:.65rem}
-.btn-p{
+.tag:hover{color:var(--text2);border-color:var(--border2)}
+.modal-actions{display:flex;gap:.65rem}
+.btn-visit{
   flex:1;background:var(--accent);color:#fff;border:none;
-  border-radius:8px;padding:.7rem;font-family:'Syne',sans-serif;
-  font-size:.78rem;font-weight:700;cursor:pointer;
-  text-decoration:none;text-align:center;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-  transition:opacity .15s;
+  border-radius:10px;padding:.75rem 1.25rem;
+  font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;
+  cursor:pointer;text-decoration:none;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:opacity .15s,transform .1s;
 }
-.btn-p:hover{opacity:.85}
-.btn-s{
-  background:var(--bg3);border:1px solid var(--border2);
-  color:var(--text);border-radius:8px;padding:.7rem 1rem;
-  font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;
-  cursor:pointer;transition:border-color .15s;
+.btn-visit:hover{opacity:.9;transform:translateY(-1px)}
+.btn-visit:active{transform:translateY(0)}
+.btn-fav{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text2);border-radius:10px;padding:.75rem 1.1rem;
+  font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;
 }
-.btn-s:hover{border-color:var(--accent)}
+.btn-fav:hover{border-color:var(--female);color:var(--female)}
+.btn-fav.on{background:rgba(253,121,168,.1);border-color:rgba(253,121,168,.3);color:var(--female)}
+.modal-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:600;
+  margin-bottom:.75rem;
+}
 
-/* ── SKELETON ── */
-@keyframes shim{0%{background:var(--bg2)}50%{background:var(--bg3)}100%{background:var(--bg2)}}
-.sk{animation:shim 1.4s infinite linear}
-.sk-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.sk-img{aspect-ratio:3/4;background:var(--bg3)}
-.sk-body{padding:.65rem .75rem}
-.sk-line{height:9px;border-radius:4px;margin-bottom:5px}
-
-/* ── TOAST ── */
+/* ─── TOAST ─── */
 .toast{
-  position:fixed;bottom:1.5rem;right:1.5rem;
-  background:var(--bg2);border:1px solid var(--border2);
-  color:var(--text);font-size:.75rem;font-family:'DM Mono',monospace;
-  padding:.65rem 1.1rem;border-radius:10px;z-index:3000;
-  transform:translateY(80px);opacity:0;transition:all .3s;
-  pointer-events:none;
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);font-size:.75rem;font-family:'JetBrains Mono',monospace;
+  padding:.6rem 1.2rem;border-radius:24px;z-index:3000;
+  opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
 }
-.toast.show{transform:translateY(0);opacity:1}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
-  main{padding:1rem}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .m-top{grid-template-columns:1fr}
-  .m-img,.m-img-ph{width:100%;height:220px;border-radius:18px 18px 0 0}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.65rem}
-  .gender-overview{display:none}
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
 }
-@media(max-width:480px){
+@media(max-width:600px){
   header{padding:0 1rem}
-  .stats{grid-template-columns:repeat(2,1fr)}
+  .hdr-center{display:none}
+  .topbar{padding:.75rem 1rem}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .grid-wrap{padding:.85rem 1rem}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.65rem}
+  .modal-hero{height:200px}
+  .modal-stats{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo"><div class="pulse"></div>CAMPULSE</div>
-  <div class="hdr-r">
-    <div class="live-tag"><div class="live-dot"></div>LIVE</div>
-    <span id="ts">—</span>
+  <div class="logo">
+    <div class="logo-icon">CP</div>
+    Campulse
+  </div>
+  <div class="hdr-center">
+    <div class="live-pill"><div class="live-dot"></div>Live</div>
+    <span id="ts-label">—</span>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" id="ref-btn">
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M14 8A6 6 0 1 1 8 2c2 0 3.8 1 4.9 2.5M14 2v4h-4"/>
+      </svg>
+      Actualizar
+    </button>
   </div>
 </header>
 
-<main>
+<div class="page">
 
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-lbl">Salas online</div>
-      <div class="stat-val" id="s-total">—</div>
-      <div class="stat-sub">chaturbate</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Género</div>
+      <button class="g-btn active" data-g="" id="gb-all">
+        <span class="g-dot" style="background:var(--text3)"></span>
+        Todos
+        <span class="g-count" id="gc-all">—</span>
+      </button>
+      <button class="g-btn" data-g="f" id="gb-f">
+        <span class="g-dot" style="background:var(--female)"></span>
+        Mujeres
+        <span class="g-count" id="gc-f">—</span>
+      </button>
+      <button class="g-btn" data-g="m" id="gb-m">
+        <span class="g-dot" style="background:var(--male)"></span>
+        Hombres
+        <span class="g-count" id="gc-m">—</span>
+      </button>
+      <button class="g-btn" data-g="c" id="gb-c">
+        <span class="g-dot" style="background:var(--couple)"></span>
+        Parejas
+        <span class="g-count" id="gc-c">—</span>
+      </button>
+      <button class="g-btn" data-g="t" id="gb-t">
+        <span class="g-dot" style="background:var(--trans)"></span>
+        Trans
+        <span class="g-count" id="gc-t">—</span>
+      </button>
     </div>
-    <div class="stat">
-      <div class="stat-lbl">Viewers totales</div>
-      <div class="stat-val" id="s-views">—</div>
-      <div class="stat-sub">en vivo ahora</div>
-    </div>
-    <div class="stat">
-      <div class="stat-lbl">Favoritas</div>
-      <div class="stat-val" id="s-favs">0</div>
-      <div class="stat-sub">guardadas</div>
-    </div>
-    <div class="stat">
-      <div class="stat-lbl">Mostrando</div>
-      <div class="stat-val" id="s-show">—</div>
-      <div class="stat-sub">resultados</div>
-    </div>
-  </div>
 
-  <div class="gender-overview">
-    <div class="g-bar-wrap">
-      <div class="g-bar" id="g-bar"></div>
-      <div class="g-legend" id="g-legend"></div>
-    </div>
-  </div>
+    <div class="sidebar-divider"></div>
 
-  <div class="controls">
-    <div class="search-wrap">
-      <span class="si">⌕</span>
-      <input type="text" id="search" placeholder="Buscar modelo...">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Filtros</div>
+      <button class="g-btn" id="sb-co">
+        <span style="font-size:.8rem">🇨🇴</span>
+        Colombia
+        <span class="g-count" id="gc-co">—</span>
+      </button>
+      <button class="g-btn" id="sb-fv">
+        <span style="font-size:.75rem;color:var(--female)">♥</span>
+        Favoritas
+        <span class="g-count" id="gc-fv">0</span>
+      </button>
+      <button class="g-btn" id="sb-hd">
+        <span class="bdg bdg-hd" style="font-size:.5rem">HD</span>
+        Solo HD
+        <span class="g-count" id="gc-hd">—</span>
+      </button>
     </div>
-    <div class="fg" id="gf">
-      <button class="fb on" data-g="">Todos</button>
-      <button class="fb" data-g="f">Mujeres</button>
-      <button class="fb" data-g="m">Hombres</button>
-      <button class="fb" data-g="c">Parejas</button>
-      <button class="fb" data-g="t">Trans</button>
-    </div>
-    <div class="fg">
-      <button class="fb" id="btn-co">🇨🇴 CO</button>
-      <button class="fb" id="btn-fv">♥ Favs</button>
-      <button class="fb" id="btn-hd">HD</button>
-    </div>
-    <select class="sort-sel" id="srt">
-      <option value="viewers">↓ Viewers</option>
-      <option value="followers">↓ Seguidores</option>
-      <option value="age">Edad ↑</option>
-    </select>
-    <button class="refresh" id="ref"><span class="ri">↺</span> Actualizar</button>
-    <div class="vtoggle">
-      <button class="vb on" id="vg" title="Grid">⊞</button>
-      <button class="vb" id="vl" title="Lista">☰</button>
-    </div>
-  </div>
 
-  <div class="res-info" id="ri"></div>
+    <div class="sidebar-divider"></div>
 
-  <div class="grid" id="gc"></div>
-  <div class="list-view" id="lc">
-    <table>
-      <thead><tr>
-        <th style="width:42px"></th>
-        <th>Modelo</th>
-        <th>Género</th>
-        <th id="th-v" style="cursor:pointer">Viewers ↓</th>
-        <th id="th-f">Seguidores</th>
-        <th id="th-a">Edad</th>
-        <th>País</th>
-        <th style="width:40px"></th>
-      </tr></thead>
-      <tbody id="lb"></tbody>
-    </table>
-  </div>
-</main>
-
-<!-- Modal -->
-<div class="modal-bg" id="mb" onclick="closeMod(event)">
-  <div class="modal">
-    <button class="mcx" onclick="closeMod()">✕</button>
-    <div class="m-top">
-      <div id="m-img-wrap"></div>
-      <div class="m-info">
-        <div>
-          <div class="m-name" id="mn"></div>
-          <div class="m-disp" id="md"></div>
-        </div>
-        <div id="mpill"></div>
-        <div class="m-subj" id="ms"></div>
+    <div class="mini-stats">
+      <div class="sidebar-label" style="padding:0 .25rem;margin-bottom:.5rem">Distribución</div>
+      <div class="dist-bar" id="dist-bar"></div>
+      <div style="height:.75rem"></div>
+      <div class="mini-stat">
+        <span class="mini-stat-lbl">Total salas</span>
+        <span class="mini-stat-val" id="ms-total">—</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-lbl">Viewers</span>
+        <span class="mini-stat-val" id="ms-views">—</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-lbl">Promedio</span>
+        <span class="mini-stat-val" id="ms-avg">—</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-lbl">Peak</span>
+        <span class="mini-stat-val" id="ms-peak">—</span>
       </div>
     </div>
-    <div class="m-stats">
-      <div class="ms"><div class="ms-v" id="mv"></div><div class="ms-l">Viewers</div></div>
-      <div class="ms"><div class="ms-v" id="mf"></div><div class="ms-l">Seguidores</div></div>
-      <div class="ms"><div class="ms-v" id="ma"></div><div class="ms-l">Edad</div></div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-cell">
+        <div class="stat-cell-lbl">Salas online</div>
+        <div class="stat-cell-val" id="s-total">—</div>
+        <div class="stat-cell-sub">chaturbate</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-cell-lbl">Viewers totales</div>
+        <div class="stat-cell-val" id="s-views">—</div>
+        <div class="stat-cell-sub">en vivo ahora</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-cell-lbl">Favoritas</div>
+        <div class="stat-cell-val" id="s-favs">0</div>
+        <div class="stat-cell-sub">guardadas</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-cell-lbl">Mostrando</div>
+        <div class="stat-cell-val" id="s-show">—</div>
+        <div class="stat-cell-sub">resultados</div>
+      </div>
     </div>
-    <div class="m-body">
-      <div class="m-tags" id="mtags"></div>
-      <div class="m-acts">
-        <a id="ml" href="#" target="_blank" rel="noopener" class="btn-p">Ver sala ↗</a>
-        <button class="btn-s" id="mfav" onclick="favMod()">♥ Favorita</button>
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="search-box">
+        <span class="search-icon">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/>
+          </svg>
+        </span>
+        <input type="text" id="search" placeholder="Buscar modelo...">
+      </div>
+
+      <!-- Mobile gender filter -->
+      <div style="display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:3px" id="mob-gf">
+        <button class="tb-chip on" data-g="" style="border:none;background:var(--surface3)">Todos</button>
+        <button class="tb-chip" data-g="f" style="border:none">♀</button>
+        <button class="tb-chip" data-g="m" style="border:none">♂</button>
+        <button class="tb-chip" data-g="c" style="border:none">⚭</button>
+        <button class="tb-chip" data-g="t" style="border:none">⚧</button>
+      </div>
+
+      <select class="tb-select" id="srt">
+        <option value="viewers">↓ Más viewers</option>
+        <option value="followers">↓ Más seguidores</option>
+        <option value="age_asc">Más jóvenes</option>
+        <option value="new">Nuevas primero</option>
+      </select>
+
+      <button class="tb-chip" id="tb-co">🇨🇴 Colombia</button>
+      <button class="tb-chip" id="tb-fv">♥ Favs</button>
+      <button class="tb-chip" id="tb-hd">HD</button>
+
+      <div class="vtog">
+        <button class="vbtn on" id="vg">
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        </button>
+        <button class="vbtn" id="vl">
+          <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2" rx="1"/><rect x="1" y="7" width="14" height="2" rx="1"/><rect x="1" y="12" width="14" height="2" rx="1"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid-wrap" id="gw">
+      <div class="grid" id="gc-grid"></div>
+    </div>
+
+    <!-- List -->
+    <div class="list-wrap" id="lw">
+      <table class="list-tbl">
+        <thead><tr>
+          <th style="width:44px"></th>
+          <th>Modelo</th>
+          <th>Género</th>
+          <th class="sort-active" id="th-v">Viewers ↓</th>
+          <th id="th-f">Seguidores</th>
+          <th id="th-a">Edad</th>
+          <th>País</th>
+          <th style="width:44px"></th>
+        </tr></thead>
+        <tbody id="lb"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeMod()">✕</button>
+    <div class="modal-hero">
+      <div id="mhero-img-wrap"></div>
+      <div class="modal-hero-grad"></div>
+      <div class="modal-hero-info">
+        <div>
+          <div class="modal-name" id="m-name"></div>
+          <div class="modal-disp" id="m-disp"></div>
+        </div>
+        <div id="m-pill"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-stats">
+        <div class="ms-cell"><div class="ms-val" id="m-vw"></div><div class="ms-lbl">Viewers</div></div>
+        <div class="ms-cell"><div class="ms-val" id="m-fl"></div><div class="ms-lbl">Seguidores</div></div>
+        <div class="ms-cell"><div class="ms-val" id="m-ag"></div><div class="ms-lbl">Edad</div></div>
+        <div class="ms-cell"><div class="ms-val" id="m-co"></div><div class="ms-lbl">País</div></div>
+      </div>
+      <div class="modal-subject" id="m-subj" style="display:none"></div>
+      <div class="modal-tags" id="m-tags"></div>
+      <div class="modal-actions">
+        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-visit">
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9M10 2h4v4M14 2L7 9"/></svg>
+          Ver sala en Chaturbate
+        </a>
+        <button class="btn-fav" id="m-fav-btn" onclick="favMod()">
+          <span id="m-fav-icon">♥</span>
+          <span id="m-fav-txt">Guardar</span>
+        </button>
       </div>
     </div>
   </div>
@@ -484,119 +737,131 @@ tr{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-// Proxy propio via Vercel Edge Function
+const PROXY = 'https://api.allorigins.win/raw?url=';
+const API_URL = 'https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=500';
 
-let rooms=[], favs=JSON.parse(localStorage.getItem('cp2_favs')||'[]');
-let gender='', country='', onlyFavs=false, onlyHD=false;
+let rooms=[], favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
+let gender='', onlyCol=false, onlyFavs=false, onlyHD=false;
 let sort='viewers', view='grid', maxV=1, active=null;
 
 const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n);
-
-// Imagen con fallback
-function imgEl(src, cls, ph='👤') {
-  if (!src) return `<div class="${cls} placeholder" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--muted2);background:var(--bg3)">${ph}</div>`;
-  return `<img class="${cls}" src="${src}" loading="lazy" 
-    onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'${cls} placeholder',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--muted2);background:var(--bg3)',innerHTML:'${ph}'}))">`;
-}
+const gl={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
+const gc={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
 
 async function load() {
-  const btn=document.getElementById('ref');
-  btn.classList.add('spin');
+  document.getElementById('ref-btn').classList.add('spin');
   skeleton();
   try {
-    const res = await fetch(API_ENDPOINT);
-    const data = await res.json();
-    rooms = data.results||[];
+    const r = await fetch(PROXY + encodeURIComponent(API_URL));
+    const d = await r.json();
+    rooms = d.results||[];
     maxV = Math.max(...rooms.map(r=>r.num_users||0),1);
-    updateStats();
-    renderGenderBar();
-    render();
-    document.getElementById('ts').textContent = new Date().toLocaleTimeString('es-CO');
+    updateAll();
+    document.getElementById('ts-label').textContent = new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
   } catch(e) {
-    document.getElementById('gc').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">
-      <div style="font-size:2rem;margin-bottom:.5rem">⚠</div>
-      <div style="margin-bottom:.5rem">Error cargando datos</div>
-      <button onclick="load()" style="background:var(--accent);color:#fff;border:none;padding:.5rem 1rem;border-radius:6px;cursor:pointer;font-family:inherit">Reintentar</button>
-    </div>`;
-  } finally { btn.classList.remove('spin'); }
+    document.getElementById('gc-grid').innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">⚠</div>
+        <div style="color:var(--text2)">Error cargando datos</div>
+        <button onclick="load()" style="margin-top:.5rem;background:var(--accent);color:#fff;border:none;padding:.45rem 1rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.75rem;font-weight:600">Reintentar</button>
+      </div>`;
+  } finally {
+    document.getElementById('ref-btn').classList.remove('spin');
+  }
 }
 
 function skeleton() {
-  document.getElementById('gc').innerHTML = Array(24).fill(0).map(()=>`
-    <div class="sk-card sk">
+  document.getElementById('gc-grid').innerHTML=Array(24).fill(0).map(()=>`
+    <div class="sk">
       <div class="sk-img sk"></div>
-      <div class="sk-body">
-        <div class="sk-line sk" style="width:65%"></div>
-        <div class="sk-line sk" style="width:40%"></div>
+      <div style="padding:.65rem .8rem">
+        <div class="sk-line sk" style="width:60%"></div>
+        <div class="sk-line sk" style="width:38%"></div>
       </div>
     </div>`).join('');
 }
 
 function getFiltered() {
-  const q = document.getElementById('search').value.toLowerCase();
+  const q=document.getElementById('search').value.toLowerCase();
   let r=[...rooms];
   if(gender) r=r.filter(x=>x.gender===gender);
-  if(country) r=r.filter(x=>x.country===country);
+  if(onlyCol) r=r.filter(x=>x.country==='CO');
   if(onlyFavs) r=r.filter(x=>favs.includes(x.username));
   if(onlyHD) r=r.filter(x=>x.is_hd);
   if(q) r=r.filter(x=>(x.username||'').toLowerCase().includes(q)||(x.display_name||'').toLowerCase().includes(q));
   r.sort((a,b)=>{
     if(sort==='viewers') return (b.num_users||0)-(a.num_users||0);
     if(sort==='followers') return (b.num_followers||0)-(a.num_followers||0);
-    if(sort==='age') return (a.age||99)-(b.age||99);
+    if(sort==='age_asc') return (a.age||99)-(b.age||99);
+    if(sort==='new') return (b.is_new?1:0)-(a.is_new?1:0);
     return 0;
   });
   return r;
 }
 
-function updateStats() {
-  document.getElementById('s-total').textContent=fmt(rooms.length);
-  document.getElementById('s-views').textContent=fmt(rooms.reduce((s,r)=>s+(r.num_users||0),0));
-  document.getElementById('s-favs').textContent=favs.length;
-}
-
-function renderGenderBar() {
+function updateAll() {
+  const total=rooms.length;
+  const views=rooms.reduce((s,r)=>s+(r.num_users||0),0);
+  const avg=total?Math.round(views/total):0;
+  const peak=rooms.reduce((m,r)=>Math.max(m,r.num_users||0),0);
   const counts={f:0,m:0,c:0,t:0};
   rooms.forEach(r=>{if(counts[r.gender]!==undefined)counts[r.gender]++});
-  const total=rooms.length||1;
+  const co=rooms.filter(r=>r.country==='CO').length;
+  const hd=rooms.filter(r=>r.is_hd).length;
+
+  document.getElementById('s-total').textContent=fmt(total);
+  document.getElementById('s-views').textContent=fmt(views);
+  document.getElementById('s-favs').textContent=favs.length;
+  document.getElementById('ms-total').textContent=fmt(total);
+  document.getElementById('ms-views').textContent=fmt(views);
+  document.getElementById('ms-avg').textContent=fmt(avg);
+  document.getElementById('ms-peak').textContent=fmt(peak);
+  document.getElementById('gc-all').textContent=fmt(total);
+  document.getElementById('gc-f').textContent=fmt(counts.f);
+  document.getElementById('gc-m').textContent=fmt(counts.m);
+  document.getElementById('gc-c').textContent=fmt(counts.c);
+  document.getElementById('gc-t').textContent=fmt(counts.t);
+  document.getElementById('gc-co').textContent=fmt(co);
+  document.getElementById('gc-fv').textContent=favs.length;
+  document.getElementById('gc-hd').textContent=fmt(hd);
+
+  // dist bar
   const colors={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
-  const labels={f:'Mujeres',m:'Hombres',c:'Parejas',t:'Trans'};
-  document.getElementById('g-bar').innerHTML=Object.entries(counts).map(([g,n])=>
-    `<div class="g-seg" style="width:${(n/total*100).toFixed(1)}%;background:${colors[g]}"></div>`).join('');
-  document.getElementById('g-legend').innerHTML=Object.entries(counts).map(([g,n])=>
-    `<div class="g-leg-item"><div class="g-dot" style="background:${colors[g]}"></div>${labels[g]} <span class="g-count">${fmt(n)}</span></div>`).join('');
+  document.getElementById('dist-bar').innerHTML=Object.entries(counts).map(([g,n])=>
+    `<div class="dist-seg" style="flex:${n};background:${colors[g]}"></div>`).join('');
+
+  render();
 }
 
 function render() {
   const r=getFiltered();
   document.getElementById('s-show').textContent=fmt(r.length);
-  const parts=[];
-  if(gender) parts.push({f:'mujeres',m:'hombres',c:'parejas',t:'trans'}[gender]);
-  if(country) parts.push('Colombia');
-  if(onlyFavs) parts.push('favoritas');
-  if(onlyHD) parts.push('HD');
-  document.getElementById('ri').textContent=`${r.length.toLocaleString()} resultados${parts.length?' · '+parts.join(' · '):''}`;
   if(view==='grid') renderGrid(r);
   else renderList(r);
 }
 
 function renderGrid(r) {
-  const g=document.getElementById('gc');
-  if(!r.length){g.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">Sin resultados</div>`;return;}
-  g.innerHTML=r.map(x=>{
+  const c=document.getElementById('gc-grid');
+  if(!r.length){c.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div>Sin resultados</div></div>`;return;}
+  c.innerHTML=r.map(x=>{
     const fv=favs.includes(x.username);
+    const img=x.image_url
+      ?`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}"
+          onerror="this.outerHTML='<div class=card-img style=background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)>👤</div>'">`
+      :`<div class="card-img" style="background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)">👤</div>`;
     return `<div class="card" onclick="openMod('${x.username}')">
       <div class="card-img-box">
-        ${imgEl(x.image_url,'card-img')}
-        <div class="badges">
+        ${img}
+        <div class="card-overlay"></div>
+        <div class="card-badges">
           ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
-          ${x.is_new?'<span class="bdg bdg-new">NEW</span>':''}
+          ${x.is_new?'<span class="bdg bdg-new">New</span>':''}
         </div>
-        <div class="vw-badge"><div class="vw-dot"></div>${fmt(x.num_users||0)}</div>
+        <div class="vw-pill"><div class="vw-dot"></div>${fmt(x.num_users||0)}</div>
         <button class="fav-btn ${fv?'on':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
       </div>
-      <div class="g-line g-${x.gender}"></div>
-      <div class="card-body">
+      <div class="g-stripe gs-${x.gender}"></div>
+      <div class="card-info">
         <div class="card-name">${x.display_name||x.username}</div>
         <div class="card-meta">${x.country||'—'} · ${x.age?x.age+'a':'—'}</div>
       </div>
@@ -605,25 +870,24 @@ function renderGrid(r) {
 }
 
 function renderList(r) {
-  const gl={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
   const b=document.getElementById('lb');
-  if(!r.length){b.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Sin resultados</td></tr>`;return;}
+  if(!r.length){b.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-icon">🔍</div><div>Sin resultados</div></div></td></tr>`;return;}
   b.innerHTML=r.map(x=>`
     <tr onclick="openMod('${x.username}')">
       <td>${x.image_url
-        ?`<img class="l-av" src="${x.image_url}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'l-av-ph',innerHTML:'👤'}))">`
+        ?`<img class="l-av" src="${x.image_url}" loading="lazy" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`
         :`<div class="l-av-ph">👤</div>`}
       </td>
       <td><div class="l-name">${x.display_name||x.username}</div><div class="l-sub">@${x.username}</div></td>
       <td><span class="gpill gp-${x.gender}">${gl[x.gender]||'—'}</span></td>
-      <td><div style="display:flex;align-items:center;gap:7px">
-        <span style="font-family:'DM Mono',monospace;font-size:.75rem">${fmt(x.num_users||0)}</span>
-        <div class="vbar-w"><div class="vbar-f" style="width:${Math.round((x.num_users||0)/maxV*100)}%"></div></div>
-      </div></td>
-      <td style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)">${fmt(x.num_followers||0)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:.75rem">${x.age||'—'}</td>
-      <td style="font-size:.72rem;color:var(--muted)">${x.country||'—'}</td>
-      <td><button class="fav-btn ${favs.includes(x.username)?'on':''}" style="position:static;width:28px;height:28px;background:var(--bg3)" onclick="toggleFav(event,'${x.username}')">♥</button></td>
+      <td>
+        <span class="mono">${fmt(x.num_users||0)}</span>
+        <span class="vbar-w"><span class="vbar-f" style="width:${Math.round((x.num_users||0)/maxV*100)}%"></span></span>
+      </td>
+      <td class="mono" style="color:var(--text3)">${fmt(x.num_followers||0)}</td>
+      <td class="mono">${x.age||'—'}</td>
+      <td style="font-size:.72rem;color:var(--text3)">${x.country||'—'}</td>
+      <td><button class="fav-btn ${favs.includes(x.username)?'on':''}" style="position:static;width:28px;height:28px;background:var(--surface2)" onclick="toggleFav(event,'${x.username}')">♥</button></td>
     </tr>`).join('');
 }
 
@@ -631,122 +895,131 @@ function openMod(u) {
   const x=rooms.find(r=>r.username===u);
   if(!x) return;
   active=x;
-  const gl={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
-  const gc={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
-  const wrap=document.getElementById('m-img-wrap');
+  // Hero image
+  const wrap=document.getElementById('mhero-img-wrap');
   if(x.image_url){
-    wrap.innerHTML=`<img class="m-img" src="${x.image_url}" alt="${x.username}"
-      onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'m-img-ph',innerHTML:'👤'}))">`;
+    wrap.innerHTML=`<img class="modal-hero-img" src="${x.image_url}" alt="${x.username}"
+      onerror="this.style.display='none';this.parentElement.style.background='var(--surface2)'">`;
   } else {
-    wrap.innerHTML=`<div class="m-img-ph">👤</div>`;
+    wrap.style.background='var(--surface2)';wrap.innerHTML='';
   }
-  document.getElementById('mn').textContent=x.username;
-  document.getElementById('md').textContent=x.display_name||'';
-  document.getElementById('mpill').innerHTML=`<span class="gpill gp-${x.gender}" style="font-size:.7rem;padding:3px 10px">${gl[x.gender]||'—'} · ${x.country||'—'} ${x.is_hd?'· HD':''}</span>`;
-  document.getElementById('ms').textContent=x.room_subject||'';
-  document.getElementById('mv').textContent=fmt(x.num_users||0);
-  document.getElementById('mf').textContent=fmt(x.num_followers||0);
-  document.getElementById('ma').textContent=x.age||'—';
-  document.getElementById('ml').href=`https://chaturbate.com/${x.username}/`;
-  document.getElementById('mtags').innerHTML=(x.tags||[]).slice(0,14).map(t=>`<span class="tag">${t}</span>`).join('');
-  const fv=favs.includes(u);
-  const fb=document.getElementById('mfav');
-  fb.textContent=fv?'♥ Quitar':'♥ Favorita';
-  fb.style.color=fv?'var(--female)':'';
-  document.getElementById('mb').classList.add('open');
+  document.getElementById('m-name').textContent=x.username;
+  document.getElementById('m-disp').textContent=x.display_name||'';
+  document.getElementById('m-pill').innerHTML=`<span class="gpill gp-${x.gender}" style="font-size:.65rem;padding:3px 10px">${gl[x.gender]||'—'}</span>`;
+  document.getElementById('m-vw').textContent=fmt(x.num_users||0);
+  document.getElementById('m-fl').textContent=fmt(x.num_followers||0);
+  document.getElementById('m-ag').textContent=x.age||'—';
+  document.getElementById('m-co').textContent=x.country||'—';
+  const subj=document.getElementById('m-subj');
+  if(x.room_subject){subj.textContent='"'+x.room_subject+'"';subj.style.display='block'}
+  else{subj.style.display='none'}
+  document.getElementById('m-tags').innerHTML=(x.tags||[]).slice(0,16).map(t=>`<span class="tag">${t}</span>`).join('');
+  document.getElementById('m-link').href=`https://chaturbate.com/${x.username}/`;
+  updateFavBtn(x.username);
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow='hidden';
 }
 
-function closeMod(e) {
-  if(!e||e.target===document.getElementById('mb'))
-    document.getElementById('mb').classList.remove('open');
+function updateFavBtn(u){
+  const fv=favs.includes(u);
+  document.getElementById('m-fav-btn').classList.toggle('on',fv);
+  document.getElementById('m-fav-icon').textContent=fv?'♥':'♡';
+  document.getElementById('m-fav-txt').textContent=fv?'Guardada':'Guardar';
+}
+
+function closeMod(e){
+  if(!e||e.target===document.getElementById('modal-bg')){
+    document.getElementById('modal-bg').classList.remove('open');
+    document.body.style.overflow='';
+  }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod()});
 
-function toggleFav(e,u) {
+function toggleFav(e,u){
   e.stopPropagation();
   const i=favs.indexOf(u);
   if(i>=0){favs.splice(i,1);toast('Quitada de favoritas')}
-  else{favs.push(u);toast('Favorita guardada ♥')}
-  localStorage.setItem('cp2_favs',JSON.stringify(favs));
+  else{favs.push(u);toast('Guardada en favoritas ♥')}
+  localStorage.setItem('cp3_favs',JSON.stringify(favs));
   document.getElementById('s-favs').textContent=favs.length;
+  document.getElementById('gc-fv').textContent=favs.length;
   render();
 }
 
-function favMod() {
+function favMod(){
   if(!active) return;
   toggleFav({stopPropagation:()=>{}},active.username);
-  const fv=favs.includes(active.username);
-  const fb=document.getElementById('mfav');
-  fb.textContent=fv?'♥ Quitar':'♥ Favorita';
-  fb.style.color=fv?'var(--female)':'';
+  updateFavBtn(active.username);
 }
 
-function toast(msg) {
+function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2400);
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// Gender filters
-document.getElementById('gf').addEventListener('click',e=>{
-  const b=e.target.closest('[data-g]');
-  if(!b) return;
-  gender=b.dataset.g;
-  document.querySelectorAll('[data-g]').forEach(x=>{
-    x.className='fb';
-    if(x===b) x.classList.add(gender?`on-${gender}`:'on');
+// Sidebar gender
+document.querySelectorAll('[data-g]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    gender=b.dataset.g;
+    // sidebar
+    document.querySelectorAll('.g-btn[data-g]').forEach(x=>{
+      x.classList.toggle('active',x.dataset.g===gender);
+    });
+    // mobile
+    document.querySelectorAll('#mob-gf [data-g]').forEach(x=>{
+      x.classList.toggle('on',x.dataset.g===gender);
+      x.style.background=x.dataset.g===gender?'var(--surface3)':'';
+    });
+    render();
   });
-  render();
 });
 
 // Special filters
-document.getElementById('btn-co').addEventListener('click',()=>{
-  country=country?'':'CO';
-  document.getElementById('btn-co').classList.toggle('on',!!country);
-  render();
-});
-document.getElementById('btn-fv').addEventListener('click',()=>{
-  onlyFavs=!onlyFavs;
-  document.getElementById('btn-fv').classList.toggle('on',onlyFavs);
-  render();
-});
-document.getElementById('btn-hd').addEventListener('click',()=>{
-  onlyHD=!onlyHD;
-  document.getElementById('btn-hd').classList.toggle('on',onlyHD);
-  render();
-});
+function setupToggle(btnId, varSetter, chip=false){
+  document.getElementById(btnId).addEventListener('click',function(){
+    varSetter();
+    this.classList.toggle('active');
+    if(chip) this.classList.toggle('on');
+    render();
+    updateAll();
+  });
+}
 
-// Sort & search
+document.getElementById('sb-co').addEventListener('click',function(){onlyCol=!onlyCol;this.classList.toggle('active');render()});
+document.getElementById('sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active');render()});
+document.getElementById('sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active');render()});
+document.getElementById('tb-co').addEventListener('click',function(){onlyCol=!onlyCol;this.classList.toggle('on-co');render()});
+document.getElementById('tb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('on-fv');render()});
+document.getElementById('tb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('on');render()});
+
 document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;render()});
 document.getElementById('search').addEventListener('input',()=>render());
+document.getElementById('ref-btn').addEventListener('click',load);
 
-// Table header sort
+// Table sort
 document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render()});
 document.getElementById('th-f').addEventListener('click',()=>{sort='followers';render()});
-document.getElementById('th-a').addEventListener('click',()=>{sort='age';render()});
+document.getElementById('th-a').addEventListener('click',()=>{sort='age_asc';render()});
 
-// Refresh
-document.getElementById('ref').addEventListener('click',load);
-
-// View toggle
+// View
 document.getElementById('vg').addEventListener('click',()=>{
   view='grid';
-  document.getElementById('gc').classList.remove('hide');
-  document.getElementById('lc').classList.remove('show');
+  document.getElementById('gw').classList.remove('hide');
+  document.getElementById('lw').classList.remove('show');
   document.getElementById('vg').classList.add('on');
   document.getElementById('vl').classList.remove('on');
   render();
 });
 document.getElementById('vl').addEventListener('click',()=>{
   view='list';
-  document.getElementById('gc').classList.add('hide');
-  document.getElementById('lc').classList.add('show');
+  document.getElementById('gw').classList.add('hide');
+  document.getElementById('lw').classList.add('show');
   document.getElementById('vg').classList.remove('on');
   document.getElementById('vl').classList.add('on');
   render();
 });
 
-// Auto-refresh 5 min
 setInterval(load,5*60*1000);
 load();
 </script>
