@@ -1050,6 +1050,27 @@ const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':Strin
 const gl={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
 const gc={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
 
+// Cargar sala individual directamente por username
+async function fetchRoom(username) {
+  try {
+    // Intentar con keywords primero
+    const res = await fetch('/api/rooms?username='+encodeURIComponent(username));
+    const d = await res.json();
+    const found = (d.results||[]).find(r => r.username === username);
+    if (found) return found;
+
+    // Si no encontró, buscar en los offsets siguientes (500-1000, 1000-1500)
+    for (let offset = 500; offset <= 2000; offset += 500) {
+      const res2 = await fetch('/api/rooms?offset='+offset);
+      const d2 = await res2.json();
+      const found2 = (d2.results||[]).find(r => r.username === username);
+      if (found2) return found2;
+      if (!d2.results || d2.results.length < 500) break; // no hay más
+    }
+    return null;
+  } catch(e) { return null; }
+}
+
 async function load() {
   document.getElementById('ref-btn').classList.add('spin');
   skeleton();
@@ -1057,6 +1078,14 @@ async function load() {
     const r = await fetch(API_ENDPOINT);
     const d = await r.json();
     rooms = d.results||[];
+
+    // Inyectar destacadas offline
+    const missing = FEATURED.filter(u => !rooms.find(x => x.username === u));
+    if (missing.length) {
+      const extra = await Promise.all(missing.map(u => fetchRoom(u)));
+      extra.forEach(room => { if (room) rooms.push(room); });
+    }
+
     maxV = Math.max(...rooms.map(r=>r.num_users||0),1);
     updateAll();
     document.getElementById('ts-label').textContent = new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
@@ -1094,7 +1123,7 @@ const FEATURED_SLOTS = 4; // cuántas posiciones "reservadas" al inicio
 function injectFeatured(filtered) {
   if (!FEATURED.length) return filtered;
 
-  // Separar destacadas online del resto
+  // Separar destacadas del resto
   const featuredOnline = [];
   const rest = [];
   filtered.forEach(r => {
@@ -1102,7 +1131,15 @@ function injectFeatured(filtered) {
     else rest.push(r);
   });
 
-  if (!featuredOnline.length) return filtered;
+  console.log('[CAMPULSE] FEATURED buscadas:', FEATURED);
+  console.log('[CAMPULSE] Destacadas encontradas en array:', featuredOnline.map(r=>r.username));
+  console.log('[CAMPULSE] Total rooms en array:', rooms.length);
+  console.log('[CAMPULSE] lexy en rooms:', rooms.find(r=>r.username==='lexy_fox2') ? 'SÍ' : 'NO');
+
+  if (!featuredOnline.length) {
+    console.log('[CAMPULSE] No se encontraron destacadas — retornando sin cambios');
+    return filtered;
+  }
 
   // Tomar hasta FEATURED_SLOTS modelos del top del resto para mezclar
   const topRest = rest.splice(0, FEATURED_SLOTS);
@@ -1120,11 +1157,13 @@ function injectFeatured(filtered) {
 function getFiltered() {
   const q=document.getElementById('search').value.toLowerCase();
   let r=[...rooms];
-  if(gender) r=r.filter(x=>x.gender===gender);
-  if(onlyCol) r=r.filter(x=>x.country==='CO');
-  if(onlyFavs) r=r.filter(x=>favs.includes(x.username));
-  if(onlyHD) r=r.filter(x=>x.is_hd);
-  if(q) r=r.filter(x=>(x.username||'').toLowerCase().includes(q)||(x.display_name||'').toLowerCase().includes(q));
+  // Las destacadas siempre pasan todos los filtros
+  const isFeatured = x => FEATURED.includes(x.username);
+  if(gender) r=r.filter(x=>isFeatured(x)||x.gender===gender);
+  if(onlyCol) r=r.filter(x=>isFeatured(x)||x.country==='CO');
+  if(onlyFavs) r=r.filter(x=>isFeatured(x)||favs.includes(x.username));
+  if(onlyHD) r=r.filter(x=>isFeatured(x)||x.is_hd);
+  if(q) r=r.filter(x=>isFeatured(x)||(x.username||'').toLowerCase().includes(q)||(x.display_name||'').toLowerCase().includes(q));
   r.sort((a,b)=>{
     if(sort==='viewers') return (b.num_users||0)-(a.num_users||0);
     if(sort==='followers') return (b.num_followers||0)-(a.num_followers||0);
