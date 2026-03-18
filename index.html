@@ -394,12 +394,63 @@ header{
 .modal-hero{
   position:relative;height:260px;overflow:hidden;flex-shrink:0;
 }
+.live-preview-wrap{
+  position:relative;width:100%;height:100%;overflow:hidden;
+  background:var(--surface2);cursor:pointer;
+}
+.live-preview-img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:opacity .4s ease;
+}
+.live-preview-img.loading{opacity:.4}
+.live-refresh-badge{
+  position:absolute;top:10px;left:10px;
+  display:flex;align-items:center;gap:5px;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:3px 10px;
+  font-size:.6rem;font-weight:600;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--green);letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.live-refresh-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);
+  animation:blink 1.4s ease-in-out infinite;
+}
+.live-refresh-timer{color:rgba(255,255,255,.45);margin-left:2px}
+.live-fullscreen-btn{
+  position:absolute;bottom:10px;right:10px;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.7);border-radius:8px;
+  padding:5px 9px;cursor:pointer;font-size:.65rem;
+  font-family:'JetBrains Mono',monospace;
+  backdrop-filter:blur(6px);transition:all .15s;
+  display:flex;align-items:center;gap:4px;
+}
+.live-fullscreen-btn:hover{background:rgba(0,0,0,.8);color:#fff}
+.live-preview-overlay{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .2s;pointer-events:none;
+}
+.live-preview-wrap:hover .live-preview-overlay{opacity:1}
+.live-play-icon{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  border:2px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.live-play-icon svg{width:22px;height:22px;fill:white;margin-left:3px}
 .modal-hero-img{
   width:100%;height:100%;object-fit:cover;
   filter:brightness(.7);
   transition:filter .3s;
 }
-.modal-hero:hover .modal-hero-img{filter:brightness(.85)}
+.modal-hero-img{filter:brightness(.85)}
 .modal-hero-grad{
   position:absolute;inset:0;
   background:linear-gradient(to bottom,transparent 30%,var(--surface) 100%);
@@ -895,14 +946,8 @@ function openMod(u) {
   const x=rooms.find(r=>r.username===u);
   if(!x) return;
   active=x;
-  // Hero image
-  const wrap=document.getElementById('mhero-img-wrap');
-  if(x.image_url){
-    wrap.innerHTML=`<img class="modal-hero-img" src="${x.image_url}" alt="${x.username}"
-      onerror="this.style.display='none';this.parentElement.style.background='var(--surface2)'">`;
-  } else {
-    wrap.style.background='var(--surface2)';wrap.innerHTML='';
-  }
+  // Hero: live preview thumbnail
+  startLivePreview(x.username);
   document.getElementById('m-name').textContent=x.username;
   document.getElementById('m-disp').textContent=x.display_name||'';
   document.getElementById('m-pill').innerHTML=`<span class="gpill gp-${x.gender}" style="font-size:.65rem;padding:3px 10px">${gl[x.gender]||'—'}</span>`;
@@ -927,10 +972,73 @@ function updateFavBtn(u){
   document.getElementById('m-fav-txt').textContent=fv?'Guardada':'Guardar';
 }
 
+// ─── LIVE PREVIEW ───
+let previewTimer=null, previewCountdown=null, previewSeconds=30;
+
+function startLivePreview(username){
+  stopLivePreview();
+  const wrap=document.getElementById('mhero-img-wrap');
+  const thumbUrl=`https://roomimg.stream.highwebmedia.com/ri/${username}.jpg`;
+  
+  wrap.innerHTML=`
+    <div class="live-preview-wrap" onclick="openInChaturbate('${username}')">
+      <img class="live-preview-img" id="live-img" src="${thumbUrl}?t=${Date.now()}" alt="${username}">
+      <div class="live-refresh-badge">
+        <div class="live-refresh-dot"></div>
+        Live
+        <span class="live-refresh-timer" id="live-timer">·30s</span>
+      </div>
+      <div class="live-preview-overlay">
+        <div class="live-play-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+      <button class="live-fullscreen-btn" onclick="event.stopPropagation();openInChaturbate('${username}')">
+        ↗ Ver en vivo
+      </button>
+    </div>`;
+
+  previewSeconds=30;
+  previewCountdown=setInterval(()=>{
+    previewSeconds--;
+    const el=document.getElementById('live-timer');
+    if(el) el.textContent='·'+previewSeconds+'s';
+    if(previewSeconds<=0){
+      previewSeconds=30;
+      refreshLivePreview(username);
+    }
+  },1000);
+}
+
+function refreshLivePreview(username){
+  const img=document.getElementById('live-img');
+  if(!img) return;
+  img.classList.add('loading');
+  const newSrc=`https://roomimg.stream.highwebmedia.com/ri/${username}.jpg?t=${Date.now()}`;
+  const tmp=new Image();
+  tmp.onload=()=>{
+    img.src=newSrc;
+    img.classList.remove('loading');
+  };
+  tmp.onerror=()=>img.classList.remove('loading');
+  tmp.src=newSrc;
+}
+
+function stopLivePreview(){
+  clearInterval(previewTimer);
+  clearInterval(previewCountdown);
+  previewTimer=null;previewCountdown=null;
+}
+
+function openInChaturbate(u){
+  window.open(`https://chaturbate.com/${u}/`,'_blank','noopener');
+}
+
 function closeMod(e){
   if(!e||e.target===document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
     document.body.style.overflow='';
+    stopLivePreview();
   }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod()});
