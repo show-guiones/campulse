@@ -1273,6 +1273,8 @@ function renderGrid(r) {
             else{this.outerHTML='<div class=card-img style=background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)>👤</div>';}
           ">`
       :`<div class="card-img" style="background:var(--surface2);display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;color:var(--text3)">👤</div>`;
+    // Si es destacada forzada y está offline, no mostrarla
+    if (x._forced && !x.num_users) return '';
     return `<div class="card" onclick="openMod('${x.username}')">
       <div class="card-img-box">
         ${img}
@@ -1281,7 +1283,7 @@ function renderGrid(r) {
           ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
           ${x.is_new?'<span class="bdg bdg-new">New</span>':''}
         </div>
-        <div class="vw-pill"><div class="vw-dot"></div>${fmt(x.num_users||0)}</div>
+        ${x.num_users ? `<div class="vw-pill"><div class="vw-dot"></div>${fmt(x.num_users)}</div>` : ''}
         <button class="fav-btn ${fv?'on':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
       </div>
       <div class="g-stripe gs-${x.gender}"></div>
