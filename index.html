@@ -699,6 +699,41 @@ header{
 }
 
 /* ── TABLET ── */
+/* ── FILTER DRAWER (MOBILE) ── */
+.filter-drawer-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:400;backdrop-filter:blur(4px);
+}
+.filter-drawer-overlay.open{display:block}
+.filter-drawer{
+  position:fixed;left:0;bottom:0;top:0;
+  width:280px;max-width:85vw;
+  background:var(--surface);border-right:1px solid var(--border);
+  z-index:401;display:flex;flex-direction:column;
+  transform:translateX(-100%);transition:transform .25s ease;
+  overflow-y:auto;
+}
+.filter-drawer.open{transform:translateX(0)}
+.filter-drawer-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1rem .5rem;border-bottom:1px solid var(--border);
+  font-size:.85rem;font-weight:600;color:var(--text);flex-shrink:0;
+}
+.filter-drawer-close{
+  background:none;border:none;color:var(--text3);
+  font-size:1.2rem;cursor:pointer;padding:4px 8px;
+  border-radius:6px;
+}
+.filter-drawer-close:hover{background:var(--surface2);color:var(--text)}
+.mob-filter-btn{
+  display:none;align-items:center;gap:5px;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text2);border-radius:9px;
+  font-family:'Inter',sans-serif;font-size:.72rem;font-weight:500;
+  padding:.5rem .8rem;cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.mob-filter-btn.has-active{border-color:var(--accent);color:var(--accent)}
+
 /* ── TABLET ── */
 @media(max-width:900px){
   .sidebar{display:none}
@@ -709,6 +744,10 @@ header{
 /* ── MOBILE ── */
 @media(max-width:600px){
   html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .sidebar{display:none!important}
+  .mob-filter-btn{display:flex}
+  #mob-gf{display:none}
+  .tb-chip#tb-co,.tb-chip#tb-fv,.tb-chip#tb-hd{display:none}
   header{padding:0 .75rem;height:48px}
   .logo{font-size:.75rem}
   .logo-icon{width:24px;height:24px;font-size:.58rem}
@@ -917,6 +956,13 @@ header{
         </span>
         <input type="text" id="search" placeholder="Buscar modelo...">
       </div>
+
+      <!-- Mobile filter button -->
+      <button class="mob-filter-btn" id="mob-filter-btn" onclick="openFilterDrawer()">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+        Filtros
+        <span id="mob-filter-count" style="display:none;background:var(--accent);color:#fff;border-radius:99px;font-size:.6rem;padding:0 5px;min-width:16px;text-align:center"></span>
+      </button>
 
       <!-- Mobile gender filter -->
       <div style="display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:3px" id="mob-gf">
@@ -1319,6 +1365,7 @@ function updateAll() {
 
   updateTagFilter();
   updateCountryFilter();
+  if(typeof syncDrawerState==='function') syncDrawerState();
   render();
 }
 
@@ -2033,5 +2080,71 @@ async function loadStatbateIncome(username) {
   }
 }
 </script>
+<!-- FILTER DRAWER OVERLAY -->
+<div class="filter-drawer-overlay" id="fd-overlay" onclick="closeFilterDrawer()"></div>
+
+<!-- FILTER DRAWER (copy of sidebar for mobile) -->
+<div class="filter-drawer" id="filter-drawer">
+  <div class="filter-drawer-head">
+    <span>Filtros</span>
+    <button class="filter-drawer-close" onclick="closeFilterDrawer()">✕</button>
+  </div>
+
+  <div class="sidebar-section" style="padding-bottom:.5rem">
+    <div class="sidebar-label">Género</div>
+    <div class="gtab-strip">
+      <button class="gtab active" data-g="" id="fd-gb-all">Todos<span class="gtab-count" id="fd-gc-all"></span></button>
+      <button class="gtab" data-g="f" id="fd-gb-f">Mujeres<span class="gtab-count" id="fd-gc-f"></span></button>
+      <button class="gtab" data-g="m" id="fd-gb-m">Hombres<span class="gtab-count" id="fd-gc-m"></span></button>
+      <button class="gtab" data-g="c" id="fd-gb-c">Parejas<span class="gtab-count" id="fd-gc-c"></span></button>
+      <button class="gtab" data-g="t" id="fd-gb-t">Trans<span class="gtab-count" id="fd-gc-t"></span></button>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Filtros</div>
+    <button class="g-btn" id="fd-sb-fv">
+      <span style="font-size:.75rem;color:var(--female)">♥</span>
+      Favoritas
+      <span class="g-count" id="fd-gc-fv">0</span>
+    </button>
+    <button class="g-btn" id="fd-sb-hd">
+      <span class="bdg bdg-hd" style="font-size:.5rem">HD</span>
+      Solo HD
+      <span class="g-count" id="fd-gc-hd">—</span>
+    </button>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">País</div>
+    <div id="fd-country-filter-list" style="display:flex;flex-direction:column;gap:3px;margin-top:.25rem"></div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Edad</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.25rem">
+      <span class="tag-filter-pill" id="fd-age-18" onclick="setAgeFilter('18-21')">18–21</span>
+      <span class="tag-filter-pill" id="fd-age-22" onclick="setAgeFilter('22-25')">22–25</span>
+      <span class="tag-filter-pill" id="fd-age-26" onclick="setAgeFilter('26-30')">26–30</span>
+      <span class="tag-filter-pill" id="fd-age-31" onclick="setAgeFilter('31-40')">31–40</span>
+      <span class="tag-filter-pill" id="fd-age-40" onclick="setAgeFilter('40+')">40+</span>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Tags populares</div>
+    <div id="fd-tag-filter-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:.25rem"></div>
+  </div>
+
+</div>
+
 </body>
 </html>
