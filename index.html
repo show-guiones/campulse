@@ -284,13 +284,13 @@ header{
 .mob-fb svg{width:12px;height:12px}
 .mob-fb.active{border-color:var(--hot);color:var(--hot2)}
 
-/* GRID — columnas siempre llenan el ancho, sin espacio vacío derecho */
+/* GRID */
 .grid-wrap{padding:.8rem .9rem;flex:1}
 .grid{
   display:grid;
-  /* auto-fit colapsa columnas vacías → no deja huecos al final */
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(140px,160px));
   gap:.65rem;
+  justify-content:start;
 }
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r20);overflow:hidden;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;position:relative}
 .card:hover{transform:translateY(-7px) scale(1.015);border-color:rgba(255,45,85,.3);box-shadow:0 22px 55px rgba(0,0,0,.7),0 0 0 1px rgba(255,45,85,.12),0 0 30px rgba(255,45,85,.07)}
@@ -755,7 +755,7 @@ header{
 
   /* Grid */
   .grid-wrap{padding:.5rem .75rem}
-  .grid{grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:.38rem}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(108px,120px));gap:.38rem;justify-content:start}
   .card-info{padding:.35rem .42rem .42rem}
   .card-name{font-size:.62rem}
   .card-meta{font-size:.54rem}
@@ -787,7 +787,7 @@ header{
 }
 
 @media(max-width:360px){
-  .grid{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(100px,115px));justify-content:start}
   .hz-card{width:58px}
   .hz-img-wrap{width:58px;height:78px}
   .hrc-body{flex-direction:column;align-items:center}
