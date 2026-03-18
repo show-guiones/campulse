@@ -1672,21 +1672,13 @@ async function loadModelReport(room) {
 }
 
 async function loadHistoricalData(username, room) {
-  const SUPA_URL = 'https://upwjwuikaxuelczlrewk.supabase.co';
-  const SUPA_KEY = 'sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
-  const headers  = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer '+SUPA_KEY };
-
   document.getElementById('heatmap-container').innerHTML =
     '<div class="no-data-msg">Cargando datos históricos...</div>';
   document.getElementById('followers-container').innerHTML =
     '<div class="no-data-msg">Cargando historial...</div>';
 
   try {
-    const since = new Date(Date.now()-30*24*60*60*1000).toISOString();
-    const res = await fetch(
-      `${SUPA_URL}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=1000`,
-      { headers }
-    );
+    const res = await fetch(`/api/history?username=${encodeURIComponent(username)}&days=30`);
     const data = await res.json();
 
     if (!data || !data.length) {
