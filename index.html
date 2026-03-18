@@ -284,9 +284,16 @@ header{
 .mob-fb svg{width:12px;height:12px}
 .mob-fb.active{border-color:var(--hot);color:var(--hot2)}
 
-/* GRID */
+/* GRID — columnas siempre llenan el ancho, sin espacio vacío derecho */
 .grid-wrap{padding:.8rem .9rem;flex:1}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:.65rem}
+.grid{
+  display:grid;
+  /* auto-fill + stretch: mínimo 140px pero max siempre 1fr → llena toda la fila */
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:.65rem;
+}
+/* Forzar que la última fila incompleta también estire las cards */
+.grid::after{content:'';grid-column:1/-1;height:0}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r20);overflow:hidden;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;position:relative}
 .card:hover{transform:translateY(-7px) scale(1.015);border-color:rgba(255,45,85,.3);box-shadow:0 22px 55px rgba(0,0,0,.7),0 0 0 1px rgba(255,45,85,.12),0 0 30px rgba(255,45,85,.07)}
 .card:active{transform:translateY(-2px)}
@@ -320,6 +327,57 @@ header{
 .card-meta{font-size:.58rem;color:var(--text3);font-variant-numeric:tabular-nums}
 .card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
 .card-tag{font-size:.54rem;color:var(--text3);background:rgba(255,255,255,.05);border-radius:4px;padding:1px 5px;line-height:1.6}
+/* Horario online — dato clave para tipeadores */
+.card-schedule{
+  display:flex;align-items:center;gap:3px;
+  margin-top:4px;font-size:.56rem;color:var(--cyan);font-weight:600;
+  background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.15);
+  border-radius:5px;padding:2px 6px;width:fit-content;
+}
+.card-schedule svg{width:9px;height:9px;flex-shrink:0}
+
+/* Income hero card en reporte — grande y visible */
+.income-hero{
+  background:linear-gradient(135deg,rgba(0,255,136,.08),rgba(0,229,255,.05));
+  border:1px solid rgba(0,255,136,.25);
+  border-radius:var(--r16);padding:1rem 1.1rem;
+  margin-bottom:.85rem;
+  position:relative;overflow:hidden;
+}
+.income-hero::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--green),var(--cyan));
+  border-radius:3px;
+}
+.income-hero-lbl{font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;font-family:'Syne',sans-serif;margin-bottom:.4rem}
+.income-hero-val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--green);font-variant-numeric:tabular-nums}
+.income-hero-sub{font-size:.68rem;color:var(--text3);margin-top:.3rem}
+.income-hero-note{font-size:.62rem;color:rgba(0,255,136,.5);margin-top:.5rem;line-height:1.5}
+
+/* Schedule hero en reporte */
+.schedule-hero{
+  background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(155,48,255,.05));
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:var(--r16);padding:1rem 1.1rem;
+  margin-bottom:.85rem;position:relative;
+}
+.schedule-hero::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--cyan),var(--violet));
+  border-radius:3px;
+}
+.schedule-hero-lbl{font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;font-family:'Syne',sans-serif;margin-bottom:.55rem}
+.sched-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.sched-day{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sched-day-lbl{font-size:.48rem;color:var(--text3);font-family:'Syne',sans-serif;text-transform:uppercase;letter-spacing:.05em}
+.sched-bar-wrap{height:40px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.sched-bar{width:70%;border-radius:3px 3px 0 0;transition:height .8s cubic-bezier(.2,.8,.3,1);min-height:2px}
+.sched-val{font-size:.48rem;color:var(--text3);font-variant-numeric:tabular-nums}
+.sched-best-label{
+  margin-top:.65rem;font-size:.7rem;color:var(--cyan);font-weight:600;
+  display:flex;align-items:center;gap:5px;
+}
+.sched-best-label svg{width:13px;height:13px;flex-shrink:0}
 
 /* LIST */
 .list-wrap{display:none;flex:1}
@@ -699,7 +757,7 @@ header{
 
   /* Grid */
   .grid-wrap{padding:.5rem .75rem}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:.38rem}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:.38rem}
   .card-info{padding:.35rem .42rem .42rem}
   .card-name{font-size:.62rem}
   .card-meta{font-size:.54rem}
@@ -1002,15 +1060,9 @@ header{
 
         <!-- Métricas laterales -->
         <div class="hrc-side">
-          <!-- Ingresos — destacado con borde verde -->
-          <div class="hrc-metric income-highlight" id="hrc-income-card" style="display:none">
-            <div class="hrc-m-lbl">💰 Ingresos est./hora</div>
-            <div class="hrc-m-val green" id="hrc-income-val">—</div>
-          </div>
           <div class="hrc-metric">
             <div class="hrc-m-lbl">👥 Viewers ahora</div>
             <div class="hrc-m-val" id="hrc-viewers" style="color:var(--text)">—</div>
-            <div class="hrc-m-trend" id="hrc-viewers-trend"></div>
           </div>
           <div class="hrc-metric">
             <div class="hrc-m-lbl">📊 Top percentil</div>
@@ -1023,6 +1075,24 @@ header{
       <div class="hrc-message" id="hrc-message" style="display:none">
         <span class="hrc-msg-ico" id="hrc-msg-ico">🏆</span>
         <span id="hrc-msg-txt"></span>
+      </div>
+    </div>
+
+    <!-- ★ INGRESOS — Sección prominente, siempre visible -->
+    <div class="income-hero" id="income-hero-section" style="display:none">
+      <div class="income-hero-lbl">💰 Estimación de ingresos</div>
+      <div class="income-hero-val" id="income-hero-val">—</div>
+      <div class="income-hero-sub">por hora estimada (fuente: Statbate)</div>
+      <div class="income-hero-note">Basado en viewers actuales × tasa de conversión histórica de tokens en Chaturbate.</div>
+    </div>
+
+    <!-- ★ HORARIO DE TRANSMISIÓN — lo que más preguntan los tipeadores -->
+    <div class="schedule-hero" id="schedule-hero-section" style="display:none">
+      <div class="schedule-hero-lbl">🕐 Horario de transmisión — Últimos 30 días</div>
+      <div id="schedule-days-grid"></div>
+      <div class="sched-best-label" id="sched-best-label" style="display:none">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        <span id="sched-best-txt"></span>
       </div>
     </div>
 
@@ -1073,12 +1143,6 @@ header{
     <div class="data-card">
       <div class="dc-title">Tendencia de viewers — 30 días</div>
       <div id="heatmap-container"><div class="no-data">Cargando datos históricos...</div></div>
-    </div>
-
-    <!-- Mejor hora (heatmap) -->
-    <div class="data-card">
-      <div class="dc-title">Tu mejor hora del día</div>
-      <div id="besttimes-container"><div class="no-data">Cargando...</div></div>
     </div>
 
     <!-- Seguidores -->
@@ -1301,7 +1365,7 @@ function renderGrid(r){
     let imgContent=x.image_url
       ?`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}" data-tried="0" onerror="const u='${x.username}';const s=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'];const t=parseInt(this.dataset.tried||0)+1;if(t<s.length){this.dataset.tried=t;this.src=s[t];}else{this.outerHTML='<div class=card-placeholder><div class=card-placeholder-avatar>👤</div><div class=card-placeholder-name>${(x.display_name||x.username).substring(0,12)}</div><div class=card-placeholder-status><span style=width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block></span>Offline</div></div>';}"`
       :`<div class="card-placeholder"><div class="card-placeholder-avatar">👤</div><div class="card-placeholder-name">${(x.display_name||x.username).substring(0,12)}</div><div class="card-placeholder-status"><span style="width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block"></span>Offline</div></div>`;
-    return `<div class="card" onclick="openInCB('${x.username}')"><div class="card-img-box">${imgContent}<div class="card-grad"></div><div class="card-badges">${isTop3?'<span class="bdg bdg-top">TOP</span>':''}${isHot?'<span class="bdg bdg-hot">🔥 Hot</span>':''}${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}${x.is_new?'<span class="bdg bdg-new">New</span>':''}</div>${x.num_users?`<div class="vw-pill"><div class="vw-dot"></div>${fmt(x.num_users)}</div>`:''}<button class="fav-btn ${fv?'on':''}" onclick="toggleFav(event,'${x.username}')">♥</button></div><div class="g-stripe gs-${x.gender}"></div><div class="card-info"><div class="card-name">${x.display_name||x.username}</div><div class="card-meta">${x.country||'—'} · ${x.age?x.age+'a':'—'}</div>${(x.tags||[]).length?`<div class="card-tags">${(x.tags||[]).slice(0,3).map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>`:''}</div></div>`;
+    return `<div class="card" onclick="openInCB('${x.username}')"><div class="card-img-box">${imgContent}<div class="card-grad"></div><div class="card-badges">${isTop3?'<span class="bdg bdg-top">TOP</span>':''}${isHot?'<span class="bdg bdg-hot">🔥 Hot</span>':''}${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}${x.is_new?'<span class="bdg bdg-new">New</span>':''}</div>${x.num_users?`<div class="vw-pill"><div class="vw-dot"></div>${fmt(x.num_users)}</div>`:''}<button class="fav-btn ${fv?'on':''}" onclick="toggleFav(event,'${x.username}')">♥</button></div><div class="g-stripe gs-${x.gender}"></div><div class="card-info"><div class="card-name">${x.display_name||x.username}</div><div class="card-meta">${x.country||'—'} · ${x.age?x.age+'a':'—'}</div>${getScheduleHint(x)}${(x.tags||[]).length?`<div class="card-tags">${(x.tags||[]).slice(0,2).map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>`:''}</div></div>`;
   }).join('');
 }
 function renderList(r){
@@ -1445,17 +1509,21 @@ async function loadModelReport(room){
     const sorted=[...rooms].sort((a,b)=>(b.num_users||0)-(a.num_users||0));
     const rank=sorted.findIndex(r=>r.username===u);
     if(rank>=0){
-      const total=rooms.length,pct=Math.round(((total-rank)/total)*100);
-      const topPct=Math.round((rank/total)*100);
+      const total=rooms.length;
+      // pct = qué tan "lleno" está el arco (posición relativa inversa)
+      const pct=Math.round(((total-rank)/total)*100);
+      // topPct = el percentil real (cuánto % está por debajo de ti)
+      // Usamos 1 decimal para evitar "Top 0%"
+      const topPctRaw=(rank/total)*100;
+      const topPctLabel = topPctRaw < 1 ? '<1%' : (topPctRaw < 10 ? topPctRaw.toFixed(1)+'%' : Math.round(topPctRaw)+'%');
+      const topPct = Math.round(topPctRaw); // para lógica de mensajes
 
-      // Número en arco
       document.getElementById('hrc-rank-num').textContent='#'+(rank+1);
       document.getElementById('hrc-rank-of').textContent='de '+fmt(total)+' salas';
 
-      // Arco SVG animado
+      // Arco SVG
       const arc=document.getElementById('arc-fill');
       const FULL=339.3;
-      // Offset: cuánto NO está lleno (invertido)
       const filled=Math.round(FULL*(pct/100));
       arc.style.strokeDashoffset=FULL-filled;
       arc.classList.remove('rank-top','rank-mid','rank-low');
@@ -1463,18 +1531,19 @@ async function loadModelReport(room){
       else if(topPct<=30) arc.classList.add('rank-mid');
       else arc.classList.add('rank-low');
 
-      // Percentil
-      document.getElementById('hrc-percentil').textContent='Top '+topPct+'%';
+      // Percentil con etiqueta correcta
+      document.getElementById('hrc-percentil').textContent='Top '+topPctLabel;
 
-      // Mensaje contextual
+      // Mensaje motivacional
       const msgEl=document.getElementById('hrc-message');
       const msgIco=document.getElementById('hrc-msg-ico');
       const msgTxt=document.getElementById('hrc-msg-txt');
       msgEl.style.display='flex';
-      if(topPct<=5){msgEl.className='hrc-message msg-top';msgIco.textContent='🏆';msgTxt.textContent=`Estás en el top ${topPct}% de todas las salas activas. Rendimiento excepcional.`;}
-      else if(topPct<=10){msgEl.className='hrc-message msg-top';msgIco.textContent='⭐';msgTxt.textContent=`Top 10% — tu sala está entre las más vistas ahora mismo.`;}
-      else if(topPct<=25){msgEl.className='hrc-message msg-mid';msgIco.textContent='📈';msgTxt.textContent=`Por encima del promedio. Estás en el top ${topPct}% — muy buen desempeño.`;}
-      else{msgEl.className='hrc-message msg-low';msgIco.textContent='💡';msgTxt.textContent=`Top ${topPct}% — cada hora online suma. Consistencia es la clave.`;}
+      if(topPct<=1){msgEl.className='hrc-message msg-top';msgIco.textContent='🏆';msgTxt.textContent=`Estás en el top ${topPctLabel} de todas las salas activas. Rendimiento élite.`;}
+      else if(topPct<=5){msgEl.className='hrc-message msg-top';msgIco.textContent='🏆';msgTxt.textContent=`Top ${topPctLabel} — una de las salas más vistas en este momento. Excepcional.`;}
+      else if(topPct<=10){msgEl.className='hrc-message msg-top';msgIco.textContent='⭐';msgTxt.textContent=`Top ${topPctLabel} — tu sala está entre las más vistas ahora mismo.`;}
+      else if(topPct<=25){msgEl.className='hrc-message msg-mid';msgIco.textContent='📈';msgTxt.textContent=`Top ${topPctLabel} — por encima del promedio. Muy buen desempeño.`;}
+      else{msgEl.className='hrc-message msg-low';msgIco.textContent='💡';msgTxt.textContent=`Top ${topPctLabel} — hay margen de crecimiento. Revisa tu mejor hora abajo.`;}
 
       // Barras de mercado
       const top10v=sorted[Math.floor(total*.1)]?.num_users||0;
@@ -1485,7 +1554,7 @@ async function loadModelReport(room){
       document.getElementById('rb-avg-val').textContent=fmt(avgV)+' viewers';
       document.getElementById('rb-avg').style.width=Math.round(avgV/(sorted[0]?.num_users||1)*100)+'%';
       const sumEl=document.getElementById('rb-summary');
-      if(sumEl) sumEl.textContent=topPct<=10?`¡Estás entre las mejores — sigue así!`:topPct<=30?`Buen desempeño. Puedes alcanzar el top 10% con consistencia.`:`Hay espacio para crecer. Revisa tu mejor hora en el heatmap abajo.`;
+      if(sumEl) sumEl.textContent=topPct<=10?`¡Estás entre las mejores — sigue así!`:topPct<=30?`Buen desempeño. Con consistencia puedes alcanzar el top 10%.`:`Revisa el horario de transmisión abajo — la hora marca la diferencia.`;
 
     }else{
       document.getElementById('hrc-rank-num').textContent='—';
@@ -1566,33 +1635,82 @@ function renderTrendChart(days,dayAvgs,avg,peak,snapshots){
 }
 
 function renderBestTimes(data){
-  // Heatmap — muestra cuándo la modelo tiene más viewers por hora/día
-  const wrap=document.getElementById('besttimes-container');if(!wrap) return;
-  const matrix={},dw=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  data.forEach(d=>{const dt=new Date(d.captured_at);const k=`${dt.getDay()}-${dt.getHours()}`;if(!matrix[k])matrix[k]=[];matrix[k].push(d.num_users||0);});
-  let mx=1;Object.values(matrix).forEach(arr=>{const a=arr.reduce((x,y)=>x+y,0)/arr.length;if(a>mx)mx=a;});
+  // ── Calcular actividad por día de semana y por hora ──
+  const byDay={0:0,1:0,2:0,3:0,4:0,5:0,6:0}; // viewers sumados por día
+  const countDay={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  const byHour={}; // avg viewers por hora del día
+  const countHour={};
+  data.forEach(d=>{
+    if(!d.num_users) return;
+    const dt=new Date(d.captured_at);
+    const day=dt.getDay(),hr=dt.getHours();
+    byDay[day]=(byDay[day]||0)+d.num_users;
+    countDay[day]=(countDay[day]||0)+1;
+    byHour[hr]=(byHour[hr]||0)+d.num_users;
+    countHour[hr]=(countHour[hr]||0)+1;
+  });
 
-  // Encontrar mejor día+hora
-  let bestK='',bestV=0;
-  Object.entries(matrix).forEach(([k,arr])=>{const a=arr.reduce((x,y)=>x+y,0)/arr.length;if(a>bestV){bestV=a;bestK=k;}});
-  const [bDay,bHour]=bestK.split('-').map(Number);
-  const bestTxt=bestK?`Tu mejor momento: ${dw[bDay]} a las ${bHour}:00h (${Math.round(bestV)} viewers promedio)`:'';
+  const dw=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const dayAvgs=Object.keys(byDay).map(d=>countDay[d]>0?Math.round(byDay[d]/countDay[d]):0);
+  const maxDay=Math.max(...dayAvgs,1);
 
-  let h='<div style="overflow-x:auto;margin-bottom:.65rem"><div class="hm-grid">';
-  h+='<div class="hm-lbl"></div>';
-  for(let hh=0;hh<24;hh++) h+=`<div class="hm-hlbl">${hh}</div>`;
-  for(let d=0;d<7;d++){
-    h+=`<div class="hm-lbl">${dw[d]}</div>`;
-    for(let hh=0;hh<24;hh++){
-      const arr=matrix[`${d}-${hh}`]||[];const a=arr.length?arr.reduce((x,y)=>x+y,0)/arr.length:0;
-      const al=(a/mx*.85+.05).toFixed(2);
-      const isBest=d===bDay&&hh===bHour;
-      h+=`<div class="hm-cell" style="background:rgba(255,45,85,${al});${isBest?'outline:1px solid var(--gold);':''}" title="${dw[d]} ${hh}h${a>0?' — '+Math.round(a)+' viewers':''}"></div>`;
-    }
+  // Mejor día y hora pico
+  const bestDayIdx=dayAvgs.indexOf(Math.max(...dayAvgs));
+  let bestHour=-1,bestHourV=0;
+  Object.keys(byHour).forEach(h=>{const v=Math.round(byHour[h]/countHour[h]);if(v>bestHourV){bestHourV=v;bestHour=parseInt(h);}});
+
+  // ── Render sección de schedule ──
+  const sec=document.getElementById('schedule-hero-section');
+  if(!sec) return;
+  sec.style.display='block';
+
+  // Barras por día
+  const barsHTML=`<div class="sched-grid">${dayAvgs.map((v,i)=>{
+    const h=Math.round((v/maxDay)*36);
+    const isB=i===bestDayIdx;
+    const color=isB?'var(--cyan)':'rgba(155,48,255,.5)';
+    return `<div class="sched-day">
+      <div class="sched-bar-wrap"><div class="sched-bar" style="height:${h}px;background:${color};${isB?'box-shadow:0 0 8px rgba(0,229,255,.4)':''}"></div></div>
+      <div class="sched-day-lbl" style="color:${isB?'var(--cyan)':'var(--text3)'};font-weight:${isB?'700':'400'}">${dw[i]}</div>
+      <div class="sched-val">${v>0?fmt(v):'—'}</div>
+    </div>`;
+  }).join('')}</div>`;
+
+  // Horas pico — top 3 mejores horas
+  const hoursSorted=Object.keys(byHour)
+    .map(h=>({h:parseInt(h),v:Math.round(byHour[h]/countHour[h])}))
+    .sort((a,b)=>b.v-a.v).slice(0,3);
+
+  const hoursHTML=hoursSorted.length?`<div style="margin-top:.7rem;display:flex;gap:.5rem;flex-wrap:wrap">
+    ${hoursSorted.map((x,i)=>`<div style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15);border-radius:8px;padding:.35rem .65rem;display:flex;align-items:center;gap:5px">
+      <span style="font-size:.65rem">${i===0?'🥇':i===1?'🥈':'🥉'}</span>
+      <span style="font-size:.72rem;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums">${x.h}:00–${x.h+1}:00</span>
+      <span style="font-size:.6rem;color:var(--text3)">${fmt(x.v)} viewers</span>
+    </div>`).join('')}
+  </div>`:'';
+
+  document.getElementById('schedule-days-grid').innerHTML=barsHTML+hoursHTML;
+
+  // Mensaje de mejor momento
+  const bestLbl=document.getElementById('sched-best-label');
+  const bestTxt=document.getElementById('sched-best-txt');
+  if(bestHour>=0&&bestLbl&&bestTxt){
+    bestLbl.style.display='flex';
+    bestTxt.textContent=`Mejor momento: ${dw[bestDayIdx]} entre ${bestHour}:00 y ${bestHour+1}:00h — ${fmt(bestHourV)} viewers promedio`;
   }
-  h+='</div></div>';
-  if(bestTxt) h+=`<div style="font-size:.7rem;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:4px"><span>⭐</span>${bestTxt}</div>`;
-  wrap.innerHTML=h;
+}
+
+// ── Horario en cards del catálogo (usando seconds_online como proxy) ──
+function getScheduleHint(room){
+  // seconds_online = tiempo online en esta sesión actual
+  // Lo usamos para mostrar "🕐 N horas en vivo hoy"
+  if(!room.seconds_online||room.seconds_online<60) return '';
+  const hrs=Math.round(room.seconds_online/3600);
+  if(hrs<1){
+    const mins=Math.round(room.seconds_online/60);
+    return `<div class="card-schedule"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l1.5 1.5"/></svg>${mins}m en vivo</div>`;
+  }
+  return `<div class="card-schedule"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l1.5 1.5"/></svg>${hrs}h en vivo hoy</div>`;
 }
 
 function renderFollowersChart(data){
@@ -1620,14 +1738,20 @@ function renderFollowersChart(data){
 }
 
 async function loadStatbateIncome(username){
-  const iC=document.getElementById('hrc-income-card'),iV=document.getElementById('hrc-income-val');
+  const sec=document.getElementById('income-hero-section');
+  const val=document.getElementById('income-hero-val');
   try{
     const res=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent('https://statbate.com/chaturbate/list/'));
     const html=await res.text();
     const re=new RegExp(`/search/1/${username.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}['\"\\s][^>]*>[^<]+</a></td>[\\s\\S]{0,300}?<td>([\\$\\d.,]+)</td>`,'i');
     const m=re.exec(html);
-    if(m){iV.textContent=m[1]+'/h';if(iC) iC.style.display='block';}else{if(iC) iC.style.display='none';}
-  }catch(e){if(iC) iC.style.display='none';}
+    if(m&&sec&&val){
+      val.textContent=m[1]+' / hora';
+      sec.style.display='block';
+    }else if(sec){
+      sec.style.display='none';
+    }
+  }catch(e){if(sec) sec.style.display='none';}
 }
 
 setInterval(load,2*60*1000);
