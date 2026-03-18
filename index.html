@@ -1318,7 +1318,7 @@ function openMod(u) {
   if(x.room_subject){subj.textContent='"'+x.room_subject+'"';subj.style.display='block'}
   else{subj.style.display='none'}
   document.getElementById('m-tags').innerHTML=(x.tags||[]).slice(0,16).map(t=>`<span class="tag">${t}</span>`).join('');
-  document.getElementById('m-link').href=`https://chaturbate.com/${x.username}/`;
+  document.getElementById('m-link').href=`https://chaturbate.com/in/?tour=Jrvi&campaign=rI8z3&track=default&room=${x.username}`;
   updateFavBtn(x.username);
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1390,7 +1390,7 @@ function stopLivePreview(){
 }
 
 function openInChaturbate(u){
-  window.open(`https://chaturbate.com/${u}/`,'_blank','noopener');
+  window.open(`https://chaturbate.com/in/?tour=Jrvi&campaign=rI8z3&track=default&room=${u}`,'_blank','noopener');
 }
 
 function closeMod(e){
@@ -1557,7 +1557,7 @@ async function loadModelReport(room) {
   const gls = {f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
   document.getElementById('rp-meta').textContent =
     [gls[room.gender]||'', room.country||'', room.age?room.age+'a':''].filter(Boolean).join(' · ');
-  document.getElementById('rp-link').href = `https://chaturbate.com/${u}/`;
+  document.getElementById('rp-link').href = `https://chaturbate.com/in/?tour=Jrvi&campaign=rI8z3&track=default&room=${u}`;
 
   // Estado online
   const isOnline = rooms.find(r => r.username === u);
