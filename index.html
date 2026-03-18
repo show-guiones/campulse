@@ -1378,7 +1378,7 @@ function renderGrid(r){
   const cols=isMobile?3:Math.max(1,Math.floor((gridW+10)/(150+10)));
   const rem=cards.length%cols;
   const ghosts=rem===0?0:cols-rem;
-  const ghostHTML=Array(ghosts).fill('<div class="card" aria-hidden="true" style="visibility:hidden;pointer-events:none;border:none;background:transparent"><div class="card-img-box"></div></div>').join('');
+  const ghostHTML=Array(ghosts).fill('<div style="visibility:hidden;min-height:1px" aria-hidden="true"></div>').join('');
   c.innerHTML=cards.join('')+ghostHTML;
 }
 function renderList(r){
