@@ -295,10 +295,10 @@ header{
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r20);overflow:hidden;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;position:relative}
 .card:hover{transform:translateY(-7px) scale(1.015);border-color:rgba(255,45,85,.3);box-shadow:0 22px 55px rgba(0,0,0,.7),0 0 0 1px rgba(255,45,85,.12),0 0 30px rgba(255,45,85,.07)}
 .card:active{transform:translateY(-2px)}
-.card-img-box{position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--surface2);width:100%;display:block}
-.card-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
+.card-img-box{position:relative;overflow:hidden;width:100%;padding-top:133.33%;background:var(--surface2)}
+.card-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
 .card:hover .card-img{transform:scale(1.09)}
-.card-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--surface2),var(--surface3));gap:8px}
+.card-placeholder{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--surface2),var(--surface3));gap:8px}
 .card-placeholder-avatar{width:56px;height:56px;border-radius:50%;background:var(--surface3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
 .card-placeholder-name{font-size:.6rem;color:var(--text3);font-weight:600;letter-spacing:.05em}
 .card-placeholder-status{font-size:.52rem;color:var(--text3);background:rgba(255,255,255,.05);padding:2px 8px;border-radius:10px;display:flex;align-items:center;gap:3px}
@@ -406,7 +406,7 @@ header{
 .empty-ico{font-size:2.5rem}
 @keyframes sh{0%{background:var(--surface)}60%{background:var(--surface2)}100%{background:var(--surface)}}
 .sk{border-radius:var(--r20);overflow:hidden;background:var(--surface);border:1px solid var(--border)}
-.sk-img{aspect-ratio:3/4;animation:sh 1.5s ease infinite}
+.sk-img{width:100%;padding-top:133.33%;animation:sh 1.5s ease infinite}
 .sk-body{padding:.5rem .65rem}
 .sk-line{height:8px;border-radius:4px;animation:sh 1.5s ease infinite;margin-bottom:5px}
 
@@ -1361,7 +1361,7 @@ function renderGrid(r){
     if(x._forced&&!x.num_users) return '';
     const fv=favs.includes(x.username),isTop3=top3.includes(x.username),isHot=top10.includes(x.username)&&!isTop3;
     let imgContent=x.image_url
-      ?`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}" data-tried="0" onerror="const u='${x.username}';const s=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'];const t=parseInt(this.dataset.tried||0)+1;if(t<s.length){this.dataset.tried=t;this.src=s[t]+'?t='+Date.now();}else{this.parentElement.innerHTML='<div class=card-placeholder style=position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--surface2),var(--surface3));gap:8px><div class=card-placeholder-avatar>\U0001F464</div><div class=card-placeholder-name>${(x.display_name||x.username).substring(0,12)}</div></div>';}"`
+      ?`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}" data-tried="0" onerror="const u='${x.username}';const s=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'];const t=parseInt(this.dataset.tried||0)+1;if(t<s.length){this.dataset.tried=t;this.src=s[t]+'?t='+Date.now();}else{this.parentElement.innerHTML='<div class=card-placeholder><div class=card-placeholder-avatar>👤</div><div class=card-placeholder-name>'+((x.display_name||x.username).substring(0,12))+'</div></div>';}"`
       :`<div class="card-placeholder"><div class="card-placeholder-avatar">👤</div><div class="card-placeholder-name">${(x.display_name||x.username).substring(0,12)}</div></div>`;
     return `<div class="card" onclick="openInCB('${x.username}')"><div class="card-img-box">${imgContent}<div class="card-grad"></div><div class="card-badges">${isTop3?'<span class="bdg bdg-top">TOP</span>':''}${isHot?'<span class="bdg bdg-hot">🔥 Hot</span>':''}${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}${x.is_new?'<span class="bdg bdg-new">New</span>':''}</div>${x.num_users?`<div class="vw-pill"><div class="vw-dot"></div>${fmt(x.num_users)}</div>`:''}<button class="fav-btn ${fv?'on':''}" onclick="toggleFav(event,'${x.username}')">♥</button></div><div class="g-stripe gs-${x.gender}"></div><div class="card-info"><div class="card-name">${x.display_name||x.username}</div><div class="card-meta">${x.country||'—'} · ${x.age?x.age+'a':'—'}</div>${getScheduleHint(x)}${(x.tags||[]).length?`<div class="card-tags">${(x.tags||[]).slice(0,2).map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>`:''}</div></div>`;
   }).filter(Boolean);
@@ -1371,7 +1371,7 @@ function renderGrid(r){
   const cols=isMobile?3:Math.max(1,Math.floor((gridW+10)/(150+10)));
   const rem=cards.length%cols;
   const ghosts=rem===0?0:cols-rem;
-  const ghostHTML=Array(ghosts).fill('<div style="visibility:hidden;pointer-events:none"></div>').join('');
+  const ghostHTML=Array(ghosts).fill('<div class="card" style="visibility:hidden;pointer-events:none"><div class="card-img-box"></div></div>').join('');
   c.innerHTML=cards.join('')+ghostHTML;
 }
 function renderList(r){
