@@ -922,6 +922,20 @@ header{
       </table>
     </div>
 
+  <!-- Banner captación modelos -->
+  <div id="model-banner" style="margin:1.5rem 1.5rem 0;padding:1.25rem 1.5rem;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border:1px solid rgba(255,255,255,0.08);border-radius:16px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="font-size:2rem;flex-shrink:0">🎬</div>
+      <div>
+        <div style="font-size:.9rem;font-weight:600;color:#fff;margin-bottom:.2rem">¿Eres modelo? Empieza a ganar en Chaturbate</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,0.5);line-height:1.4">Regístrate gratis, configura tu sala y empieza a recibir propinas en minutos.</div>
+      </div>
+    </div>
+    <a href="https://chaturbate.com/in/?track=default&tour=grq&campaign=rI8z3&room=" target="_blank" rel="noopener" style="flex-shrink:0;background:#ff6b35;color:#fff;border:none;border-radius:10px;padding:.6rem 1.25rem;font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;display:inline-block">
+      Crear cuenta gratis →
+    </a>
+  </div>
+
   </div>
 </div>
 
@@ -1907,10 +1921,13 @@ async function loadStatbateIncome(username) {
   const incEl    = document.getElementById('rp-income');
   const incValEl = document.getElementById('rp-income-val');
   try {
-    const res  = await fetch(`/api/statbate?username=${encodeURIComponent(username)}&platform=chaturbate`);
-    const data = await res.json();
-    if (data.income) {
-      incValEl.textContent = data.income+'/h';
+    const res  = await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent('https://statbate.com/chaturbate/list/'));
+    const html = await res.text();
+    // Buscar la fila con el username en el HTML de Statbate
+    const re = new RegExp(`/search/1/${username.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}['"\s][^>]*>[^<]+</a></td>[\s\S]{0,300}?<td>([\$\d.,]+)</td>`, 'i');
+    const m  = re.exec(html);
+    if (m) {
+      incValEl.textContent = m[1]+'/h';
       if(incEl) incEl.style.display='flex';
     } else {
       if(incEl) incEl.style.display='none';
