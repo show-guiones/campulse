@@ -288,10 +288,10 @@ header{
 .grid-wrap{padding:.8rem .9rem;flex:1}
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,160px));
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
   gap:.65rem;
-  justify-content:start;
 }
+/* Última fila: forzar que las cards vacías no dejen espacio — las cards reales siempre tienen width fijo via JS */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r20);overflow:hidden;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;position:relative}
 .card:hover{transform:translateY(-7px) scale(1.015);border-color:rgba(255,45,85,.3);box-shadow:0 22px 55px rgba(0,0,0,.7),0 0 0 1px rgba(255,45,85,.12),0 0 30px rgba(255,45,85,.07)}
 .card:active{transform:translateY(-2px)}
@@ -755,7 +755,7 @@ header{
 
   /* Grid */
   .grid-wrap{padding:.5rem .75rem}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(108px,120px));gap:.38rem;justify-content:start}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:.38rem}
   .card-info{padding:.35rem .42rem .42rem}
   .card-name{font-size:.62rem}
   .card-meta{font-size:.54rem}
@@ -787,7 +787,7 @@ header{
 }
 
 @media(max-width:360px){
-  .grid{grid-template-columns:repeat(auto-fill,minmax(100px,115px));justify-content:start}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
   .hz-card{width:58px}
   .hz-img-wrap{width:58px;height:78px}
   .hrc-body{flex-direction:column;align-items:center}
@@ -1357,14 +1357,22 @@ function renderGrid(r){
   if(!r.length){c.innerHTML=`<div class="empty"><div class="empty-ico">🔍</div><div>Sin resultados</div></div>`;return;}
   const top3=[...rooms].filter(x=>x.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,3).map(x=>x.username);
   const top10=[...rooms].filter(x=>x.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,10).map(x=>x.username);
-  c.innerHTML=r.map(x=>{
+  const cards=r.map(x=>{
     if(x._forced&&!x.num_users) return '';
     const fv=favs.includes(x.username),isTop3=top3.includes(x.username),isHot=top10.includes(x.username)&&!isTop3;
     let imgContent=x.image_url
       ?`<img class="card-img" src="${x.image_url}" loading="lazy" alt="${x.username}" data-tried="0" onerror="const u='${x.username}';const s=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'];const t=parseInt(this.dataset.tried||0)+1;if(t<s.length){this.dataset.tried=t;this.src=s[t];}else{this.outerHTML='<div class=card-placeholder><div class=card-placeholder-avatar>👤</div><div class=card-placeholder-name>${(x.display_name||x.username).substring(0,12)}</div><div class=card-placeholder-status><span style=width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block></span>Offline</div></div>';}"`
       :`<div class="card-placeholder"><div class="card-placeholder-avatar">👤</div><div class="card-placeholder-name">${(x.display_name||x.username).substring(0,12)}</div><div class="card-placeholder-status"><span style="width:5px;height:5px;border-radius:50%;background:var(--text3);display:inline-block"></span>Offline</div></div>`;
     return `<div class="card" onclick="openInCB('${x.username}')"><div class="card-img-box">${imgContent}<div class="card-grad"></div><div class="card-badges">${isTop3?'<span class="bdg bdg-top">TOP</span>':''}${isHot?'<span class="bdg bdg-hot">🔥 Hot</span>':''}${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}${x.is_new?'<span class="bdg bdg-new">New</span>':''}</div>${x.num_users?`<div class="vw-pill"><div class="vw-dot"></div>${fmt(x.num_users)}</div>`:''}<button class="fav-btn ${fv?'on':''}" onclick="toggleFav(event,'${x.username}')">♥</button></div><div class="g-stripe gs-${x.gender}"></div><div class="card-info"><div class="card-name">${x.display_name||x.username}</div><div class="card-meta">${x.country||'—'} · ${x.age?x.age+'a':'—'}</div>${getScheduleHint(x)}${(x.tags||[]).length?`<div class="card-tags">${(x.tags||[]).slice(0,2).map(t=>`<span class="card-tag">${t}</span>`).join('')}</div>`:''}</div></div>`;
-  }).join('');
+  }).filter(Boolean);
+  // Calcular cuántas columnas hay y rellenar la última fila con fantasmas invisibles
+  const colW=140,gap=Math.round(0.65*16);
+  const gridW=c.parentElement?.offsetWidth||window.innerWidth;
+  const cols=Math.max(1,Math.floor((gridW+gap)/(colW+gap)));
+  const rem=cards.length%cols;
+  const ghosts=rem===0?0:cols-rem;
+  const ghostHTML=Array(ghosts).fill('<div class="card-ghost" style="visibility:hidden;pointer-events:none"></div>').join('');
+  c.innerHTML=cards.join('')+ghostHTML;
 }
 function renderList(r){
   const b=document.getElementById('lb');
