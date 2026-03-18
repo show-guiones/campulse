@@ -1052,35 +1052,19 @@ const gc={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'};
 
 // Cargar sala individual directamente por username
 async function fetchRoom(username) {
-  // Estrategia 1: buscar en offsets de la API (500 en 500 hasta 3000)
-  for (let offset = 0; offset <= 3000; offset += 500) {
+  // Buscar en offsets via /api/rooms (nuestro proxy de Vercel — sin CORS)
+  for (let offset = 0; offset <= 2000; offset += 500) {
     try {
-      const url = offset === 0
-        ? '/api/rooms?username='+encodeURIComponent(username)
-        : '/api/rooms?offset='+offset;
+      const url = '/api/rooms?offset='+offset;
       const res = await fetch(url);
       const d   = await res.json();
       const found = (d.results||[]).find(r => r.username === username);
-      if (found) {
-        console.log('[CAMPULSE] fetchRoom encontró a', username, 'en offset', offset);
-        return found;
-      }
+      if (found) return found;
       if (!d.results || d.results.length < 100) break;
     } catch(e) { break; }
   }
 
-  // Estrategia 2: obtener datos reales del perfil desde la API de Chaturbate
-  // La imagen del perfil usa esta URL estática que siempre funciona
-  try {
-    const profileRes = await fetch('https://api.allorigins.win/raw?url='+
-      encodeURIComponent('https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=1000&offset=0'));
-    const profileData = await profileRes.json();
-    // Buscar en lista extendida
-    const found = (profileData.results||[]).find(r => r.username === username);
-    if (found) return found;
-  } catch(e) {}
-
-  // Estrategia 3: usar datos del perfil manual si existen, si no objeto mínimo
+  // No encontrada — usar datos del perfil manual (FEATURED_PROFILES)
   const profile = FEATURED_PROFILES[username] || {};
   return {
     username:      username,
