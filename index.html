@@ -978,7 +978,8 @@ body::after {
     <div class="pro-card">
       <div class="pro-title">✦ Campulse Pro</div>
       <div class="pro-desc">Historial 30 días, alertas y horario óptimo de transmisión.</div>
-      <button class="pro-btn">Activar Pro — $7/mes</button>
+      <button class="pro-btn" onclick="openAuthModal()">Activar Pro — $7/mes</button>
+      <div id="auth-status" style="display:none;margin-top:6px;font-size:10px;color:var(--mint);text-align:center"></div>
     </div>
     <div style="height:10px"></div>
   </aside>
@@ -2018,8 +2019,198 @@ function checkMobile(){
 window.addEventListener('resize',checkMobile);
 checkMobile();
 
+// ══════════ AUTH SYSTEM ══════════
+const SUPA_URL = 'https://upwjwuikaxuelczlrewk.supabase.co';
+const SUPA_KEY = 'sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
+let currentUser = null;
+
+// Cargar sesión guardada
+async function initAuth() {
+  const saved = localStorage.getItem('cp_user');
+  if (!saved) return;
+  try {
+    const u = JSON.parse(saved);
+    if (u && u.email) {
+      currentUser = u;
+      await checkUserTier(u.email);
+      updateAuthUI();
+    }
+  } catch(e) {}
+}
+
+async function checkUserTier(email) {
+  try {
+    const res = await fetch('/api/auth-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    currentUser = { email, tier: data.tier, trial_end: data.trial_end };
+    localStorage.setItem('cp_user', JSON.stringify(currentUser));
+    // Migrar favoritas de localStorage a perfil
+    if (data.is_new) migrateLocalFavs(email);
+  } catch(e) {}
+}
+
+function updateAuthUI() {
+  if (!currentUser) return;
+  const st = document.getElementById('auth-status');
+  if (!st) return;
+  const tier = currentUser.tier;
+  if (tier === 'trial') {
+    const days = currentUser.trial_end
+      ? Math.max(0, Math.ceil((new Date(currentUser.trial_end) - new Date()) / 86400000))
+      : 14;
+    st.style.display = 'block';
+    st.textContent = `✦ Trial activo · ${days} días restantes`;
+  } else if (tier === 'pro' || tier === 'agency') {
+    st.style.display = 'block';
+    st.textContent = `✦ Pro activo`;
+    // Cambiar botón
+    const btn = document.querySelector('.pro-btn');
+    if (btn) { btn.textContent = '✦ Pro activo'; btn.style.background = 'var(--mint)'; btn.style.color = '#000'; }
+  } else {
+    st.style.display = 'none';
+  }
+}
+
+function openAuthModal() {
+  if (currentUser && (currentUser.tier === 'trial' || currentUser.tier === 'pro')) {
+    toast('Ya tienes acceso Pro activo ✦');
+    return;
+  }
+  document.getElementById('auth-modal-bg').style.display = 'flex';
+  document.getElementById('auth-step-email').style.display = 'block';
+  document.getElementById('auth-step-sent').style.display = 'none';
+  document.getElementById('auth-email-error').style.display = 'none';
+  setTimeout(() => document.getElementById('auth-email-input').focus(), 100);
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal-bg').style.display = 'none';
+}
+
+async function submitAuthEmail() {
+  const email = document.getElementById('auth-email-input').value.trim();
+  if (!email || !email.includes('@')) {
+    const err = document.getElementById('auth-email-error');
+    err.textContent = 'Ingresa un email válido';
+    err.style.display = 'block';
+    return;
+  }
+  // Enviar magic link via Supabase Auth
+  try {
+    const res = await fetch(`${SUPA_URL}/auth/v1/otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_KEY,
+      },
+      body: JSON.stringify({ email, create_user: true })
+    });
+    if (res.ok) {
+      document.getElementById('auth-step-email').style.display = 'none';
+      document.getElementById('auth-step-sent').style.display = 'block';
+      document.getElementById('auth-sent-msg').textContent =
+        `Te enviamos un link a ${email}. Haz clic en él para activar tu trial gratuito de 14 días.`;
+      // Pre-guardar email para cuando vuelva
+      localStorage.setItem('cp_pending_email', email);
+    } else {
+      throw new Error('Error enviando email');
+    }
+  } catch(e) {
+    const err = document.getElementById('auth-email-error');
+    err.textContent = 'Error al enviar. Intenta de nuevo.';
+    err.style.display = 'block';
+  }
+}
+
+// Migrar favoritas de localStorage a perfil en Supabase
+async function migrateLocalFavs(email) {
+  const localFavs = JSON.parse(localStorage.getItem('cp3_favs') || '[]');
+  if (!localFavs.length) return;
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/profiles?email=eq.${encodeURIComponent(email)}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': `Bearer ${SUPA_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ favs: localFavs })
+    });
+  } catch(e) {}
+}
+
+// Verificar si viene de magic link (hash en URL)
+async function checkMagicLink() {
+  const hash = window.location.hash;
+  if (!hash.includes('access_token')) return;
+  try {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get('access_token');
+    if (!token) return;
+    // Obtener info del usuario
+    const res = await fetch(`${SUPA_URL}/auth/v1/user`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPA_KEY }
+    });
+    const user = await res.json();
+    if (user && user.email) {
+      await checkUserTier(user.email);
+      updateAuthUI();
+      toast('✦ Trial activado — bienvenido a Campulse Pro');
+      // Limpiar hash de la URL
+      history.replaceState(null, '', window.location.pathname);
+    }
+  } catch(e) {}
+}
+
+checkMagicLink();
+initAuth();
+
 setInterval(load, 2*60*1000);
 load();
 </script>
+<!-- ══════════ AUTH MODAL ══════════ -->
+<div id="auth-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center" onclick="if(event.target===this)closeAuthModal()">
+  <div style="background:var(--bg2);border:1px solid var(--b2);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;margin:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div style="font-size:14px;font-weight:700;color:var(--t1)">✦ Campulse Pro</div>
+      <button onclick="closeAuthModal()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;line-height:1">✕</button>
+    </div>
+    <!-- Beneficios -->
+    <div id="auth-benefits" style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--t2);margin-bottom:10px">14 días gratis · Sin tarjeta de crédito</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:11px;color:var(--t2)">✓ Heatmap de mejores horas por modelo</div>
+        <div style="font-size:11px;color:var(--t2)">✓ Historial de 30 días de audiencia</div>
+        <div style="font-size:11px;color:var(--t2)">✓ Favoritas guardadas en la nube</div>
+        <div style="font-size:11px;color:var(--t2)">✓ Alertas cuando tu modelo favorita sube</div>
+      </div>
+    </div>
+    <!-- Form -->
+    <div id="auth-step-email">
+      <input id="auth-email-input" type="email" placeholder="tu@email.com"
+        style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;color:var(--t1);font-size:13px;font-family:inherit;box-sizing:border-box;margin-bottom:10px"
+        onkeydown="if(event.key==='Enter')submitAuthEmail()">
+      <button onclick="submitAuthEmail()"
+        style="width:100%;padding:10px;background:var(--red);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+        Empezar trial gratuito →
+      </button>
+      <div id="auth-email-error" style="display:none;margin-top:8px;font-size:11px;color:var(--red);text-align:center"></div>
+      <div style="margin-top:10px;font-size:10px;color:var(--t3);text-align:center">
+        Ya tienes cuenta — <span onclick="submitAuthEmail()" style="color:var(--blue);cursor:pointer">inicia sesión con tu email</span>
+      </div>
+    </div>
+    <!-- Confirmación enviada -->
+    <div id="auth-step-sent" style="display:none;text-align:center">
+      <div style="font-size:28px;margin-bottom:10px">📬</div>
+      <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px">Revisa tu email</div>
+      <div id="auth-sent-msg" style="font-size:11px;color:var(--t2);line-height:1.5"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
