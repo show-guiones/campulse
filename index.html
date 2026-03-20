@@ -1374,6 +1374,7 @@ body::after {
 <!-- ══════════ JAVASCRIPT ══════════ -->
 <script>
 const API='/api/rooms', HOT_N=14;
+let currentUser = null;
 let rooms=[], favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
 let gender='', onlyCol=false, onlyFavs=false, onlyHD=false;
 let activeTag='', activeCountry='', ageRange='';
@@ -2023,7 +2024,7 @@ function checkMobile(){
   const mobBtn=document.getElementById('mob-filter-btn');
   if(mobBtn) mobBtn.style.display=isMob?'flex':'none';
   const banner=document.getElementById('pro-banner-mobile');
-  if(banner) banner.style.display=isMob&&(!currentUser||currentUser.tier==='free')?'flex':'none';
+  if(banner) banner.style.display=isMob&&(!window.currentUser||window.currentUser.tier==='free')?'flex':'none';
 }
 window.addEventListener('resize',checkMobile);
 checkMobile();
@@ -2031,7 +2032,6 @@ checkMobile();
 // ══════════ AUTH SYSTEM ══════════
 const SUPA_URL = 'https://upwjwuikaxuelczlrewk.supabase.co';
 const SUPA_KEY = 'sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
-let currentUser = null;
 
 // Cargar sesión guardada
 async function initAuth() {
