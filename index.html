@@ -1340,6 +1340,12 @@ body::after {
   </div>
 </div>
 
+<!-- Pro banner mobile -->
+<div id="pro-banner-mobile" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(90deg,#F04848,#a742f5);padding:7px 12px;align-items:center;justify-content:space-between">
+  <span style="font-size:11px;font-weight:700;color:#fff">✦ Campulse Pro — 14 días gratis</span>
+  <button onclick="openAuthModal()" style="background:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:#F04848;cursor:pointer;font-family:inherit">Activar</button>
+</div>
+
 <!-- Bottom nav (mobile) -->
 <nav class="bottom-nav">
   <div class="bnav-inner">
@@ -1355,9 +1361,9 @@ body::after {
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="5" x2="14" y2="5"/><line x1="4" y1="9" x2="12" y2="9"/><line x1="6" y1="13" x2="10" y2="13"/></svg>
       Filtros
     </button>
-    <button class="bnav-item" onclick="load()">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8A6.5 6.5 0 0 1 13 4.5"/><polyline points="11,2 13,4.5 10.5,5.5"/></svg>
-      Refresh
+    <button class="bnav-item" onclick="openAuthModal()" style="color:var(--red)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="8,2 10,6 14,6.5 11,9.5 11.8,14 8,12 4.2,14 5,9.5 2,6.5 6,6"/></svg>
+      Pro
     </button>
   </div>
 </nav>
@@ -2016,6 +2022,8 @@ function checkMobile(){
   const isMob=window.innerWidth<=768;
   const mobBtn=document.getElementById('mob-filter-btn');
   if(mobBtn) mobBtn.style.display=isMob?'flex':'none';
+  const banner=document.getElementById('pro-banner-mobile');
+  if(banner) banner.style.display=isMob&&(!currentUser||currentUser.tier==='free')?'flex':'none';
 }
 window.addEventListener('resize',checkMobile);
 checkMobile();
