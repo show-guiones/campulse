@@ -1,8 +1,9 @@
 import os
+import time
 import requests
 from datetime import datetime
 
-CHATURBATE_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=1000"
+BASE_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=500"
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 
@@ -10,14 +11,32 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError("Faltan variables de entorno: SUPABASE_URL y SUPABASE_KEY son requeridas")
 
 def get_rooms():
-    print("[" + str(datetime.now()) + "] Llamando a Chaturbate API...")
-    r = requests.get(CHATURBATE_URL, timeout=30)
-    data = r.json()
-    rooms = data.get("results", [])
-    print("[" + str(datetime.now()) + "] " + str(len(rooms)) + " salas encontradas")
-    return rooms
+    all_rooms = []
+    offset = 0
+    print(f"[{datetime.now()}] Iniciando scraping con paginación...")
+    while True:
+        url = f"{BASE_URL}&offset={offset}"
+        try:
+            r = requests.get(url, timeout=30)
+            data = r.json()
+        except Exception as e:
+            print(f"  Error en offset={offset}: {e}")
+            break
+        batch = data.get("results", [])
+        if not batch:
+            break
+        all_rooms.extend(batch)
+        print(f"  offset={offset} → {len(batch)} salas (acumulado: {len(all_rooms)})")
+        if len(batch) < 500:
+            break
+        offset += 500
+        if offset > 5000:
+            break
+        time.sleep(0.5)
+    print(f"[{datetime.now()}] Total salas encontradas: {len(all_rooms)}")
+    return all_rooms
 
-def save_snapshot(rooms):
+def save_snapshot(rooms, platform="chaturbate"):
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": "Bearer " + SUPABASE_KEY,
@@ -42,7 +61,8 @@ def save_snapshot(rooms):
             "spoken_languages": r.get("spoken_languages", ""),
             "chat_room_url": r.get("chat_room_url", ""),
             "tags": r.get("tags", []) if isinstance(r.get("tags"), list) else [],
-            "seconds_online": r.get("seconds_online", 0)
+            "seconds_online": r.get("seconds_online", 0),
+            "platform": platform,
         })
     total = 0
     for i in range(0, len(records), 100):
@@ -58,7 +78,7 @@ def save_snapshot(rooms):
             print("Lote " + str(i//100 + 1) + " guardado: " + str(len(batch)) + " registros")
         else:
             print("Error lote " + str(i//100 + 1) + ": " + str(resp.status_code) + " - " + resp.text[:300])
-    print("[" + str(datetime.now()) + "] Total guardado: " + str(total) + " registros")
+    print(f"[{datetime.now()}] Total guardado: {total} registros")
 
 if __name__ == "__main__":
     rooms = get_rooms()
