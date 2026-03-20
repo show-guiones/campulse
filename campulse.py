@@ -80,8 +80,30 @@ def save_snapshot(rooms, platform="chaturbate"):
             print("Error lote " + str(i//100 + 1) + ": " + str(resp.status_code) + " - " + resp.text[:300])
     print(f"[{datetime.now()}] Total guardado: {total} registros")
 
+def refresh_best_hours():
+    """
+    Dispara refresh_best_hours() en Supabase via RPC.
+    Fallback si pg_cron no está activo. Si pg_cron sí corre, esta llamada
+    es inocua — simplemente recalcula antes de lo programado.
+    """
+    resp = requests.post(
+        SUPABASE_URL + "/rest/v1/rpc/refresh_best_hours",
+        headers={
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY,
+            "Content-Type": "application/json",
+        },
+        json={},
+        timeout=60
+    )
+    if resp.status_code == 200:
+        print(f"[{datetime.now()}] best_hours actualizado correctamente")
+    else:
+        print(f"[{datetime.now()}] Error al actualizar best_hours: {resp.status_code} — {resp.text[:200]}")
+
 if __name__ == "__main__":
     rooms = get_rooms()
     if rooms:
         save_snapshot(rooms)
+        refresh_best_hours()
     print("Listo!")
