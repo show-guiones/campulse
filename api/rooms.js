@@ -3,12 +3,13 @@ export const config = { runtime: 'edge' };
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
   const username = searchParams.get('username');
+  const offset   = parseInt(searchParams.get('offset') || '0', 10);
   const AFF = 'rI8z3';
 
-  // Si viene username, buscar esa sala específica
+  // Si viene username, buscar esa sala específica (sin offset — búsqueda puntual)
   const url = username
     ? `https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=${AFF}&client_ip=request_ip&format=json&limit=500&keywords=${encodeURIComponent(username)}`
-    : `https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=${AFF}&client_ip=request_ip&format=json&limit=500`;
+    : `https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=${AFF}&client_ip=request_ip&format=json&limit=500&offset=${offset}`;
 
   try {
     const res = await fetch(url, {
