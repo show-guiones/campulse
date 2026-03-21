@@ -44,31 +44,35 @@ def get_previous_usernames():
         "Authorization": "Bearer " + SUPABASE_KEY,
     }
     try:
-        # Obtener el captured_at más reciente anterior
+        # Obtener los dos captured_at más recientes distintos
         resp = requests.get(
             SUPABASE_URL + "/rest/v1/rooms_snapshot"
             "?select=captured_at"
             "&order=captured_at.desc"
-            "&limit=1"
-            "&offset=1",
+            "&limit=1",
             headers=headers,
             timeout=15
         )
         data = resp.json()
-        if not data:
+        if not data or not isinstance(data, list) or len(data) == 0:
             return set()
-        last_ts = data[0]["captured_at"]
-        # Obtener todos los usernames de esa ejecución
+        last_ts = data[0].get("captured_at", "")
+        if not last_ts:
+            return set()
+        # Obtener todos los usernames del snapshot anterior a este
         resp2 = requests.get(
-            SUPABASE_URL + f"/rest/v1/rooms_snapshot"
+            SUPABASE_URL + "/rest/v1/rooms_snapshot"
             f"?select=username"
-            f"&captured_at=eq.{last_ts}"
-            f"&limit=10000",
+            f"&captured_at=lt.{last_ts}"
+            f"&order=captured_at.desc"
+            f"&limit=6000",
             headers=headers,
             timeout=30
         )
         rows = resp2.json()
-        return {r["username"] for r in rows}
+        if not isinstance(rows, list):
+            return set()
+        return {r["username"] for r in rows if isinstance(r, dict) and "username" in r}
     except Exception as e:
         print(f"  Error obteniendo usernames anteriores: {e}")
         return set()
