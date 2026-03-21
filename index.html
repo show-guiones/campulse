@@ -2079,10 +2079,95 @@ toggleFav=function(e,u){
   _origToggleFav(e,u);
   const isNowFav=favs.includes(u);
   saveFavToCloud(u,isNowFav);
+  updatePushFavorites();
+  updateNotifBtn();
 };
+
+// ── PUSH NOTIFICATIONS ──
+const VAPID_PUBLIC_KEY = 'BKqvU5q_vDW2OovTMBoLaGMWloXsp1iFpby8C0z2bJglipZmZx7TA6Op_tp7LENjT183GAnC09RcR_j_yqn_H2o';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+let swRegistration = null;
+
+async function initPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    swRegistration = await navigator.serviceWorker.register('/sw.js');
+  } catch(e) { console.warn('SW error:', e); }
+}
+
+async function requestPushPermission() {
+  if (!swRegistration) return false;
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return false;
+  try {
+    const sub = await swRegistration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    await savePushSubscription(sub);
+    return true;
+  } catch(e) {
+    console.warn('Push subscribe error:', e);
+    return false;
+  }
+}
+
+async function savePushSubscription(sub) {
+  try {
+    await fetch('/api/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subscription: sub.toJSON(),
+        user_id: currentUser?.id || null,
+        favorites: favs
+      })
+    });
+  } catch(e) { console.warn('Save push error:', e); }
+}
+
+async function updatePushFavorites() {
+  if (!swRegistration) return;
+  try {
+    const sub = await swRegistration.pushManager.getSubscription();
+    if (sub) await savePushSubscription(sub);
+  } catch(e) {}
+}
+
+// Mostrar botón de notificaciones en el header cuando hay favoritas
+function updateNotifBtn() {
+  let btn = document.getElementById('notif-btn');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'notif-btn';
+    btn.className = 'icon-btn';
+    btn.title = 'Activar alertas de favoritas';
+    btn.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 2a5 5 0 0 1 5 5v2l1 2H2l1-2V7a5 5 0 0 1 5-5z"/><path d="M6.5 13a1.5 1.5 0 0 0 3 0"/></svg>`;
+    btn.onclick = async () => {
+      const ok = await requestPushPermission();
+      if (ok) {
+        toast('🔔 Alertas activadas — te avisamos cuando tus favoritas se conecten');
+        btn.style.color = 'var(--grn)';
+      }
+    };
+    const refBtn = document.getElementById('ref-btn');
+    refBtn.parentNode.insertBefore(btn, refBtn);
+  }
+  btn.style.display = favs.length > 0 ? 'flex' : 'none';
+}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape') closeAuthModal();});
 initAuth();
+initPush();
 </script>
 </body>
 </html>
