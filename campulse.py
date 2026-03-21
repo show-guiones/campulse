@@ -6,6 +6,7 @@ from datetime import datetime
 BASE_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=500"
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
+SITE_URL = os.environ.get("SITE_URL", "https://www.campulsehub.com")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError("Faltan variables de entorno: SUPABASE_URL y SUPABASE_KEY son requeridas")
@@ -35,6 +36,75 @@ def get_rooms():
         time.sleep(0.5)
     print(f"[{datetime.now()}] Total salas encontradas: {len(all_rooms)}")
     return all_rooms
+
+def get_previous_usernames():
+    """Obtiene los usernames de la ejecución anterior (último snapshot distinto)."""
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+    }
+    try:
+        # Obtener el captured_at más reciente anterior
+        resp = requests.get(
+            SUPABASE_URL + "/rest/v1/rooms_snapshot"
+            "?select=captured_at"
+            "&order=captured_at.desc"
+            "&limit=1"
+            "&offset=1",
+            headers=headers,
+            timeout=15
+        )
+        data = resp.json()
+        if not data:
+            return set()
+        last_ts = data[0]["captured_at"]
+        # Obtener todos los usernames de esa ejecución
+        resp2 = requests.get(
+            SUPABASE_URL + f"/rest/v1/rooms_snapshot"
+            f"?select=username"
+            f"&captured_at=eq.{last_ts}"
+            f"&limit=10000",
+            headers=headers,
+            timeout=30
+        )
+        rows = resp2.json()
+        return {r["username"] for r in rows}
+    except Exception as e:
+        print(f"  Error obteniendo usernames anteriores: {e}")
+        return set()
+
+def send_notifications(newly_online):
+    """Envía notificaciones push para modelos recién conectadas."""
+    if not newly_online:
+        return
+    print(f"[{datetime.now()}] Enviando notificaciones para {len(newly_online)} modelos recién conectadas...")
+    sent_total = 0
+    for room in newly_online[:20]:  # máximo 20 notificaciones por ejecución
+        username = room.get("username", "")
+        viewers = room.get("num_users", 0)
+        if not username or viewers < 10:
+            continue
+        try:
+            resp = requests.post(
+                SITE_URL + "/api/push-send",
+                json={
+                    "username": username,
+                    "viewers": viewers,
+                    "title": f"{room.get('display_name', username)} está en vivo",
+                    "body": f"{viewers:,} viewers ahora · Entra a verla",
+                    "url": f"https://www.campulsehub.com"
+                },
+                timeout=15
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                sent = data.get("sent", 0)
+                if sent > 0:
+                    print(f"  ✓ {username}: {sent} notificaciones enviadas")
+                    sent_total += sent
+        except Exception as e:
+            print(f"  Error notificando {username}: {e}")
+    print(f"[{datetime.now()}] Total notificaciones enviadas: {sent_total}")
 
 def save_snapshot(rooms, platform="chaturbate"):
     headers = {
@@ -78,32 +148,35 @@ def save_snapshot(rooms, platform="chaturbate"):
             print("Lote " + str(i//100 + 1) + " guardado: " + str(len(batch)) + " registros")
         else:
             print("Error lote " + str(i//100 + 1) + ": " + str(resp.status_code) + " - " + resp.text[:300])
-    print(f"[{datetime.now()}] Total guardado: {total} registros")
-
-def refresh_best_hours():
-    """
-    Dispara refresh_best_hours() en Supabase via RPC.
-    Fallback si pg_cron no está activo. Si pg_cron sí corre, esta llamada
-    es inocua — simplemente recalcula antes de lo programado.
-    """
-    resp = requests.post(
-        SUPABASE_URL + "/rest/v1/rpc/refresh_best_hours",
-        headers={
-            "apikey": SUPABASE_KEY,
-            "Authorization": "Bearer " + SUPABASE_KEY,
-            "Content-Type": "application/json",
-        },
-        json={},
-        timeout=60
-    )
-    if resp.status_code == 200:
-        print(f"[{datetime.now()}] best_hours actualizado correctamente")
-    else:
-        print(f"[{datetime.now()}] Error al actualizar best_hours: {resp.status_code} — {resp.text[:200]}")
+    print("[" + str(datetime.now()) + "] Total guardado: " + str(total) + " registros")
 
 if __name__ == "__main__":
+    # 1. Obtener usernames de la ejecución anterior ANTES de guardar
+    prev_usernames = get_previous_usernames()
+    print(f"[{datetime.now()}] Usernames en ejecución anterior: {len(prev_usernames)}")
+
+    # 2. Obtener salas actuales
     rooms = get_rooms()
+
     if rooms:
+        # 3. Detectar modelos recién conectadas
+        current_usernames = {r.get("username") for r in rooms}
+        if prev_usernames:
+            newly_online = [
+                r for r in rooms
+                if r.get("username") in (current_usernames - prev_usernames)
+                and r.get("num_users", 0) > 0
+            ]
+            print(f"[{datetime.now()}] Modelos recién conectadas: {len(newly_online)}")
+        else:
+            newly_online = []
+
+        # 4. Guardar snapshot
         save_snapshot(rooms)
-        refresh_best_hours()
+
+        # 5. Enviar notificaciones
+        if newly_online:
+            send_notifications(newly_online)
+
     print("Listo!")
+
