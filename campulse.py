@@ -44,26 +44,44 @@ def get_previous_usernames():
         "Authorization": "Bearer " + SUPABASE_KEY,
     }
     try:
-        # Obtener los 2 captured_at más recientes distintos
+        # Obtener el captured_at más reciente
         resp = requests.get(
             SUPABASE_URL + "/rest/v1/rooms_snapshot"
             "?select=captured_at"
             "&order=captured_at.desc"
-            "&limit=2",
+            "&limit=1",
             headers=headers,
             timeout=15
         )
         data = resp.json()
-        if not isinstance(data, list) or len(data) < 2:
+        if not isinstance(data, list) or len(data) == 0:
             return set()
 
-        # El segundo es de la ejecución anterior
-        prev_ts = data[1].get("captured_at", "")
+        latest_ts = data[0].get("captured_at", "")
+        if not latest_ts:
+            return set()
+
+        # Obtener el captured_at anterior (distinto al más reciente)
+        resp2 = requests.get(
+            SUPABASE_URL + "/rest/v1/rooms_snapshot"
+            f"?select=captured_at"
+            f"&captured_at=lt.{latest_ts}"
+            f"&order=captured_at.desc"
+            f"&limit=1",
+            headers=headers,
+            timeout=15
+        )
+        data2 = resp2.json()
+        if not isinstance(data2, list) or len(data2) == 0:
+            print(f"  No hay ejecución anterior a {latest_ts}")
+            return set()
+
+        prev_ts = data2[0].get("captured_at", "")
         if not prev_ts:
             return set()
 
         # Obtener todos los usernames de esa ejecución anterior
-        resp2 = requests.get(
+        resp3 = requests.get(
             SUPABASE_URL + "/rest/v1/rooms_snapshot"
             f"?select=username"
             f"&captured_at=eq.{prev_ts}"
@@ -71,7 +89,7 @@ def get_previous_usernames():
             headers=headers,
             timeout=30
         )
-        rows = resp2.json()
+        rows = resp3.json()
         if not isinstance(rows, list):
             return set()
         result = {r["username"] for r in rows if isinstance(r, dict) and "username" in r}
