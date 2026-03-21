@@ -38,41 +38,45 @@ def get_rooms():
     return all_rooms
 
 def get_previous_usernames():
-    """Obtiene los usernames de la ejecución anterior (último snapshot distinto)."""
+    """Obtiene los usernames de la ejecución anterior."""
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": "Bearer " + SUPABASE_KEY,
     }
     try:
-        # Obtener los dos captured_at más recientes distintos
+        # Obtener los 2 captured_at más recientes distintos
         resp = requests.get(
             SUPABASE_URL + "/rest/v1/rooms_snapshot"
             "?select=captured_at"
             "&order=captured_at.desc"
-            "&limit=1",
+            "&limit=2",
             headers=headers,
             timeout=15
         )
         data = resp.json()
-        if not data or not isinstance(data, list) or len(data) == 0:
+        if not isinstance(data, list) or len(data) < 2:
             return set()
-        last_ts = data[0].get("captured_at", "")
-        if not last_ts:
+
+        # El segundo es de la ejecución anterior
+        prev_ts = data[1].get("captured_at", "")
+        if not prev_ts:
             return set()
-        # Obtener todos los usernames del snapshot anterior a este
+
+        # Obtener todos los usernames de esa ejecución anterior
         resp2 = requests.get(
             SUPABASE_URL + "/rest/v1/rooms_snapshot"
             f"?select=username"
-            f"&captured_at=lt.{last_ts}"
-            f"&order=captured_at.desc"
-            f"&limit=6000",
+            f"&captured_at=eq.{prev_ts}"
+            f"&limit=10000",
             headers=headers,
             timeout=30
         )
         rows = resp2.json()
         if not isinstance(rows, list):
             return set()
-        return {r["username"] for r in rows if isinstance(r, dict) and "username" in r}
+        result = {r["username"] for r in rows if isinstance(r, dict) and "username" in r}
+        print(f"  Ejecución anterior: {prev_ts} → {len(result)} usernames")
+        return result
     except Exception as e:
         print(f"  Error obteniendo usernames anteriores: {e}")
         return set()
