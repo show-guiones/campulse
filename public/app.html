@@ -459,104 +459,184 @@ header{
 /* ═══════════════════════════════════════════
    MODAL
 ═══════════════════════════════════════════ */
+/* ═══ MODAL — conversion machine ═══ */
 .modal-bg{
   display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.7);z-index:500;
-  backdrop-filter:blur(8px);
-  align-items:center;justify-content:center;padding:1rem
+  background:rgba(0,0,0,.85);z-index:500;
+  align-items:center;justify-content:center;padding:.75rem;
+  animation:fadein .18s ease
 }
 .modal-bg.open{display:flex}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes slideup{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+
 .modal{
-  background:var(--bg2);border:1px solid var(--bdr2);
-  border-radius:18px;width:100%;max-width:400px;
-  max-height:90dvh;overflow:hidden;
-  display:flex;flex-direction:column
+  background:var(--bg2);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:22px;width:100%;max-width:480px;
+  max-height:92dvh;overflow:hidden;
+  display:flex;flex-direction:column;
+  animation:slideup .22s cubic-bezier(.34,1.56,.64,1)
 }
 .modal-close{
-  position:absolute;right:.7rem;top:.7rem;
-  width:28px;height:28px;border-radius:50%;
-  background:rgba(0,0,0,.5);border:none;color:#fff;
-  font-size:.8rem;display:flex;align-items:center;justify-content:center;
-  z-index:10;transition:background .15s
+  position:absolute;right:.8rem;top:.8rem;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.8);font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;
+  z-index:10;transition:all .15s;cursor:pointer
 }
-.modal-close:hover{background:rgba(255,255,255,.15)}
-.modal-hero{position:relative;height:220px;overflow:hidden;flex-shrink:0}
-.modal-hero img,.live-preview-img{width:100%;height:100%;object-fit:cover}
+.modal-close:hover{background:rgba(255,255,255,.15);color:#fff}
+
+/* Hero — taller, more cinematic */
+.modal-hero{position:relative;height:280px;overflow:hidden;flex-shrink:0;cursor:pointer}
+.modal-hero img,.live-preview-img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .4s ease
+}
+.modal-hero:hover .live-preview-img{transform:scale(1.03)}
 .modal-hero-grad{
   position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(12,13,16,.98) 0%,transparent 55%)
+  background:linear-gradient(to top,rgba(10,11,14,1) 0%,rgba(10,11,14,.3) 45%,transparent 75%)
 }
+
+/* Name overlay on hero */
 .modal-hero-info{
-  position:absolute;bottom:.75rem;left:.8rem;right:.8rem;
-  display:flex;align-items:flex-end;justify-content:space-between
+  position:absolute;bottom:0;left:0;right:0;
+  padding:.9rem 1rem .75rem
 }
-.modal-name{font-size:1.05rem;font-weight:800;line-height:1.1}
-.modal-sub{font-size:.68rem;color:var(--txt2)}
-.modal-body{padding:.75rem .9rem 1rem;overflow-y:auto;flex:1}
+.modal-name{font-size:1.3rem;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.modal-sub{font-size:.7rem;color:rgba(255,255,255,.55);margin-top:.2rem}
+.modal-live-pill{
+  display:inline-flex;align-items:center;gap:.3rem;
+  background:var(--hot);border-radius:20px;
+  padding:3px 10px;font-size:.62rem;font-weight:800;
+  color:#fff;letter-spacing:.04em;margin-bottom:.4rem
+}
+.modal-viewer-count{
+  display:inline-flex;align-items:center;gap:.3rem;
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:3px 10px;
+  font-size:.68rem;font-weight:700;color:#fff;
+  margin-left:.4rem;margin-bottom:.4rem
+}
+
+/* Live pulse overlay */
+.live-preview-wrap{position:relative;height:100%}
+.live-play-btn{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(255,42,109,.9);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 8px rgba(255,42,109,.2),0 0 0 16px rgba(255,42,109,.08);
+  animation:livepulse 2s ease-in-out infinite;
+  transition:transform .15s
+}
+.live-play-btn:hover{transform:translate(-50%,-50%) scale(1.08)}
+@keyframes livepulse{
+  0%,100%{box-shadow:0 0 0 8px rgba(255,42,109,.2),0 0 0 16px rgba(255,42,109,.08)}
+  50%{box-shadow:0 0 0 12px rgba(255,42,109,.15),0 0 0 24px rgba(255,42,109,.04)}
+}
+.live-play-btn svg{width:26px;height:26px;fill:#fff;margin-left:3px}
+.live-timer-badge{
+  position:absolute;top:.6rem;left:.6rem;
+  background:rgba(255,42,109,.92);border-radius:8px;
+  padding:3px 9px;font-size:.6rem;font-weight:800;color:#fff;
+  display:flex;align-items:center;gap:.35rem;letter-spacing:.04em
+}
+.live-timer-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s infinite}
+
+/* Body */
+.modal-body{padding:.8rem 1rem 1.1rem;overflow-y:auto;flex:1}
+
+/* Stats row */
 .modal-stats{
   display:grid;grid-template-columns:repeat(4,1fr);
-  gap:.4rem;margin-bottom:.75rem
+  gap:.35rem;margin-bottom:.7rem
 }
 .ms-cell2{
-  background:var(--surf);border-radius:9px;
-  padding:.4rem .3rem;text-align:center
+  background:var(--surf);border-radius:10px;
+  padding:.45rem .3rem;text-align:center
 }
-.ms-val2{font-size:.88rem;font-weight:800;color:var(--txt);line-height:1.2}
-.ms-lbl2{font-size:.52rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.ms-val2{font-size:.95rem;font-weight:800;color:var(--txt);line-height:1.2}
+.ms-lbl2{font-size:.5rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+
+/* Subject */
 .modal-subj{
   font-size:.72rem;color:var(--txt2);
-  background:var(--surf);border-radius:8px;padding:.5rem .7rem;
-  margin-bottom:.6rem;font-style:italic;line-height:1.4
+  background:var(--surf);border-radius:9px;padding:.5rem .75rem;
+  margin-bottom:.6rem;font-style:italic;line-height:1.45;
+  border-left:2px solid rgba(255,42,109,.4)
 }
-.modal-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.75rem}
+
+/* Tags */
+.modal-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.8rem}
 .m-tag{
-  font-size:.6rem;background:rgba(255,255,255,.06);
-  border-radius:10px;padding:2px 8px;color:var(--txt2)
+  font-size:.6rem;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:2px 9px;color:var(--txt2);
+  transition:all .15s;cursor:pointer
 }
-.modal-acts{display:flex;gap:.5rem}
+.m-tag:hover{background:rgba(255,42,109,.12);border-color:rgba(255,42,109,.3);color:var(--hot)}
+
+/* CTA — the money button */
+.modal-acts{display:flex;gap:.5rem;margin-top:.3rem}
 .btn-go{
-  flex:1;background:linear-gradient(135deg,var(--hot),#c0195a);
-  color:#fff;border:none;border-radius:10px;
-  padding:.55rem;font-size:.78rem;font-weight:700;
-  display:flex;align-items:center;justify-content:center;gap:.35rem;
-  transition:opacity .15s
+  flex:1;
+  background:linear-gradient(135deg,#ff2a6d,#c0195a);
+  color:#fff;border:none;border-radius:12px;
+  padding:.75rem 1rem;
+  font-size:.9rem;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:center;gap:.45rem;
+  transition:all .18s;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(255,42,109,.4)
 }
-.btn-go:hover{opacity:.85}
-.btn-fav2{
-  width:42px;background:var(--surf);border:1px solid var(--bdr);
-  border-radius:10px;color:var(--txt3);font-size:1rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s
+.btn-go::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+  pointer-events:none
 }
-.btn-fav2:hover,.btn-fav2.on{color:var(--hot);background:rgba(255,42,109,.1);border-color:rgba(255,42,109,.3)}
-.live-preview-wrap{position:relative;height:100%;cursor:pointer}
-.play-circle{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(255,42,109,.85);
-  display:flex;align-items:center;justify-content:center
+.btn-go:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(255,42,109,.55)}
+.btn-go:active{transform:translateY(0)}
+.btn-go-ico{font-size:1.1rem}
+.btn-go-text{}
+.btn-go-arrow{
+  margin-left:auto;font-size:1rem;
+  transition:transform .18s
 }
-.play-circle svg{width:20px;height:20px;fill:#fff}
-.live-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.live-refresh-badge{
-  position:absolute;top:.5rem;left:.5rem;
-  background:rgba(255,42,109,.9);border-radius:8px;
-  padding:2px 8px;font-size:.58rem;font-weight:700;color:#fff;
-  display:flex;align-items:center;gap:.3rem
+.btn-go:hover .btn-go-arrow{transform:translateX(3px)}
+
+/* Secondary actions */
+.modal-secondary{display:flex;gap:.4rem;margin-top:.45rem}
+.btn-sec{
+  flex:1;background:var(--surf);border:1px solid var(--bdr);
+  border-radius:10px;color:var(--txt2);
+  font-family:inherit;font-size:.72rem;font-weight:600;
+  padding:.5rem;display:flex;align-items:center;justify-content:center;gap:.3rem;
+  transition:all .15s;cursor:pointer
 }
-.live-refresh-dot{width:4px;height:4px;border-radius:50%;background:#fff;animation:pulse 1s infinite}
-.modal-live-btn{
-  position:absolute;bottom:.7rem;right:.7rem;
-  background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.2);
-  border-radius:8px;padding:4px 10px;color:#fff;font-size:.65rem;font-weight:600
-}
+.btn-sec:hover{background:var(--surf2);color:var(--txt)}
+.btn-sec.on{color:var(--hot);background:rgba(255,42,109,.08);border-color:rgba(255,42,109,.25)}
+
+/* Offline state */
 .mhp-wrap{
   height:100%;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:.5rem;
-  background:var(--surf2)
+  align-items:center;justify-content:center;gap:.6rem;
+  background:linear-gradient(135deg,var(--surf2),var(--bg3))
 }
-.mhp-ava{font-size:3rem;line-height:1}
+.mhp-ava{font-size:3.5rem;line-height:1}
+.mhp-name{font-size:1rem;font-weight:700;color:var(--txt)}
 .mhp-offline{display:flex;align-items:center;gap:.35rem;font-size:.68rem;color:var(--txt3)}
+.mhp-cta{
+  margin-top:.4rem;
+  background:var(--surf);border:1px solid var(--bdr2);
+  border-radius:10px;padding:.5rem 1.2rem;
+  color:var(--txt2);font-size:.75rem;font-weight:600;
+  text-decoration:none;transition:all .15s;
+  display:inline-flex;align-items:center;gap:.35rem
+}
+.mhp-cta:hover{background:var(--hot);border-color:var(--hot);color:#fff}
 
 /* ═══════════════════════════════════════════
    TOAST
@@ -833,8 +913,8 @@ header{
   .rep-search{padding:1.5rem 1rem}
   .rep-search-title{font-size:1.6rem}
   .modal-bg{padding:0;align-items:flex-end}
-  .modal{border-radius:18px 18px 0 0;max-height:91dvh;width:100%}
-  .modal-hero{height:180px}
+  .modal{border-radius:22px 22px 0 0;max-height:93dvh;width:100%}
+  .modal-hero{height:240px}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar{padding:.4rem .7rem}
@@ -1239,32 +1319,73 @@ header{
 
 </div><!-- .page -->
 
-<!-- MODAL -->
+<!-- MODAL — conversion machine -->
 <div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
   <div class="modal" style="position:relative">
     <button class="modal-close" onclick="closeMod()">✕</button>
-    <div class="modal-hero"><div id="mhero-img-wrap"></div><div class="modal-hero-grad"></div>
+
+    <!-- Hero — live preview -->
+    <div class="modal-hero" id="modal-hero-wrap" onclick="openInCB(active&&active.username)">
+      <div id="mhero-img-wrap"></div>
+      <div class="modal-hero-grad"></div>
       <div class="modal-hero-info">
-        <div><div class="modal-name" id="m-name"></div><div class="modal-sub" id="m-disp"></div></div>
-        <div id="m-pill"></div>
+        <div>
+          <div id="m-live-pill"></div>
+          <div class="modal-name" id="m-name"></div>
+          <div class="modal-sub" id="m-disp"></div>
+        </div>
       </div>
     </div>
+
+    <!-- Body -->
     <div class="modal-body">
+
+      <!-- Stats row -->
       <div class="modal-stats">
-        <div class="ms-cell2"><div class="ms-val2" id="m-vw"></div><div class="ms-lbl2">Viewers</div></div>
-        <div class="ms-cell2"><div class="ms-val2" id="m-fl"></div><div class="ms-lbl2">Seguidores</div></div>
-        <div class="ms-cell2"><div class="ms-val2" id="m-ag"></div><div class="ms-lbl2">Edad</div></div>
-        <div class="ms-cell2"><div class="ms-val2" id="m-co"></div><div class="ms-lbl2">País</div></div>
+        <div class="ms-cell2">
+          <div class="ms-val2" id="m-vw" style="color:var(--hot)"></div>
+          <div class="ms-lbl2">👀 Viewers</div>
+        </div>
+        <div class="ms-cell2">
+          <div class="ms-val2" id="m-fl"></div>
+          <div class="ms-lbl2">❤️ Fans</div>
+        </div>
+        <div class="ms-cell2">
+          <div class="ms-val2" id="m-ag"></div>
+          <div class="ms-lbl2">🎂 Edad</div>
+        </div>
+        <div class="ms-cell2">
+          <div class="ms-val2" id="m-co"></div>
+          <div class="ms-lbl2">🌍 País</div>
+        </div>
       </div>
+
+      <!-- Room subject -->
       <div class="modal-subj" id="m-subj" style="display:none"></div>
+
+      <!-- Tags -->
       <div class="modal-tags" id="m-tags"></div>
+
+      <!-- PRIMARY CTA — the money button -->
       <div class="modal-acts">
         <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go">
-          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9M10 2h4v4M14 2L7 9"/></svg>
-          Entrar a la sala
+          <span class="btn-go-ico">▶</span>
+          <span class="btn-go-text">Entrar a la sala en vivo</span>
+          <span class="btn-go-arrow">→</span>
         </a>
-        <button class="btn-fav2" id="m-fav-btn" onclick="favMod()"><span id="m-fav-icon">♥</span></button>
       </div>
+
+      <!-- Secondary actions -->
+      <div class="modal-secondary">
+        <button class="btn-sec" id="m-fav-btn" onclick="favMod()">
+          <span id="m-fav-icon">♥</span>
+          <span id="m-fav-txt">Guardar favorita</span>
+        </button>
+        <button class="btn-sec" onclick="reportFromModal()">
+          📊 Ver su reporte
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1664,36 +1785,73 @@ function updateFavBtn(u){
 function startLivePreview(x){
   clearInterval(prevCd);
   const wrap=document.getElementById('mhero-img-wrap');
+  const pill=document.getElementById('m-live-pill');
   const u=x.username;
-  const srcs=[`https://roomimg.stream.highwebmedia.com/ri/${u}.jpg`,`https://thumb.live.mmcdn.com/ri/${u}.jpg`,`https://thumb.live.mmcdn.com/riw/${u}.jpg`];
+  const srcs=[
+    `https://roomimg.stream.highwebmedia.com/ri/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`
+  ];
   if(x.num_users>0){
-    wrap.innerHTML=`<div class="live-preview-wrap" onclick="openInCB('${u}')">
-      <img class="live-preview-img" id="live-img" src="${srcs[0]}?t=${Date.now()}" alt="${u}" data-t="0" onerror="const t=parseInt(this.dataset.t||0)+1;const s=${JSON.stringify(srcs)};if(t<s.length){this.dataset.t=t;this.src=s[t]+'?t='+Date.now();}else this.style.display='none';">
-      <div class="live-refresh-badge"><div class="live-refresh-dot"></div>Live<span style="margin-left:4px;opacity:.7" id="live-timer">·30s</span></div>
-      <div class="live-overlay"><div class="play-circle"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>
-      <button class="modal-live-btn" onclick="event.stopPropagation();openInCB('${u}')">↗ Entrar en vivo</button>
-    </div>`;
+    // Live pill badge
+    if(pill) pill.innerHTML=`<span class="modal-live-pill"><span class="live-timer-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s infinite;margin-right:2px"></span>EN VIVO</span><span class="modal-viewer-count">👀 ${fmt(x.num_users)}</span>`;
+    wrap.innerHTML=`
+      <div class="live-preview-wrap">
+        <img class="live-preview-img" id="live-img"
+          src="${srcs[0]}?t=${Date.now()}" alt="${u}" data-t="0"
+          onerror="const t=parseInt(this.dataset.t||0)+1;const s=${JSON.stringify(srcs)};if(t<s.length){this.dataset.t=t;this.src=s[t]+'?t='+Date.now();}else{this.style.opacity='0';}">
+        <div class="live-timer-badge">
+          <span class="live-timer-dot"></span>
+          LIVE · <span id="live-timer">30s</span>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <div class="live-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>`;
     prevSec=30;
     prevCd=setInterval(()=>{
       prevSec--;
-      const el=document.getElementById('live-timer');if(el)el.textContent='·'+prevSec+'s';
+      const el=document.getElementById('live-timer');
+      if(el) el.textContent=prevSec+'s';
       if(prevSec<=0){
         prevSec=30;
         const img=document.getElementById('live-img');
-        if(img){img.style.opacity='.6';const ns=srcs[0]+'?t='+Date.now();const tmp=new Image();tmp.onload=()=>{img.src=ns;img.style.opacity='1';};tmp.onerror=()=>img.style.opacity='1';tmp.src=ns;}
+        if(img){
+          const ns=srcs[0]+'?t='+Date.now();
+          const tmp=new Image();
+          tmp.onload=()=>{img.src=ns;};
+          tmp.src=ns;
+        }
       }
     },1000);
   }else{
-    wrap.innerHTML=`<div class="mhp-wrap">
-      <div class="mhp-ava">👤</div>
-      <div style="font-weight:700;font-size:.9rem">${x.display_name||u}</div>
-      <div class="mhp-offline"><div class="live-dot" style="background:var(--txt3)"></div>Offline ahora</div>
-      <a href="https://chaturbate.com/${u}/?campaign=rI8z3&track=default" target="_blank" rel="noopener" style="margin-top:.5rem;background:var(--hot);color:#fff;border:none;border-radius:9px;padding:6px 14px;font-size:.72rem;font-weight:700;cursor:pointer;text-decoration:none">Ir a su sala ↗</a>
-    </div>`;
+    if(pill) pill.innerHTML='';
+    wrap.innerHTML=`
+      <div class="mhp-wrap">
+        <div class="mhp-ava">🎥</div>
+        <div class="mhp-name">${x.display_name||u}</div>
+        <div class="mhp-offline">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>
+          Offline en este momento
+        </div>
+        <a href="https://chaturbate.com/${u}/?campaign=rI8z3&track=default"
+           target="_blank" rel="noopener" class="mhp-cta">
+          🔔 Seguirla en Chaturbate →
+        </a>
+      </div>`;
   }
 }
 function openInCB(u){window.open(`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`,'_blank','noopener');}
 function closeMod(e){if(!e||e.target===document.getElementById('modal-bg')){document.getElementById('modal-bg').classList.remove('open');document.body.style.overflow='';clearInterval(prevCd);}}
+function reportFromModal(){
+  if(!active)return;
+  closeMod();
+  document.getElementById('model-username-input').value=active.username;
+  switchTab('model');
+  searchModel();
+}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
 
 /* ═══════════════════════════════════════════
