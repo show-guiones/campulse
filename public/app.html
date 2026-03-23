@@ -1325,7 +1325,7 @@ header{
     <button class="modal-close" onclick="closeMod()">✕</button>
 
     <!-- Hero — live preview -->
-    <div class="modal-hero" id="modal-hero-wrap" onclick="openInCB(active&&active.username)">
+    <div class="modal-hero" id="modal-hero-wrap" onclick="if(active)openInCB(active.username)">
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
       <div class="modal-hero-info">
@@ -1762,7 +1762,7 @@ function openMod(u){
   active=x;
   document.getElementById('m-name').textContent=x.username;
   document.getElementById('m-disp').textContent=x.display_name||'';
-  document.getElementById('m-pill').innerHTML=`<span class="gpill gp-${x.gender}" style="font-size:.6rem">${GL[x.gender]||'—'}</span>`;
+  // gender pill now handled inside startLivePreview
   document.getElementById('m-vw').textContent=fmt(x.num_users||0);
   document.getElementById('m-fl').textContent=fmt(x.num_followers||0);
   document.getElementById('m-ag').textContent=x.age||'—';
@@ -1796,7 +1796,7 @@ function startLivePreview(x){
     // Live pill badge
     if(pill) pill.innerHTML=`<span class="modal-live-pill"><span class="live-timer-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s infinite;margin-right:2px"></span>EN VIVO</span><span class="modal-viewer-count">👀 ${fmt(x.num_users)}</span>`;
     wrap.innerHTML=`
-      <div class="live-preview-wrap">
+      <div class="live-preview-wrap" style="cursor:pointer">
         <img class="live-preview-img" id="live-img"
           src="${srcs[0]}?t=${Date.now()}" alt="${u}" data-t="0"
           onerror="const t=parseInt(this.dataset.t||0)+1;const s=${JSON.stringify(srcs)};if(t<s.length){this.dataset.t=t;this.src=s[t]+'?t='+Date.now();}else{this.style.opacity='0';}">
