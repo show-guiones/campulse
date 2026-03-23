@@ -1710,6 +1710,16 @@ function cardHtml(x,mode='grid'){
 </article>`;
 }
 
+function modalImgFallback(img){
+  const u=img.dataset.u||img.alt;
+  const srcs=[
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`
+  ];
+  const t=parseInt(img.dataset.t||0)+1;
+  if(t<srcs.length){img.dataset.t=t;img.src=srcs[t]+'?t='+Date.now();}
+  else{img.style.opacity='0';}
+}
 function imgFallback(img){
   const srcs=JSON.parse(img.dataset.srcs||'[]');
   const t=parseInt(img.dataset.t||0)+1;
@@ -1834,8 +1844,9 @@ function startLivePreview(x){
     wrap.innerHTML=`
       <div class="live-preview-wrap" style="cursor:pointer">
         <img class="live-preview-img" id="live-img"
-          src="${srcs[0]}?t=${Date.now()}" alt="${u}" data-t="0"
-          onerror="const t=parseInt(this.dataset.t||0)+1;const s=${JSON.stringify(srcs)};if(t<s.length){this.dataset.t=t;this.src=s[t]+'?t='+Date.now();}else{this.style.opacity='0';}">
+          src="${srcs[0]}?t=${Date.now()}" alt="${u}"
+          data-u="${u}" data-t="0"
+          onerror="modalImgFallback(this)">
         <div class="live-timer-badge">
           <span class="live-timer-dot"></span>
           LIVE · <span id="live-timer">30s</span>
