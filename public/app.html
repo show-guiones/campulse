@@ -330,8 +330,9 @@ header{
 .carousel-scroll .crd .crd-media{padding-top:0;height:186px;width:140px}
 .crd-img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  transition:transform .3s;will-change:transform
+  transition:transform .3s
 }
+.crd:hover .crd-img{will-change:transform}
 .carousel-scroll .crd .crd-img{position:relative;inset:auto;height:186px}
 .crd:hover .crd-img{transform:scale(1.04)}
 .crd-overlay{
@@ -372,7 +373,7 @@ header{
   display:flex;align-items:center;gap:.25rem;
   background:rgba(0,0,0,.65);border-radius:12px;
   padding:2px 7px;font-size:.6rem;font-weight:700;
-  backdrop-filter:blur(4px);color:#fff
+  color:#fff
 }
 .crd-vw-dot{width:4px;height:4px;border-radius:50%;background:var(--hot);box-shadow:0 0 4px var(--hot)}
 
@@ -434,8 +435,8 @@ header{
 .sk-line{height:.5rem;border-radius:4px;background:var(--surf2);margin-bottom:.3rem;animation:shimmer 1.6s infinite}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* Images INSIDE cards fade in smoothly */
-.crd-img{opacity:0;transition:opacity .35s ease}
-.crd-img.loaded{opacity:1}
+/* images appear immediately — no opacity flicker */
+.crd-img{opacity:1}
 
 /* ═══════════════════════════════════════════
    EMPTY STATE
@@ -1279,7 +1280,9 @@ const LIMIT=3000; // increased from 500
 let rooms=[],favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
 let gender='',onlyFavs=false,onlyHD=false,onlyCol=false,activeTag='',activeCountry='',ageRange='';
 let sort='viewers',view='grid',maxV=1,active=null;
-let loaded=false; // track first load to avoid blank flash
+let loaded=false;
+let _rankCache=null; // pre-computed rank map {username->rank}
+let _renderTimer=null; // debounce timer for filter renders // track first load to avoid blank flash
 const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n);
 const GL={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
 
@@ -1314,36 +1317,64 @@ function showSkeleton(){
 /* ═══════════════════════════════════════════
    LOAD — no blank flash on refresh
 ═══════════════════════════════════════════ */
+// Pre-computa ranking una sola vez O(n log n) en lugar de O(n²) por card
+function buildRankCache(arr){
+  const m=new Map();
+  [...arr].filter(r=>r.num_users>0)
+    .sort((a,b)=>(b.num_users||0)-(a.num_users||0))
+    .forEach((r,i)=>m.set(r.username,i));
+  return m;
+}
+
+// Actualiza stats y contadores sin re-renderizar las cards
+function silentUpdate(){
+  updateStats();
+  updateDrawerCounts();
+  const cc=document.getElementById('catalog-count');
+  if(cc)cc.textContent=fmt(getFiltered().length)+' modelos';
+}
+
 async function load(){
   const btn=document.getElementById('ref-btn');
   btn.classList.add('spin');
   if(!loaded) showSkeleton();
   try{
-    // fetch up to LIMIT rooms using pagination
-    let allRooms=[];
+    // — FASE 1: mostrar 500 rooms INMEDIATAMENTE (~1s) —
     const first=await fetch(`${API}?limit=500`);
     const d=await first.json();
-    allRooms=d.results||[];
-    // fetch additional pages in parallel for more coverage
-    if(allRooms.length>=500){
+    const batch1=d.results||[];
+    if(batch1.length){
+      const seen=new Set();
+      rooms=batch1.filter(r=>{if(seen.has(r.username))return false;seen.add(r.username);return true;});
+      maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
+      _rankCache=buildRankCache(rooms);
+      loaded=true;
+      updateAll();
+      document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+      btn.classList.remove('spin');
+    }
+    // — FASE 2: cargar resto en background sin bloquear UI —
+    if(batch1.length>=500){
       const pages=await Promise.allSettled(
         [500,1000,1500,2000,2500].map(o=>
           fetch(`${API}?offset=${o}&limit=500`).then(r=>r.json())
         )
       );
+      let extra=[];
       pages.forEach(p=>{
-        if(p.status==='fulfilled'&&p.value.results){
-          allRooms=[...allRooms,...p.value.results];
-        }
+        if(p.status==='fulfilled'&&p.value.results) extra=[...extra,...p.value.results];
       });
+      if(extra.length){
+        const seen=new Set(rooms.map(r=>r.username));
+        const newRooms=extra.filter(r=>{if(seen.has(r.username))return false;seen.add(r.username);return true;});
+        if(newRooms.length){
+          rooms=[...rooms,...newRooms];
+          maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
+          _rankCache=buildRankCache(rooms);
+          silentUpdate();
+        }
+      }
     }
-    // deduplicate by username
-    const seen=new Set();
-    rooms=allRooms.filter(r=>{if(seen.has(r.username))return false;seen.add(r.username);return true;});
-    maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
-    loaded=true;
-    updateAll();
-    document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
     if(!loaded){
       document.getElementById('gc-grid').innerHTML=`
@@ -1353,7 +1384,6 @@ async function load(){
           <button class="retry-btn" onclick="load()">Reintentar</button>
         </div>`;
     }
-    // if loaded before, silently fail (keep showing old data)
   }finally{
     btn.classList.remove('spin');
   }
@@ -1407,6 +1437,18 @@ function updateAll(){
   render();
   updateDrawerCounts();
 }
+// Para filtros: solo re-renderiza grid, NO los carousels (que son costosos)
+function renderOnFilter(){
+  clearTimeout(_renderTimer);
+  _renderTimer=setTimeout(()=>{
+    const filt=getFiltered();
+    const cc=document.getElementById('catalog-count');
+    if(cc)cc.textContent=fmt(filt.length)+' modelos';
+    if(view==='grid')renderGrid(filt);
+    else renderList(filt);
+    updateDrawerCounts();
+  },40);
+}
 
 function updateStats(){
   const views=rooms.reduce((s,r)=>s+(r.num_users||0),0);
@@ -1448,7 +1490,7 @@ function renderCarousels(){
   const container=document.getElementById('carousels-container');
   if(!container||!rooms.length)return;
   const filt=getFiltered();
-  // Top section carousel
+  // Top: salas con viewers, ya ordenadas por getFiltered(sort=viewers)
   const top=filt.filter(r=>r.num_users>0).slice(0,14);
   let html=`<div class="carousel-section">
     <div class="carousel-head">
@@ -1482,8 +1524,8 @@ function renderCarousels(){
 ═══════════════════════════════════════════ */
 function cardHtml(x,mode='grid'){
   const fv=favs.includes(x.username);
-  const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
-  const rank=sorted.findIndex(r=>r.username===x.username);
+  // usa el cache pre-computado en lugar de re-ordenar en cada card
+  const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
   const isTop3=rank>=0&&rank<3;
   const isHot=rank>=0&&rank<10&&!isTop3;
   const imgSrcs=[
@@ -1542,18 +1584,25 @@ function lazyLoadImages(){
       }
     });
   },{rootMargin:'200px'});
-  document.querySelectorAll('.crd-img[data-srcs]').forEach(img=>observer.observe(img));
+  // Solo observar imágenes que aún no tienen src cargado
+  document.querySelectorAll('.crd-img').forEach(img=>{
+    if(!img.complete||img.naturalWidth===0) observer.observe(img);
+  });
 }
 
 /* ═══════════════════════════════════════════
    RENDER GRID / LIST
 ═══════════════════════════════════════════ */
 function render(){
-  const filt=getFiltered();
-  const cc=document.getElementById('catalog-count');
-  if(cc)cc.textContent=`${fmt(filt.length)} modelos`;
-  if(view==='grid')renderGrid(filt);
-  else renderList(filt);
+  // Debounce: si el usuario hace clic rápido, espera 40ms antes de renderizar
+  clearTimeout(_renderTimer);
+  _renderTimer=setTimeout(()=>{
+    const filt=getFiltered();
+    const cc=document.getElementById('catalog-count');
+    if(cc)cc.textContent=`${fmt(filt.length)} modelos`;
+    if(view==='grid')renderGrid(filt);
+    else renderList(filt);
+  },40);
 }
 
 function renderGrid(r){
@@ -1677,22 +1726,22 @@ function setGender(btn,g){
     const match=b.getAttribute('onclick')||'';
     b.classList.toggle('active',match.includes(`'${g}'`)||(g===''&&match.includes("''")));
   });
-  renderCarousels();render();
+  renderCarousels();renderOnFilter();
 }
 function toggleFavFilter(btn){
   onlyFavs=!onlyFavs;
   document.querySelectorAll('#sd-fv,#md-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
-  render();
+  renderOnFilter();
 }
 function toggleHDFilter(btn){
   onlyHD=!onlyHD;
   document.querySelectorAll('#sd-hd,#md-hd,#tb-hd').forEach(b=>b.classList.toggle('active',onlyHD));
-  render();
+  renderOnFilter();
 }
 function toggleColFilter(btn){
   onlyCol=!onlyCol;
   document.getElementById('tb-co').classList.toggle('on',onlyCol);
-  render();
+  renderOnFilter();
 }
 function setAgeFilter(el,r){
   ageRange=ageRange===r?'':r;
@@ -1700,15 +1749,15 @@ function setAgeFilter(el,r){
     const match=c.getAttribute('onclick')||'';
     c.classList.toggle('active',match.includes(`'${ageRange}'`));
   });
-  render();
+  renderOnFilter();
 }
 function setTagFilter(tag){
   activeTag=activeTag===tag?'':tag;
   document.getElementById('search').value='';
-  render();
+  renderOnFilter();
 }
-document.getElementById('search').addEventListener('input',()=>render());
-document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;render();});
+document.getElementById('search').addEventListener('input',()=>renderOnFilter());
+document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;renderOnFilter();});
 document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render();});
 document.getElementById('th-f').addEventListener('click',()=>{sort='followers';render();});
 document.getElementById('th-a').addEventListener('click',()=>{sort='age_asc';render();});
