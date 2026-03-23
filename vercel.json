@@ -1,15 +1,5 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "framework": "nextjs",
-  "functions": {
-    "api/rooms.js":        { "runtime": "edge" },
-    "api/history.js":      { "runtime": "edge" },
-    "api/auth-check.js":   { "runtime": "edge" },
-    "api/best-hours.js":   { "runtime": "edge" },
-    "api/best-hours-all.js":{ "runtime": "edge" },
-    "api/statbate.js":     { "runtime": "edge" },
-    "api/push-subscribe.js":{ "runtime": "edge" },
-    "api/push-send.js":    { "maxDuration": 10 }
-  }
+  "framework": "nextjs"
 }
