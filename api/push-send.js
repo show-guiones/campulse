@@ -1,6 +1,6 @@
-export const config = { runtime: 'nodejs' };
+import webpush from 'web-push';
 
-const webpush = require('web-push');
+export const config = { runtime: 'nodejs' };
 
 webpush.setVapidDetails(
   process.env.VAPID_SUBJECT,
@@ -8,7 +8,7 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY
 );
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -19,21 +19,12 @@ module.exports = async function handler(req, res) {
   try {
     const { username, viewers, title, body, url } = req.body;
 
-    // Obtener todas las suscripciones que tienen esta modelo como favorita
     const subRes = await fetch(
       `${SUPABASE_URL}/rest/v1/push_subscriptions?favorites=cs.{"${username}"}`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      }
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
     const subscriptions = await subRes.json();
-
-    if (!subscriptions || !subscriptions.length) {
-      return res.json({ sent: 0 });
-    }
+    if (!subscriptions?.length) return res.json({ sent: 0 });
 
     const payload = JSON.stringify({
       title: title || `${username} está en vivo`,
@@ -48,27 +39,17 @@ module.exports = async function handler(req, res) {
 
     await Promise.all(subscriptions.map(async sub => {
       try {
-        await webpush.sendNotification({
-          endpoint: sub.endpoint,
-          keys: { p256dh: sub.p256dh, auth: sub.auth }
-        }, payload);
+        await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
         sent++;
       } catch (e) {
-        // Suscripción expirada — marcar para eliminar
-        if (e.statusCode === 410 || e.statusCode === 404) {
-          dead.push(sub.endpoint);
-        }
+        if (e.statusCode === 410 || e.statusCode === 404) dead.push(sub.endpoint);
       }
     }));
 
-    // Limpiar suscripciones muertas
     if (dead.length) {
       await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions?endpoint=in.(${dead.map(e => `"${e}"`).join(',')})`, {
         method: 'DELETE',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       });
     }
 
@@ -76,4 +57,4 @@ module.exports = async function handler(req, res) {
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
-};
+}
