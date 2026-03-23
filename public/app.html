@@ -216,11 +216,10 @@ header{
 .gender-nav{
   display:flex;align-items:center;gap:0;
   padding:0 1rem;
-  background:rgba(20,21,25,.97);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  background:var(--bg2);
   border-bottom:1px solid var(--bdr);
   overflow-x:auto;scrollbar-width:none;
-  flex-shrink:0;position:sticky;top:var(--hdr);z-index:50
+  flex-shrink:0;position:sticky;top:var(--hdr);z-index:20
 }
 .gender-nav::-webkit-scrollbar{display:none}
 .gnav-btn{
@@ -243,9 +242,8 @@ header{
   padding:.5rem 1rem;
   border-bottom:1px solid var(--bdr);
   overflow-x:auto;scrollbar-width:none;flex-shrink:0;
-  position:sticky;top:calc(var(--hdr) + 42px);z-index:49;
-  background:rgba(20,21,25,.97);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  position:sticky;top:calc(var(--hdr) + 42px);z-index:19;
+  background:var(--bg);
 }
 .filter-bar::-webkit-scrollbar{display:none}
 .srch{
@@ -323,7 +321,8 @@ header{
   border-radius:var(--radius);overflow:hidden;
   background:var(--surf);cursor:pointer;
   transition:transform .18s,box-shadow .18s;
-  position:relative;flex-shrink:0
+  position:relative;flex-shrink:0;
+  isolation:isolate;
 }
 .crd:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.5)}
 .crd-media{
@@ -672,7 +671,17 @@ header{
 /* ═══════════════════════════════════════════
    ADMIN PANEL
 ═══════════════════════════════════════════ */
-.admin-fab{display:none!important}
+.admin-fab{
+  position:fixed;bottom:calc(var(--bnav) + .6rem);right:.75rem;
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.25);font-size:.65rem;
+  display:flex;align-items:center;justify-content:center;
+  z-index:280;cursor:pointer;transition:all .2s;
+  backdrop-filter:blur(4px);
+  letter-spacing:.04em;font-weight:700;font-family:inherit
+}
+.admin-fab:hover{background:rgba(155,93,229,.2);border-color:rgba(155,93,229,.4);color:rgba(155,93,229,.8)}
 .admin-panel-bg{
   display:none;position:fixed;inset:0;z-index:490;
   background:rgba(0,0,0,.8);backdrop-filter:blur(6px);
@@ -1067,7 +1076,8 @@ header{
   .modal-hero{height:250px}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
-  .filter-bar{padding:.4rem .7rem;top:calc(var(--hdr) + 38px)}
+  .filter-bar{padding:.4rem .7rem;top:calc(46px + 36px);background:var(--bg)}
+  .gender-nav{top:46px;background:var(--bg2)}
   .gender-nav{padding:0 .7rem}
   .toast{bottom:calc(var(--bnav) + .65rem)}
 }
@@ -1521,6 +1531,9 @@ header{
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ADMIN FAB — subtle -->
+<button class="admin-fab" id="admin-fab" onclick="openAdminPanel()" title="Admin">✦</button>
 
 <!-- ADMIN PANEL -->
 <div class="admin-panel-bg" id="admin-panel-bg" onclick="closeAdminPanel(event)">
@@ -2481,17 +2494,6 @@ async function loadStatbateIncome(username){
 ═══════════════════════════════════════════ */
 let _adminSecret='';
 let _adminUnlocked=false;
-
-// Logo secret tap: 5 clicks to open admin
-let _adminTaps=0,_adminTapTimer=null;
-function _adminTap(){
-  _adminTaps++;
-  clearTimeout(_adminTapTimer);
-  _adminTapTimer=setTimeout(()=>{_adminTaps=0;},1800);
-  if(_adminTaps>=5){_adminTaps=0;openAdminPanel();}
-}
-// Attach to logo
-document.querySelector('.logo').addEventListener('click',_adminTap);
 
 function openAdminPanel(){
   document.getElementById('admin-panel-bg').classList.add('open');
