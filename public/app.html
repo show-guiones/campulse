@@ -1682,13 +1682,12 @@ function cardHtml(x,mode='grid'){
   const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
   const isTop3=rank>=0&&rank<3;
   const isHot=rank>=0&&rank<10&&!isTop3;
+  // mmcdn — fuente confiable
   const imgSrcs=[
-    x.image_url,
     `https://thumb.live.mmcdn.com/riw/${x.username}.jpg`,
-    `https://thumb.live.mmcdn.com/ri/${x.username}.jpg`,
-    `https://roomimg.stream.highwebmedia.com/ri/${x.username}.jpg`
-  ].filter(Boolean);
-  const imgTag=`<img class="crd-img" data-srcs='${JSON.stringify(imgSrcs)}' data-t="0" src="${imgSrcs[0]||''}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+    `https://thumb.live.mmcdn.com/ri/${x.username}.jpg`
+  ];
+  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
   return `<article class="crd" onclick="openMod('${x.username}')">
   <div class="crd-media">
@@ -1710,38 +1709,39 @@ function cardHtml(x,mode='grid'){
 </article>`;
 }
 
-function imgFallback(img){
-  const srcs=JSON.parse(img.dataset.srcs||'[]');
+function modalImgFallback(img){
+  const u=img.dataset.u||img.alt;
+  const srcs=[
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`
+  ];
   const t=parseInt(img.dataset.t||0)+1;
-  if(t<srcs.length){img.dataset.t=t;img.src=srcs[t];}
-  else{
+  if(t<srcs.length){img.dataset.t=t;img.src=srcs[t]+'?t='+Date.now();}
+  else{img.style.opacity='0';}
+}
+function imgFallback(img){
+  const u=img.dataset.u||img.alt;
+  const srcs=[
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`
+  ];
+  const t=parseInt(img.dataset.t||0)+1;
+  if(t<srcs.length){
+    img.dataset.t=t;
+    img.src=srcs[t];
+  } else {
     const ph=document.createElement('div');
     ph.className='crd-ph';
-    ph.textContent=img.alt.substring(0,2).toUpperCase();
+    ph.textContent=u.substring(0,2).toUpperCase();
     img.replaceWith(ph);
   }
 }
 
-// Intersection observer for lazy loading
+// Intersection observer — no lazy needed, src ya está seteado
 let observer;
 function lazyLoadImages(){
+  // src ya está en el HTML, solo observar para fade-in
   if(observer)observer.disconnect();
-  observer=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        const img=e.target;
-        if(img.dataset.srcs&&!img.src){
-          const srcs=JSON.parse(img.dataset.srcs);
-          img.src=srcs[0];
-        }
-        observer.unobserve(img);
-      }
-    });
-  },{rootMargin:'200px'});
-  // Solo observar imágenes que aún no tienen src cargado
-  document.querySelectorAll('.crd-img').forEach(img=>{
-    if(!img.complete||img.naturalWidth===0) observer.observe(img);
-  });
 }
 
 /* ═══════════════════════════════════════════
@@ -1824,9 +1824,8 @@ function startLivePreview(x){
   const pill=document.getElementById('m-live-pill');
   const u=x.username;
   const srcs=[
-    `https://roomimg.stream.highwebmedia.com/ri/${u}.jpg`,
-    `https://thumb.live.mmcdn.com/ri/${u}.jpg`,
-    `https://thumb.live.mmcdn.com/riw/${u}.jpg`
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`
   ];
   if(x.num_users>0){
     // Live pill badge
@@ -1834,8 +1833,9 @@ function startLivePreview(x){
     wrap.innerHTML=`
       <div class="live-preview-wrap" style="cursor:pointer">
         <img class="live-preview-img" id="live-img"
-          src="${srcs[0]}?t=${Date.now()}" alt="${u}" data-t="0"
-          onerror="const t=parseInt(this.dataset.t||0)+1;const s=${JSON.stringify(srcs)};if(t<s.length){this.dataset.t=t;this.src=s[t]+'?t='+Date.now();}else{this.style.opacity='0';}">
+          src="${srcs[0]}?t=${Date.now()}" alt="${u}"
+          data-u="${u}" data-t="0"
+          onerror="modalImgFallback(this)">
         <div class="live-timer-badge">
           <span class="live-timer-dot"></span>
           LIVE · <span id="live-timer">30s</span>
@@ -2063,7 +2063,7 @@ async function loadModelReport(room,username){
 
   // Profile
   const img=document.getElementById('rp-img');
-  img.src=room?.image_url||`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
+  img.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
   img.onerror=()=>{img.src='';img.style.display='none';};
   el('rp-name',room?.display_name||u||'—');
   el('rp-meta',`@${u}${room?.country?' · '+room.country:''}${room?.age?' · '+room.age+' años':''}`);
