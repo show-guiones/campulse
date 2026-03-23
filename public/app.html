@@ -672,17 +672,7 @@ header{
 /* ═══════════════════════════════════════════
    ADMIN PANEL
 ═══════════════════════════════════════════ */
-.admin-fab{
-  position:fixed;bottom:calc(var(--bnav) + .85rem);right:1rem;
-  width:44px;height:44px;border-radius:50%;
-  background:var(--purple);border:none;
-  color:#fff;font-size:1.1rem;
-  display:none;align-items:center;justify-content:center;
-  box-shadow:0 4px 18px rgba(155,93,229,.5);
-  z-index:280;cursor:pointer;transition:all .18s
-}
-.admin-fab.show{display:flex}
-.admin-fab:hover{transform:scale(1.08)}
+.admin-fab{display:none!important}
 .admin-panel-bg{
   display:none;position:fixed;inset:0;z-index:490;
   background:rgba(0,0,0,.8);backdrop-filter:blur(6px);
@@ -1531,9 +1521,6 @@ header{
 </div>
 
 <div class="toast" id="toast"></div>
-
-<!-- ADMIN FAB -->
-<button class="admin-fab" id="admin-fab" onclick="openAdminPanel()" title="Admin Featured">⭐</button>
 
 <!-- ADMIN PANEL -->
 <div class="admin-panel-bg" id="admin-panel-bg" onclick="closeAdminPanel(event)">
@@ -2495,8 +2482,16 @@ async function loadStatbateIncome(username){
 let _adminSecret='';
 let _adminUnlocked=false;
 
-// Show FAB only when ADMIN_SECRET env var is available (always show for now, login protects it)
-document.getElementById('admin-fab').classList.add('show');
+// Logo secret tap: 5 clicks to open admin
+let _adminTaps=0,_adminTapTimer=null;
+function _adminTap(){
+  _adminTaps++;
+  clearTimeout(_adminTapTimer);
+  _adminTapTimer=setTimeout(()=>{_adminTaps=0;},1800);
+  if(_adminTaps>=5){_adminTaps=0;openAdminPanel();}
+}
+// Attach to logo
+document.querySelector('.logo').addEventListener('click',_adminTap);
 
 function openAdminPanel(){
   document.getElementById('admin-panel-bg').classList.add('open');
