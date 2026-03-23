@@ -1,7 +1,11 @@
-﻿/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['jpeg.cpmimage.com', 'thumb.live.mmcdn.com'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'jpeg.cpmimage.com' },
+      { protocol: 'https', hostname: 'thumb.live.mmcdn.com' },
+      { protocol: 'https', hostname: 'roomimg.stream.highwebmedia.com' },
+    ],
   },
   async redirects() {
     return [
@@ -22,4 +26,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
