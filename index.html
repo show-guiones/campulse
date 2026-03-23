@@ -384,6 +384,15 @@ header{
    Imagen a pantalla completa, info superpuesta abajo
 ════════════════════════════════════════ */
 .grid-wrap{padding:.75rem .9rem;flex:1}
+.pinned-section{padding:.6rem .9rem 0}
+.pinned-section+.pinned-section{padding-top:.4rem}
+.pinned-hd{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.pinned-hd-title{font-size:.72rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em}
+.pinned-hd-count{font-size:.65rem;color:var(--txt3);background:var(--surf2);border:1px solid var(--bdr);border-radius:99px;padding:1px 7px}
+.pinned-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.55rem}
+.pinned-divider{height:1px;background:var(--bdr);margin:.6rem .9rem .2rem}
+.crd-featured-badge{position:absolute;bottom:5px;left:5px;background:rgba(224,64,251,.85);color:#fff;font-size:.52rem;font-weight:700;padding:2px 6px;border-radius:4px;backdrop-filter:blur(4px);text-transform:uppercase;letter-spacing:.04em}
+.crd-fav-badge{position:absolute;bottom:5px;left:5px;background:rgba(255,60,100,.85);color:#fff;font-size:.52rem;font-weight:700;padding:2px 6px;border-radius:4px;backdrop-filter:blur(4px)}
 .grid{
   /* Columnas que se adaptan — mínimo 130px */
   display:grid;
@@ -1113,6 +1122,9 @@ header{
       </div>
     </div>
 
+    <div id="featured-section" class="pinned-section" style="display:none"></div>
+    <div id="favs-section" class="pinned-section" style="display:none"></div>
+    <div class="pinned-divider" id="pinned-divider" style="display:none"></div>
     <div class="grid-wrap" id="gw"><div class="grid" id="gc-grid"></div></div>
     <div class="list-wrap" id="lw">
       <table class="list-tbl">
@@ -1421,13 +1433,48 @@ function renderHotZone(){
   }).join('');
 }
 
-function injectFeatured(f){
-  if(!FEATURED.length) return f;
-  const feat=[],rest=[];f.forEach(r=>FEATURED.includes(r.username)?feat.push(r):rest.push(r));
-  if(!feat.length) return f;
-  const result=[...rest];
-  feat.forEach(ft=>{const mp=Math.min(5,result.length);result.splice(Math.floor(Math.random()*(mp+1)),0,ft);});
-  return result;
+function injectFeatured(f){return f;}
+
+function buildCard(x,badge){
+  const gc={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'}[x.gender]||'var(--text3)';
+  const top3=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,3).map(r=>r.username);
+  const top10=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,10).map(r=>r.username);
+  const fv=favs.includes(x.username),isTop3=top3.includes(x.username),isHot=top10.includes(x.username)&&!isTop3;
+  const img=x.image_url
+    ?`<img class="crd-img" src="${x.image_url}" loading="lazy" alt="${x.username}" data-u="${x.username}" data-t="0" onerror="var u=this.dataset.u,s=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'],t=+this.dataset.t+1;t<s.length?(this.dataset.t=t,this.src=s[t]):this.closest('.crd-media').innerHTML='<div class=crd-ph><span>'+u.substring(0,2).toUpperCase()+'</span></div>';">`
+    :`<div class="crd-ph"><span>${(x.display_name||x.username).substring(0,2).toUpperCase()}</span></div>`;
+  const avgH=bestHoursMap[x.username];
+  let ctxBadge='';
+  if(avgH&&x.num_users>0){const pct=Math.round(((x.num_users-avgH)/avgH)*100);if(pct>=30)ctxBadge=`<div class="crd-ctx ctx-up">↑ Mejor sesión</div>`;else if(pct>=10)ctxBadge=`<div class="crd-ctx ctx-ok">↑ Por encima</div>`;else if(pct<=-20)ctxBadge=`<div class="crd-ctx ctx-low">Sesión tranquila</div>`;}
+  const pinnedBadge=badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
+  return `<article class="crd" onclick="openInCB('${x.username}')">
+  <div class="crd-media" style="--gc:${gc}">
+    ${img}
+    <div class="crd-overlay"></div>
+    <div class="crd-top">
+      <div class="crd-badges">${isTop3?'<span class="bdg bdg-top">TOP</span>':''}${isHot?'<span class="bdg bdg-fire">🔥</span>':''}${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}${x.is_new?'<span class="bdg bdg-new">NEW</span>':''}</div>
+      <button class="crd-fav ${fv?'is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
+    </div>
+    ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
+    ${ctxBadge}
+    ${pinnedBadge}
+  </div>
+  <div class="crd-body">
+    <div class="crd-name">${x.display_name||x.username}</div>
+    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'—'}${x.is_hd?' · <span class="crd-hd-tag">HD</span>':''}</div>
+  </div>
+</article>`;
+}
+
+function renderPinnedSection(sectionId,items,title,icon,badgeType){
+  const el=document.getElementById(sectionId);
+  const divider=document.getElementById('pinned-divider');
+  if(!el) return;
+  const online=items.filter(x=>x&&x.num_users>0);
+  if(!online.length){el.style.display='none';return;}
+  el.style.display='block';
+  if(divider) divider.style.display='block';
+  el.innerHTML=`<div class="pinned-hd"><span class="pinned-hd-title">${icon} ${title}</span><span class="pinned-hd-count">${online.length} en vivo</span></div><div class="pinned-grid">${online.map(x=>buildCard(x,badgeType)).join('')}</div>`;
 }
 function getFiltered(){
   const q=document.getElementById('search').value.toLowerCase();
@@ -1485,47 +1532,28 @@ function updateCountryFilter(){
   ['country-filter-list','fd-country-filter-list'].forEach(id=>{const el=document.getElementById(id);if(!el) return;el.innerHTML=top.map(([code,cnt])=>`<button class="g-btn${activeCountry===code?' active':''}" onclick="setCountryFilter('${code}')" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:5px"><span>${F[code]||'🌐'}</span><span>${code}</span></span><span class="g-cnt">${cnt}</span></button>`).join('');});
 }
 function render(){
-  const r=injectFeatured(getFiltered());
-  document.getElementById('s-show').textContent=fmt(r.length);
+  // Featured section
+  const featRooms=FEATURED.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+  renderPinnedSection('featured-section',featRooms,'Destacadas','📌','featured');
+  // Favs section
+  const favRooms=favs.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+  renderPinnedSection('favs-section',favRooms,'Mis Favoritas','♥','fav');
+  // Show divider only if any pinned section is visible
+  const anyPinned=featRooms.some(x=>x&&x.num_users>0)||favRooms.some(x=>x&&x.num_users>0);
+  const divider=document.getElementById('pinned-divider');
+  if(divider) divider.style.display=anyPinned?'block':'none';
+  // Main grid — exclude already shown featured & favs
+  const pinnedUsernames=new Set([...FEATURED,...favs]);
+  const r=getFiltered().filter(x=>!pinnedUsernames.has(x.username));
+  document.getElementById('s-show').textContent=fmt(r.length+featRooms.filter(x=>x&&x.num_users>0).length+favRooms.filter(x=>x&&x.num_users>0).length);
   view==='grid'?renderGrid(r):renderList(r);
 }
 function renderGrid(r){
   const c=document.getElementById('gc-grid');
   if(!r.length){c.innerHTML='<div class="empty"><div class="empty-ico">🔍</div><div>Sin resultados</div></div>';return;}
-  const top3=[...rooms].filter(x=>x.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,3).map(x=>x.username);
-  const top10=[...rooms].filter(x=>x.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0)).slice(0,10).map(x=>x.username);
   c.innerHTML=r.map(x=>{
     if(x._forced&&!x.num_users) return '';
-    const fv=favs.includes(x.username),isTop3=top3.includes(x.username),isHot=top10.includes(x.username)&&!isTop3;
-    const gc={f:'var(--female)',m:'var(--male)',c:'var(--couple)',t:'var(--trans)'}[x.gender]||'var(--text3)';
-    const img=x.image_url
-      ?`<img class="crd-img" src="${x.image_url}" loading="lazy" alt="${x.username}" data-u="${x.username}" data-t="0" onerror="var u=this.dataset.u,s=['https://thumb.live.mmcdn.com/riw/'+u+'.jpg','https://thumb.live.mmcdn.com/ri/'+u+'.jpg','https://roomimg.stream.highwebmedia.com/ri/'+u+'.jpg'],t=+this.dataset.t+1;t<s.length?(this.dataset.t=t,this.src=s[t]):this.closest('.crd-media').innerHTML='<div class=crd-ph><span>'+u.substring(0,2).toUpperCase()+'</span></div>';">`
-      :`<div class="crd-ph"><span>${(x.display_name||x.username).substring(0,2).toUpperCase()}</span></div>`;
-    // ── Indicador contextual ──
-    let ctxBadge='';
-    const avgH=bestHoursMap[x.username];
-    if(avgH&&x.num_users>0){
-      const pct=Math.round(((x.num_users-avgH)/avgH)*100);
-      if(pct>=30) ctxBadge=`<div class="crd-ctx ctx-up">↑ Mejor sesión</div>`;
-      else if(pct>=10) ctxBadge=`<div class="crd-ctx ctx-ok">↑ Por encima</div>`;
-      else if(pct<=-20) ctxBadge=`<div class="crd-ctx ctx-low">Sesión tranquila</div>`;
-    }
-    return `<article class="crd" onclick="openInCB('${x.username}')">
-  <div class="crd-media" style="--gc:${gc}">
-    ${img}
-    <div class="crd-overlay"></div>
-    <div class="crd-top">
-      <div class="crd-badges">${isTop3?'<span class="bdg bdg-top">TOP</span>':''}${isHot?'<span class="bdg bdg-fire">🔥</span>':''}${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}${x.is_new?'<span class="bdg bdg-new">NEW</span>':''}</div>
-      <button class="crd-fav ${fv?'is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
-    </div>
-    ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
-    ${ctxBadge}
-  </div>
-  <div class="crd-body">
-    <div class="crd-name">${x.display_name||x.username}</div>
-    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'—'}${x.is_hd?' · <span class="crd-hd-tag">HD</span>':''}</div>
-  </div>
-</article>`;
+    return buildCard(x,'');
   }).filter(Boolean).join('');
 }
 function renderList(r){
