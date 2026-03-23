@@ -389,6 +389,15 @@ header{
    CATALOG GRID SECTION
 ═══════════════════════════════════════════ */
 .catalog-section{padding:.85rem 1rem .5rem}
+.pinned-section{padding:.7rem 1rem 0}
+.pinned-section+.pinned-section{padding-top:.3rem}
+.pinned-hd{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem}
+.pinned-hd-title{font-size:.75rem;font-weight:700;color:var(--txt);text-transform:uppercase;letter-spacing:.06em}
+.pinned-hd-count{font-size:.63rem;color:var(--txt3);background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-radius:99px;padding:1px 8px}
+.pinned-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.55rem}
+.pinned-divider{height:1px;background:var(--bdr);margin:.5rem 1rem}
+.crd-featured-badge{position:absolute;bottom:5px;left:5px;background:rgba(224,64,251,.9);color:#fff;font-size:.52rem;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em;pointer-events:none}
+.crd-fav-badge{position:absolute;bottom:5px;left:5px;background:rgba(255,60,100,.9);color:#fff;font-size:.52rem;font-weight:700;padding:2px 7px;border-radius:4px;pointer-events:none}
 .catalog-head{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:.7rem
@@ -1181,6 +1190,9 @@ header{
     </div>
 
     <!-- Carousels by tag — rendered dynamically -->
+    <div id="featured-section" class="pinned-section" style="display:none"></div>
+    <div id="favs-section" class="pinned-section" style="display:none"></div>
+    <div class="pinned-divider" id="pinned-divider" style="display:none"></div>
     <div id="carousels-container"></div>
 
     <!-- Catalog (full grid) -->
@@ -1432,6 +1444,19 @@ header{
 const API='/api/rooms';
 const LIMIT=3000; // increased from 500
 let rooms=[],favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
+let FEATURED=[];
+const FEATURED_PROFILES={};
+async function loadFeatured(){
+  try{
+    const res=await fetch('/api/featured-models');
+    const data=await res.json();
+    if(Array.isArray(data)&&data.length>0){
+      data.sort((a,b)=>a.position-b.position);
+      FEATURED=data.map(d=>d.username);
+      data.forEach(d=>{if(d.label)FEATURED_PROFILES[d.username]={label:d.label};});
+    }
+  }catch(e){console.warn('featured:',e);}
+}
 let gender='',onlyFavs=false,onlyHD=false,onlyCol=false,activeTag='',activeCountry='',ageRange='';
 let sort='viewers',view='grid',maxV=1,active=null;
 let loaded=false;
@@ -1489,6 +1514,7 @@ function silentUpdate(){
 }
 
 async function load(){
+  await loadFeatured();
   const btn=document.getElementById('ref-btn');
   btn.classList.add('spin');
   if(!loaded) showSkeleton();
@@ -1638,11 +1664,59 @@ function updateDrawerCounts(){
 }
 
 /* ═══════════════════════════════════════════
+   PINNED SECTIONS — featured & favs
+═══════════════════════════════════════════ */
+function renderPinnedSection(sectionId,items,title,icon,badgeType){
+  const el=document.getElementById(sectionId);
+  const divider=document.getElementById('pinned-divider');
+  if(!el)return;
+  const online=items.filter(x=>x&&x.num_users>0);
+  if(!online.length){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML=`<div class="pinned-hd"><span class="pinned-hd-title">${icon} ${title}</span><span class="pinned-hd-count">${online.length} en vivo</span></div><div class="pinned-grid">${online.map(x=>pinnedCardHtml(x,badgeType)).join('')}</div>`;
+  lazyLoadImages();
+}
+function pinnedCardHtml(x,badge){
+  const fv=favs.includes(x.username);
+  const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
+  const isTop3=rank>=0&&rank<3;
+  const isHot=rank>=0&&rank<10&&!isTop3;
+  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="https://thumb.live.mmcdn.com/riw/${x.username}.jpg" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+  const pinnedBadge=badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
+  return `<article class="crd" onclick="openMod('${x.username}')">
+  <div class="crd-media">
+    ${imgTag}
+    <div class="crd-overlay"></div>
+    <div class="crd-badges">
+      ${isTop3?'<span class="bdg bdg-top">TOP</span>':''}
+      ${isHot?'<span class="bdg bdg-fire">🔥</span>':''}
+      ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
+    </div>
+    <button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
+    ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
+    ${pinnedBadge}
+  </div>
+  <div class="crd-body">
+    <div class="crd-name">${x.display_name||x.username}</div>
+    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+  </div>
+</article>`;
+}
+
+/* ═══════════════════════════════════════════
    CAROUSELS — tag rows
 ═══════════════════════════════════════════ */
 function renderCarousels(){
   const container=document.getElementById('carousels-container');
   if(!container||!rooms.length)return;
+  // Pinned sections
+  const featRooms=FEATURED.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+  renderPinnedSection('featured-section',featRooms,'Destacadas','📌','featured');
+  const favRooms=favs.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+  renderPinnedSection('favs-section',favRooms,'Mis Favoritas','♥','fav');
+  const anyPinned=featRooms.some(x=>x&&x.num_users>0)||favRooms.some(x=>x&&x.num_users>0);
+  const divider=document.getElementById('pinned-divider');
+  if(divider)divider.style.display=anyPinned?'block':'none';
   const filt=getFiltered();
   // Top: salas con viewers, ya ordenadas por getFiltered(sort=viewers)
   const top=filt.filter(r=>r.num_users>0).slice(0,14);
@@ -1748,10 +1822,10 @@ function lazyLoadImages(){
    RENDER GRID / LIST
 ═══════════════════════════════════════════ */
 function render(){
-  // Debounce: si el usuario hace clic rápido, espera 40ms antes de renderizar
   clearTimeout(_renderTimer);
   _renderTimer=setTimeout(()=>{
-    const filt=getFiltered();
+    const pinnedUsernames=new Set([...FEATURED,...favs]);
+    const filt=getFiltered().filter(x=>!pinnedUsernames.has(x.username));
     const cc=document.getElementById('catalog-count');
     if(cc)cc.textContent=`${fmt(filt.length)} modelos`;
     if(view==='grid')renderGrid(filt);
