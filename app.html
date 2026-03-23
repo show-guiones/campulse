@@ -1,0 +1,2283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>CampulseHub — Explora en Vivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════════ */
+:root{
+  --bg:       #0c0d10;
+  --bg2:      #141519;
+  --bg3:      #1a1c22;
+  --surf:     #1f2128;
+  --surf2:    #252830;
+  --bdr:      rgba(255,255,255,.07);
+  --bdr2:     rgba(255,255,255,.12);
+  --txt:      #f0f0f2;
+  --txt2:     #9499a8;
+  --txt3:     #5a5f70;
+  --hot:      #ff2a6d;
+  --neon:     #00e5ff;
+  --gold:     #ffc840;
+  --grn:      #00e897;
+  --purple:   #9b5de5;
+  --female:   #ff2a6d;
+  --male:     #2a8cff;
+  --couple:   #ff9800;
+  --trans:    #ab47bc;
+  --hdr:      52px;
+  --bnav:     60px;
+  --radius:   12px;
+  --radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+img{display:block}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surf2);border-radius:4px}
+
+/* ═══════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════ */
+header{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--hdr);z-index:300;
+  background:rgba(12,13,16,.92);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;
+  padding:0 1rem;gap:.75rem;
+}
+.logo{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.logo-icon{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--hot),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:800;color:#fff;letter-spacing:-.02em
+}
+.logo-name{font-size:1.05rem;font-weight:800;letter-spacing:-.03em;white-space:nowrap}
+.logo-name em{color:var(--neon);font-style:normal}
+
+/* Live badge */
+.live-badge{
+  display:flex;align-items:center;gap:.3rem;
+  background:rgba(255,42,109,.12);border:1px solid rgba(255,42,109,.25);
+  border-radius:20px;padding:2px 8px;font-size:.65rem;font-weight:700;
+  color:var(--hot);letter-spacing:.04em;flex-shrink:0;white-space:nowrap
+}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--hot);animation:pulse 1.6s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* Tabs center */
+.hdr-tabs{flex:1;display:flex;justify-content:center}
+.dtabs{
+  display:flex;gap:2px;
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:10px;padding:3px
+}
+.dtab{
+  display:flex;align-items:center;gap:.35rem;
+  background:none;border:none;color:var(--txt2);
+  font-size:.72rem;font-weight:600;
+  padding:.3rem .8rem;border-radius:7px;
+  transition:all .18s;letter-spacing:.02em
+}
+.dtab svg{width:12px;height:12px;opacity:.6}
+.dtab.active{background:var(--hot);color:#fff}
+.dtab.active svg{opacity:1}
+.dtab:hover:not(.active){background:var(--surf2);color:var(--txt)}
+
+.hdr-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+/* Hamburger */
+.ham-btn{
+  width:36px;height:36px;background:var(--surf);
+  border:1px solid var(--bdr);border-radius:9px;
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:4px;padding:8px
+}
+.ham-btn span{width:16px;height:2px;background:var(--txt2);border-radius:2px;transition:all .2s;display:block}
+.ham-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.ham-btn.open span:nth-child(2){opacity:0}
+.ham-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.ref-btn{
+  width:36px;height:36px;background:var(--surf);
+  border:1px solid var(--bdr);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s
+}
+.ref-btn:hover{background:var(--surf2)}
+.ref-btn svg{width:14px;height:14px;stroke:var(--txt2)}
+.ref-btn.spin svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.page{
+  padding-top:var(--hdr);
+  min-height:100vh;
+  display:flex;
+}
+.page-explore{display:flex;flex:1;overflow:hidden;position:relative}
+.page-explore.hide{display:none}
+.model-view{
+  flex:1;overflow-y:auto;
+  padding-top:var(--hdr);
+  display:none
+}
+.model-view.show{display:flex;flex-direction:column}
+
+/* ═══════════════════════════════════════════
+   SIDE DRAWER (desktop sidebar / mobile drawer)
+═══════════════════════════════════════════ */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:350;backdrop-filter:blur(4px)}
+.drawer-overlay.open{display:block}
+.drawer{
+  width:220px;min-width:220px;
+  height:calc(100vh - var(--hdr));
+  background:var(--bg2);
+  border-right:1px solid var(--bdr);
+  overflow-y:auto;overflow-x:hidden;
+  flex-shrink:0;
+  position:sticky;top:var(--hdr);
+  padding:.75rem 0;
+}
+.drawer-sec{padding:0 .75rem;margin-bottom:.5rem}
+.drawer-lbl{
+  font-size:.6rem;font-weight:700;
+  color:var(--txt3);letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:0 .15rem;margin-bottom:.4rem
+}
+.g-strip{display:flex;flex-direction:column;gap:2px}
+.g-btn{
+  width:100%;background:none;border:none;
+  color:var(--txt2);font-size:.78rem;font-weight:500;
+  padding:.38rem .6rem;border-radius:7px;
+  text-align:left;display:flex;align-items:center;justify-content:space-between;
+  transition:all .15s
+}
+.g-btn:hover,.g-btn.active{background:rgba(255,255,255,.06);color:var(--txt)}
+.g-btn .gcnt{
+  font-size:.6rem;background:var(--surf2);
+  border-radius:10px;padding:1px 6px;color:var(--txt3)
+}
+.g-btn.active .gcnt{background:var(--hot);color:#fff}
+.drawer-div{height:1px;background:var(--bdr);margin:.5rem .75rem}
+.filter-chip{
+  display:flex;align-items:center;gap:.35rem;
+  background:none;border:none;
+  color:var(--txt2);font-size:.76rem;font-weight:500;
+  padding:.35rem .6rem;border-radius:7px;
+  width:100%;text-align:left;transition:all .15s
+}
+.filter-chip:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.filter-chip.active{background:rgba(255,42,109,.1);color:var(--hot)}
+.age-chips{display:flex;flex-wrap:wrap;gap:3px;padding:.15rem 0}
+.age-chip{
+  font-size:.65rem;background:var(--surf);
+  border:1px solid var(--bdr);border-radius:20px;
+  padding:2px 8px;color:var(--txt2);cursor:pointer;
+  transition:all .15s
+}
+.age-chip:hover,.age-chip.active{background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);color:var(--neon)}
+.mini-stat-row{display:flex;justify-content:space-between;align-items:center;padding:.2rem 0;font-size:.7rem}
+.mini-stat-row span:first-child{color:var(--txt3)}
+.mini-stat-row span:last-child{font-weight:600;color:var(--txt2)}
+
+/* Mobile drawer */
+.mob-drawer{
+  position:fixed;left:0;top:var(--hdr);bottom:0;
+  width:260px;max-width:85vw;
+  background:var(--bg2);border-right:1px solid var(--bdr);
+  z-index:360;overflow-y:auto;
+  transform:translateX(-100%);
+  transition:transform .25s ease;
+  padding:.75rem 0
+}
+.mob-drawer.open{transform:translateX(0)}
+
+/* ═══════════════════════════════════════════
+   CONTENT AREA
+═══════════════════════════════════════════ */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;min-width:0}
+
+/* ═══════════════════════════════════════════
+   GENDER NAV BAR (top of content - Stripchat style)
+═══════════════════════════════════════════ */
+.gender-nav{
+  display:flex;align-items:center;gap:0;
+  padding:0 1rem;
+  background:var(--bg2);
+  border-bottom:1px solid var(--bdr);
+  overflow-x:auto;scrollbar-width:none;
+  flex-shrink:0;position:sticky;top:0;z-index:10
+}
+.gender-nav::-webkit-scrollbar{display:none}
+.gnav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;
+  color:var(--txt2);font-size:.72rem;font-weight:600;
+  padding:.65rem .9rem;border-bottom:2px solid transparent;
+  transition:all .18s;white-space:nowrap;flex-shrink:0
+}
+.gnav-btn:hover{color:var(--txt)}
+.gnav-btn.active{color:var(--txt);border-bottom-color:var(--hot)}
+.gnav-btn .gnav-ico{font-size:1.1rem;line-height:1}
+.gnav-div{width:1px;height:24px;background:var(--bdr);flex-shrink:0;margin:0 .25rem}
+
+/* ═══════════════════════════════════════════
+   FILTER BAR
+═══════════════════════════════════════════ */
+.filter-bar{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.5rem 1rem;
+  border-bottom:1px solid var(--bdr);
+  overflow-x:auto;scrollbar-width:none;flex-shrink:0
+}
+.filter-bar::-webkit-scrollbar{display:none}
+.srch{
+  display:flex;align-items:center;
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:8px;padding:0 .6rem;gap:.4rem;flex-shrink:0
+}
+.srch input{
+  background:none;border:none;outline:none;
+  color:var(--txt);font-family:inherit;font-size:.75rem;
+  width:130px;height:30px;transition:width .2s
+}
+.srch input::placeholder{color:var(--txt3)}
+.srch input:focus{width:180px}
+.srch-ico svg{width:11px;height:11px;stroke:var(--txt3)}
+.fb-sep{width:1px;height:18px;background:var(--bdr);flex-shrink:0}
+.qchip{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:20px;padding:3px 10px;
+  color:var(--txt2);font-size:.7rem;font-weight:600;
+  white-space:nowrap;transition:all .15s;flex-shrink:0
+}
+.qchip:hover{border-color:var(--bdr2);color:var(--txt)}
+.qchip.on{background:rgba(255,42,109,.12);border-color:rgba(255,42,109,.4);color:var(--hot)}
+.sort-sel{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:8px;color:var(--txt2);font-family:inherit;
+  font-size:.7rem;padding:3px 8px;outline:none;flex-shrink:0;height:30px
+}
+.view-toggle{display:flex;gap:2px;flex-shrink:0}
+.vtb{
+  width:28px;height:28px;background:var(--surf);
+  border:1px solid var(--bdr);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s
+}
+.vtb.on{background:var(--surf2);border-color:var(--bdr2)}
+.vtb svg{width:11px;height:11px;fill:var(--txt3)}
+.vtb.on svg{fill:var(--txt)}
+
+/* ═══════════════════════════════════════════
+   CAROUSEL SECTION (tag rows)
+═══════════════════════════════════════════ */
+.carousel-section{padding:.85rem 0 .25rem;border-bottom:1px solid var(--bdr)}
+.carousel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1rem;margin-bottom:.6rem
+}
+.carousel-title{
+  font-size:.8rem;font-weight:700;
+  display:flex;align-items:center;gap:.4rem;color:var(--txt)
+}
+.carousel-tag-badge{
+  font-size:.55rem;font-weight:700;
+  background:rgba(255,42,109,.15);
+  border:1px solid rgba(255,42,109,.3);
+  color:var(--hot);border-radius:10px;padding:1px 6px;
+  letter-spacing:.04em;text-transform:uppercase
+}
+.carousel-see-all{
+  font-size:.68rem;color:var(--txt3);background:none;border:none;
+  font-weight:500;transition:color .15s;display:flex;align-items:center;gap:.2rem
+}
+.carousel-see-all:hover{color:var(--neon)}
+.carousel-scroll{
+  display:flex;gap:.55rem;
+  overflow-x:auto;scrollbar-width:none;
+  padding:0 1rem .4rem
+}
+.carousel-scroll::-webkit-scrollbar{display:none}
+
+/* ═══════════════════════════════════════════
+   CARD
+═══════════════════════════════════════════ */
+.crd{
+  border-radius:var(--radius);overflow:hidden;
+  background:var(--surf);cursor:pointer;
+  transition:transform .18s,box-shadow .18s;
+  position:relative;flex-shrink:0
+}
+.crd:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.crd-media{
+  position:relative;width:100%;padding-top:133%;
+  background:var(--surf2);overflow:hidden
+}
+.carousel-scroll .crd{width:140px}
+.carousel-scroll .crd .crd-media{padding-top:0;height:186px;width:140px}
+.crd-img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .3s
+}
+.crd:hover .crd-img{will-change:transform}
+.carousel-scroll .crd .crd-img{position:relative;inset:auto;height:186px}
+.crd:hover .crd-img{transform:scale(1.04)}
+.crd-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.2) 40%,transparent 70%)
+}
+.crd-ph{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:var(--surf2);font-size:1.8rem;color:var(--txt3)
+}
+.carousel-scroll .crd .crd-ph{position:relative;height:186px;font-size:1.5rem}
+
+/* badges */
+.crd-badges{position:absolute;top:.4rem;left:.4rem;display:flex;gap:.2rem;flex-wrap:wrap}
+.bdg{
+  font-size:.5rem;font-weight:800;padding:2px 5px;
+  border-radius:4px;letter-spacing:.03em;backdrop-filter:blur(6px)
+}
+.bdg-top{background:linear-gradient(135deg,var(--gold),#ff8c00);color:#000}
+.bdg-fire{background:rgba(0,0,0,.5);color:var(--hot)}
+.bdg-hd{background:rgba(0,229,255,.2);border:1px solid rgba(0,229,255,.4);color:var(--neon)}
+.bdg-new{background:rgba(0,232,148,.2);border:1px solid rgba(0,232,148,.4);color:var(--grn)}
+
+/* fav btn */
+.crd-fav{
+  position:absolute;top:.4rem;right:.4rem;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(0,0,0,.5);border:none;
+  color:rgba(255,255,255,.4);font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;backdrop-filter:blur(4px)
+}
+.crd-fav:hover,.crd-fav.is-fav{color:var(--hot);background:rgba(255,42,109,.25)}
+
+/* viewers badge */
+.crd-vw{
+  position:absolute;left:.4rem;bottom:.4rem;
+  display:flex;align-items:center;gap:.25rem;
+  background:rgba(0,0,0,.65);border-radius:12px;
+  padding:2px 7px;font-size:.6rem;font-weight:700;
+  color:#fff
+}
+.crd-vw-dot{width:4px;height:4px;border-radius:50%;background:var(--hot);box-shadow:0 0 4px var(--hot)}
+
+/* card body */
+.crd-body{padding:.45rem .55rem .55rem}
+.crd-name{
+  font-size:.72rem;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)
+}
+.crd-sub{font-size:.58rem;color:var(--txt3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ═══════════════════════════════════════════
+   CATALOG GRID SECTION
+═══════════════════════════════════════════ */
+.catalog-section{padding:.85rem 1rem .5rem}
+.catalog-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:.7rem
+}
+.catalog-title{font-size:.8rem;font-weight:700;color:var(--txt)}
+.catalog-count{font-size:.68rem;color:var(--txt3);font-weight:500}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:.55rem
+}
+/* Grid card — fill 100% of column */
+.grid .crd{width:100%}
+.grid .crd .crd-media{padding-top:133%}
+.grid .crd .crd-img{position:absolute}
+.grid .crd .crd-ph{position:absolute;font-size:1.8rem}
+
+.list-wrap{overflow-x:auto}
+.list-tbl{width:100%;border-collapse:collapse;min-width:520px;font-size:.75rem}
+.list-tbl th{padding:.55rem .85rem;border-bottom:1px solid var(--bdr);color:var(--txt3);font-weight:600;font-size:.65rem;text-align:left;text-transform:uppercase;letter-spacing:.06em}
+.list-tbl td{padding:.5rem .85rem;border-bottom:1px solid var(--bdr);vertical-align:middle}
+.list-tbl tr:hover td{background:var(--surf)}
+.l-av{width:32px;height:32px;border-radius:8px;object-fit:cover;background:var(--surf2)}
+.l-av-ph{width:32px;height:32px;border-radius:8px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.l-name{font-weight:600;font-size:.78rem;color:var(--txt)}
+.l-sub{font-size:.62rem;color:var(--txt3)}
+.vbar-w{width:50px;height:2px;background:var(--surf3);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:5px}
+.vbar-f{height:100%;background:var(--hot);border-radius:2px}
+.gpill{display:inline-block;font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:10px;letter-spacing:.03em}
+.gp-f{background:rgba(255,42,109,.15);color:var(--hot)}
+.gp-m{background:rgba(42,140,255,.15);color:var(--male)}
+.gp-c{background:rgba(255,152,0,.15);color:var(--couple)}
+.gp-t{background:rgba(171,71,188,.15);color:var(--trans)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.7rem}
+.hide{display:none!important}
+.show{display:block!important}
+
+/* ═══════════════════════════════════════════
+   SKELETON — fade-in ONLY (no blank flash)
+═══════════════════════════════════════════ */
+.sk{border-radius:var(--radius);overflow:hidden;background:var(--surf)}
+.sk-media{padding-top:133%;background:linear-gradient(90deg,var(--surf) 25%,var(--surf2) 50%,var(--surf) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite}
+.sk-body{padding:.45rem .55rem .55rem}
+.sk-line{height:.5rem;border-radius:4px;background:var(--surf2);margin-bottom:.3rem;animation:shimmer 1.6s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* Images INSIDE cards fade in smoothly */
+/* images appear immediately — no opacity flicker */
+.crd-img{opacity:1}
+
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════ */
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:.6rem;padding:3rem 1rem;
+  text-align:center
+}
+.empty-ico{font-size:2.5rem}
+.empty p{font-size:.8rem;color:var(--txt3)}
+.retry-btn{
+  background:var(--hot);border:none;
+  color:#fff;font-family:inherit;font-size:.75rem;font-weight:700;
+  border-radius:8px;padding:.5rem 1.2rem;
+  transition:opacity .15s;margin-top:.3rem
+}
+.retry-btn:hover{opacity:.85}
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+/* ══════════════════════════════════
+   MODAL — imagen protagonista, play sutil
+══════════════════════════════════ */
+.modal-bg{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.82);
+  align-items:flex-end;justify-content:center;
+  padding:0
+}
+.modal-bg.open{display:flex}
+@keyframes fademodal{from{opacity:0}to{opacity:1}}
+@keyframes slidemodal{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-bg.open{animation:fademodal .18s ease}
+
+.modal{
+  background:var(--bg2);
+  border-radius:24px 24px 0 0;
+  width:100%;max-width:500px;
+  overflow:hidden;display:flex;flex-direction:column;
+  animation:slidemodal .28s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 -8px 60px rgba(0,0,0,.6);
+  max-height:92dvh
+}
+
+/* Drag handle */
+.modal::before{
+  content:'';display:block;
+  width:36px;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.15);
+  margin:10px auto 0;flex-shrink:0
+}
+
+.modal-close{
+  position:absolute;right:.75rem;top:.75rem;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.7);font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;
+  z-index:10;transition:all .15s;cursor:pointer
+}
+.modal-close:hover{background:rgba(255,255,255,.18);color:#fff}
+
+/* ── HERO — imagen real grande, play como toque fino ── */
+.modal-hero{
+  position:relative;
+  height:260px;
+  overflow:hidden;cursor:pointer;flex-shrink:0
+}
+.modal-hero img,.live-preview-img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .4s ease
+}
+.modal-hero:hover .live-preview-img{transform:scale(1.03)}
+
+/* Gradiente sutil solo en la parte baja para el texto */
+.modal-hero-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(14,15,18,1) 0%,
+    rgba(14,15,18,.6) 30%,
+    rgba(14,15,18,.1) 55%,
+    transparent 75%
+  )
+}
+
+/* Play overlay — pequeño, elegante, no tapa la imagen */
+.live-preview-wrap{position:relative;height:100%}
+.live-play-btn{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-60%);/* desplazado arriba para dejar ver la cara */
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(255,42,109,.82);
+  border:2px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  animation:livepulse 2.4s ease-in-out infinite;
+  pointer-events:none;
+  backdrop-filter:blur(4px)
+}
+@keyframes livepulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,42,109,.4),0 4px 20px rgba(255,42,109,.3)}
+  50%{box-shadow:0 0 0 12px rgba(255,42,109,.0),0 4px 28px rgba(255,42,109,.5)}
+}
+.live-play-btn svg{width:20px;height:20px;fill:#fff;margin-left:3px}
+
+/* Tap hint text under the play button */
+.live-tap-hint{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%, calc(-60% + 42px));
+  font-size:.58rem;font-weight:700;color:rgba(255,255,255,.65);
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.8)
+}
+
+/* LIVE badge — top left */
+.live-timer-badge{
+  position:absolute;top:.6rem;left:.6rem;
+  background:var(--hot);border-radius:20px;
+  padding:3px 10px;font-size:.58rem;font-weight:800;color:#fff;
+  display:flex;align-items:center;gap:.3rem;letter-spacing:.04em
+}
+.live-timer-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:#fff;animation:pulse 1.2s infinite
+}
+
+/* Name & meta over hero */
+.modal-hero-info{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:.85rem 1rem .8rem
+}
+.modal-live-pill{
+  display:inline-flex;align-items:center;gap:.3rem;
+  background:var(--hot);border-radius:20px;
+  padding:2px 9px;font-size:.58rem;font-weight:800;
+  color:#fff;letter-spacing:.05em;margin-bottom:.4rem
+}
+.modal-viewer-count{
+  display:inline-flex;align-items:center;gap:.25rem;
+  background:rgba(0,0,0,.55);
+  border-radius:20px;padding:2px 9px;
+  font-size:.62rem;font-weight:700;color:#fff;
+  margin-left:.3rem;margin-bottom:.4rem
+}
+.modal-name{
+  font-size:1.35rem;font-weight:800;
+  line-height:1.1;letter-spacing:-.025em;color:#fff;
+  text-shadow:0 2px 12px rgba(0,0,0,.5)
+}
+.modal-sub{font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.15rem}
+
+/* ── BODY ── */
+.modal-body{padding:.7rem .9rem .85rem;background:var(--bg2);overflow-y:auto}
+
+/* Stats row */
+.modal-stats-row{
+  display:flex;gap:.4rem;margin-bottom:.65rem;
+  font-size:.67rem;color:var(--txt2);align-items:center;flex-wrap:wrap
+}
+.modal-stat-item{display:flex;align-items:center;gap:.2rem}
+.modal-stat-val{font-weight:700;color:var(--txt)}
+
+/* CTA */
+.modal-acts{display:flex;gap:.45rem}
+.btn-go{
+  flex:1;
+  background:var(--hot);
+  color:#fff;border:none;border-radius:14px;
+  padding:.82rem 1rem;
+  font-size:.9rem;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:center;gap:.45rem;
+  transition:all .18s;cursor:pointer;
+  box-shadow:0 4px 18px rgba(255,42,109,.38)
+}
+.btn-go:hover{filter:brightness(1.1);box-shadow:0 6px 24px rgba(255,42,109,.52)}
+.btn-go:active{transform:scale(.98)}
+.btn-go-ico{font-size:1rem}
+.btn-go-arrow{margin-left:auto;opacity:.7;transition:transform .15s}
+.btn-go:hover .btn-go-arrow{transform:translateX(3px);opacity:1}
+
+/* Secondaries */
+.modal-secondary{display:flex;gap:.4rem;margin-top:.4rem}
+.btn-sec{
+  flex:1;background:var(--surf);border:1px solid var(--bdr);
+  border-radius:11px;color:var(--txt2);
+  font-family:inherit;font-size:.7rem;font-weight:600;
+  padding:.5rem;display:flex;align-items:center;justify-content:center;gap:.3rem;
+  transition:all .15s;cursor:pointer
+}
+.btn-sec:hover{background:var(--surf2);color:var(--txt);border-color:var(--bdr2)}
+.btn-sec.on{color:var(--hot);background:rgba(255,42,109,.07);border-color:rgba(255,42,109,.22)}
+
+/* Offline */
+.mhp-wrap{
+  height:240px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:.55rem;
+  background:linear-gradient(160deg,var(--bg3),var(--surf))
+}
+.mhp-ava{font-size:3rem;line-height:1;filter:grayscale(.3)}
+.mhp-name{font-size:1rem;font-weight:700;color:var(--txt)}
+.mhp-offline{
+  display:flex;align-items:center;gap:.3rem;
+  font-size:.65rem;color:var(--txt3)
+}
+.mhp-cta{
+  margin-top:.35rem;
+  background:rgba(255,42,109,.1);border:1px solid rgba(255,42,109,.25);
+  border-radius:10px;padding:.45rem 1.1rem;
+  color:var(--hot);font-size:.72rem;font-weight:700;
+  text-decoration:none;transition:all .15s;
+  display:inline-flex;align-items:center;gap:.35rem
+}
+.mhp-cta:hover{background:var(--hot);border-color:var(--hot);color:#fff}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--surf2);border:1px solid var(--bdr2);
+  border-radius:20px;padding:.4rem 1.1rem;
+  font-size:.75rem;font-weight:600;color:var(--txt);
+  opacity:0;transition:all .25s;z-index:600;white-space:nowrap
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════════
+   BOTTOM NAV (mobile)
+═══════════════════════════════════════════ */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--bnav);z-index:290;
+  background:rgba(20,21,25,.95);
+  backdrop-filter:blur(18px);
+  border-top:1px solid var(--bdr)
+}
+.bnav-inner{display:flex;height:100%;max-width:420px;margin:0 auto}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;background:none;border:none;
+  color:var(--txt3);font-size:.55rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.06em;transition:color .18s
+}
+.bnav-btn svg{width:20px;height:20px;transition:transform .2s}
+.bnav-btn.active{color:var(--hot)}
+.bnav-btn.active svg{transform:scale(1.1)}
+
+/* ═══════════════════════════════════════════
+   MODEL REPORT — redesigned friendly UX
+═══════════════════════════════════════════ */
+.rep-search{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:2.5rem 1.5rem;gap:1.4rem;text-align:center;
+  min-height:calc(100vh - var(--hdr));
+  position:relative;overflow:hidden
+}
+/* Fondo atmosférico */
+.rep-search::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 45% at 50% 30%,rgba(255,42,109,.07) 0%,transparent 70%);
+  pointer-events:none
+}
+.rep-search-eyebrow{
+  font-size:.6rem;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--neon);
+  display:flex;align-items:center;gap:.4rem
+}
+.rep-search-eyebrow::before,.rep-search-eyebrow::after{
+  content:'';display:block;width:20px;height:1px;
+  background:var(--neon);opacity:.4
+}
+.rep-search-title{
+  font-size:2.2rem;font-weight:800;line-height:1.1;
+  letter-spacing:-.04em;max-width:300px
+}
+.rep-search-title em{font-style:normal;color:var(--hot)}
+.rep-search-sub{
+  font-size:.8rem;color:var(--txt2);
+  max-width:300px;line-height:1.65
+}
+/* Feat chips — icono + texto en dos columnas */
+.rep-feats{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:.4rem;width:100%;max-width:320px
+}
+.rep-feat-chip{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:12px;padding:.45rem .75rem;
+  font-size:.7rem;font-weight:600;color:var(--txt2);
+  text-align:left;display:flex;align-items:center;gap:.4rem;
+  transition:all .15s
+}
+.rep-feat-chip:hover{border-color:var(--bdr2);color:var(--txt)}
+
+/* Input box — más elegante */
+.rep-input-row{
+  display:flex;flex-direction:column;gap:.5rem;
+  width:100%;max-width:340px
+}
+.rep-input-wrap{
+  display:flex;align-items:center;
+  background:var(--surf);border:1.5px solid var(--bdr2);
+  border-radius:14px;overflow:hidden;
+  transition:border-color .2s;
+  padding:0 .2rem 0 1rem
+}
+.rep-input-wrap:focus-within{border-color:rgba(0,229,255,.5)}
+.rep-input-wrap input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--txt);font-family:inherit;font-size:.88rem;
+  padding:.72rem 0;min-width:0
+}
+.rep-input-wrap input::placeholder{color:var(--txt3)}
+.rep-input-wrap button{
+  background:var(--hot);border:none;
+  border-radius:10px;padding:.55rem 1rem;
+  color:#fff;font-family:inherit;font-size:.8rem;font-weight:700;
+  white-space:nowrap;transition:all .15s;margin:.25rem;cursor:pointer;
+  flex-shrink:0
+}
+.rep-input-wrap button:hover{filter:brightness(1.1)}
+.rep-error{font-size:.7rem;color:var(--hot);margin-top:-.3rem}
+
+/* Report view */
+.rep-view{padding:1rem 1rem 2rem;max-width:640px;margin:0 auto}
+.rep-back{
+  display:inline-flex;align-items:center;gap:.3rem;
+  background:none;border:none;color:var(--txt3);
+  font-size:.75rem;margin-bottom:1rem;padding:.3rem 0;
+  transition:color .15s
+}
+.rep-back:hover{color:var(--txt)}
+
+/* Profile hero */
+.rep-hero{
+  display:flex;align-items:center;gap:.9rem;
+  background:var(--surf);border-radius:var(--radius);
+  padding:.9rem;margin-bottom:.75rem;position:relative;overflow:hidden
+}
+.rep-hero::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,42,109,.08),transparent);
+  pointer-events:none
+}
+.rep-avatar{
+  width:58px;height:58px;border-radius:50%;
+  object-fit:cover;background:var(--surf2);flex-shrink:0;
+  border:2px solid var(--bdr2)
+}
+.rep-pname{font-size:1.05rem;font-weight:800;line-height:1.2}
+.rep-pmeta{font-size:.7rem;color:var(--txt2);margin-top:2px}
+.rep-pstatus{
+  display:flex;align-items:center;gap:.3rem;
+  font-size:.65rem;margin-top:.3rem;font-weight:600
+}
+.rep-go-btn{
+  margin-left:auto;background:var(--hot);border:none;
+  border-radius:9px;padding:.4rem .8rem;color:#fff;
+  font-size:.7rem;font-weight:700;white-space:nowrap;
+  transition:opacity .15s;flex-shrink:0
+}
+.rep-go-btn:hover{opacity:.85}
+
+/* ═══ RANK CARD — friendly ═══ */
+.rank-card{
+  background:var(--surf);border-radius:var(--radius);
+  padding:1rem;margin-bottom:.75rem;
+  border:1px solid var(--bdr)
+}
+.rank-card-title{
+  font-size:.62rem;font-weight:700;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:.65rem
+}
+.rank-main{display:flex;align-items:center;gap:.9rem}
+.rank-big-num{
+  font-size:2.8rem;font-weight:800;line-height:1;
+  background:linear-gradient(135deg,var(--hot),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;letter-spacing:-.04em;flex-shrink:0
+}
+.rank-right{flex:1;min-width:0}
+.rank-label{font-size:.68rem;color:var(--txt2);margin-bottom:.3rem}
+.rank-bar-track{height:6px;background:var(--surf2);border-radius:3px;overflow:hidden;margin-bottom:.3rem}
+.rank-bar-fill{height:100%;background:linear-gradient(90deg,var(--hot),var(--purple));border-radius:3px;transition:width .8s ease}
+.rank-msg{font-size:.72rem;color:var(--txt2);line-height:1.4}
+.rank-msg strong{color:var(--txt);font-weight:700}
+.rank-pct{
+  display:inline-block;background:rgba(0,232,148,.15);
+  border:1px solid rgba(0,232,148,.3);color:var(--grn);
+  border-radius:10px;padding:1px 7px;font-size:.65rem;font-weight:700
+}
+
+/* ═══ KPI CARDS — friendly labels ═══ */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:.5rem;margin-bottom:.75rem
+}
+.kpi-card{
+  background:var(--surf);border-radius:var(--radius);
+  padding:.75rem .85rem;position:relative;overflow:hidden
+}
+.kpi-icon{font-size:1.6rem;margin-bottom:.3rem;line-height:1}
+.kpi-label{
+  font-size:.58rem;font-weight:700;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem
+}
+.kpi-val{font-size:1.5rem;font-weight:800;line-height:1;letter-spacing:-.03em}
+.kpi-sub{font-size:.6rem;color:var(--txt3);margin-top:.2rem;line-height:1.3}
+.kpi-badge{
+  font-size:.55rem;font-weight:700;border-radius:10px;
+  padding:1px 6px;display:inline-block;margin-top:.2rem
+}
+.kb-up{background:rgba(0,232,148,.15);color:var(--grn)}
+.kb-down{background:rgba(255,42,109,.15);color:var(--hot)}
+
+/* ═══ SECTION CARDS ═══ */
+.rep-section{
+  background:var(--surf);border-radius:var(--radius);
+  padding:.9rem;margin-bottom:.65rem;border:1px solid var(--bdr)
+}
+.rep-section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:.7rem
+}
+.rep-section-title{
+  font-size:.75rem;font-weight:700;color:var(--txt);
+  display:flex;align-items:center;gap:.4rem
+}
+.rep-section-title .ico{font-size:1rem}
+.rep-section-badge{
+  font-size:.58rem;font-weight:700;
+  background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.25);
+  color:var(--neon);border-radius:10px;padding:1px 7px
+}
+
+/* ═══ INCOME DISPLAY ═══ */
+.income-big{
+  display:flex;align-items:baseline;gap:.3rem;margin-bottom:.3rem
+}
+.income-val{font-size:2.2rem;font-weight:800;color:var(--gold);letter-spacing:-.03em}
+.income-period{font-size:.75rem;color:var(--txt3);font-weight:500}
+.income-sub{font-size:.65rem;color:var(--txt3);line-height:1.4}
+
+/* ═══ SCHEDULE HEATMAP ═══ */
+.sched-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:3px;margin-bottom:.6rem
+}
+.sched-day{
+  aspect-ratio:1;border-radius:4px;background:var(--surf2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:.5rem;cursor:default;transition:transform .15s;
+  position:relative
+}
+.sched-day:hover{transform:scale(1.1)}
+.sched-day-lbl{font-size:.42rem;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:1px}
+.sched-day-val{font-size:.55rem;font-weight:700}
+.sched-best-pill{
+  display:inline-flex;align-items:center;gap:.35rem;
+  background:rgba(255,200,64,.12);border:1px solid rgba(255,200,64,.3);
+  border-radius:20px;padding:.35rem .75rem;
+  font-size:.72rem;font-weight:600;color:var(--gold)
+}
+
+/* ═══ MARKET COMPARISON ═══ */
+.compare-rows{display:flex;flex-direction:column;gap:.5rem}
+.compare-row{}
+.compare-row-head{
+  display:flex;justify-content:space-between;
+  font-size:.7rem;margin-bottom:.3rem
+}
+.compare-row-label{color:var(--txt2)}
+.compare-row-val{font-weight:700;color:var(--txt)}
+.compare-track{height:6px;background:var(--surf2);border-radius:3px;overflow:hidden}
+.compare-fill{height:100%;border-radius:3px;transition:width .8s ease}
+
+/* ═══ CHART CONTAINERS ═══ */
+.chart-wrap{
+  width:100%;overflow:hidden;position:relative;
+  height:120px;margin-top:.3rem
+}
+.chart-no-data{
+  height:120px;display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;color:var(--txt3)
+}
+
+/* ═══ TAGS ═══ */
+.rep-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.rep-tag{
+  background:rgba(255,255,255,.06);border-radius:10px;
+  padding:3px 10px;font-size:.65rem;color:var(--txt2)
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(min-width:601px){
+  .modal-bg{align-items:center;padding:1rem}
+  .modal{border-radius:24px;max-height:88dvh}
+  .modal-hero{height:280px}
+  .modal::before{display:none}
+}
+@media(max-width:900px){
+  .drawer{display:none}
+  .ham-btn{display:flex}
+  .dtabs{display:none}
+  .bottom-nav{display:block}
+  body{padding-bottom:var(--bnav)}
+  .page{height:calc(100vh - var(--bnav))}
+  .rep-search{min-height:calc(100vh - var(--hdr) - var(--bnav))}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .modal-stats{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:600px){
+  header{padding:0 .7rem;height:46px}
+  --hdr:46px;
+  .logo-name{font-size:.9rem}
+  .live-badge{display:none}
+  .grid{grid-template-columns:repeat(3,1fr);gap:.3rem}
+  .catalog-section{padding:.65rem .7rem .4rem}
+  .carousel-section{padding:.65rem 0 .2rem}
+  .carousel-scroll{padding:0 .7rem .3rem}
+  .carousel-scroll .crd{width:110px}
+  .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:147px}
+  .rep-search{padding:1.5rem 1rem}
+  .rep-search-title{font-size:1.6rem}
+  .modal-bg{padding:0;align-items:flex-end}
+  .modal{border-radius:24px 24px 0 0;max-height:90dvh;width:100%}
+  .modal-hero{height:250px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .sched-grid{grid-template-columns:repeat(7,1fr)}
+  .filter-bar{padding:.4rem .7rem}
+  .gender-nav{padding:0 .7rem}
+  .toast{bottom:calc(var(--bnav) + .65rem)}
+}
+@media(max-width:380px){
+  .grid{grid-template-columns:repeat(3,1fr);gap:.22rem}
+  .carousel-scroll .crd{width:95px}
+  .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="/">
+    <div class="logo-icon">CH</div>
+    <span class="logo-name">Campulse<em>Hub</em></span>
+  </a>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    Live
+    <span id="ts-label" style="color:rgba(255,255,255,.28);margin-left:2px">—</span>
+  </div>
+  <div class="hdr-tabs">
+    <div class="dtabs">
+      <button class="dtab active" id="tab-explore" onclick="switchTab('explore')">
+        <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Explorar
+      </button>
+      <button class="dtab" id="tab-model" onclick="switchTab('model')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/><circle cx="8" cy="5" r="3"/></svg>
+        Mi Reporte
+      </button>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <button class="ref-btn" id="ref-btn" title="Actualizar">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 8A6 6 0 1 1 8 2c2 0 3.8 1 4.9 2.5M14 2v4h-4"/></svg>
+    </button>
+    <button class="ham-btn" id="ham-btn" onclick="toggleDrawer()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- MOBILE DRAWER -->
+<div class="mob-drawer" id="mob-drawer">
+  <div class="drawer-sec">
+    <div class="drawer-lbl">Género</div>
+    <div class="g-strip" id="md-gender-strip">
+      <button class="g-btn active" data-g="" onclick="setGender(this,'')">Todas las categorías <span class="gcnt" id="md-gc-all"></span></button>
+      <button class="g-btn" data-g="f" onclick="setGender(this,'f')">Mujeres <span class="gcnt" id="md-gc-f"></span></button>
+      <button class="g-btn" data-g="m" onclick="setGender(this,'m')">Hombres <span class="gcnt" id="md-gc-m"></span></button>
+      <button class="g-btn" data-g="c" onclick="setGender(this,'c')">Parejas <span class="gcnt" id="md-gc-c"></span></button>
+      <button class="g-btn" data-g="t" onclick="setGender(this,'t')">Trans <span class="gcnt" id="md-gc-t"></span></button>
+    </div>
+  </div>
+  <div class="drawer-div"></div>
+  <div class="drawer-sec">
+    <div class="drawer-lbl">Filtros</div>
+    <button class="filter-chip" id="md-fv" onclick="toggleFavFilter(this)">♥ Favoritas <span id="md-gc-fv">0</span></button>
+    <button class="filter-chip" id="md-hd" onclick="toggleHDFilter(this)">HD Solo HD</button>
+  </div>
+  <div class="drawer-div"></div>
+  <div class="drawer-sec">
+    <div class="drawer-lbl">Edad</div>
+    <div class="age-chips" id="md-age-chips">
+      <span class="age-chip" onclick="setAgeFilter(this,'18-21')">18–21</span>
+      <span class="age-chip" onclick="setAgeFilter(this,'22-25')">22–25</span>
+      <span class="age-chip" onclick="setAgeFilter(this,'26-30')">26–30</span>
+      <span class="age-chip" onclick="setAgeFilter(this,'31-40')">31–40</span>
+      <span class="age-chip" onclick="setAgeFilter(this,'40+')">40+</span>
+    </div>
+  </div>
+  <div class="drawer-div"></div>
+  <div class="drawer-sec">
+    <div class="drawer-lbl">País</div>
+    <div id="md-country-list"></div>
+  </div>
+  <div class="drawer-div"></div>
+  <div class="drawer-sec">
+    <div class="drawer-lbl">Stats en vivo</div>
+    <div class="mini-stat-row"><span>Salas online</span><span id="md-ms-total">—</span></div>
+    <div class="mini-stat-row"><span>Viewers totales</span><span id="md-ms-views">—</span></div>
+    <div class="mini-stat-row"><span>Promedio</span><span id="md-ms-avg">—</span></div>
+    <div class="mini-stat-row"><span>Peak actual</span><span id="md-ms-peak">—</span></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav">
+  <div class="bnav-inner">
+    <button class="bnav-btn active" id="bnav-explore" onclick="switchTab('explore')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="9" height="9" rx="2"/><rect x="13" y="2" width="9" height="9" rx="2"/><rect x="2" y="13" width="9" height="9" rx="2"/><rect x="13" y="13" width="9" height="9" rx="2"/></svg>
+      Explorar
+    </button>
+    <button class="bnav-btn" id="bnav-model" onclick="switchTab('model')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/><circle cx="8" cy="5" r="3"/><path d="M16 8h6M16 12h4M16 16h5"/></svg>
+      Mi Reporte
+    </button>
+  </div>
+</nav>
+
+<div class="page">
+
+<!-- ═══ EXPLORE PAGE ═══ -->
+<div class="page-explore" id="page-explore">
+
+  <!-- Desktop sidebar drawer -->
+  <aside class="drawer">
+    <div class="drawer-sec">
+      <div class="drawer-lbl">Género</div>
+      <div class="g-strip">
+        <button class="g-btn active" onclick="setGender(this,'')">Todas <span class="gcnt" id="sd-gc-all"></span></button>
+        <button class="g-btn" onclick="setGender(this,'f')">Mujeres <span class="gcnt" id="sd-gc-f"></span></button>
+        <button class="g-btn" onclick="setGender(this,'m')">Hombres <span class="gcnt" id="sd-gc-m"></span></button>
+        <button class="g-btn" onclick="setGender(this,'c')">Parejas <span class="gcnt" id="sd-gc-c"></span></button>
+        <button class="g-btn" onclick="setGender(this,'t')">Trans <span class="gcnt" id="sd-gc-t"></span></button>
+      </div>
+    </div>
+    <div class="drawer-div"></div>
+    <div class="drawer-sec">
+      <div class="drawer-lbl">Filtros rápidos</div>
+      <button class="filter-chip" id="sd-fv" onclick="toggleFavFilter(this)">♥ Favoritas <span id="sd-gc-fv">0</span></button>
+      <button class="filter-chip" id="sd-hd" onclick="toggleHDFilter(this)">HD Solo HD</button>
+    </div>
+    <div class="drawer-div"></div>
+    <div class="drawer-sec">
+      <div class="drawer-lbl">Edad</div>
+      <div class="age-chips">
+        <span class="age-chip" onclick="setAgeFilter(this,'18-21')">18–21</span>
+        <span class="age-chip" onclick="setAgeFilter(this,'22-25')">22–25</span>
+        <span class="age-chip" onclick="setAgeFilter(this,'26-30')">26–30</span>
+        <span class="age-chip" onclick="setAgeFilter(this,'31-40')">31–40</span>
+        <span class="age-chip" onclick="setAgeFilter(this,'40+')">40+</span>
+      </div>
+    </div>
+    <div class="drawer-div"></div>
+    <div class="drawer-sec">
+      <div class="drawer-lbl">País</div>
+      <div id="sd-country-list"></div>
+    </div>
+    <div class="drawer-div"></div>
+    <div class="drawer-sec">
+      <div class="drawer-lbl">Stats en vivo</div>
+      <div class="mini-stat-row"><span>Salas online</span><span id="sd-ms-total">—</span></div>
+      <div class="mini-stat-row"><span>Viewers totales</span><span id="sd-ms-views">—</span></div>
+      <div class="mini-stat-row"><span>Promedio</span><span id="sd-ms-avg">—</span></div>
+      <div class="mini-stat-row"><span>Peak actual</span><span id="sd-ms-peak">—</span></div>
+    </div>
+    <div class="drawer-div"></div>
+    <div class="drawer-sec">
+      <div class="drawer-lbl">Tags populares</div>
+      <div id="sd-tag-list" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.3rem"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="content" id="main-content">
+
+    <!-- Gender nav (Stripchat style) -->
+    <div class="gender-nav">
+      <button class="gnav-btn active" data-g="" onclick="setGender(this,'')">
+        <span class="gnav-ico">🌐</span>Todas
+      </button>
+      <div class="gnav-div"></div>
+      <button class="gnav-btn" data-g="f" onclick="setGender(this,'f')">
+        <span class="gnav-ico">👩</span>Mujeres
+      </button>
+      <button class="gnav-btn" data-g="m" onclick="setGender(this,'m')">
+        <span class="gnav-ico">👨</span>Hombres
+      </button>
+      <button class="gnav-btn" data-g="c" onclick="setGender(this,'c')">
+        <span class="gnav-ico">👫</span>Parejas
+      </button>
+      <button class="gnav-btn" data-g="t" onclick="setGender(this,'t')">
+        <span class="gnav-ico">⚧</span>Trans
+      </button>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="srch">
+        <span class="srch-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/></svg></span>
+        <input type="text" id="search" placeholder="Buscar modelo...">
+      </div>
+      <div class="fb-sep"></div>
+      <button class="qchip" id="tb-fv" onclick="toggleFavFilter(this)">♥ Favs</button>
+      <button class="qchip" id="tb-hd" onclick="toggleHDFilter(this)">HD</button>
+      <button class="qchip" id="tb-co" onclick="toggleColFilter(this)">🇨🇴</button>
+      <div class="fb-sep"></div>
+      <select class="sort-sel" id="srt">
+        <option value="viewers">↓ Viewers</option>
+        <option value="followers">↓ Seguidores</option>
+        <option value="age_asc">Más jóvenes</option>
+        <option value="new">Nuevas</option>
+      </select>
+      <div class="view-toggle">
+        <button class="vtb on" id="vg"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
+        <button class="vtb" id="vl"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2" rx="1"/><rect x="1" y="7" width="14" height="2" rx="1"/><rect x="1" y="12" width="14" height="2" rx="1"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Carousels by tag — rendered dynamically -->
+    <div id="carousels-container"></div>
+
+    <!-- Catalog (full grid) -->
+    <div class="catalog-section" id="catalog-section">
+      <div class="catalog-head">
+        <span class="catalog-title">🌐 Todas en vivo</span>
+        <span class="catalog-count" id="catalog-count"></span>
+      </div>
+      <div class="grid" id="gc-grid"></div>
+      <div class="list-wrap hide" id="lw">
+        <table class="list-tbl">
+          <thead><tr>
+            <th style="width:42px"></th><th>Modelo</th><th>Género</th>
+            <th id="th-v" style="cursor:pointer">Viewers ↓</th>
+            <th id="th-f" style="cursor:pointer">Seguidores</th>
+            <th id="th-a" style="cursor:pointer">Edad</th>
+            <th>País</th><th style="width:38px"></th>
+          </tr></thead>
+          <tbody id="lb"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- .content -->
+</div><!-- .page-explore -->
+
+<!-- ═══ MODEL REPORT ═══ -->
+<div class="model-view" id="model-view">
+
+  <!-- Search screen -->
+  <div class="rep-search" id="model-search-screen">
+    <div class="rep-search-eyebrow">Para modelos 📊</div>
+    <div class="rep-search-title">Descubre<br><em>cuándo eres</em><br>imparable</div>
+    <div class="rep-search-sub">Escribe tu username y en segundos sabrás en qué puesto estás, cuánto podrías ganar, y cuál es tu mejor momento para transmitir.</div>
+    <div class="rep-feats">
+      <div class="rep-feat-chip">🏆 Tu puesto ahora</div>
+      <div class="rep-feat-chip">💰 Ingresos estimados</div>
+      <div class="rep-feat-chip">📈 Tu curva de crecimiento</div>
+      <div class="rep-feat-chip">⏰ Tu mejor hora del día</div>
+      <div class="rep-feat-chip">📊 Comparativa con otras</div>
+    </div>
+    <div class="rep-input-row">
+      <div class="rep-input-wrap">
+        <input type="text" id="model-username-input" placeholder="Tu username de Chaturbate" onkeydown="if(event.key==='Enter')searchModel()">
+        <button onclick="searchModel()">Ver →</button>
+      </div>
+    </div>
+    <div id="model-search-error" class="rep-error" style="display:none"></div>
+  </div>
+
+  <!-- Report view -->
+  <div class="rep-view" id="model-report" style="display:none">
+    <button class="rep-back" onclick="resetModelSearch()">← Volver</button>
+
+    <!-- Profile hero -->
+    <div class="rep-hero">
+      <img class="rep-avatar" id="rp-img" src="" alt="">
+      <div style="flex:1;min-width:0">
+        <div class="rep-pname" id="rp-name">—</div>
+        <div class="rep-pmeta" id="rp-meta">—</div>
+        <div class="rep-pstatus">
+          <div class="live-dot" style="background:var(--txt3)" id="rp-status-dot"></div>
+          <span id="rp-status-txt" style="color:var(--txt3)">Verificando...</span>
+        </div>
+      </div>
+      <a id="rp-link" href="#" target="_blank" rel="noopener" class="rep-go-btn">Ver sala ↗</a>
+    </div>
+
+    <!-- Rank card -->
+    <div class="rank-card" id="hero-rank-card">
+      <div class="rank-card-title">Tu posición ahora mismo</div>
+      <div class="rank-main">
+        <div class="rank-big-num" id="hrc-rank-num">—</div>
+        <div class="rank-right">
+          <div class="rank-label" id="hrc-rank-of">de — salas activas</div>
+          <div class="rank-bar-track">
+            <div class="rank-bar-fill" id="arc-fill" style="width:0%"></div>
+          </div>
+          <div class="rank-msg" id="hrc-message" style="display:none">
+            <span id="hrc-msg-ico"></span> <span id="hrc-msg-txt"></span>
+            — <span class="rank-pct" id="hrc-percentil">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs — friendly -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">👀</div>
+        <div class="kpi-label">Viewers ahora</div>
+        <div class="kpi-val" id="hrc-viewers">—</div>
+        <div class="kpi-sub">personas viéndote en este momento</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">❤️</div>
+        <div class="kpi-label">Seguidores</div>
+        <div class="kpi-val" id="rp-followers">—</div>
+        <div class="kpi-badge" id="rp-followers-trend" style="display:none"></div>
+        <div class="kpi-sub">fans que te siguen</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-label">Promedio 30 días</div>
+        <div class="kpi-val" style="color:var(--grn)" id="rp-avg">—</div>
+        <div class="kpi-sub">viewers típicos por sesión</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🏆</div>
+        <div class="kpi-label">Tu mejor momento</div>
+        <div class="kpi-val" style="color:var(--gold)" id="rp-peak">—</div>
+        <div class="kpi-sub" id="rp-snaps">viewers en tu mejor día</div>
+      </div>
+    </div>
+
+    <!-- Income section -->
+    <div class="rep-section" id="income-hero-section" style="display:none">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">💰</span> ¿Cuánto podrías ganar?</div>
+      </div>
+      <div class="income-big">
+        <div class="income-val" id="income-hero-val">—</div>
+        <div class="income-period">por hora</div>
+      </div>
+      <div class="income-sub">Estimación basada en tus viewers actuales y la tasa de conversión histórica del mercado. Es un cálculo aproximado para que tengas una referencia.</div>
+    </div>
+
+    <!-- Schedule section -->
+    <div class="rep-section" id="schedule-hero-section" style="display:none">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">⏰</span> ¿Cuándo transmitir?</div>
+        <div class="rep-section-badge">últimos 30 días</div>
+      </div>
+      <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.75rem;line-height:1.5">Cada cajita es un día de la semana. Las más verdes son los días donde tuviste <strong style="color:var(--txt)">más viewers</strong>. ¡Transmite más esos días!</p>
+      <div class="sched-grid" id="schedule-days-grid"></div>
+      <div class="sched-best-pill" id="sched-best-label" style="display:none">
+        ⭐ <span id="sched-best-txt"></span>
+      </div>
+    </div>
+
+    <!-- Market comparison -->
+    <div class="rep-section">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">🌍</span> ¿Cómo estás vs las demás?</div>
+      </div>
+      <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.75rem;line-height:1.5">Las barras muestran dónde estás tú comparada con el resto. Mientras más a la derecha, ¡mejor!</p>
+      <div class="compare-rows">
+        <div class="compare-row">
+          <div class="compare-row-head"><span class="compare-row-label">Tú ahora mismo</span><span class="compare-row-val" id="rb-pos-val">—</span></div>
+          <div class="compare-track"><div class="compare-fill" id="rb-pos" style="width:0%;background:var(--hot)"></div></div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-row-head"><span class="compare-row-label">Las top 10% ganan</span><span class="compare-row-val" id="rb-top10-val">—</span></div>
+          <div class="compare-track"><div class="compare-fill" id="rb-top10" style="width:10%;background:var(--gold)"></div></div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-row-head"><span class="compare-row-label">El promedio general</span><span class="compare-row-val" id="rb-avg-val">—</span></div>
+          <div class="compare-track"><div class="compare-fill" id="rb-avg" style="width:50%;background:var(--txt3)"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:.6rem;font-size:.7rem;color:var(--txt3)" id="rb-summary"></div>
+    </div>
+
+    <!-- Trend chart -->
+    <div class="rep-section">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">📈</span> Tu evolución — 30 días</div>
+      </div>
+      <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.5rem;line-height:1.5">Aquí ves si estás creciendo o necesitas ajustar algo. ¡Hacia arriba siempre!</p>
+      <div id="heatmap-container"><div class="chart-no-data">Cargando tus datos...</div></div>
+    </div>
+
+    <!-- Followers chart -->
+    <div class="rep-section">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">❤️</span> Tus seguidores crecen</div>
+      </div>
+      <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.5rem;line-height:1.5">Cada seguidor nuevo es un fan que va a volver a verte. ¡Este número solo debería subir!</p>
+      <div id="followers-container"><div class="chart-no-data">Cargando...</div></div>
+    </div>
+
+    <!-- Tags -->
+    <div class="rep-section">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">🏷️</span> Tus tags activos</div>
+      </div>
+      <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.6rem;line-height:1.5">Estos son los tags que tienen las personas que te buscan. ¡Asegúrate de que reflejen tu contenido!</p>
+      <div class="rep-tags" id="rp-tags"></div>
+    </div>
+
+    <div id="besttimes-container" style="display:none"></div>
+  </div>
+</div>
+
+</div><!-- .page -->
+
+<!-- MODAL — ultralight conversion -->
+<div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeMod()">✕</button>
+
+    <!-- HERO — full image, click = enter room -->
+    <div class="modal-hero" onclick="if(active)openInCB(active.username)">
+      <div id="mhero-img-wrap"></div>
+      <div class="modal-hero-grad"></div>
+      <div class="modal-hero-info">
+        <div id="m-live-pill"></div>
+        <div class="modal-name" id="m-name"></div>
+        <div class="modal-sub" id="m-disp"></div>
+      </div>
+    </div>
+
+    <!-- BODY — only what matters -->
+    <div class="modal-body">
+
+      <!-- Compact stats line -->
+      <div class="modal-stats-row" id="m-stats-row"></div>
+
+      <!-- CTA -->
+      <div class="modal-acts">
+        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go">
+          <span class="btn-go-ico">▶</span>
+          <span>Entrar a la sala en vivo</span>
+          <span class="btn-go-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- Secondary -->
+      <div class="modal-secondary">
+        <button class="btn-sec" id="m-fav-btn" onclick="favMod()">
+          <span id="m-fav-icon">♥</span>
+          <span id="m-fav-txt">Favorita</span>
+        </button>
+        <button class="btn-sec" onclick="reportFromModal()">
+          📊 Su reporte
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONSTANTS & STATE
+═══════════════════════════════════════════ */
+const API='/api/rooms';
+const LIMIT=3000; // increased from 500
+let rooms=[],favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
+let gender='',onlyFavs=false,onlyHD=false,onlyCol=false,activeTag='',activeCountry='',ageRange='';
+let sort='viewers',view='grid',maxV=1,active=null;
+let loaded=false;
+let _rankCache=null; // pre-computed rank map {username->rank}
+let _renderTimer=null; // debounce timer for filter renders // track first load to avoid blank flash
+const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':String(n);
+const GL={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
+
+// Popular tag carousels to show
+const CAROUSEL_TAGS=[
+  {tag:'lovense',label:'Lovense',ico:'🎮'},
+  {tag:'squirt',label:'Squirt',ico:'💦'},
+  {tag:'anal',label:'Anal',ico:'🔥'},
+  {tag:'bigass',label:'Big Ass',ico:'🍑'},
+  {tag:'latina',label:'Latinas',ico:'🌶️'},
+  {tag:'teen',label:'Teen',ico:'⭐'},
+  {tag:'asian',label:'Asian',ico:'🌸'},
+  {tag:'hairy',label:'Hairy',ico:'✨'},
+];
+
+/* ═══════════════════════════════════════════
+   SKELETON — show on first load ONLY
+═══════════════════════════════════════════ */
+function showSkeleton(){
+  if(loaded) return; // don't flash skeleton on refresh
+  const g=document.getElementById('gc-grid');
+  g.innerHTML=Array(24).fill(0).map(()=>`
+    <div class="sk">
+      <div class="sk-media"></div>
+      <div class="sk-body">
+        <div class="sk-line" style="width:65%"></div>
+        <div class="sk-line" style="width:40%"></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   LOAD — no blank flash on refresh
+═══════════════════════════════════════════ */
+// Pre-computa ranking una sola vez O(n log n) en lugar de O(n²) por card
+function buildRankCache(arr){
+  const m=new Map();
+  [...arr].filter(r=>r.num_users>0)
+    .sort((a,b)=>(b.num_users||0)-(a.num_users||0))
+    .forEach((r,i)=>m.set(r.username,i));
+  return m;
+}
+
+// Actualiza stats y contadores sin re-renderizar las cards
+function silentUpdate(){
+  updateStats();
+  updateDrawerCounts();
+  const cc=document.getElementById('catalog-count');
+  if(cc)cc.textContent=fmt(getFiltered().length)+' modelos';
+}
+
+async function load(){
+  const btn=document.getElementById('ref-btn');
+  btn.classList.add('spin');
+  if(!loaded) showSkeleton();
+  try{
+    // — FASE 1: mostrar 500 rooms INMEDIATAMENTE (~1s) —
+    const first=await fetch(`${API}?limit=500`);
+    const d=await first.json();
+    const batch1=d.results||[];
+    if(batch1.length){
+      const seen=new Set();
+      rooms=batch1.filter(r=>{if(seen.has(r.username))return false;seen.add(r.username);return true;});
+      maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
+      _rankCache=buildRankCache(rooms);
+      loaded=true;
+      updateAll();
+      document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+      btn.classList.remove('spin');
+    }
+    // — FASE 2: cargar resto en background sin bloquear UI —
+    if(batch1.length>=500){
+      const pages=await Promise.allSettled(
+        [500,1000,1500,2000,2500].map(o=>
+          fetch(`${API}?offset=${o}&limit=500`).then(r=>r.json())
+        )
+      );
+      let extra=[];
+      pages.forEach(p=>{
+        if(p.status==='fulfilled'&&p.value.results) extra=[...extra,...p.value.results];
+      });
+      if(extra.length){
+        const seen=new Set(rooms.map(r=>r.username));
+        const newRooms=extra.filter(r=>{if(seen.has(r.username))return false;seen.add(r.username);return true;});
+        if(newRooms.length){
+          rooms=[...rooms,...newRooms];
+          maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
+          _rankCache=buildRankCache(rooms);
+          silentUpdate();
+        }
+      }
+    }
+  }catch(e){
+    if(!loaded){
+      document.getElementById('gc-grid').innerHTML=`
+        <div class="empty" style="grid-column:1/-1">
+          <div class="empty-ico">📡</div>
+          <p>No pudimos conectar. Revisa tu internet.</p>
+          <button class="retry-btn" onclick="load()">Reintentar</button>
+        </div>`;
+    }
+  }finally{
+    btn.classList.remove('spin');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   FILTER & SORT
+═══════════════════════════════════════════ */
+function getFiltered(){
+  const q=document.getElementById('search').value.trim().toLowerCase();
+  return rooms.filter(r=>{
+    if(gender&&r.gender!==gender)return false;
+    if(onlyFavs&&!favs.includes(r.username))return false;
+    if(onlyHD&&!r.is_hd)return false;
+    if(onlyCol&&r.country!=='CO')return false;
+    if(activeTag&&!(r.tags||[]).includes(activeTag))return false;
+    if(activeCountry&&r.country!==activeCountry)return false;
+    if(ageRange){
+      const age=r.age;if(!age)return false;
+      if(ageRange==='18-21'&&(age<18||age>21))return false;
+      if(ageRange==='22-25'&&(age<22||age>25))return false;
+      if(ageRange==='26-30'&&(age<26||age>30))return false;
+      if(ageRange==='31-40'&&(age<31||age>40))return false;
+      if(ageRange==='40+'&&age<40)return false;
+    }
+    if(q){
+      const hay=(r.username+' '+(r.display_name||'')+' '+(r.tags||[]).join(' ')).toLowerCase();
+      if(!hay.includes(q))return false;
+    }
+    return true;
+  }).sort((a,b)=>{
+    if(sort==='viewers')return (b.num_users||0)-(a.num_users||0);
+    if(sort==='followers')return (b.num_followers||0)-(a.num_followers||0);
+    if(sort==='age_asc')return (a.age||99)-(b.age||99);
+    if(sort==='new')return (b.is_new?1:0)-(a.is_new?1:0);
+    return 0;
+  });
+}
+
+function getFilteredByTag(tag){
+  return rooms.filter(r=>(r.tags||[]).includes(tag)&&r.num_users>0)
+    .sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+}
+
+/* ═══════════════════════════════════════════
+   UPDATE ALL
+═══════════════════════════════════════════ */
+function updateAll(){
+  updateStats();
+  renderCarousels();
+  render();
+  updateDrawerCounts();
+}
+// Para filtros: solo re-renderiza grid, NO los carousels (que son costosos)
+function renderOnFilter(){
+  clearTimeout(_renderTimer);
+  _renderTimer=setTimeout(()=>{
+    const filt=getFiltered();
+    const cc=document.getElementById('catalog-count');
+    if(cc)cc.textContent=fmt(filt.length)+' modelos';
+    if(view==='grid')renderGrid(filt);
+    else renderList(filt);
+    updateDrawerCounts();
+  },40);
+}
+
+function updateStats(){
+  const views=rooms.reduce((s,r)=>s+(r.num_users||0),0);
+  const avg=rooms.length?Math.round(views/rooms.length):0;
+  const peak=Math.max(...rooms.map(r=>r.num_users||0),0);
+  // sidebar stats
+  ['sd','md'].forEach(p=>{
+    el(p+'-ms-total',fmt(rooms.length));
+    el(p+'-ms-views',fmt(views));
+    el(p+'-ms-avg',fmt(avg));
+    el(p+'-ms-peak',fmt(peak));
+  });
+  // tag cloud in sidebar
+  const tagCount={};
+  rooms.forEach(r=>(r.tags||[]).forEach(t=>{tagCount[t]=(tagCount[t]||0)+1;}));
+  const topTags=Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  const tagEl=document.getElementById('sd-tag-list');
+  if(tagEl)tagEl.innerHTML=topTags.map(([t,c])=>
+    `<span class="age-chip${activeTag===t?' active':''}" onclick="setTagFilter('${t}')">#${t}<span style="opacity:.5;font-size:.55rem;margin-left:3px">${c}</span></span>`
+  ).join('');
+}
+
+function updateDrawerCounts(){
+  const counts={all:0,f:0,m:0,c:0,t:0};
+  rooms.forEach(r=>{counts.all++;counts[r.gender]=(counts[r.gender]||0)+1;});
+  [['all','all'],['f','f'],['m','m'],['c','c'],['t','t']].forEach(([k,id])=>{
+    ['sd-gc-','md-gc-'].forEach(p=>{
+      const el=document.getElementById(p+id);if(el)el.textContent=fmt(counts[k]||0);
+    });
+  });
+  const fc=favs.length;
+  ['sd-gc-fv','md-gc-fv'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=fc;});
+}
+
+/* ═══════════════════════════════════════════
+   CAROUSELS — tag rows
+═══════════════════════════════════════════ */
+function renderCarousels(){
+  const container=document.getElementById('carousels-container');
+  if(!container||!rooms.length)return;
+  const filt=getFiltered();
+  // Top: salas con viewers, ya ordenadas por getFiltered(sort=viewers)
+  const top=filt.filter(r=>r.num_users>0).slice(0,14);
+  let html=`<div class="carousel-section">
+    <div class="carousel-head">
+      <div class="carousel-title">🔥 Más vistas ahora <span class="carousel-tag-badge">TOP</span></div>
+    </div>
+    <div class="carousel-scroll" id="cs-top">
+      ${top.map(x=>cardHtml(x,'carousel')).join('')}
+    </div>
+  </div>`;
+  // Tag carousels
+  CAROUSEL_TAGS.forEach(({tag,label,ico})=>{
+    const tagged=getFilteredByTag(tag).slice(0,12);
+    if(!tagged.length)return;
+    html+=`<div class="carousel-section">
+      <div class="carousel-head">
+        <div class="carousel-title">${ico} ${label} <span class="carousel-tag-badge">#${tag}</span></div>
+        <button class="carousel-see-all" onclick="setTagFilter('${tag}')">Ver todas →</button>
+      </div>
+      <div class="carousel-scroll">
+        ${tagged.map(x=>cardHtml(x,'carousel')).join('')}
+      </div>
+    </div>`;
+  });
+  container.innerHTML=html;
+  // Lazy load images
+  lazyLoadImages();
+}
+
+/* ═══════════════════════════════════════════
+   CARD HTML
+═══════════════════════════════════════════ */
+function cardHtml(x,mode='grid'){
+  const fv=favs.includes(x.username);
+  // usa el cache pre-computado en lugar de re-ordenar en cada card
+  const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
+  const isTop3=rank>=0&&rank<3;
+  const isHot=rank>=0&&rank<10&&!isTop3;
+  const imgSrcs=[
+    x.image_url,
+    `https://thumb.live.mmcdn.com/riw/${x.username}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${x.username}.jpg`,
+    `https://roomimg.stream.highwebmedia.com/ri/${x.username}.jpg`
+  ].filter(Boolean);
+  const imgTag=`<img class="crd-img" data-srcs='${JSON.stringify(imgSrcs)}' data-t="0" src="${imgSrcs[0]||''}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+  const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
+  return `<article class="crd" onclick="openMod('${x.username}')">
+  <div class="crd-media">
+    ${imgSrcs.length?imgTag:phTag}
+    <div class="crd-overlay"></div>
+    <div class="crd-badges">
+      ${isTop3?'<span class="bdg bdg-top">TOP</span>':''}
+      ${isHot?'<span class="bdg bdg-fire">🔥</span>':''}
+      ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
+      ${x.is_new?'<span class="bdg bdg-new">NEW</span>':''}
+    </div>
+    <button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
+    ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
+  </div>
+  <div class="crd-body">
+    <div class="crd-name">${x.display_name||x.username}</div>
+    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+  </div>
+</article>`;
+}
+
+function imgFallback(img){
+  const srcs=JSON.parse(img.dataset.srcs||'[]');
+  const t=parseInt(img.dataset.t||0)+1;
+  if(t<srcs.length){img.dataset.t=t;img.src=srcs[t];}
+  else{
+    const ph=document.createElement('div');
+    ph.className='crd-ph';
+    ph.textContent=img.alt.substring(0,2).toUpperCase();
+    img.replaceWith(ph);
+  }
+}
+
+// Intersection observer for lazy loading
+let observer;
+function lazyLoadImages(){
+  if(observer)observer.disconnect();
+  observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const img=e.target;
+        if(img.dataset.srcs&&!img.src){
+          const srcs=JSON.parse(img.dataset.srcs);
+          img.src=srcs[0];
+        }
+        observer.unobserve(img);
+      }
+    });
+  },{rootMargin:'200px'});
+  // Solo observar imágenes que aún no tienen src cargado
+  document.querySelectorAll('.crd-img').forEach(img=>{
+    if(!img.complete||img.naturalWidth===0) observer.observe(img);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   RENDER GRID / LIST
+═══════════════════════════════════════════ */
+function render(){
+  // Debounce: si el usuario hace clic rápido, espera 40ms antes de renderizar
+  clearTimeout(_renderTimer);
+  _renderTimer=setTimeout(()=>{
+    const filt=getFiltered();
+    const cc=document.getElementById('catalog-count');
+    if(cc)cc.textContent=`${fmt(filt.length)} modelos`;
+    if(view==='grid')renderGrid(filt);
+    else renderList(filt);
+  },40);
+}
+
+function renderGrid(r){
+  const c=document.getElementById('gc-grid');
+  if(!r.length){
+    c.innerHTML=`<div class="empty" style="grid-column:1/-1">
+      <div class="empty-ico">🔍</div><p>Sin resultados para ese filtro</p>
+    </div>`;
+    return;
+  }
+  c.innerHTML=r.map(x=>cardHtml(x,'grid')).join('');
+  lazyLoadImages();
+}
+
+function renderList(r){
+  const b=document.getElementById('lb');
+  if(!r.length){b.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ico">🔍</div><p>Sin resultados</p></div></td></tr>`;return;}
+  b.innerHTML=r.map(x=>`<tr onclick="openInCB('${x.username}')">
+    <td>${x.image_url?`<img class="l-av" src="${x.image_url}" loading="lazy" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`:`<div class="l-av-ph">👤</div>`}</td>
+    <td><div class="l-name">${x.display_name||x.username}</div><div class="l-sub">@${x.username}</div></td>
+    <td><span class="gpill gp-${x.gender}">${GL[x.gender]||'—'}</span></td>
+    <td><span class="mono">${fmt(x.num_users||0)}</span><span class="vbar-w"><span class="vbar-f" style="width:${Math.round((x.num_users||0)/maxV*100)}%"></span></span></td>
+    <td class="mono" style="color:var(--txt2)">${fmt(x.num_followers||0)}</td>
+    <td class="mono">${x.age||'—'}</td>
+    <td style="font-size:.68rem;color:var(--txt3)">${x.country||'—'}</td>
+    <td><button class="crd-fav${favs.includes(x.username)?' is-fav':''}" style="position:static;width:26px;height:26px;border-radius:50%" onclick="toggleFav(event,'${x.username}')">♥</button></td>
+  </tr>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+let prevCd=null,prevSec=30;
+function openMod(u){
+  const x=rooms.find(r=>r.username===u);if(!x)return;
+  active=x;
+  document.getElementById('m-name').textContent=x.username;
+  document.getElementById('m-disp').textContent=x.display_name||'';
+  // gender pill now handled inside startLivePreview
+  // Compact stats row: viewers · fans · age · country · tags
+  const statsRow=document.getElementById('m-stats-row');
+  if(statsRow){
+    const parts=[];
+    if(x.num_users)parts.push(`<span class="modal-stat-item"><span class="modal-stat-val" style="color:var(--hot)">${fmt(x.num_users)}</span> viewers</span>`);
+    if(x.num_followers)parts.push(`<span class="modal-stat-item">❤️ <span class="modal-stat-val">${fmt(x.num_followers)}</span></span>`);
+    if(x.age)parts.push(`<span class="modal-stat-item">🎂 <span class="modal-stat-val">${x.age}</span></span>`);
+    if(x.country)parts.push(`<span class="modal-stat-item">🌍 <span class="modal-stat-val">${x.country}</span></span>`);
+    const tags=(x.tags||[]).slice(0,4).map(t=>`<span style="background:rgba(255,255,255,.07);border-radius:8px;padding:1px 7px;font-size:.6rem">#${t}</span>`).join('');
+    statsRow.innerHTML=parts.join('<span style="opacity:.3;margin:0 .15rem">·</span>')+( tags?`<span style="margin-left:.3rem;display:flex;gap:.2rem;flex-wrap:wrap">${tags}</span>`:'' );
+  }
+  document.getElementById('m-link').href=`https://chaturbate.com/${x.username}/?campaign=rI8z3&track=default`;
+  updateFavBtn(x.username);
+  startLivePreview(x);
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function updateFavBtn(u){
+  const fv=favs.includes(u);
+  document.getElementById('m-fav-btn').classList.toggle('on',fv);
+  document.getElementById('m-fav-icon').textContent=fv?'♥':'♡';
+}
+function startLivePreview(x){
+  clearInterval(prevCd);
+  const wrap=document.getElementById('mhero-img-wrap');
+  const pill=document.getElementById('m-live-pill');
+  const u=x.username;
+  const srcs=[
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`,
+    `https://roomimg.stream.highwebmedia.com/ri/${u}.jpg`
+  ];
+  if(x.num_users>0){
+    // Live pill badge
+    if(pill) pill.innerHTML=`<span class="modal-live-pill"><span class="live-timer-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s infinite;margin-right:2px"></span>EN VIVO</span><span class="modal-viewer-count">👀 ${fmt(x.num_users)}</span>`;
+    wrap.innerHTML=`
+      <div class="live-preview-wrap" style="cursor:pointer">
+        <img class="live-preview-img" id="live-img"
+          src="${srcs[0]}?t=${Date.now()}" alt="${u}" data-t="0"
+          onerror="const t=parseInt(this.dataset.t||0)+1;const s=${JSON.stringify(srcs)};if(t<s.length){this.dataset.t=t;this.src=s[t]+'?t='+Date.now();}else{this.style.opacity='0';}">
+        <div class="live-timer-badge">
+          <span class="live-timer-dot"></span>
+          LIVE · <span id="live-timer">30s</span>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <div class="live-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <div class="live-tap-hint">Toca para entrar</div>
+        </div>
+      </div>`;
+    prevSec=30;
+    prevCd=setInterval(()=>{
+      prevSec--;
+      const el=document.getElementById('live-timer');
+      if(el) el.textContent=prevSec+'s';
+      if(prevSec<=0){
+        prevSec=30;
+        const img=document.getElementById('live-img');
+        if(img){
+          const ns=srcs[0]+'?t='+Date.now();
+          const tmp=new Image();
+          tmp.onload=()=>{img.src=ns;};
+          tmp.src=ns;
+        }
+      }
+    },1000);
+  }else{
+    if(pill) pill.innerHTML='';
+    wrap.innerHTML=`
+      <div class="mhp-wrap">
+        <div class="mhp-ava">🎥</div>
+        <div class="mhp-name">${x.display_name||u}</div>
+        <div class="mhp-offline">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>
+          Offline en este momento
+        </div>
+        <a href="https://chaturbate.com/${u}/?campaign=rI8z3&track=default"
+           target="_blank" rel="noopener" class="mhp-cta">
+          🔔 Seguirla en Chaturbate →
+        </a>
+      </div>`;
+  }
+}
+function openInCB(u){window.open(`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`,'_blank','noopener');}
+function closeMod(e){if(!e||e.target===document.getElementById('modal-bg')){document.getElementById('modal-bg').classList.remove('open');document.body.style.overflow='';clearInterval(prevCd);}}
+function reportFromModal(){
+  if(!active)return;
+  closeMod();
+  document.getElementById('model-username-input').value=active.username;
+  switchTab('model');
+  searchModel();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
+
+/* ═══════════════════════════════════════════
+   FAVORITES
+═══════════════════════════════════════════ */
+function toggleFav(e,u){
+  e.stopPropagation();
+  const i=favs.indexOf(u);
+  if(i>=0)favs.splice(i,1);else favs.push(u);
+  localStorage.setItem('cp3_favs',JSON.stringify(favs));
+  // update all fav buttons without re-render
+  document.querySelectorAll(`.crd-fav`).forEach(btn=>{
+    const art=btn.closest('.crd');if(!art)return;
+    const onclick=art.getAttribute('onclick')||'';
+    const m=onclick.match(/openMod\('([^']+)'\)/);
+    if(m&&m[1]===u)btn.classList.toggle('is-fav',favs.includes(u));
+  });
+  ['sd-gc-fv','md-gc-fv'].forEach(id=>{const el2=document.getElementById(id);if(el2)el2.textContent=favs.length;});
+  toast(favs.includes(u)?'Guardada en favoritas ♥':'Quitada de favoritas');
+}
+function favMod(){if(!active)return;toggleFav({stopPropagation:()=>{}},active.username);updateFavBtn(active.username);}
+
+/* ═══════════════════════════════════════════
+   FILTER HANDLERS
+═══════════════════════════════════════════ */
+function setGender(btn,g){
+  gender=g;
+  document.querySelectorAll('.gnav-btn[data-g]').forEach(b=>b.classList.toggle('active',b.dataset.g===g));
+  document.querySelectorAll('.g-btn[data-g],.g-btn[onclick]').forEach(b=>{
+    const match=b.getAttribute('onclick')||'';
+    b.classList.toggle('active',match.includes(`'${g}'`)||(g===''&&match.includes("''")));
+  });
+  renderCarousels();renderOnFilter();
+}
+function toggleFavFilter(btn){
+  onlyFavs=!onlyFavs;
+  document.querySelectorAll('#sd-fv,#md-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
+  renderOnFilter();
+}
+function toggleHDFilter(btn){
+  onlyHD=!onlyHD;
+  document.querySelectorAll('#sd-hd,#md-hd,#tb-hd').forEach(b=>b.classList.toggle('active',onlyHD));
+  renderOnFilter();
+}
+function toggleColFilter(btn){
+  onlyCol=!onlyCol;
+  document.getElementById('tb-co').classList.toggle('on',onlyCol);
+  renderOnFilter();
+}
+function setAgeFilter(el,r){
+  ageRange=ageRange===r?'':r;
+  document.querySelectorAll('.age-chip').forEach(c=>{
+    const match=c.getAttribute('onclick')||'';
+    c.classList.toggle('active',match.includes(`'${ageRange}'`));
+  });
+  renderOnFilter();
+}
+function setTagFilter(tag){
+  activeTag=activeTag===tag?'':tag;
+  document.getElementById('search').value='';
+  renderOnFilter();
+}
+document.getElementById('search').addEventListener('input',()=>renderOnFilter());
+document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;renderOnFilter();});
+document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render();});
+document.getElementById('th-f').addEventListener('click',()=>{sort='followers';render();});
+document.getElementById('th-a').addEventListener('click',()=>{sort='age_asc';render();});
+document.getElementById('vg').addEventListener('click',()=>{
+  view='grid';
+  document.getElementById('gc-grid').classList.remove('hide');
+  document.getElementById('lw').classList.add('hide');
+  document.getElementById('vg').classList.add('on');
+  document.getElementById('vl').classList.remove('on');
+  render();
+});
+document.getElementById('vl').addEventListener('click',()=>{
+  view='list';
+  document.getElementById('gc-grid').classList.add('hide');
+  document.getElementById('lw').classList.remove('hide');
+  document.getElementById('vg').classList.remove('on');
+  document.getElementById('vl').classList.add('on');
+  render();
+});
+document.getElementById('tb-co').addEventListener('click',function(){toggleColFilter(this);});
+document.getElementById('tb-fv').addEventListener('click',function(){toggleFavFilter(this);});
+document.getElementById('tb-hd').addEventListener('click',function(){toggleHDFilter(this);});
+document.getElementById('ref-btn').addEventListener('click',load);
+
+/* ═══════════════════════════════════════════
+   DRAWER / HAMBURGER
+═══════════════════════════════════════════ */
+function toggleDrawer(){
+  const d=document.getElementById('mob-drawer');
+  const ov=document.getElementById('drawer-overlay');
+  const btn=document.getElementById('ham-btn');
+  const open=d.classList.toggle('open');
+  ov.classList.toggle('open',open);
+  btn.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeDrawer(){
+  document.getElementById('mob-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('ham-btn').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ═══════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════ */
+function switchTab(tab){
+  const explore=document.getElementById('page-explore');
+  const model=document.getElementById('model-view');
+  ['tab-explore','tab-model'].forEach(id=>{
+    document.getElementById(id).classList.toggle('active',id===`tab-${tab}`);
+  });
+  ['bnav-explore','bnav-model'].forEach(id=>{
+    document.getElementById(id).classList.toggle('active',id===`bnav-${tab}`);
+  });
+  if(tab==='explore'){
+    explore.classList.remove('hide');
+    model.classList.remove('show');
+  }else{
+    explore.classList.add('hide');
+    model.classList.add('show');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ═══════════════════════════════════════════
+   MODEL REPORT
+═══════════════════════════════════════════ */
+let curModel=null;
+function el(id,val){const e=document.getElementById(id);if(e)e.textContent=val;}
+
+function resetModelSearch(){
+  document.getElementById('model-search-screen').style.display='flex';
+  document.getElementById('model-report').style.display='none';
+  document.getElementById('model-username-input').value='';
+  curModel=null;
+}
+
+async function searchModel(){
+  const u=document.getElementById('model-username-input').value.trim().toLowerCase();
+  const err=document.getElementById('model-search-error');
+  if(!u){err.style.display='block';err.textContent='Escribe tu username primero';return;}
+  err.style.display='none';
+  let room=rooms.find(r=>r.username===u)||null;
+  if(!room){
+    try{
+      const res=await fetch(`/api/rooms?username=${encodeURIComponent(u)}`);
+      const d=await res.json();
+      room=(d.results||[]).find(r=>r.username===u)||null;
+    }catch(e){}
+  }
+  curModel=room;
+  loadModelReport(room,u);
+}
+
+async function loadModelReport(room,username){
+  const u=username||(room&&room.username)||'';
+  document.getElementById('model-search-screen').style.display='none';
+  document.getElementById('model-report').style.display='block';
+
+  // Profile
+  const img=document.getElementById('rp-img');
+  img.src=room?.image_url||`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
+  img.onerror=()=>{img.src='';img.style.display='none';};
+  el('rp-name',room?.display_name||u||'—');
+  el('rp-meta',`@${u}${room?.country?' · '+room.country:''}${room?.age?' · '+room.age+' años':''}`);
+  const dot=document.getElementById('rp-status-dot');
+  const stxt=document.getElementById('rp-status-txt');
+  if(room&&room.num_users>0){dot.style.background='var(--hot)';stxt.style.color='var(--hot)';stxt.textContent='En vivo ahora';}
+  else{dot.style.background='var(--txt3)';stxt.style.color='var(--txt3)';stxt.textContent='Offline en este momento';}
+  document.getElementById('rp-link').href=`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`;
+
+  // Rank
+  const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+  const rank=sorted.findIndex(r=>r.username===u);
+  const total=sorted.length;
+  if(rank>=0){
+    el('hrc-rank-num','#'+(rank+1));
+    el('hrc-rank-of',`de ${fmt(total)} salas activas`);
+    const pct=Math.round(((total-rank)/total)*100);
+    const fillW=Math.round(((total-rank)/total)*100);
+    document.getElementById('arc-fill').style.width=fillW+'%';
+    const hrcMsg=document.getElementById('hrc-message');
+    hrcMsg.style.display='block';
+    const percentilEl=document.getElementById('hrc-percentil');
+    percentilEl.textContent=`Top ${100-pct+1}%`;
+    document.getElementById('hrc-msg-ico').textContent=pct>90?'🏆':pct>70?'🔥':pct>50?'⭐':'📊';
+    document.getElementById('hrc-msg-txt').textContent=pct>90?'¡Estás entre las mejores!':pct>70?'¡Muy buen rendimiento!':pct>50?'Por encima del promedio':'Sigue creciendo';
+  }else{
+    el('hrc-rank-num','—');el('hrc-rank-of','No está en línea ahora');
+    document.getElementById('hrc-message').style.display='none';
+  }
+
+  // KPIs
+  el('hrc-viewers',fmt(room?.num_users||0));
+  el('rp-followers',fmt(room?.num_followers||0));
+
+  // Tags
+  const tagsEl=document.getElementById('rp-tags');
+  if(tagsEl)tagsEl.innerHTML=(room?.tags||[]).slice(0,20).map(t=>`<span class="rep-tag">#${t}</span>`).join('')||'<span style="color:var(--txt3);font-size:.72rem">Sin tags disponibles</span>';
+
+  // Historical data
+  loadHistoricalData(u,room);
+  loadStatbateIncome(u);
+}
+
+async function loadHistoricalData(username,room){
+  const SU='https://upwjwuikaxuelczlrewk.supabase.co';
+  const SK='sb_publishable_q_2qqv0L4-NZ6ChmfLvd7A_t2ucKAaF';
+  const H={'apikey':SK,'Authorization':'Bearer '+SK};
+  const days=30;
+  const since=new Date(Date.now()-days*24*60*60*1000).toISOString();
+  try{
+    const res=await fetch(`${SU}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=1000`,{headers:H});
+    const data=await res.json();
+    if(!data.length){
+      el('rp-avg','—');el('rp-peak','—');el('rp-snaps','0 registros');
+      renderTrendChart([],[],0,0,0);renderFollowersChart([]);
+      return;
+    }
+    const views=data.map(d=>d.num_users||0);
+    const avg=Math.round(views.reduce((s,v)=>s+v,0)/views.length);
+    const peak=Math.max(...views);
+    el('rp-avg',fmt(avg));
+    el('rp-peak',fmt(peak));
+    el('rp-snaps',`${data.length} registros en 30d`);
+
+    // Day averages
+    const byDay={};
+    data.forEach(d=>{
+      const day=d.captured_at.substring(0,10);
+      if(!byDay[day])byDay[day]=[];byDay[day].push(d.num_users||0);
+    });
+    const dayAvgs=Object.entries(byDay).map(([d,vs])=>({day:d,avg:Math.round(vs.reduce((s,v)=>s+v,0)/vs.length)}));
+
+    // Market comparison
+    const sorted=[...rooms].map(r=>r.num_users||0).sort((a,b)=>b-a);
+    const top10Threshold=sorted[Math.floor(sorted.length*0.1)]||0;
+    const avgAll=sorted.length?Math.round(sorted.reduce((s,v)=>s+v,0)/sorted.length):0;
+    const myViews=room?.num_users||avg;
+    const myPct=sorted.length?Math.round((myViews/Math.max(...sorted,1))*100):0;
+    const top10Pct=Math.round((top10Threshold/Math.max(...sorted,1))*100);
+    const avgPct=Math.round((avgAll/Math.max(...sorted,1))*100);
+    el('rb-pos-val',fmt(myViews)+' viewers');
+    el('rb-top10-val',fmt(top10Threshold)+' viewers');
+    el('rb-avg-val',fmt(avgAll)+' viewers');
+    document.getElementById('rb-pos').style.width=Math.min(myPct,100)+'%';
+    document.getElementById('rb-top10').style.width=Math.min(top10Pct,100)+'%';
+    document.getElementById('rb-avg').style.width=Math.min(avgPct,100)+'%';
+    const summary=myViews>top10Threshold?'🏆 ¡Estás en el top 10%! Eso es lo mejor de lo mejor.':myViews>avgAll?`⭐ Estás por encima del promedio. ¡Vas bien!`:`📈 Con ${fmt(avgAll-myViews)} viewers más llegarías al promedio. ¡Tú puedes!`;
+    el('rb-summary',summary);
+
+    renderTrendChart(data,dayAvgs,avg,peak,data.length);
+    renderFollowersChart(data);
+    renderScheduleSection(data);
+  }catch(e){el('rp-avg','—');el('rp-peak','—');}
+}
+
+function renderTrendChart(data,dayAvgs,avg,peak,snaps){
+  const cont=document.getElementById('heatmap-container');
+  if(!cont)return;
+  if(!data.length){cont.innerHTML='<div class="chart-no-data">Aún no hay suficientes datos. ¡Empieza a transmitir!</div>';return;}
+  const w=cont.clientWidth||280,h=110;
+  const vals=dayAvgs.map(d=>d.avg);
+  const mx=Math.max(...vals,1);
+  const pts=vals.map((v,i)=>{
+    const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
+    const y=h-12-(v/mx)*(h-24);
+    return`${x},${y}`;
+  }).join(' ');
+  cont.innerHTML=`<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="overflow:visible">
+    <defs>
+      <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--hot)" stop-opacity=".35"/>
+        <stop offset="100%" stop-color="var(--hot)" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${vals.length>1?`<polygon points="${pts} ${w-8},${h} 8,${h}" fill="url(#grad)"/>
+    <polyline points="${pts}" fill="none" stroke="var(--hot)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`:''}
+    ${vals.map((v,i)=>{
+      const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
+      const y=h-12-(v/mx)*(h-24);
+      return v===peak&&vals.length>1?`<circle cx="${x}" cy="${y}" r="4" fill="var(--gold)" stroke="var(--bg2)" stroke-width="2"/>`:'';
+    }).join('')}
+  </svg>
+  <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--txt3);margin-top:.2rem;padding:0 2px">
+    <span>${dayAvgs[0]?.day.substring(5)||''}</span>
+    <span style="color:var(--txt2)">Promedio: <strong style="color:var(--txt)">${fmt(avg)}</strong></span>
+    <span>${dayAvgs[dayAvgs.length-1]?.day.substring(5)||''}</span>
+  </div>`;
+}
+
+function renderFollowersChart(data){
+  const cont=document.getElementById('followers-container');
+  if(!cont)return;
+  const fdata=data.filter(d=>d.num_followers>0);
+  if(fdata.length<2){cont.innerHTML='<div class="chart-no-data">Pocos datos de seguidores aún</div>';return;}
+  const w=cont.clientWidth||280,h=110;
+  const vals=fdata.map(d=>d.num_followers);
+  const mn=Math.min(...vals),mx=Math.max(...vals,mn+1);
+  const pts=vals.map((v,i)=>{
+    const x=i/(vals.length-1)*(w-16)+8;
+    const y=h-12-((v-mn)/(mx-mn))*(h-24);
+    return`${x},${y}`;
+  }).join(' ');
+  const diff=vals[vals.length-1]-vals[0];
+  const diffColor=diff>=0?'var(--grn)':'var(--hot)';
+  const diffSign=diff>=0?'+':'';
+  cont.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem">
+    <span style="font-size:1.2rem;font-weight:800;color:var(--txt)">${fmt(vals[vals.length-1])}</span>
+    <span style="font-size:.72rem;font-weight:700;color:${diffColor}">${diffSign}${fmt(diff)} en 30d</span>
+  </div>
+  <svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="overflow:visible">
+    <defs>
+      <linearGradient id="gradF" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--grn)" stop-opacity=".3"/>
+        <stop offset="100%" stop-color="var(--grn)" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="${pts} ${w-8},${h} 8,${h}" fill="url(#gradF)"/>
+    <polyline points="${pts}" fill="none" stroke="var(--grn)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function renderScheduleSection(data){
+  if(!data.length){document.getElementById('schedule-hero-section').style.display='none';return;}
+  const byDay={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  const countDay={0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  data.forEach(d=>{
+    const dow=new Date(d.captured_at).getDay();
+    byDay[dow]+=(d.num_users||0);countDay[dow]++;
+  });
+  const avgByDay=Object.entries(byDay).map(([d,s])=>({day:parseInt(d),avg:countDay[d]?Math.round(s/countDay[d]):0}));
+  const mx=Math.max(...avgByDay.map(d=>d.avg),1);
+  const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const cont=document.getElementById('schedule-days-grid');
+  if(!cont)return;
+  cont.innerHTML=avgByDay.map(({day,avg})=>{
+    const pct=avg/mx;
+    const opacity=0.1+pct*0.9;
+    const bg=`rgba(0,232,148,${opacity})`;
+    const txtColor=pct>0.6?'#000':'var(--txt)';
+    return`<div class="sched-day" style="background:${bg}" title="${DAYS[day]}: ${fmt(avg)} viewers promedio">
+      <div class="sched-day-lbl" style="color:${pct>0.6?'rgba(0,0,0,.7)':'var(--txt3)'}">${DAYS[day]}</div>
+      <div class="sched-day-val" style="color:${txtColor}">${fmt(avg)}</div>
+    </div>`;
+  }).join('');
+  const best=avgByDay.reduce((b,c)=>c.avg>b.avg?c:b,avgByDay[0]);
+  const bestEl=document.getElementById('sched-best-label');
+  const bestTxt=document.getElementById('sched-best-txt');
+  if(bestEl&&bestTxt&&best.avg>0){
+    bestTxt.textContent=`Los ${DAYS[best.day]} eres imparable — promedio de ${fmt(best.avg)} viewers`;
+    bestEl.style.display='inline-flex';
+  }
+  document.getElementById('schedule-hero-section').style.display='block';
+}
+
+async function loadStatbateIncome(username){
+  try{
+    const res=await fetch(`/api/income?username=${encodeURIComponent(username)}`);
+    const d=await res.json();
+    if(d.income){
+      el('income-hero-val',d.income);
+      document.getElementById('income-hero-section').style.display='block';
+    }
+  }catch(e){}
+}
+
+/* ═══════════════════════════════════════════
+   AUTO REFRESH
+═══════════════════════════════════════════ */
+setInterval(load, 2*60*1000);
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+load();
+</script>
+</body>
+</html>
