@@ -216,10 +216,11 @@ header{
 .gender-nav{
   display:flex;align-items:center;gap:0;
   padding:0 1rem;
-  background:var(--bg2);
+  background:rgba(20,21,25,.97);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border-bottom:1px solid var(--bdr);
   overflow-x:auto;scrollbar-width:none;
-  flex-shrink:0;position:sticky;top:0;z-index:10
+  flex-shrink:0;position:sticky;top:var(--hdr);z-index:50
 }
 .gender-nav::-webkit-scrollbar{display:none}
 .gnav-btn{
@@ -230,7 +231,7 @@ header{
   transition:all .18s;white-space:nowrap;flex-shrink:0
 }
 .gnav-btn:hover{color:var(--txt)}
-.gnav-btn.active{color:var(--txt);border-bottom-color:var(--hot)}
+.gnav-btn.active{color:var(--txt);border-bottom-color:var(--hot);font-weight:700}
 .gnav-btn .gnav-ico{font-size:1.1rem;line-height:1}
 .gnav-div{width:1px;height:24px;background:var(--bdr);flex-shrink:0;margin:0 .25rem}
 
@@ -241,7 +242,10 @@ header{
   display:flex;align-items:center;gap:.5rem;
   padding:.5rem 1rem;
   border-bottom:1px solid var(--bdr);
-  overflow-x:auto;scrollbar-width:none;flex-shrink:0
+  overflow-x:auto;scrollbar-width:none;flex-shrink:0;
+  position:sticky;top:calc(var(--hdr) + 42px);z-index:49;
+  background:rgba(20,21,25,.97);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
 .filter-bar::-webkit-scrollbar{display:none}
 .srch{
@@ -265,7 +269,7 @@ header{
   white-space:nowrap;transition:all .15s;flex-shrink:0
 }
 .qchip:hover{border-color:var(--bdr2);color:var(--txt)}
-.qchip.on{background:rgba(255,42,109,.12);border-color:rgba(255,42,109,.4);color:var(--hot)}
+.qchip.on{background:rgba(255,42,109,.2);border-color:var(--hot);color:var(--hot);font-weight:700;box-shadow:0 0 0 1px rgba(255,42,109,.3)}
 .sort-sel{
   background:var(--surf);border:1px solid var(--bdr);
   border-radius:8px;color:var(--txt2);font-family:inherit;
@@ -665,6 +669,97 @@ header{
 /* ═══════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   ADMIN PANEL
+═══════════════════════════════════════════ */
+.admin-fab{
+  position:fixed;bottom:calc(var(--bnav) + .85rem);right:1rem;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--purple);border:none;
+  color:#fff;font-size:1.1rem;
+  display:none;align-items:center;justify-content:center;
+  box-shadow:0 4px 18px rgba(155,93,229,.5);
+  z-index:280;cursor:pointer;transition:all .18s
+}
+.admin-fab.show{display:flex}
+.admin-fab:hover{transform:scale(1.08)}
+.admin-panel-bg{
+  display:none;position:fixed;inset:0;z-index:490;
+  background:rgba(0,0,0,.8);backdrop-filter:blur(6px);
+  align-items:flex-end;justify-content:center
+}
+.admin-panel-bg.open{display:flex}
+.admin-panel{
+  background:var(--bg2);border-radius:24px 24px 0 0;
+  width:100%;max-width:500px;
+  padding:1.2rem 1.2rem 2rem;
+  animation:slidemodal .28s cubic-bezier(.22,1,.36,1);
+  max-height:80dvh;overflow-y:auto
+}
+.admin-panel::before{
+  content:'';display:block;width:36px;height:4px;
+  border-radius:2px;background:rgba(255,255,255,.15);
+  margin:0 auto .9rem
+}
+.admin-panel-title{
+  font-size:.95rem;font-weight:800;margin-bottom:1rem;
+  display:flex;align-items:center;gap:.5rem
+}
+.admin-field{margin-bottom:.75rem}
+.admin-field label{
+  display:block;font-size:.6rem;font-weight:700;
+  color:var(--txt3);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:.35rem
+}
+.admin-field input{
+  width:100%;background:var(--surf);border:1px solid var(--bdr);
+  border-radius:9px;padding:.6rem .85rem;color:var(--txt);
+  font-family:inherit;font-size:.82rem;outline:none;
+  transition:border-color .15s
+}
+.admin-field input:focus{border-color:rgba(155,93,229,.6)}
+.admin-row{display:flex;gap:.5rem}
+.admin-row .admin-field{flex:1}
+.admin-submit{
+  width:100%;background:var(--purple);border:none;
+  border-radius:10px;padding:.7rem;color:#fff;
+  font-family:inherit;font-size:.85rem;font-weight:700;
+  cursor:pointer;transition:opacity .15s;margin-top:.25rem
+}
+.admin-submit:hover{opacity:.88}
+.admin-submit:disabled{opacity:.5}
+.admin-list{margin-top:1.1rem}
+.admin-list-title{
+  font-size:.65rem;font-weight:700;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:.55rem
+}
+.admin-item{
+  display:flex;align-items:center;gap:.75rem;
+  background:var(--surf);border-radius:10px;
+  padding:.6rem .75rem;margin-bottom:.4rem
+}
+.admin-item-thumb{
+  width:36px;height:48px;border-radius:6px;
+  object-fit:cover;background:var(--surf2);flex-shrink:0
+}
+.admin-item-pos{
+  width:24px;height:24px;border-radius:6px;
+  background:var(--surf2);border:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;color:var(--purple);flex-shrink:0
+}
+.admin-item-info{flex:1;min-width:0}
+.admin-item-name{font-size:.78rem;font-weight:700;color:var(--txt)}
+.admin-item-meta{font-size:.62rem;color:var(--txt3);margin-top:1px}
+.admin-del{
+  background:none;border:none;color:var(--txt3);
+  font-size:.9rem;cursor:pointer;padding:.2rem;
+  transition:color .15s;flex-shrink:0
+}
+.admin-del:hover{color:var(--hot)}
+.admin-err{font-size:.68rem;color:var(--hot);margin-top:.35rem;min-height:.9rem}
+.admin-pass-screen{padding:.5rem 0 .75rem}
+
 .toast{
   position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(8px);
   background:var(--surf2);border:1px solid var(--bdr2);
@@ -982,7 +1077,7 @@ header{
   .modal-hero{height:250px}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
-  .filter-bar{padding:.4rem .7rem}
+  .filter-bar{padding:.4rem .7rem;top:calc(var(--hdr) + 38px)}
   .gender-nav{padding:0 .7rem}
   .toast{bottom:calc(var(--bnav) + .65rem)}
 }
@@ -1437,6 +1532,51 @@ header{
 
 <div class="toast" id="toast"></div>
 
+<!-- ADMIN FAB -->
+<button class="admin-fab" id="admin-fab" onclick="openAdminPanel()" title="Admin Featured">⭐</button>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel-bg" id="admin-panel-bg" onclick="closeAdminPanel(event)">
+  <div class="admin-panel">
+    <!-- Password screen -->
+    <div id="admin-pass-screen" class="admin-pass-screen">
+      <div class="admin-panel-title">🔐 Panel Admin</div>
+      <div class="admin-field">
+        <label>Clave de administrador</label>
+        <input type="password" id="admin-secret-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <button class="admin-submit" onclick="adminLogin()">Entrar</button>
+      <div class="admin-err" id="admin-login-err"></div>
+    </div>
+    <!-- Main screen -->
+    <div id="admin-main-screen" style="display:none">
+      <div class="admin-panel-title">⭐ Modelos Destacadas</div>
+      <!-- Add form -->
+      <div class="admin-row">
+        <div class="admin-field" style="flex:2">
+          <label>Username de Chaturbate</label>
+          <input type="text" id="admin-username" placeholder="ej: sweetangelxxx" oninput="adminPreview()" onkeydown="if(event.key==='Enter')adminAdd()">
+        </div>
+        <div class="admin-field" style="flex:1">
+          <label>Posición</label>
+          <input type="number" id="admin-position" placeholder="Auto" min="1">
+        </div>
+      </div>
+      <div class="admin-field">
+        <label>Etiqueta (opcional)</label>
+        <input type="text" id="admin-label" placeholder="VIP, Patrocinada...">
+      </div>
+      <button class="admin-submit" id="admin-add-btn" onclick="adminAdd()">➕ Agregar modelo</button>
+      <div class="admin-err" id="admin-add-err"></div>
+      <!-- List -->
+      <div class="admin-list">
+        <div class="admin-list-title">Actualmente destacadas</div>
+        <div id="admin-items-list"><div style="color:var(--txt3);font-size:.75rem;text-align:center;padding:.75rem">Cargando...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════
    CONSTANTS & STATE
@@ -1621,7 +1761,17 @@ function updateAll(){
 function renderOnFilter(){
   clearTimeout(_renderTimer);
   _renderTimer=setTimeout(()=>{
-    const filt=getFiltered();
+    // Re-render pinned sections (featured + favs) on every filter change
+    const featRooms=FEATURED.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+    renderPinnedSection('featured-section',featRooms,'Destacadas','📌','featured');
+    const favRooms=favs.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+    renderPinnedSection('favs-section',favRooms,'Mis Favoritas','♥','fav');
+    const anyPinned=featRooms.some(x=>x&&x.num_users>0)||favRooms.some(x=>x&&x.num_users>0);
+    const divider=document.getElementById('pinned-divider');
+    if(divider)divider.style.display=anyPinned?'block':'none';
+    // Grid without pinned
+    const pinnedUsernames=new Set([...FEATURED,...favs]);
+    const filt=getFiltered().filter(x=>!pinnedUsernames.has(x.username));
     const cc=document.getElementById('catalog-count');
     if(cc)cc.textContent=fmt(filt.length)+' modelos';
     if(view==='grid')renderGrid(filt);
@@ -2337,6 +2487,120 @@ async function loadStatbateIncome(username){
       document.getElementById('income-hero-section').style.display='block';
     }
   }catch(e){}
+}
+
+/* ═══════════════════════════════════════════
+   ADMIN PANEL
+═══════════════════════════════════════════ */
+let _adminSecret='';
+let _adminUnlocked=false;
+
+// Show FAB only when ADMIN_SECRET env var is available (always show for now, login protects it)
+document.getElementById('admin-fab').classList.add('show');
+
+function openAdminPanel(){
+  document.getElementById('admin-panel-bg').classList.add('open');
+  document.body.style.overflow='hidden';
+  if(_adminUnlocked) adminLoadList();
+}
+function closeAdminPanel(e){
+  if(!e||e.target===document.getElementById('admin-panel-bg')){
+    document.getElementById('admin-panel-bg').classList.remove('open');
+    document.body.style.overflow='';
+  }
+}
+function adminLogin(){
+  const val=document.getElementById('admin-secret-input').value.trim();
+  if(!val){document.getElementById('admin-login-err').textContent='Ingresa la clave.';return;}
+  _adminSecret=val;
+  // Test with a GET request
+  fetch('/api/featured-models',{headers:{'Authorization':'Bearer '+val}})
+    .then(r=>r.json())
+    .then(data=>{
+      if(!Array.isArray(data)){throw new Error('invalid');}
+      _adminUnlocked=true;
+      document.getElementById('admin-pass-screen').style.display='none';
+      document.getElementById('admin-main-screen').style.display='block';
+      document.getElementById('admin-login-err').textContent='';
+      adminLoadList();
+    })
+    .catch(()=>{
+      _adminSecret='';
+      document.getElementById('admin-login-err').textContent='Clave incorrecta.';
+    });
+}
+function adminPreview(){
+  // Could show thumb preview — skip for now
+}
+async function adminAdd(){
+  const username=document.getElementById('admin-username').value.trim().toLowerCase();
+  const position=parseInt(document.getElementById('admin-position').value)||null;
+  const label=document.getElementById('admin-label').value.trim()||null;
+  const errEl=document.getElementById('admin-add-err');
+  const btn=document.getElementById('admin-add-btn');
+  errEl.textContent='';
+  if(!username){errEl.textContent='Ingresa el username.';return;}
+  btn.disabled=true;btn.textContent='Agregando...';
+  try{
+    const res=await fetch('/api/featured-models',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+_adminSecret},
+      body:JSON.stringify({username,position,label})
+    });
+    const data=await res.json();
+    if(!data.ok&&!data.data){throw new Error(JSON.stringify(data));}
+    document.getElementById('admin-username').value='';
+    document.getElementById('admin-position').value='';
+    document.getElementById('admin-label').value='';
+    await adminLoadList();
+    await loadFeatured();
+    renderCarousels();
+    toast('Modelo agregada ✓');
+  }catch(e){
+    errEl.textContent='Error al agregar. ¿Ya existe?';
+  }finally{
+    btn.disabled=false;btn.textContent='➕ Agregar modelo';
+  }
+}
+async function adminLoadList(){
+  const el=document.getElementById('admin-items-list');
+  try{
+    const res=await fetch('/api/featured-models?_t='+Date.now());
+    const data=await res.json();
+    if(!Array.isArray(data)||!data.length){
+      el.innerHTML='<div style="color:var(--txt3);font-size:.75rem;text-align:center;padding:.75rem">No hay modelos destacadas aún.</div>';
+      return;
+    }
+    el.innerHTML=data.map(item=>`
+      <div class="admin-item">
+        <div class="admin-item-pos">${item.position}</div>
+        <img class="admin-item-thumb"
+          src="https://thumb.live.mmcdn.com/riw/${item.username}.jpg"
+          onerror="this.src='https://thumb.live.mmcdn.com/ri/${item.username}.jpg'"
+          alt="${item.username}">
+        <div class="admin-item-info">
+          <div class="admin-item-name">${item.username}</div>
+          <div class="admin-item-meta">${item.active!==false?'✓ Activa':'○ Inactiva'}${item.label?' · '+item.label:''}</div>
+        </div>
+        <button class="admin-del" onclick="adminDelete('${item.username}')" title="Eliminar">🗑</button>
+      </div>`).join('');
+  }catch(e){
+    el.innerHTML='<div style="color:var(--hot);font-size:.72rem">Error cargando lista.</div>';
+  }
+}
+async function adminDelete(username){
+  if(!confirm('¿Eliminar "'+username+'" de las destacadas?'))return;
+  try{
+    await fetch('/api/featured-models',{
+      method:'DELETE',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+_adminSecret},
+      body:JSON.stringify({username})
+    });
+    await adminLoadList();
+    await loadFeatured();
+    renderCarousels();
+    toast('Modelo eliminada');
+  }catch(e){toast('Error al eliminar');}
 }
 
 /* ═══════════════════════════════════════════
