@@ -181,7 +181,7 @@ export default function ModelPage({
   const histMax = peakViewers || 1;
 
   // ── SEO ───────────────────────────────────────────────────────────────────
-  const pageTitle = viewers != null
+  let pageTitle = viewers != null
     ? `${name} en Chaturbate — ${viewers.toLocaleString("es")} viewers ahora | Campulse`
     : `${name} Stats en Chaturbate | Campulse`;
 
