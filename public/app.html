@@ -2722,15 +2722,42 @@ function openCardPlayer(e, username, btn) {
 
       clearTimeout(_cardPlayerTimeout);
 
-      if (!data.success || !data.url || data.room_status !== 'public') {
+      if (!data.success || !data.url) {
         if (loading) loading.classList.add('hidden');
         if (errorEl) errorEl.classList.add('show');
         return;
       }
 
-      const m3u8 = data.url;
+      // Tipo 'embed' → usar iframe con el URL de afiliado (permitido por Chaturbate)
+      // Tipo 'hls'   → reproducir .m3u8 con hls.js en el <video>
+      if (data.type === 'embed') {
+        // Swap: reemplazar el <video> por un <iframe> dinámico dentro del mismo contenedor
+        const body = document.querySelector('.crd-iframe-body');
+        const existingVideo = document.getElementById('crd-popup-video');
+        if (body && existingVideo) {
+          const ifrm = document.createElement('iframe');
+          ifrm.id = 'crd-popup-iframe-dyn';
+          ifrm.style.cssText = 'width:100%;height:236px;border:none;display:block;background:#000;';
+          ifrm.allow = 'autoplay; fullscreen; encrypted-media';
+          ifrm.allowFullscreen = true;
+          ifrm.referrerPolicy = 'no-referrer-when-downgrade';
+          ifrm.src = data.url;
+          existingVideo.style.display = 'none';
+          // Quitar iframe anterior si existe
+          const old = document.getElementById('crd-popup-iframe-dyn');
+          if (old) old.remove();
+          body.insertBefore(ifrm, existingVideo);
+          // Quitar loading cuando el iframe cargue
+          ifrm.onload = () => { if (loading) loading.classList.add('hidden'); };
+          // Timeout de seguridad
+          setTimeout(() => { if (loading && !loading.classList.contains('hidden')) {
+            loading.classList.add('hidden');
+          }}, 8000);
+        }
+        return;
+      }
 
-      // 2. Reproducir con hls.js (o con soporte nativo en Safari/iOS)
+      // Tipo 'hls' → reproducir con hls.js
       if (typeof Hls !== 'undefined' && Hls.isSupported()) {
         _hlsInstance = new Hls({
           maxBufferLength: 10,
@@ -2778,6 +2805,11 @@ function closeCardPlayer() {
 
   clearTimeout(_cardPlayerTimeout);
   _destroyHls();
+  // Limpiar iframe dinámico si fue creado por tipo embed
+  const dynIframe = document.getElementById('crd-popup-iframe-dyn');
+  if (dynIframe) dynIframe.remove();
+  const vid = document.getElementById('crd-popup-video');
+  if (vid) vid.style.display = 'block';
   if (loading) loading.classList.remove('hidden');
   if (errorEl) errorEl.classList.remove('show');
   popup.classList.remove('active');
