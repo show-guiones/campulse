@@ -4,6 +4,9 @@
 // Devuelve modelos filtradas por género desde Supabase.
 // ?gender=female|male|couple|trans  → top modelos de ese género
 // ?list=1                           → conteo de modelos por género
+//
+// FIX: La tabla rooms_snapshot almacena gender como CHAR(1): f, m, c, t
+//      Este archivo mapea los slugs de URL al valor real de la BD.
 
 export const config = { runtime: "edge" };
 
@@ -11,6 +14,17 @@ const SITE = "https://www.campulsehub.com";
 const DEFAULT_DAYS = 30;
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
+
+// Mapa de slug de URL → valor real en Supabase (CHAR 1)
+const GENDER_DB_MAP = {
+  female: "f",
+  male:   "m",
+  couple: "c",
+  trans:  "t",
+};
+
+// Mapa inverso: valor BD → slug URL
+const DB_TO_SLUG = { f: "female", m: "male", c: "couple", t: "trans" };
 
 const GENDER_INFO = {
   female: {
@@ -72,6 +86,7 @@ export default async function handler(req) {
 
   try {
     if (list) {
+      // Trae todos los snapshots recientes con username y gender (CHAR 1)
       const url =
         `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
         `?captured_at=gte.${since}` +
@@ -81,12 +96,14 @@ export default async function handler(req) {
       const r = await fetch(url, { headers: sbHeaders });
       const rows = await r.json();
 
+      // Agrupa por slug de URL (convirtiendo el CHAR 1 al slug)
       const map = {};
       for (const row of rows) {
-        const g = (row.gender || "").toLowerCase().trim();
-        if (!g || !GENDER_INFO[g]) continue;
-        if (!map[g]) map[g] = new Set();
-        map[g].add(row.username);
+        const dbVal = (row.gender || "").toLowerCase().trim();
+        const slug  = DB_TO_SLUG[dbVal]; // "f" → "female", etc.
+        if (!slug || !GENDER_INFO[slug]) continue;
+        if (!map[slug]) map[slug] = new Set();
+        map[slug].add(row.username);
       }
 
       const genders = Object.entries(GENDER_INFO).map(([key, info]) => ({
@@ -94,6 +111,7 @@ export default async function handler(req) {
         name: info.name,
         nameEs: info.nameEs,
         emoji: info.emoji,
+        description: info.description,
         models: map[key] ? map[key].size : 0,
         slug: `/gender/${key}`,
       })).filter(g => g.models > 0).sort((a, b) => b.models - a.models);
@@ -103,6 +121,7 @@ export default async function handler(req) {
       });
     }
 
+    // Validar slug recibido
     if (!gender || !GENDER_INFO[gender]) {
       return new Response(
         JSON.stringify({ error: "Parámetro 'gender' requerido: female, male, couple, trans" }),
@@ -110,10 +129,13 @@ export default async function handler(req) {
       );
     }
 
+    // Convertir slug → valor CHAR 1 para filtrar en Supabase
+    const dbGender = GENDER_DB_MAP[gender]; // ej: "female" → "f"
+
     const url =
       `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
       `?captured_at=gte.${since}` +
-      `&gender=eq.${gender}` +
+      `&gender=eq.${dbGender}` +           // ← filtro con valor real de la BD
       `&select=username,num_users,num_followers,display_name,country` +
       `&limit=50000`;
 
