@@ -719,6 +719,41 @@ header{
   background:#fff;animation:pulse 1.2s infinite
 }
 
+/* ── EMBED EN VIVO ── */
+.embed-wrap{
+  display:none;position:relative;
+  width:100%;aspect-ratio:16/9;
+  background:#000;flex-shrink:0
+}
+.embed-wrap.active{display:block}
+.embed-frame{
+  width:100%;height:100%;border:none;display:block
+}
+.embed-loading{
+  position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;
+  background:#000;color:var(--txt2);font-size:.75rem;
+  gap:.5rem;flex-direction:column;pointer-events:none;
+  transition:opacity .3s
+}
+.embed-loading.hidden{opacity:0}
+.embed-loading-spinner{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.12);
+  border-top-color:var(--hot);
+  animation:spin .8s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.embed-back-btn{
+  position:absolute;top:.5rem;left:.5rem;z-index:10;
+  background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);
+  border-radius:20px;color:#fff;font-size:.65rem;font-weight:700;
+  padding:4px 12px;cursor:pointer;backdrop-filter:blur(6px);
+  display:flex;align-items:center;gap:.3rem;
+  transition:background .15s
+}
+.embed-back-btn:hover{background:rgba(0,0,0,.9)}
+
 /* Name & meta over hero */
 .modal-hero-info{
   position:absolute;bottom:0;left:0;right:0;
@@ -1684,7 +1719,18 @@ header{
     <button class="modal-close" onclick="closeMod()">✕</button>
 
     <!-- HERO — full image, click = enter room -->
-    <div class="modal-hero" onclick="if(active)openInCB(active.username)">
+    <div class="modal-hero" id="modal-hero">
+      <!-- EMBED CONTAINER — shown when user clicks play -->
+      <div class="embed-wrap" id="mhero-embed-wrap">
+        <div class="embed-loading" id="embed-loading">
+          <div class="embed-loading-spinner"></div>
+          <span>Cargando stream…</span>
+        </div>
+        <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
+          allow="autoplay; fullscreen" allowfullscreen
+          onload="onEmbedLoad()"></iframe>
+        <button class="embed-back-btn" onclick="deactivateEmbed()">← Volver</button>
+      </div>
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
       <div class="modal-hero-info">
@@ -2319,6 +2365,13 @@ let prevCd=null,prevSec=30;
 function openMod(u){
   const x=rooms.find(r=>r.username===u);if(!x)return;
   active=x;
+  // Reset embed state when switching models
+  const frame=document.getElementById('live-embed-frame');
+  const wrap=document.getElementById('mhero-embed-wrap');
+  const imgWrap=document.getElementById('mhero-img-wrap');
+  if(frame) frame.src='about:blank';
+  if(wrap) wrap.classList.remove('active');
+  if(imgWrap) imgWrap.style.display='';
   document.getElementById('m-name').textContent=x.username;
   document.getElementById('m-disp').textContent=x.display_name||'';
   // gender pill now handled inside startLivePreview
@@ -2375,10 +2428,10 @@ function startLivePreview(x){
           LIVE · <span id="live-timer">30s</span>
         </div>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <div class="live-play-btn">
+          <div class="live-play-btn" id="modal-play-btn" style="pointer-events:all;cursor:pointer" onclick="activateEmbed('${u}')">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           </div>
-          <div class="live-tap-hint">Toca para entrar</div>
+          <div class="live-tap-hint">Toca para ver en vivo</div>
         </div>
       </div>`;
     prevSec=30;
@@ -2414,8 +2467,51 @@ function startLivePreview(x){
       </div>`;
   }
 }
+/* ─── EMBED EN VIVO ─── */
+function activateEmbed(u){
+  const wrap=document.getElementById('mhero-embed-wrap');
+  const imgWrap=document.getElementById('mhero-img-wrap');
+  const frame=document.getElementById('live-embed-frame');
+  const loading=document.getElementById('embed-loading');
+  if(!wrap||!frame)return;
+  // Pausar el interval de thumbnail
+  clearInterval(prevCd);
+  // Ocultar imagen, mostrar embed
+  if(imgWrap) imgWrap.style.display='none';
+  wrap.classList.add('active');
+  if(loading) loading.classList.remove('hidden');
+  // Cargar embed oficial de Chaturbate
+  frame.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${u}&autoplay=1&mobileRedirect=never`;
+}
+function onEmbedLoad(){
+  const loading=document.getElementById('embed-loading');
+  if(loading) loading.classList.add('hidden');
+}
+function deactivateEmbed(){
+  const wrap=document.getElementById('mhero-embed-wrap');
+  const imgWrap=document.getElementById('mhero-img-wrap');
+  const frame=document.getElementById('live-embed-frame');
+  if(frame) frame.src='about:blank';
+  wrap.classList.remove('active');
+  if(imgWrap) imgWrap.style.display='';
+  // Reiniciar preview del modelo activo
+  if(active) startLivePreview(active);
+}
 function openInCB(u){window.open(`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`,'_blank','noopener');}
-function closeMod(e){if(!e||e.target===document.getElementById('modal-bg')){document.getElementById('modal-bg').classList.remove('open');document.body.style.overflow='';clearInterval(prevCd);}}
+function closeMod(e){
+  if(!e||e.target===document.getElementById('modal-bg')){
+    document.getElementById('modal-bg').classList.remove('open');
+    document.body.style.overflow='';
+    clearInterval(prevCd);
+    // Matar el stream del embed
+    const frame=document.getElementById('live-embed-frame');
+    const wrap=document.getElementById('mhero-embed-wrap');
+    const imgWrap=document.getElementById('mhero-img-wrap');
+    if(frame) frame.src='about:blank';
+    if(wrap) wrap.classList.remove('active');
+    if(imgWrap) imgWrap.style.display='';
+  }
+}
 function reportFromModal(){
   if(!active)return;
   closeMod();
