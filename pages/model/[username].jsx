@@ -8,6 +8,7 @@
 //   · Peak viewers (máximo histórico) mostrado en métricas
 //   · Tabla de historial con barras proporcionales inline
 //   · canonical, Schema.org, OG, links a categorías
+//   · fix: deduplicar similarModels por username
 
 import Head from "next/head";
 
@@ -145,12 +146,19 @@ export async function getServerSideProps({ params }) {
           `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
           `?${filter}` +
           `&select=username,display_name,num_users,country` +
-          `&order=num_users.desc&limit=6`,
+          `&order=num_users.desc&limit=20`,
           { headers: sbHeaders }
         );
         if (simRes.ok) {
           const rows = await simRes.json();
-          similarModels = Array.isArray(rows) ? rows : [];
+          if (Array.isArray(rows)) {
+            const seen = new Set();
+            similarModels = rows.filter((r) => {
+              if (seen.has(r.username)) return false;
+              seen.add(r.username);
+              return true;
+            }).slice(0, 6);
+          }
         }
       } catch { /* no bloquea el render */ }
     }
@@ -549,8 +557,6 @@ const styles = {
   histViewers: { fontSize: 12, color: "#a78bfa", width: 50, textAlign: "right", flexShrink: 0 },
   categoryLinks: { display: "flex", flexDirection: "column", gap: 8, marginTop: 28 },
   countryLink: { display: "block", textAlign: "center", color: "#a78bfa", fontSize: 14, textDecoration: "none" },
-  // Modelos similares
-  // Embed en vivo
   embedSection: { marginTop: 24, marginBottom: 8 },
   embedHeader: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10 },
   liveDot: { color: "#ef4444", fontSize: 10, animation: "pulse 2s infinite" },
@@ -558,7 +564,6 @@ const styles = {
   embedWrap: { position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 12, background: "#111" },
   embedFrame: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 12 },
   embedNote: { fontSize: 11, color: "#444", marginTop: 8, textAlign: "center" },
-  // Modelos similares
   similarSection: { marginTop: 40, paddingTop: 28, borderTop: "1px solid #1a1a1a" },
   similarTitle: { fontSize: 15, color: "#ccc", marginBottom: 16, fontWeight: 600 },
   similarGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 },
