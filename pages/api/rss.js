@@ -1,7 +1,7 @@
 // pages/api/rss.js — Live RSS feed for CampulseHub
 export default async function handler(req, res) {
   try {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://campulsehub.com';
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://www.campulsehub.com';
     const resp = await fetch(`${apiBase}/api/rooms`);
     const rooms = await resp.json();
     const online = Array.isArray(rooms)
@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     const items = online.map(r => `
     <item>
       <title>${escXml(r.display_name || r.username)} — ${r.num_users} viewers</title>
-      <link>https://campulsehub.com/model/${r.username}</link>
-      <guid isPermaLink="true">https://campulsehub.com/model/${r.username}</guid>
+      <link>https://www.campulsehub.com/model/${r.username}</link>
+      <guid isPermaLink="true">https://www.campulsehub.com/model/${r.username}</guid>
       <description>${escXml(`${r.username} está en vivo con ${r.num_users} viewers ahora mismo en CampulseHub.`)}</description>
       <pubDate>${new Date().toUTCString()}</pubDate>
     </item>`).join('');
@@ -21,8 +21,8 @@ export default async function handler(req, res) {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>CampulseHub — Modelos en Vivo Ahora</title>
-    <link>https://campulsehub.com</link>
-    <atom:link href="https://campulsehub.com/api/rss" rel="self" type="application/rss+xml"/>
+    <link>https://www.campulsehub.com</link>
+    <atom:link href="https://www.campulsehub.com/api/rss" rel="self" type="application/rss+xml"/>
     <description>Las modelos más vistas en vivo en este momento en CampulseHub.</description>
     <language>es</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
