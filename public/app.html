@@ -20,25 +20,25 @@
    TOKENS & RESET
 ═══════════════════════════════════════════ */
 :root{
-  --bg:       #0d0e12;
-  --bg2:      #13151b;
-  --bg3:      #191c24;
-  --surf:     #1e2029;
-  --surf2:    #242733;
-  --bdr:      rgba(255,255,255,.065);
-  --bdr2:     rgba(255,255,255,.11);
-  --txt:      #edeef2;
-  --txt2:     #8e93a6;
-  --txt3:     #555b6e;
-  --hot:      #f02060;
-  --neon:     #00d4f0;
-  --gold:     #ffbe30;
-  --grn:      #00d97e;
-  --purple:   #9248e0;
-  --female:   #f02060;
-  --male:     #2880f5;
-  --couple:   #f59300;
-  --trans:    #a83ec0;
+  --bg:       #0f1014;
+  --bg2:      #151720;
+  --bg3:      #1a1d28;
+  --surf:     #1e2130;
+  --surf2:    #252839;
+  --bdr:      rgba(255,255,255,.07);
+  --bdr2:     rgba(255,255,255,.12);
+  --txt:      #e8eaf0;
+  --txt2:     #8892a8;
+  --txt3:     #505870;
+  --hot:      #e8305a;
+  --neon:     #38b6d4;
+  --gold:     #f0a830;
+  --grn:      #22c77a;
+  --purple:   #7c5cbf;
+  --female:   #e8305a;
+  --male:     #3080e8;
+  --couple:   #d48020;
+  --trans:    #9248c8;
   --hdr:      52px;
   --bnav:     60px;
   --radius:   12px;
@@ -86,7 +86,7 @@ header{
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 
 /* Tabs center */
-.hdr-tabs{flex:1;display:flex;justify-content:center}
+.hdr-tabs{flex:1}
 .dtabs{
   display:flex;gap:2px;
   background:var(--surf);border:1px solid var(--bdr);
@@ -103,6 +103,53 @@ header{
 .dtab.active{background:var(--hot);color:#fff}
 .dtab.active svg{opacity:1}
 .dtab:hover:not(.active){background:var(--surf2);color:var(--txt)}
+
+/* ── Report menu button ── */
+.rep-menu-btn{
+  display:flex;align-items:center;gap:.35rem;
+  background:var(--surf);border:1px solid var(--bdr2);
+  color:var(--txt2);font-size:.72rem;font-weight:600;
+  padding:.35rem .65rem;border-radius:8px;
+  transition:all .18s;white-space:nowrap;cursor:pointer;
+  font-family:inherit
+}
+.rep-menu-btn svg{width:14px;height:14px;flex-shrink:0}
+.rep-menu-btn:hover,.rep-menu-btn.active{
+  background:var(--surf2);border-color:var(--bdr2);color:var(--txt)
+}
+.rep-menu-label{display:none}
+@media(min-width:600px){.rep-menu-label{display:inline}}
+.rep-menu-dropdown{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  width:280px;background:var(--bg2);
+  border:1px solid var(--bdr2);border-radius:12px;
+  padding:.85rem;box-shadow:0 12px 40px rgba(0,0,0,.55);
+  z-index:600;animation:fadeDown .15s ease
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.rep-menu-dropdown.open{display:block}
+.rep-menu-title{
+  font-size:.72rem;font-weight:700;color:var(--txt);
+  margin-bottom:.65rem;letter-spacing:.02em
+}
+.rep-menu-input-row{display:flex;gap:.4rem;margin-bottom:.4rem}
+.rep-menu-input{
+  flex:1;background:var(--surf);border:1px solid var(--bdr2);
+  color:var(--txt);font-size:.78rem;padding:.5rem .65rem;
+  border-radius:8px;outline:none;font-family:inherit;min-width:0;
+  transition:border-color .15s
+}
+.rep-menu-input:focus{border-color:var(--hot)}
+.rep-menu-go{
+  background:var(--hot);border:none;color:#fff;
+  font-size:.75rem;font-weight:700;padding:.5rem .75rem;
+  border-radius:8px;cursor:pointer;font-family:inherit;
+  white-space:nowrap;transition:opacity .15s
+}
+.rep-menu-go:hover{opacity:.85}
+.rep-menu-err{font-size:.68rem;color:var(--hot);margin-bottom:.3rem}
+.rep-menu-hint{font-size:.65rem;color:var(--txt3);line-height:1.4}
+.rep-menu-links{margin-top:.3rem}
 
 .hdr-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
 /* Hamburger */
@@ -206,7 +253,9 @@ header{
   transition:background .12s,color .12s;
   user-select:none;
 }
-.filter-chip:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.filter-chip:hover:not(.active){background:rgba(255,255,255,.05);color:var(--txt)}
+.filter-chip:focus{outline:none}
+.filter-chip:focus:not(.active){background:var(--surf);color:var(--txt2)}
 .filter-chip.active{
   background:rgba(240,32,96,.12)!important;
   color:var(--hot)!important;
@@ -221,7 +270,10 @@ header{
   padding:2px 8px;color:var(--txt2);cursor:pointer;
   transition:all .15s
 }
-.age-chip:hover{background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);color:var(--neon)}.age-chip.active{background:var(--neon)!important;border-color:var(--neon)!important;color:#000!important;font-weight:700!important}
+.age-chip:hover:not(.active){background:rgba(56,182,212,.1);border-color:rgba(56,182,212,.35);color:var(--neon)}
+.age-chip:focus{outline:none}
+.age-chip.active{background:var(--neon)!important;border-color:var(--neon)!important;color:#000!important;font-weight:700!important}
+.age-chip:focus:not(.active){background:var(--surf2);border-color:var(--bdr2);color:var(--txt2)}
 .mini-stat-row{display:flex;justify-content:space-between;align-items:center;padding:.2rem 0;font-size:.7rem}
 .mini-stat-row span:first-child{color:var(--txt3)}
 .mini-stat-row span:last-child{font-weight:600;color:var(--txt2)}
@@ -270,7 +322,10 @@ header{
 }
 .gender-nav::-webkit-scrollbar{height:3px}
 .gender-nav::-webkit-scrollbar-track{background:transparent}
-.gender-nav::-webkit-scrollbar-thumb{background:var(--surf2);border-radius:3px}
+.gender-nav::-webkit-scrollbar{height:4px}
+.gender-nav::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:4px}
+.gender-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px}
+.gender-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
 .gnav-btn{
   display:flex;flex-direction:column;align-items:center;gap:3px;
   background:none;border:none;
@@ -289,26 +344,31 @@ header{
 .filter-bar{
   display:flex;align-items:center;gap:.5rem;
   padding:.45rem 1rem;
-  background:var(--bg);
+  background:var(--bg2);
   flex-shrink:0;
-  position:sticky;z-index:99;
+  position:sticky;top:var(--hdr);z-index:99;
   overflow-x:auto;
   scrollbar-width:thin;
   scrollbar-color:var(--bdr2) transparent;
+  -webkit-overflow-scrolling:touch;
 }
-.filter-bar::-webkit-scrollbar{height:3px}
-.filter-bar::-webkit-scrollbar-track{background:transparent}
-.filter-bar::-webkit-scrollbar-thumb{background:var(--surf2);border-radius:3px}
+.filter-bar::-webkit-scrollbar{height:4px}
+.filter-bar::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:4px}
+.filter-bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px}
+.filter-bar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
 .filter-bar-top{
-  top:44px;border-bottom:1px solid var(--bdr);
+  top:var(--hdr);border-bottom:1px solid var(--bdr);
   padding:.45rem 1rem;
-  overflow-x:visible;scrollbar-width:none;
+  overflow-x:auto;scrollbar-width:thin;
 }
-.filter-bar-top::-webkit-scrollbar{display:none}
+.filter-bar-top::-webkit-scrollbar{height:3px}
+.filter-bar-top::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:3px}
 .filter-bar-chips{
-  top:calc(44px + 41px);border-bottom:1px solid var(--bdr);
-  padding:.35rem 1rem .5rem;
+  top:calc(var(--hdr) + 41px);border-bottom:1px solid var(--bdr);
+  padding:.35rem 1rem .55rem;
   gap:.4rem;
+  -webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);
+  mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);
 }
 .srch{
   display:flex;align-items:center;
@@ -338,6 +398,8 @@ header{
   box-shadow:0 2px 12px rgba(240,32,96,.35)!important
 }
 .qchip:active{transform:scale(.95)}
+.qchip:focus{outline:none}
+.qchip:focus:not(.active){background:var(--surf);border-color:var(--bdr);color:var(--txt2)}
 .sort-sel{
   background:var(--surf);border:1px solid var(--bdr);
   border-radius:8px;color:var(--txt2);font-family:inherit;
@@ -694,21 +756,21 @@ header{
 .modal-stat-val{font-weight:700;color:var(--txt)}
 
 /* CTA */
-.modal-acts{display:flex;gap:.45rem}
+.modal-acts{display:block;margin-bottom:.55rem}
 .btn-go{
-  flex:1;
+  width:100%;
   background:var(--hot);
   color:#fff;border:none;border-radius:14px;
-  padding:.82rem 1rem;
-  font-size:.9rem;font-weight:800;letter-spacing:-.01em;
-  display:flex;align-items:center;justify-content:center;gap:.45rem;
-  transition:all .18s;cursor:pointer;
-  box-shadow:0 4px 18px rgba(255,42,109,.38)
+  padding:.9rem 1rem;
+  font-size:.95rem;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  transition:all .18s;cursor:pointer;text-decoration:none;
+  box-shadow:0 4px 22px rgba(232,48,90,.4)
 }
-.btn-go:hover{filter:brightness(1.1);box-shadow:0 6px 24px rgba(255,42,109,.52)}
-.btn-go:active{transform:scale(.98)}
-.btn-go-ico{font-size:1rem}
-.btn-go-arrow{margin-left:auto;opacity:.7;transition:transform .15s}
+.btn-go:hover{filter:brightness(1.08);box-shadow:0 6px 28px rgba(232,48,90,.58);transform:translateY(-1px)}
+.btn-go:active{transform:scale(.98);filter:none}
+.btn-go-ico{font-size:1rem;flex-shrink:0}
+.btn-go-arrow{margin-left:auto;opacity:.75;transition:transform .15s}
 .btn-go:hover .btn-go-arrow{transform:translateX(3px);opacity:1}
 
 /* Secondaries */
@@ -1203,22 +1265,26 @@ header{
     Live
     <span id="ts-label" style="color:rgba(255,255,255,.28);margin-left:2px">—</span>
   </div>
-  <div class="hdr-tabs">
-    <div class="dtabs">
-      <button class="dtab active" id="tab-explore" onclick="switchTab('explore')">
-        <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-        Explorar
-      </button>
-      <button class="dtab" id="tab-model" onclick="switchTab('model')">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/><circle cx="8" cy="5" r="3"/></svg>
-        Mi Reporte
-      </button>
-    </div>
-  </div>
+  <span style="flex:1"></span>
   <div class="hdr-r">
-    <button class="ref-btn" id="ref-btn" title="Actualizar">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 8A6 6 0 1 1 8 2c2 0 3.8 1 4.9 2.5M14 2v4h-4"/></svg>
-    </button>
+    <!-- 👤 Mi Reporte — floating menu button -->
+    <div style="position:relative" id="report-menu-wrap">
+      <button class="rep-menu-btn" id="rep-menu-btn" onclick="toggleReportMenu()" title="Mi Reporte">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/><circle cx="8" cy="5" r="3"/></svg>
+        <span class="rep-menu-label">Mi Reporte</span>
+      </button>
+      <div class="rep-menu-dropdown" id="rep-menu-dropdown">
+        <div class="rep-menu-title">Tu panel de modelo</div>
+        <div class="rep-menu-input-row">
+          <input type="text" id="model-username-input" class="rep-menu-input" placeholder="Tu username de Chaturbate" onkeydown="if(event.key==='Enter')searchModelFromMenu()">
+          <button class="rep-menu-go" onclick="searchModelFromMenu()">Ver →</button>
+        </div>
+        <div id="rep-menu-error" class="rep-menu-err" style="display:none"></div>
+        <div class="rep-menu-links">
+          <span class="rep-menu-hint">Ver estadísticas, ranking y horarios de tu cuenta</span>
+        </div>
+      </div>
+    </div>
     <button class="ham-btn" id="ham-btn" onclick="toggleDrawer()">
       <span></span><span></span><span></span>
     </button>
@@ -1628,20 +1694,20 @@ header{
       </div>
     </div>
 
-    <!-- BODY — only what matters -->
+    <!-- BODY — CTA first, friction-free -->
     <div class="modal-body">
 
-      <!-- Compact stats line -->
-      <div class="modal-stats-row" id="m-stats-row"></div>
-
-      <!-- CTA -->
+      <!-- PRIMARY CTA — always first, most prominent -->
       <div class="modal-acts">
-        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go">
-          <span class="btn-go-ico">▶</span>
-          <span>Entrar a la sala en vivo</span>
+        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go" id="m-link">
+          <span class="btn-go-ico" id="m-cta-ico">▶</span>
+          <span id="m-cta-txt">Entrar a la sala</span>
           <span class="btn-go-arrow">→</span>
         </a>
       </div>
+
+      <!-- Compact stats line -->
+      <div class="modal-stats-row" id="m-stats-row"></div>
 
       <!-- Secondary -->
       <div class="modal-secondary">
@@ -1650,7 +1716,7 @@ header{
           <span id="m-fav-txt">Favorita</span>
         </button>
         <button class="btn-sec" onclick="reportFromModal()">
-          📊 Su reporte
+          📊 Reporte
         </button>
       </div>
 
@@ -2004,7 +2070,8 @@ function pinnedCardHtml(x,badge){
   const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="https://thumb.live.mmcdn.com/riw/${x.username}.jpg" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const lexyBadge=isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':'';
   const pinnedBadge=!isLexy&&badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':!isLexy&&badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
-  return `<article class="crd${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')">
+  const isLivePinned=(x.num_users||0)>0;
+  return `<article class="crd${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLivePinned?1:0}">
   <div class="crd-media">
     ${imgTag}
     <div class="crd-overlay"></div>
@@ -2039,6 +2106,8 @@ function renderCarousels(){
   const anyPinned=favRooms.some(x=>x&&x.num_users>0)||featRooms.some(x=>x&&x.num_users>0);
   const divider=document.getElementById('pinned-divider');
   if(divider)divider.style.display=anyPinned?'block':'none';
+  // Re-observe cards after carousel renders
+  requestAnimationFrame(()=>lazyLoadImages());
   const filt=getFiltered();
   // Top: salas con viewers — LEXY siempre primera si está online
   let topList=filt.filter(r=>r.num_users>0);
@@ -2089,7 +2158,8 @@ function cardHtml(x,mode='grid'){
   ];
   const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
-  return `<article class="crd${mode==='carousel'?' crd-sm':''}${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')">
+  const isLive = (x.num_users||0)>0;
+  return `<article class="crd${mode==='carousel'?' crd-sm':''}${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLive?1:0}">
   <div class="crd-media">
     ${imgSrcs.length?imgTag:phTag}
     <div class="crd-overlay"></div>
@@ -2138,11 +2208,65 @@ function imgFallback(img){
   }
 }
 
-// Intersection observer — no lazy needed, src ya está seteado
+/* ═══════════════════════════════════════════
+   CAMSODA-STYLE: IntersectionObserver live preview
+   Cards visible on screen → auto-start 15s snapshot cycle
+   Cards off-screen → pause (save bandwidth + UX focus)
+═══════════════════════════════════════════ */
 let observer;
+const cardPreviews = new Map(); // username → {interval, active}
+
 function lazyLoadImages(){
-  // src ya está en el HTML, solo observar para fade-in
-  if(observer)observer.disconnect();
+  if(observer) observer.disconnect();
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const art = entry.target;
+      const u = art.dataset.username;
+      if(!u) return;
+      if(entry.isIntersecting){
+        startCardPreview(art, u);
+      } else {
+        stopCardPreview(u);
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '0px 0px 100px 0px' });
+
+  document.querySelectorAll('.crd[data-username][data-live="1"]').forEach(art => {
+    observer.observe(art);
+  });
+}
+
+function startCardPreview(art, u){
+  if(cardPreviews.has(u)) return; // already running
+  const img = art.querySelector('.crd-img');
+  if(!img) return;
+
+  const srcs = [
+    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+    `https://thumb.live.mmcdn.com/ri/${u}.jpg`
+  ];
+
+  let tick = 0;
+  const refreshImg = () => {
+    const newSrc = srcs[tick % srcs.length] + '?t=' + Date.now();
+    const tmp = new Image();
+    tmp.onload = () => { if(img && img.parentElement) img.src = newSrc; };
+    tmp.src = newSrc;
+    tick++;
+  };
+
+  // Start immediately, then every 15s
+  refreshImg();
+  const interval = setInterval(refreshImg, 15000);
+  cardPreviews.set(u, { interval });
+}
+
+function stopCardPreview(u){
+  const preview = cardPreviews.get(u);
+  if(preview){
+    clearInterval(preview.interval);
+    cardPreviews.delete(u);
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -2169,7 +2293,8 @@ function renderGrid(r){
     return;
   }
   c.innerHTML=r.map(x=>cardHtml(x,'grid')).join('');
-  lazyLoadImages();
+  // Re-observe newly rendered live cards
+  requestAnimationFrame(()=>lazyLoadImages());
 }
 
 function renderList(r){
@@ -2209,6 +2334,11 @@ function openMod(u){
     statsRow.innerHTML=parts.join('<span style="opacity:.3;margin:0 .15rem">·</span>')+( tags?`<span style="margin-left:.3rem;display:flex;gap:.2rem;flex-wrap:wrap">${tags}</span>`:'' );
   }
   document.getElementById('m-link').href=`https://chaturbate.com/${x.username}/?campaign=rI8z3&track=default`;
+  // CTA text: live vs offline
+  const ctaTxt=document.getElementById('m-cta-txt');
+  const ctaIco=document.getElementById('m-cta-ico');
+  if(ctaTxt){ctaTxt.textContent=x.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';}
+  if(ctaIco){ctaIco.textContent=x.num_users>0?'▶':'';}
   updateFavBtn(x.username);
   startLivePreview(x);
   document.getElementById('modal-bg').classList.add('open');
@@ -2396,11 +2526,15 @@ function updateActiveFilterSummary(){
 function setTagFilter(tag){
   activeTag=activeTag===tag?'':tag;
   document.getElementById('search').value='';
-  // Update active state on all tag chips (age-chip = tag drawer chips)
+  // Update active state on all tag chips + blur to prevent :focus sticky
   document.querySelectorAll('.age-chip').forEach(el=>{
     const t=el.getAttribute('onclick')||'';
     const m=t.match(/setTagFilter\('([^']+)'\)/);
-    if(m) el.classList.toggle('active', m[1]===activeTag);
+    if(m){
+      const isActive=m[1]===activeTag;
+      el.classList.toggle('active',isActive);
+      if(!isActive) el.blur(); // remove focus ring on deactivated chips
+    }
   });
   updateActiveFilterSummary();renderOnFilter();
 }
@@ -2465,6 +2599,51 @@ function closeDrawer(){
 /* ═══════════════════════════════════════════
    TABS
 ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   REPORT MENU (floating 👤 dropdown)
+═══════════════════════════════════════════ */
+function toggleReportMenu(){
+  const dd=document.getElementById('rep-menu-dropdown');
+  const btn=document.getElementById('rep-menu-btn');
+  const isOpen=dd.classList.contains('open');
+  // Close on second click
+  dd.classList.toggle('open',!isOpen);
+  btn.classList.toggle('active',!isOpen);
+  if(!isOpen){
+    // Focus input
+    setTimeout(()=>{
+      const inp=document.getElementById('model-username-input');
+      if(inp) inp.focus();
+    },120);
+  }
+}
+// Close report menu when clicking outside
+document.addEventListener('click',function(e){
+  const wrap=document.getElementById('report-menu-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    document.getElementById('rep-menu-dropdown')?.classList.remove('open');
+    document.getElementById('rep-menu-btn')?.classList.remove('active');
+  }
+});
+
+async function searchModelFromMenu(){
+  const inp=document.getElementById('model-username-input');
+  const err=document.getElementById('rep-menu-error');
+  const u=(inp?.value||'').trim().toLowerCase();
+  if(!u){
+    if(err){err.style.display='block';err.textContent='Escribe tu username primero';}
+    return;
+  }
+  if(err) err.style.display='none';
+  // Close dropdown
+  document.getElementById('rep-menu-dropdown')?.classList.remove('open');
+  document.getElementById('rep-menu-btn')?.classList.remove('active');
+  // Delegate to existing searchModel (it reads #model-username-input)
+  // but first switch to model view so report is visible
+  switchTab('model');
+  await searchModel();
+}
+
 function switchTab(tab){
   const explore=document.getElementById('page-explore');
   const model=document.getElementById('model-view');
