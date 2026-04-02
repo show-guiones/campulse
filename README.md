@@ -1,2 +1,2 @@
 # campulse
-Live cam stats dashboard powered by Chaturbate API 
+Live cam stats dashboard powered by Chaturbate API
