@@ -5,6 +5,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'jpeg.cpmimage.com' },
       { protocol: 'https', hostname: 'thumb.live.mmcdn.com' },
       { protocol: 'https', hostname: 'roomimg.stream.highwebmedia.com' },
+      { protocol: 'https', hostname: 'flagcdn.com' }, // ← banderas por país
     ],
   },
   async redirects() {
