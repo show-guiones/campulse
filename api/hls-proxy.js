@@ -29,32 +29,15 @@ export default async function handler(req) {
     return json({ error: 'invalid_username' }, 400);
   }
 
-  // ── Estrategia 1: chatvideocontext API (no requiere CSRF) ──
+  // ── Estrategia 1: GET a la página del modelo — extraer CSRF de cookies ──
+  // Chaturbate devuelve csrftoken en Set-Cookie en el primer GET, sin necesitar leer el body
   try {
-    const ctxRes = await fetch(`https://chaturbate.com/api/chatvideocontext/${username}/`, {
+    const pageRes = await fetch(`https://chaturbate.com/${username}/`, {
       headers: {
         ...HEADERS_BASE,
-        'X-Requested-With': 'XMLHttpRequest',
-        'Referer': `https://chaturbate.com/${username}/`,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
-    });
-
-    if (ctxRes.ok) {
-      const data = await ctxRes.json();
-      if (data.hls_source && data.room_status === 'public') {
-        return json({ success: true, url: data.hls_source, room_status: 'public' });
-      }
-      if (data.room_status) {
-        return json({ success: false, room_status: data.room_status });
-      }
-    }
-  } catch (_) { /* continúa */ }
-
-  // ── Estrategia 2: get_edge_hls_url_ajax con CSRF ──
-  try {
-    // GET a la página del modelo para obtener csrftoken
-    const pageRes = await fetch(`https://chaturbate.com/${username}/`, {
-      headers: { ...HEADERS_BASE, 'Accept': 'text/html,application/xhtml+xml' },
+      redirect: 'follow',
     });
 
     const setCookies = pageRes.headers.getSetCookie
@@ -63,16 +46,26 @@ export default async function handler(req) {
 
     let csrfToken = extractCookie(setCookies, 'csrftoken');
 
+    // Si no vino en Set-Cookie, leer solo los primeros 8KB del body (más eficiente)
     if (!csrfToken) {
-      const html = await pageRes.text();
-      const m = html.match(/csrftoken['"]\s*:\s*['"]([a-zA-Z0-9]+)['"]/);
+      const reader = pageRes.body.getReader();
+      let chunk = '';
+      let done = false;
+      while (!done && chunk.length < 8000) {
+        const { value, done: d } = await reader.read();
+        done = d;
+        if (value) chunk += new TextDecoder().decode(value);
+      }
+      reader.cancel();
+      const m = chunk.match(/csrftoken['":\s]+([a-zA-Z0-9]{20,64})/);
       if (m) csrfToken = m[1];
     }
 
     if (!csrfToken) {
-      return json({ success: false, error: 'no_csrf', room_status: 'unknown' });
+      return json({ success: false, error: 'no_csrf_in_page' });
     }
 
+    // ── POST con el CSRF obtenido ──
     const postRes = await fetch('https://chaturbate.com/get_edge_hls_url_ajax/', {
       method: 'POST',
       headers: {
@@ -92,7 +85,7 @@ export default async function handler(req) {
     }
 
     const data = await postRes.json();
-    return json(data);
+    return json({ ...data, _csrf: csrfToken.slice(0, 6) + '...' }); // debug parcial
 
   } catch (err) {
     return json({ success: false, error: 'proxy_error', message: err.message }, 500);
