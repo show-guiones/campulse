@@ -3,6 +3,7 @@
 // Cambios respecto a versiones anteriores:
 //   · Trae country, display_name y gender del snapshot más reciente
 //   · Link a la página de categoría del país del modelo
+//   · Link a la página de idioma del modelo
 //   · canonical tag → evita duplicados con vercel.app
 //   · title y description con datos reales (viewers, seguidores, mejor horario)
 //   · Schema.org ProfilePage → habilita rich results en Google
@@ -10,6 +11,33 @@
 //   · base de APIs apunta a campulsehub.com
 
 import Head from "next/head";
+
+// Detecta el slug de idioma desde el campo spoken_languages de Supabase
+const LANG_VARIANTS = {
+  spanish:    ["spanish", "español", "espanol", "es"],
+  english:    ["english", "inglés", "ingles", "en"],
+  portuguese: ["portuguese", "portugués", "portugues", "pt"],
+  romanian:   ["romanian", "rumano", "română", "ro"],
+  russian:    ["russian", "ruso", "русский", "ru"],
+  german:     ["german", "alemán", "deutsch", "de"],
+  french:     ["french", "francés", "français", "fr"],
+  italian:    ["italian", "italiano", "it"],
+};
+
+const LANG_NAMES = {
+  spanish: "Español", english: "English", portuguese: "Português",
+  romanian: "Română", russian: "Русский", german: "Deutsch",
+  french: "Français", italian: "Italiano",
+};
+
+function detectLangSlug(raw) {
+  if (!raw) return null;
+  const val = raw.toLowerCase().trim();
+  for (const [slug, variants] of Object.entries(LANG_VARIANTS)) {
+    if (variants.some((v) => val.includes(v))) return slug;
+  }
+  return null;
+}
 
 const SITE = "https://www.campulsehub.com";
 
@@ -106,6 +134,8 @@ export default function ModelPage({
   const flag        = countryCodeToFlag(countryCode);
   const genderLabel = GENDER_LABELS[gender] || null;
   const name        = displayName || username;
+  const langSlug    = detectLangSlug(languages);
+  const langName    = langSlug ? LANG_NAMES[langSlug] : null;
 
   // ── SEO ───────────────────────────────────────────────────────────────────
   const pageTitle = viewers != null
@@ -211,7 +241,11 @@ export default function ModelPage({
                 {flag} {countryName}
               </a>
             )}
-            {languages && <span style={styles.tag}>🗣 {languages}</span>}
+            {languages && langSlug ? (
+              <a href={`/language/${langSlug}`} style={styles.tagLink}>🗣 {langName}</a>
+            ) : languages ? (
+              <span style={styles.tag}>🗣 {languages}</span>
+            ) : null}
           </div>
         </div>
 
@@ -275,12 +309,19 @@ export default function ModelPage({
           Ver sala en vivo
         </a>
 
-        {/* Link a categoría del país */}
-        {countryName && countryCode && (
-          <a href={`/country/${countryCode.toLowerCase()}`} style={styles.countryLink}>
-            {flag} Ver más modelos de {countryName} →
-          </a>
-        )}
+        {/* Links a categorías */}
+        <div style={styles.categoryLinks}>
+          {countryName && countryCode && (
+            <a href={`/country/${countryCode.toLowerCase()}`} style={styles.countryLink}>
+              {flag} Ver más modelos de {countryName} →
+            </a>
+          )}
+          {langSlug && (
+            <a href={`/language/${langSlug}`} style={styles.countryLink}>
+              🗣 Ver modelos en {langName} →
+            </a>
+          )}
+        </div>
       </main>
     </>
   );
@@ -355,10 +396,15 @@ const styles = {
     fontSize: 16,
     marginTop: 28,
   },
+  categoryLinks: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    marginTop: 16,
+  },
   countryLink: {
     display: "block",
     textAlign: "center",
-    marginTop: 16,
     color: "#a78bfa",
     fontSize: 14,
     textDecoration: "none",
