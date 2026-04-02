@@ -1,5 +1,5 @@
 // pages/api/country.js — v2
-// Fixes: más países en COUNTRY_NAMES, mejor manejo de códigos desconocidos
+// Ruta: pages/api/country.js
 
 export const config = { runtime: "edge" };
 
@@ -24,16 +24,18 @@ const COUNTRY_NAMES = {
   AT: "Austria", CH: "Suiza", NO: "Noruega", DK: "Dinamarca",
   FI: "Finlandia", SK: "Eslovaquia", RS: "Serbia", HR: "Croacia",
   BG: "Bulgaria", MD: "Moldavia", LT: "Lituania", LV: "Letonia",
-  EE: "Estonia", SI: "Eslovenia", MK: "Macedonia", AL: "Albania",
+  EE: "Estonia", SI: "Eslovenia", MK: "Macedonia del Norte", AL: "Albania",
   ME: "Montenegro", BA: "Bosnia", BY: "Bielorrusia", KZ: "Kazajistán",
   // Asia / Oceanía
   PH: "Filipinas", TH: "Tailandia", IN: "India", CN: "China",
   JP: "Japón", KR: "Corea del Sur", AU: "Australia", NZ: "Nueva Zelanda",
   ID: "Indonesia", MY: "Malasia", VN: "Vietnam", SG: "Singapur",
-  TR: "Turquía", IL: "Israel", AE: "Emiratos Árabes",
+  TR: "Turquía", IL: "Israel", AE: "Emiratos Árabes Unidos",
   // África
   ZA: "Sudáfrica", NG: "Nigeria", KE: "Kenia", EG: "Egipto",
   MA: "Marruecos", GH: "Ghana", MG: "Madagascar", TZ: "Tanzania",
+  // Otros
+  MX: "México",
 };
 
 export default async function handler(req) {
@@ -86,7 +88,7 @@ export default async function handler(req) {
         .map(([code, usernames]) => ({
           code,
           name: COUNTRY_NAMES[code] || code,
-          flag: `https://flagcdn.com/24x18/${code.toLowerCase()}.png`,
+          flag: `https://flagcdn.com/32x24/${code.toLowerCase()}.png`,
           models: usernames.size,
           slug: `/country/${code.toLowerCase()}`,
         }))
@@ -151,7 +153,7 @@ export default async function handler(req) {
       JSON.stringify({
         code,
         name: COUNTRY_NAMES[code] || code,
-        flag: `https://flagcdn.com/24x18/${code.toLowerCase()}.png`,
+        flag: `https://flagcdn.com/32x24/${code.toLowerCase()}.png`,
         models,
       }),
       {
