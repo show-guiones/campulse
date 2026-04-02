@@ -2,6 +2,7 @@
 //
 // Sitemap completo — incluye:
 //   · Home y páginas estáticas de categoría (género, país, idioma)
+//   · Tags populares de Chaturbate
 //   · Modelos individuales filtradas (MIN_SNAPSHOTS + MIN_VIEWERS)
 //
 // Criterios de inclusión de modelos (configurable):
@@ -64,6 +65,28 @@ const STATIC_PAGES = [
   { loc: "/language/german",     changefreq: "daily",  priority: "0.6" },
   { loc: "/language/french",     changefreq: "daily",  priority: "0.6" },
   { loc: "/language/italian",    changefreq: "daily",  priority: "0.6" },
+
+  // Tags populares
+  { loc: "/tag/latina",      changefreq: "hourly", priority: "0.8" },
+  { loc: "/tag/bigboobs",    changefreq: "hourly", priority: "0.8" },
+  { loc: "/tag/ebony",       changefreq: "hourly", priority: "0.8" },
+  { loc: "/tag/teen",        changefreq: "hourly", priority: "0.8" },
+  { loc: "/tag/squirt",      changefreq: "hourly", priority: "0.7" },
+  { loc: "/tag/anal",        changefreq: "hourly", priority: "0.7" },
+  { loc: "/tag/curvy",       changefreq: "hourly", priority: "0.7" },
+  { loc: "/tag/mature",      changefreq: "hourly", priority: "0.7" },
+  { loc: "/tag/lovense",     changefreq: "hourly", priority: "0.7" },
+  { loc: "/tag/new",         changefreq: "hourly", priority: "0.7" },
+  { loc: "/tag/lesbians",    changefreq: "hourly", priority: "0.7" },
+  { loc: "/tag/colombia",    changefreq: "hourly", priority: "0.8" },
+  { loc: "/tag/spanish",     changefreq: "hourly", priority: "0.8" },
+  { loc: "/tag/pantyhose",   changefreq: "hourly", priority: "0.6" },
+  { loc: "/tag/feet",        changefreq: "hourly", priority: "0.6" },
+  { loc: "/tag/chubby",      changefreq: "hourly", priority: "0.6" },
+  { loc: "/tag/hairy",       changefreq: "hourly", priority: "0.6" },
+  { loc: "/tag/muscle",      changefreq: "hourly", priority: "0.6" },
+  { loc: "/tag/daddy",       changefreq: "hourly", priority: "0.6" },
+  { loc: "/tag/bigcock",     changefreq: "hourly", priority: "0.6" },
 ];
 
 function buildUrl({ loc, changefreq, priority }) {
