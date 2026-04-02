@@ -1311,7 +1311,7 @@ header{
       <div class="rep-menu-dropdown" id="rep-menu-dropdown">
         <div class="rep-menu-title">Tu panel de modelo</div>
         <div class="rep-menu-input-row">
-          <input type="text" id="model-username-input" class="rep-menu-input" placeholder="Tu username de Chaturbate" onkeydown="if(event.key==='Enter')searchModelFromMenu()">
+          <input type="text" id="model-username-input-menu" class="rep-menu-input" placeholder="Tu username de Chaturbate" aria-label="Username de Chaturbate" onkeydown="if(event.key==='Enter')searchModelFromMenu()">
           <button class="rep-menu-go" onclick="searchModelFromMenu()">Ver →</button>
         </div>
         <div id="rep-menu-error" class="rep-menu-err" style="display:none"></div>
@@ -1480,7 +1480,7 @@ header{
     <div class="filter-bar filter-bar-top">
       <div class="srch">
         <span class="srch-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/></svg></span>
-        <input type="text" id="search" placeholder="Buscar modelo...">
+        <input type="text" id="search" placeholder="Buscar modelo..." aria-label="Buscar modelo">
       </div>
       <div class="fb-sep"></div>
       <select class="sort-sel" id="srt">
@@ -1560,7 +1560,7 @@ header{
     </div>
     <div class="rep-input-row">
       <div class="rep-input-wrap">
-        <input type="text" id="model-username-input" placeholder="Tu username de Chaturbate" onkeydown="if(event.key==='Enter')searchModel()">
+        <input type="text" id="model-username-input" placeholder="Tu username de Chaturbate" aria-label="Tu username de Chaturbate" onkeydown="if(event.key==='Enter')searchModel()">
         <button onclick="searchModel()">Ver →</button>
       </div>
     </div>
@@ -1727,7 +1727,7 @@ header{
           <span>Cargando stream…</span>
         </div>
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
-          allow="autoplay; fullscreen" allowfullscreen></iframe>
+          allow="autoplay; fullscreen" allowFullscreen></iframe>
         <button class="embed-back-btn" onclick="deactivateEmbed()">← Volver</button>
       </div>
       <div id="mhero-img-wrap"></div>
@@ -1744,7 +1744,7 @@ header{
 
       <!-- PRIMARY CTA — always first, most prominent -->
       <div class="modal-acts">
-        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go" id="m-link">
+        <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go">
           <span class="btn-go-ico" id="m-cta-ico">▶</span>
           <span id="m-cta-txt">Entrar a la sala</span>
           <span class="btn-go-arrow">→</span>
@@ -1790,7 +1790,7 @@ header{
       <div class="admin-panel-title">🔐 Panel Admin</div>
       <div class="admin-field">
         <label>Clave de administrador</label>
-        <input type="password" id="admin-secret-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()">
+        <input type="password" id="admin-secret-input" placeholder="••••••••" aria-label="Contraseña de administrador" onkeydown="if(event.key==='Enter')adminLogin()">
       </div>
       <button class="admin-submit" onclick="adminLogin()">Entrar</button>
       <div class="admin-err" id="admin-login-err"></div>
@@ -1801,16 +1801,16 @@ header{
       <!-- Add form -->
       <div class="admin-row">
         <div class="admin-field" style="flex:2">
-          <label>Username de Chaturbate</label>
+          <label for="admin-username">Username de Chaturbate</label>
           <input type="text" id="admin-username" placeholder="ej: sweetangelxxx" oninput="adminPreview()" onkeydown="if(event.key==='Enter')adminAdd()">
         </div>
         <div class="admin-field" style="flex:1">
-          <label>Posición</label>
+          <label for="admin-position">Posición</label>
           <input type="number" id="admin-position" placeholder="Auto" min="1">
         </div>
       </div>
       <div class="admin-field">
-        <label>Etiqueta (opcional)</label>
+        <label for="admin-label">Etiqueta (opcional)</label>
         <input type="text" id="admin-label" placeholder="VIP, Patrocinada...">
       </div>
       <button class="admin-submit" id="admin-add-btn" onclick="adminAdd()">➕ Agregar modelo</button>
@@ -2751,7 +2751,7 @@ document.addEventListener('click',function(e){
 });
 
 async function searchModelFromMenu(){
-  const inp=document.getElementById('model-username-input');
+  const inp=document.getElementById('model-username-input-menu');
   const err=document.getElementById('rep-menu-error');
   const u=(inp?.value||'').trim().toLowerCase();
   if(!u){
@@ -2759,11 +2759,12 @@ async function searchModelFromMenu(){
     return;
   }
   if(err) err.style.display='none';
+  // Sync value to the main input so searchModel() lo lea correctamente
+  const mainInp=document.getElementById('model-username-input');
+  if(mainInp) mainInp.value=u;
   // Close dropdown
   document.getElementById('rep-menu-dropdown')?.classList.remove('open');
   document.getElementById('rep-menu-btn')?.classList.remove('active');
-  // Delegate to existing searchModel (it reads #model-username-input)
-  // but first switch to model view so report is visible
   switchTab('model');
   await searchModel();
 }
