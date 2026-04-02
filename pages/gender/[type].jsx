@@ -26,7 +26,6 @@ const COUNTRY_NAMES = {
 export async function getServerSideProps({ params }) {
   const type = params.type.toLowerCase();
 
-  // Rechazar slugs inválidos directamente
   if (!SUPPORTED_GENDERS.includes(type)) {
     return { notFound: true };
   }
@@ -94,7 +93,6 @@ export default function GenderTypePage({ data }) {
       </Head>
 
       <main style={styles.main}>
-        {/* Breadcrumb */}
         <nav style={styles.breadcrumbs}>
           <a href="/" style={styles.link}>Campulse</a>
           <span style={styles.sep}> › </span>
@@ -108,7 +106,6 @@ export default function GenderTypePage({ data }) {
           Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio en los últimos 30 días.
         </p>
 
-        {/* Lista de modelos */}
         <div style={styles.list}>
           {models.map((m, i) => (
             <a key={m.username} href={`/model/${m.username}`} style={styles.row}>
@@ -146,7 +143,6 @@ export default function GenderTypePage({ data }) {
           ))}
         </div>
 
-        {/* SEO text */}
         <section style={styles.seoText}>
           <h2 style={styles.h2}>{name} en Chaturbate</h2>
           <p>
@@ -176,15 +172,7 @@ export default function GenderTypePage({ data }) {
 }
 
 const styles = {
-  main: {
-    fontFamily: "sans-serif",
-    maxWidth: 800,
-    margin: "0 auto",
-    padding: "2rem 1rem",
-    background: "#0d0d0d",
-    minHeight: "100vh",
-    color: "#f0f0f0",
-  },
+  main: { fontFamily: "sans-serif", maxWidth: 800, margin: "0 auto", padding: "2rem 1rem", background: "#0d0d0d", minHeight: "100vh", color: "#f0f0f0" },
   breadcrumbs: { fontSize: 13, color: "#888", marginBottom: 16 },
   link: { color: "#a78bfa", textDecoration: "none" },
   sep: { color: "#555", margin: "0 4px" },
@@ -192,16 +180,7 @@ const styles = {
   h2: { fontSize: 18, marginBottom: 12, color: "#ccc" },
   subtitle: { color: "#888", fontSize: 14, marginBottom: 28 },
   list: { display: "flex", flexDirection: "column", gap: 8 },
-  row: {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-    background: "#1a1a2e",
-    borderRadius: 10,
-    padding: "14px 18px",
-    textDecoration: "none",
-    color: "#f0f0f0",
-  },
+  row: { display: "flex", alignItems: "center", gap: 16, background: "#1a1a2e", borderRadius: 10, padding: "14px 18px", textDecoration: "none", color: "#f0f0f0" },
   rank: { fontSize: 13, color: "#555", width: 28, flexShrink: 0 },
   info: { flex: 1 },
   username: { fontWeight: 700, fontSize: 15 },
@@ -211,13 +190,5 @@ const styles = {
   statMain: { fontWeight: 700, color: "#a78bfa", fontSize: 16 },
   statLabel: { fontSize: 11, color: "#888", fontWeight: 400 },
   statSub: { fontSize: 11, color: "#666", marginTop: 2 },
-  seoText: {
-    marginTop: 48,
-    padding: "24px",
-    background: "#111",
-    borderRadius: 12,
-    color: "#aaa",
-    fontSize: 14,
-    lineHeight: 1.7,
-  },
+  seoText: { marginTop: 48, padding: "24px", background: "#111", borderRadius: 12, color: "#aaa", fontSize: 14, lineHeight: 1.7 },
 };
