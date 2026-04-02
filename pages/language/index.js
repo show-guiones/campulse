@@ -1,85 +1,42 @@
-// pages/index.js
-// Home de Campulse — hub de navegación a categorías
-// SSR para mostrar conteos reales desde Supabase
+// pages/language/index.js
+// Índice de idiomas disponibles en Campulse
+// URL: /language
 
 import Head from "next/head";
 
 const SITE = "https://www.campulsehub.com";
 
-export async function getServerSideProps() {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const LANGUAGES = [
+  { slug: "spanish",    name: "Español",    flag: "🇪🇸", desc: "Modelos hispanohablantes" },
+  { slug: "english",    name: "English",    flag: "🇬🇧", desc: "English-speaking models" },
+  { slug: "portuguese", name: "Português",  flag: "🇧🇷", desc: "Modelos que falam português" },
+  { slug: "romanian",   name: "Română",     flag: "🇷🇴", desc: "Modele vorbitoare de română" },
+  { slug: "russian",    name: "Русский",    flag: "🇷🇺", desc: "Русскоязычные модели" },
+  { slug: "german",     name: "Deutsch",    flag: "🇩🇪", desc: "Deutschsprachige Models" },
+  { slug: "french",     name: "Français",   flag: "🇫🇷", desc: "Modèles francophones" },
+  { slug: "italian",    name: "Italiano",   flag: "🇮🇹", desc: "Modelle italiane" },
+];
 
-  let totalModels = 0;
-
-  try {
-    if (SUPABASE_URL && SUPABASE_KEY) {
-      const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // últimas 2h
-      const r = await fetch(
-        `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
-        `?captured_at=gte.${since}` +
-        `&select=username` +
-        `&limit=10000`,
-        {
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-          },
-        }
-      );
-      if (r.ok) {
-        const rows = await r.json();
-        const unique = new Set(rows.map((r) => r.username));
-        totalModels = unique.size;
-      }
-    }
-  } catch {}
-
-  return { props: { totalModels } };
-}
-
-export default function Home({ totalModels }) {
-  const pageTitle = "Campulse — Estadísticas de Chaturbate en Tiempo Real";
+export default function LanguageIndex() {
+  const pageTitle = "Modelos de Chaturbate por Idioma | Campulse";
   const pageDescription =
-    "Campulse rastrea las estadísticas de Chaturbate en tiempo real: viewers, seguidores y mejores horarios. " +
-    "Filtra modelos por género, país e idioma. Datos actualizados cada 2 horas.";
+    "Encuentra modelos de Chaturbate por idioma: español, inglés, portugués, rumano y más. " +
+    "Estadísticas en tiempo real actualizadas cada 2 horas.";
 
   const schema = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Campulse",
+    "@type": "CollectionPage",
+    name: pageTitle,
     description: pageDescription,
-    url: SITE,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${SITE}/model/{username}`,
-      "query-input": "required name=username",
+    url: `${SITE}/language`,
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Campulse", item: SITE },
+        { "@type": "ListItem", position: 2, name: "Idiomas",  item: `${SITE}/language` },
+      ],
     },
   };
-
-  const categories = [
-    {
-      href: "/gender",
-      icon: "⚥",
-      title: "Por Género",
-      desc: "Chicas, chicos, parejas y trans",
-      color: "#a78bfa",
-    },
-    {
-      href: "/country",
-      icon: "🌍",
-      title: "Por País",
-      desc: "Colombia, España, México y más",
-      color: "#34d399",
-    },
-    {
-      href: "/language",
-      icon: "🗣",
-      title: "Por Idioma",
-      desc: "Español, inglés, portugués y más",
-      color: "#f59e0b",
-    },
-  ];
 
   return (
     <>
@@ -87,10 +44,10 @@ export default function Home({ totalModels }) {
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href={SITE} />
+        <link rel="canonical" href={`${SITE}/language`} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={SITE} />
+        <meta property="og:url" content={`${SITE}/language`} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Campulse" />
         <script
@@ -100,94 +57,33 @@ export default function Home({ totalModels }) {
       </Head>
 
       <main style={styles.main}>
-        {/* Hero */}
-        <section style={styles.hero}>
-          <h1 style={styles.h1}>Campulse</h1>
-          <p style={styles.tagline}>
-            Estadísticas de Chaturbate en tiempo real
-          </p>
-          {totalModels > 0 && (
-            <div style={styles.badge}>
-              🔴 {totalModels.toLocaleString("es")} modelos online ahora
-            </div>
-          )}
-        </section>
+        {/* Breadcrumb */}
+        <nav style={styles.breadcrumbs}>
+          <a href="/" style={styles.link}>Campulse</a>
+          <span style={styles.sep}> › </span>
+          <span>Idiomas</span>
+        </nav>
 
-        {/* Categorías */}
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Explorar por categoría</h2>
-          <div style={styles.grid}>
-            {categories.map((cat) => (
-              <a key={cat.href} href={cat.href} style={styles.card}>
-                <div style={{ ...styles.cardIcon, color: cat.color }}>{cat.icon}</div>
-                <div style={styles.cardTitle}>{cat.title}</div>
-                <div style={styles.cardDesc}>{cat.desc}</div>
-              </a>
-            ))}
-          </div>
-        </section>
+        <h1 style={styles.h1}>Modelos por Idioma</h1>
+        <p style={styles.subtitle}>
+          Explora modelos de Chaturbate filtradas por el idioma que hablan.
+        </p>
 
-        {/* Links rápidos */}
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Géneros populares</h2>
-          <div style={styles.linkRow}>
-            {[
-              { href: "/gender/female", label: "♀ Chicas" },
-              { href: "/gender/male",   label: "♂ Chicos" },
-              { href: "/gender/couple", label: "♥ Parejas" },
-              { href: "/gender/trans",  label: "⚧ Trans" },
-            ].map((l) => (
-              <a key={l.href} href={l.href} style={styles.pill}>{l.label}</a>
-            ))}
-          </div>
-        </section>
+        <div style={styles.grid}>
+          {LANGUAGES.map((l) => (
+            <a key={l.slug} href={`/language/${l.slug}`} style={styles.card}>
+              <div style={styles.flag}>{l.flag}</div>
+              <div style={styles.name}>{l.name}</div>
+              <div style={styles.desc}>{l.desc}</div>
+            </a>
+          ))}
+        </div>
 
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Países más activos</h2>
-          <div style={styles.linkRow}>
-            {[
-              { href: "/country/co", label: "🇨🇴 Colombia" },
-              { href: "/country/es", label: "🇪🇸 España" },
-              { href: "/country/mx", label: "🇲🇽 México" },
-              { href: "/country/ro", label: "🇷🇴 Rumania" },
-              { href: "/country/us", label: "🇺🇸 EEUU" },
-              { href: "/country/br", label: "🇧🇷 Brasil" },
-            ].map((l) => (
-              <a key={l.href} href={l.href} style={styles.pill}>{l.label}</a>
-            ))}
-          </div>
-        </section>
-
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Idiomas</h2>
-          <div style={styles.linkRow}>
-            {[
-              { href: "/language/spanish",    label: "🇪🇸 Español" },
-              { href: "/language/english",    label: "🇬🇧 English" },
-              { href: "/language/portuguese", label: "🇧🇷 Português" },
-              { href: "/language/romanian",   label: "🇷🇴 Română" },
-              { href: "/language/russian",    label: "🇷🇺 Русский" },
-            ].map((l) => (
-              <a key={l.href} href={l.href} style={styles.pill}>{l.label}</a>
-            ))}
-          </div>
-        </section>
-
-        {/* SEO text */}
-        <section style={styles.seoText}>
-          <h2 style={{ ...styles.h2, color: "#ccc" }}>
-            Estadísticas de Chaturbate en tiempo real
-          </h2>
-          <p>
-            Campulse es la herramienta de estadísticas más completa para Chaturbate.
-            Rastrea viewers, seguidores y mejores horarios de miles de modelos,
-            actualizado automáticamente cada 2 horas desde Chaturbate.
-          </p>
-          <p>
-            Encuentra las modelos más vistas de Colombia, España, México y 50 países más.
-            Filtra por género, idioma o país para descubrir nuevas modelos en vivo.
-          </p>
-        </section>
+        <div style={styles.nav}>
+          <a href="/gender" style={styles.link}>⚥ Por género</a>
+          <span style={styles.sep}> · </span>
+          <a href="/country" style={styles.link}>🌍 Por país</a>
+        </div>
       </main>
     </>
   );
@@ -203,62 +99,28 @@ const styles = {
     minHeight: "100vh",
     color: "#f0f0f0",
   },
-  hero: {
-    textAlign: "center",
-    padding: "48px 0 40px",
-  },
-  h1: { fontSize: 42, fontWeight: 800, margin: "0 0 12px", letterSpacing: -1 },
-  tagline: { fontSize: 18, color: "#888", margin: "0 0 20px" },
-  badge: {
-    display: "inline-block",
-    background: "#1a1a2e",
-    borderRadius: 20,
-    padding: "8px 20px",
-    fontSize: 14,
-    color: "#a78bfa",
-    fontWeight: 600,
-  },
-  section: { marginBottom: 40 },
-  h2: { fontSize: 16, color: "#888", marginBottom: 16, textTransform: "uppercase", letterSpacing: 1 },
+  breadcrumbs: { fontSize: 13, color: "#888", marginBottom: 16 },
+  link: { color: "#a78bfa", textDecoration: "none" },
+  sep: { color: "#555", margin: "0 4px" },
+  h1: { fontSize: 28, fontWeight: 800, margin: "0 0 8px" },
+  subtitle: { color: "#888", fontSize: 14, marginBottom: 32 },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
     gap: 16,
+    marginBottom: 32,
   },
   card: {
     background: "#1a1a2e",
     borderRadius: 14,
-    padding: "28px 20px",
+    padding: "24px 20px",
     textDecoration: "none",
     color: "#f0f0f0",
     display: "block",
     textAlign: "center",
-    transition: "background 0.15s",
   },
-  cardIcon: { fontSize: 36, marginBottom: 12 },
-  cardTitle: { fontWeight: 700, fontSize: 17, marginBottom: 6 },
-  cardDesc: { fontSize: 13, color: "#777" },
-  linkRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  pill: {
-    background: "#1a1a2e",
-    borderRadius: 20,
-    padding: "8px 16px",
-    textDecoration: "none",
-    color: "#a78bfa",
-    fontSize: 14,
-    fontWeight: 500,
-  },
-  seoText: {
-    marginTop: 32,
-    padding: "24px",
-    background: "#111",
-    borderRadius: 12,
-    color: "#aaa",
-    fontSize: 14,
-    lineHeight: 1.7,
-  },
+  flag: { fontSize: 36, marginBottom: 10 },
+  name: { fontWeight: 700, fontSize: 17, marginBottom: 6 },
+  desc: { fontSize: 12, color: "#777" },
+  nav: { textAlign: "center", fontSize: 14, marginTop: 16 },
 };
