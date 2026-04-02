@@ -196,10 +196,19 @@ export default function ModelPage({
   }
   if (snapCount > 0) pageDescription += ` ${snapCount} snapshots en los últimos 30 días.`;
 
+  // lexy_fox2 — SEO reforzado
+  const LEXY_USER = 'lexy_fox2';
+  if (username === LEXY_USER) {
+    pageTitle = isLive
+      ? `lexy_fox2 en vivo — ${viewers.toLocaleString('es')} viewers ahora | CampulseHub`
+      : 'lexy_fox2 en Chaturbate — Perfil y estadísticas | CampulseHub';
+    pageDescription = `lexy_fox2 es una de las modelos más vistas en CampulseHub. ${isLive ? `Ahora mismo con ${viewers.toLocaleString('es')} viewers en vivo. ` : ''}Sigue sus estadísticas, historial y mejor horario en tiempo real.`;
+  }
+
   const schema = {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    name: `${name} — Stats en Chaturbate`,
+    name: username === LEXY_USER ? 'lexy_fox2 — Modelo destacada en CampulseHub' : `${name} — Stats en Chaturbate`,
     description: pageDescription,
     url: `${SITE}/model/${username}`,
     breadcrumb: {
@@ -241,6 +250,13 @@ export default function ModelPage({
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
+        {username === 'lexy_fox2' && (
+          <>
+            <meta name="keywords" content="lexy_fox2, lexy fox, modelo en vivo, chaturbate, campulse, webcam latina" />
+            <meta name="robots" content="index,follow,max-image-preview:large" />
+            <meta property="og:image" content={`https://thumb.live.mmcdn.com/riw/lexy_fox2.jpg`} />
+          </>
+        )}
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={`${SITE}/model/${username}`} />
         <meta property="og:title" content={pageTitle} />
