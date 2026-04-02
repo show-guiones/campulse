@@ -1,5 +1,8 @@
-// pages/api/country.js — v2
+// pages/api/country.js — v3
 // Ruta: pages/api/country.js
+//
+// FIX v3: agrega campo `gender` al select de modelos por código
+// para que pages/country/[code].jsx pueda mostrar el género en la lista.
 
 export const config = { runtime: "edge" };
 
@@ -34,9 +37,9 @@ const COUNTRY_NAMES = {
   // África
   ZA: "Sudáfrica", NG: "Nigeria", KE: "Kenia", EG: "Egipto",
   MA: "Marruecos", GH: "Ghana", MG: "Madagascar", TZ: "Tanzania",
-  // Otros
-  MX: "México",
 };
+
+const GENDER_LABELS = { f: "Mujer", m: "Hombre", c: "Pareja", t: "Trans" };
 
 export default async function handler(req) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -66,6 +69,7 @@ export default async function handler(req) {
   };
 
   try {
+    // ── Listado de todos los países ────────────────────────────────────────
     if (list) {
       const url =
         `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
@@ -99,6 +103,7 @@ export default async function handler(req) {
       });
     }
 
+    // ── Modelos de un país específico ──────────────────────────────────────
     if (!code || code.length !== 2) {
       return new Response(
         JSON.stringify({ error: "Parámetro 'code' requerido (ej: CO)" }),
@@ -106,11 +111,12 @@ export default async function handler(req) {
       );
     }
 
+    // FIX: añadido `gender` al select para mostrar el género en la página
     const url =
       `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
       `?captured_at=gte.${since}` +
       `&country=eq.${code}` +
-      `&select=username,num_users,num_followers,display_name` +
+      `&select=username,num_users,num_followers,display_name,gender` +
       `&limit=50000`;
 
     const r = await fetch(url, { headers: sbHeaders });
@@ -124,6 +130,7 @@ export default async function handler(req) {
         map[u] = {
           username: u,
           display_name: row.display_name || u,
+          gender: row.gender || "",
           total_viewers: 0,
           snapshots: 0,
           max_followers: 0,
@@ -141,6 +148,8 @@ export default async function handler(req) {
       .map((m) => ({
         username: m.username,
         display_name: m.display_name,
+        gender: m.gender,
+        gender_label: GENDER_LABELS[m.gender] || null,
         avg_viewers: Math.round(m.total_viewers / m.snapshots),
         max_followers: m.max_followers,
         snapshots: m.snapshots,
