@@ -14,23 +14,48 @@ export async function getServerSideProps() {
 
   try {
     if (SUPABASE_URL && SUPABASE_KEY) {
-      const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // últimas 2h
+      const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      const sbHeaders = {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      };
+
+      // Usar COUNT de Supabase en vez de traer todas las filas
       const r = await fetch(
         `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
         `?captured_at=gte.${since}` +
-        `&select=username` +
-        `&limit=10000`,
+        `&select=username`,
         {
           headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
+            ...sbHeaders,
+            "Prefer": "count=exact",
+            "Range": "0-0",
           },
         }
       );
+
       if (r.ok) {
-        const rows = await r.json();
-        const unique = new Set(rows.map((r) => r.username));
-        totalModels = unique.size;
+        // Content-Range: 0-0/TOTAL
+        const range = r.headers.get("content-range");
+        if (range) {
+          const total = parseInt(range.split("/")[1], 10);
+          if (!isNaN(total)) totalModels = total;
+        }
+        // Fallback: si no hay Content-Range, contar filas normalmente
+        if (totalModels === 0) {
+          const r2 = await fetch(
+            `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+            `?captured_at=gte.${since}` +
+            `&select=username` +
+            `&limit=50000`,
+            { headers: sbHeaders }
+          );
+          if (r2.ok) {
+            const rows = await r2.json();
+            const unique = new Set(rows.map((r) => r.username));
+            totalModels = unique.size;
+          }
+        }
       }
     }
   } catch {}
@@ -52,7 +77,7 @@ export default function Home({ totalModels }) {
     url: SITE,
     potentialAction: {
       "@type": "SearchAction",
-      target: `${SITE}/model/{username}`,
+      target: `${SITE}/search?q={username}`,
       "query-input": "required name=username",
     },
   };
@@ -111,6 +136,13 @@ export default function Home({ totalModels }) {
               🔴 {totalModels.toLocaleString("es")} modelos online ahora
             </div>
           )}
+        </section>
+
+        {/* Buscador */}
+        <section style={styles.section}>
+          <a href="/search" style={styles.searchBox}>
+            🔍 Buscar modelo por username...
+          </a>
         </section>
 
         {/* Categorías */}
@@ -173,6 +205,25 @@ export default function Home({ totalModels }) {
           </div>
         </section>
 
+        {/* Tags populares */}
+        <section style={styles.section}>
+          <h2 style={styles.h2}>Tags populares</h2>
+          <div style={styles.linkRow}>
+            {[
+              { href: "/tag/latina",   label: "#latina" },
+              { href: "/tag/bigboobs", label: "#bigboobs" },
+              { href: "/tag/ebony",    label: "#ebony" },
+              { href: "/tag/teen",     label: "#teen" },
+              { href: "/tag/curvy",    label: "#curvy" },
+              { href: "/tag/lovense",  label: "#lovense" },
+              { href: "/tag/squirt",   label: "#squirt" },
+              { href: "/tag/colombia", label: "#colombia" },
+            ].map((l) => (
+              <a key={l.href} href={l.href} style={styles.pillTag}>{l.label}</a>
+            ))}
+          </div>
+        </section>
+
         {/* SEO text */}
         <section style={styles.seoText}>
           <h2 style={{ ...styles.h2, color: "#ccc" }}>
@@ -218,6 +269,17 @@ const styles = {
     color: "#a78bfa",
     fontWeight: 600,
   },
+  searchBox: {
+    display: "block",
+    background: "#1a1a2e",
+    border: "1px solid #333",
+    borderRadius: 12,
+    padding: "14px 20px",
+    color: "#666",
+    fontSize: 15,
+    textDecoration: "none",
+    textAlign: "left",
+  },
   section: { marginBottom: 40 },
   h2: { fontSize: 16, color: "#888", marginBottom: 16, textTransform: "uppercase", letterSpacing: 1 },
   grid: {
@@ -249,6 +311,15 @@ const styles = {
     padding: "8px 16px",
     textDecoration: "none",
     color: "#a78bfa",
+    fontSize: 14,
+    fontWeight: 500,
+  },
+  pillTag: {
+    background: "#1a1a2e",
+    borderRadius: 20,
+    padding: "8px 16px",
+    textDecoration: "none",
+    color: "#34d399",
     fontSize: 14,
     fontWeight: 500,
   },
