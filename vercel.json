@@ -30,6 +30,55 @@
           "value": "index,follow"
         }
       ]
+    },
+    {
+      "source": "/country/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=1800, stale-while-revalidate=3600"
+        }
+      ]
+    },
+    {
+      "source": "/gender/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=1800, stale-while-revalidate=3600"
+        }
+      ]
+    },
+    {
+      "source": "/language/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=1800, stale-while-revalidate=3600"
+        }
+      ]
+    },
+    {
+      "source": "/tag/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=1800, stale-while-revalidate=3600"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.campulsehub.com"
+        }
+      ],
+      "destination": "https://campulsehub.com/:path*",
+      "permanent": true
     }
   ],
   "rewrites": [
