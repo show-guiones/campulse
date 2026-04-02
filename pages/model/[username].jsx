@@ -1,11 +1,13 @@
 // pages/model/[username].jsx
 //
 // Novedades respecto a la versión anterior:
+//   · noindex automático si snapCount < 3 (páginas sin datos reales)
+//   · Sección "Modelos similares" al final — modelos del mismo país en vivo
 //   · Mini gráfico SVG de viewers (sparkline) generado desde el historial
 //   · Sección "En vivo ahora" si el último snapshot tiene viewers > 0
 //   · Peak viewers (máximo histórico) mostrado en métricas
 //   · Tabla de historial con barras proporcionales inline
-//   · Resto idéntico: canonical, Schema.org, OG, links a categorías
+//   · canonical, Schema.org, OG, links a categorías
 
 import Head from "next/head";
 
@@ -77,12 +79,10 @@ function Sparkline({ data, width = 280, height = 56 }) {
           <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
         </linearGradient>
       </defs>
-      {/* Área rellena */}
       <polygon
         points={`0,${height} ${points} ${(values.length - 1) * step},${height}`}
         fill="url(#sg)"
       />
-      {/* Línea */}
       <polyline
         points={points}
         fill="none"
@@ -91,7 +91,6 @@ function Sparkline({ data, width = 280, height = 56 }) {
         strokeLinejoin="round"
         strokeLinecap="round"
       />
-      {/* Punto final (más reciente) */}
       {(() => {
         const last = values.length - 1;
         const x = last * step;
@@ -106,20 +105,22 @@ export async function getServerSideProps({ params }) {
   const { username } = params;
 
   try {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_KEY = process.env.SUPABASE_KEY;
+    const sbHeaders = {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+    };
+
     const [h, b, s] = await Promise.all([
       fetch(`${SITE}/api/history?username=${encodeURIComponent(username)}`),
       fetch(`${SITE}/api/best-hours?username=${encodeURIComponent(username)}`),
       fetch(
-        `${process.env.SUPABASE_URL}/rest/v1/rooms_snapshot` +
+        `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
         `?username=eq.${encodeURIComponent(username)}` +
         `&select=country,gender,display_name,spoken_languages` +
         `&order=captured_at.desc&limit=1`,
-        {
-          headers: {
-            apikey: process.env.SUPABASE_KEY,
-            Authorization: `Bearer ${process.env.SUPABASE_KEY}`,
-          },
-        }
+        { headers: sbHeaders }
       ),
     ]);
 
@@ -128,15 +129,42 @@ export async function getServerSideProps({ params }) {
     const snapRows  = s.ok ? await s.json() : [];
     const snap      = Array.isArray(snapRows) ? snapRows[0] || {} : {};
 
+    const countryCode = (snap.country || "").toUpperCase().trim();
+    const gender      = snap.gender || "";
+
+    // ── Modelos similares: mismo país en vivo, excluir al propio modelo ──
+    let similarModels = [];
+    if (SUPABASE_URL && SUPABASE_KEY && (countryCode || gender)) {
+      try {
+        const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+        let filter = `captured_at=gte.${since}&username=neq.${encodeURIComponent(username)}&num_users=gt.0`;
+        if (countryCode) filter += `&country=eq.${countryCode}`;
+        else if (gender)  filter += `&gender=eq.${gender}`;
+
+        const simRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+          `?${filter}` +
+          `&select=username,display_name,num_users,country` +
+          `&order=num_users.desc&limit=6`,
+          { headers: sbHeaders }
+        );
+        if (simRes.ok) {
+          const rows = await simRes.json();
+          similarModels = Array.isArray(rows) ? rows : [];
+        }
+      } catch { /* no bloquea el render */ }
+    }
+
     return {
       props: {
         username,
-        history:    Array.isArray(history) ? history : [],
-        bestHours:  Array.isArray(bestHours) ? bestHours : [],
-        country:    snap.country         || "",
-        gender:     snap.gender          || "",
-        displayName: snap.display_name   || "",
-        languages:  snap.spoken_languages || "",
+        history:      Array.isArray(history) ? history : [],
+        bestHours:    Array.isArray(bestHours) ? bestHours : [],
+        country:      snap.country          || "",
+        gender,
+        displayName:  snap.display_name     || "",
+        languages:    snap.spoken_languages  || "",
+        similarModels,
       },
     };
   } catch {
@@ -145,6 +173,7 @@ export async function getServerSideProps({ params }) {
         username,
         history: [], bestHours: [],
         country: "", gender: "", displayName: "", languages: "",
+        similarModels: [],
       },
     };
   }
@@ -153,6 +182,7 @@ export async function getServerSideProps({ params }) {
 export default function ModelPage({
   username, history, bestHours,
   country, gender, displayName, languages,
+  similarModels,
 }) {
   const last      = history[history.length - 1] || {};
   const days      = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
@@ -174,11 +204,11 @@ export default function ModelPage({
   const langSlug    = detectLangSlug(languages);
   const langName    = langSlug ? LANG_NAMES[langSlug] : null;
 
-  // Últimos 30 puntos para el sparkline
   const sparkData = history.slice(-30);
+  const histMax   = peakViewers || 1;
 
-  // Máximo para barras de historial
-  const histMax = peakViewers || 1;
+  // ── noindex para páginas sin datos suficientes ─────────────────────────────
+  const shouldIndex = snapCount >= 3;
 
   // ── SEO ───────────────────────────────────────────────────────────────────
   let pageTitle = viewers != null
@@ -196,19 +226,18 @@ export default function ModelPage({
   }
   if (snapCount > 0) pageDescription += ` ${snapCount} snapshots en los últimos 30 días.`;
 
-  // lexy_fox2 — SEO reforzado
-  const LEXY_USER = 'lexy_fox2';
+  const LEXY_USER = "lexy_fox2";
   if (username === LEXY_USER) {
     pageTitle = isLive
-      ? `lexy_fox2 en vivo — ${viewers.toLocaleString('es')} viewers ahora | CampulseHub`
-      : 'lexy_fox2 en Chaturbate — Perfil y estadísticas | CampulseHub';
-    pageDescription = `lexy_fox2 es una de las modelos más vistas en CampulseHub. ${isLive ? `Ahora mismo con ${viewers.toLocaleString('es')} viewers en vivo. ` : ''}Sigue sus estadísticas, historial y mejor horario en tiempo real.`;
+      ? `lexy_fox2 en vivo — ${viewers.toLocaleString("es")} viewers ahora | CampulseHub`
+      : "lexy_fox2 en Chaturbate — Perfil y estadísticas | CampulseHub";
+    pageDescription = `lexy_fox2 es una de las modelos más vistas en CampulseHub. ${isLive ? `Ahora mismo con ${viewers.toLocaleString("es")} viewers en vivo. ` : ""}Sigue sus estadísticas, historial y mejor horario en tiempo real.`;
   }
 
   const schema = {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    name: username === LEXY_USER ? 'lexy_fox2 — Modelo destacada en CampulseHub' : `${name} — Stats en Chaturbate`,
+    name: username === LEXY_USER ? "lexy_fox2 — Modelo destacada en CampulseHub" : `${name} — Stats en Chaturbate`,
     description: pageDescription,
     url: `${SITE}/model/${username}`,
     breadcrumb: {
@@ -250,14 +279,18 @@ export default function ModelPage({
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        {username === 'lexy_fox2' && (
+        {username === LEXY_USER ? (
           <>
             <meta name="keywords" content="lexy_fox2, lexy fox, modelo en vivo, chaturbate, campulse, webcam latina" />
             <meta name="robots" content="index,follow,max-image-preview:large" />
             <meta property="og:image" content={`https://thumb.live.mmcdn.com/riw/lexy_fox2.jpg`} />
           </>
+        ) : (
+          <meta
+            name="robots"
+            content={shouldIndex ? "index, follow" : "noindex, nofollow"}
+          />
         )}
-        <meta name="robots" content="index, follow" />
         <link rel="canonical" href={`${SITE}/model/${username}`} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
@@ -398,6 +431,49 @@ export default function ModelPage({
           </>
         )}
 
+        {/* ── Modelos similares ─────────────────────────────────────────────── */}
+        {similarModels.length > 0 && (
+          <section style={styles.similarSection}>
+            <h2 style={styles.similarTitle}>
+              {countryName
+                ? `Más modelos de ${countryName} en vivo ahora`
+                : "Modelos similares en vivo"}
+            </h2>
+            <div style={styles.similarGrid}>
+              {similarModels.map((m) => {
+                const mFlag = countryCodeToFlag(m.country || "");
+                return (
+                  <a
+                    key={m.username}
+                    href={`/model/${m.username}`}
+                    style={styles.similarCard}
+                  >
+                    <div style={styles.similarName}>
+                      {m.display_name || m.username}
+                    </div>
+                    <div style={styles.similarHandle}>@{m.username}</div>
+                    <div style={styles.similarViewers}>
+                      👁 {(m.num_users ?? 0).toLocaleString("es")} viewers
+                    </div>
+                    {m.country && (
+                      <div style={styles.similarCountry}>
+                        {mFlag} {m.country.toUpperCase()}
+                      </div>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+            {countryCode && (
+              <p style={{ textAlign: "center", marginTop: 16 }}>
+                <a href={`/country/${countryCode.toLowerCase()}`} style={styles.link}>
+                  Ver todas las modelos de {countryName} →
+                </a>
+              </p>
+            )}
+          </section>
+        )}
+
         {/* Links a categorías */}
         <div style={styles.categoryLinks}>
           {countryName && countryCode && (
@@ -450,4 +526,13 @@ const styles = {
   histViewers: { fontSize: 12, color: "#a78bfa", width: 50, textAlign: "right", flexShrink: 0 },
   categoryLinks: { display: "flex", flexDirection: "column", gap: 8, marginTop: 28 },
   countryLink: { display: "block", textAlign: "center", color: "#a78bfa", fontSize: 14, textDecoration: "none" },
+  // Modelos similares
+  similarSection: { marginTop: 40, paddingTop: 28, borderTop: "1px solid #1a1a1a" },
+  similarTitle: { fontSize: 15, color: "#ccc", marginBottom: 16, fontWeight: 600 },
+  similarGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 },
+  similarCard: { background: "#1a1a2e", borderRadius: 10, padding: "12px 14px", textDecoration: "none", color: "#f0f0f0", display: "block" },
+  similarName: { fontWeight: 700, fontSize: 14, marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+  similarHandle: { fontSize: 11, color: "#555", marginBottom: 6 },
+  similarViewers: { fontSize: 12, color: "#a78bfa", marginBottom: 2 },
+  similarCountry: { fontSize: 11, color: "#666" },
 };
