@@ -29,10 +29,11 @@ def get_rooms():
         all_rooms.extend(batch)
         print(f"  offset={offset} → {len(batch)} salas (acumulado: {len(all_rooms)})")
         if len(batch) < 500:
+            # Última página — no hay más resultados
             break
         offset += 500
-        if offset > 5000:
-            break
+        # FIX: eliminado el límite de offset > 5000 para capturar todas las salas
+        # Chaturbate puede tener 10.000+ salas online simultáneamente
         time.sleep(0.5)
     print(f"[{datetime.now()}] Total salas encontradas: {len(all_rooms)}")
     return all_rooms
@@ -205,4 +206,3 @@ if __name__ == "__main__":
             send_notifications(newly_online)
 
     print("Listo!")
-
