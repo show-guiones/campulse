@@ -1,11 +1,10 @@
 // pages/gender/[type].jsx
-// FIX: female timeout — reducir ventana a 7 días y límite de filas a 10000
+// FIX: snapshots >= 1, ventana 14 días para más modelos en el ranking
 
 import Head from "next/head";
 
 const SITE = "https://www.campulsehub.com";
 const SUPPORTED_GENDERS = ["female", "male", "couple", "trans"];
-
 const GENDER_DB_MAP = { female: "f", male: "m", couple: "c", trans: "t" };
 
 const GENDER_INFO = {
@@ -35,8 +34,7 @@ export async function getServerSideProps({ params }) {
 
   try {
     const dbGender = GENDER_DB_MAP[type];
-    // Ventana de 7 días (en vez de 30) para reducir volumen de datos
-    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
 
     const url =
       `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
@@ -44,7 +42,7 @@ export async function getServerSideProps({ params }) {
       `&gender=eq.${dbGender}` +
       `&select=username,num_users,num_followers,display_name,country` +
       `&order=captured_at.desc` +
-      `&limit=10000`;   // máximo razonable
+      `&limit=10000`;
 
     const r = await fetch(url, {
       headers: {
@@ -79,7 +77,7 @@ export async function getServerSideProps({ params }) {
     }
 
     const models = Object.values(map)
-      .filter((m) => m.snapshots >= 2)
+      .filter((m) => m.snapshots >= 1)
       .map((m) => ({
         username: m.username,
         display_name: m.display_name,
@@ -100,7 +98,7 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function GenderTypePage({ data }) {
-  const { gender, name, nameEs, description, models } = data;
+  const { gender, name, nameEs, models } = data;
   const topModel = models[0];
 
   const pageTitle = `${name} en Chaturbate — Top ${models.length} | Campulse`;
@@ -156,7 +154,7 @@ export default function GenderTypePage({ data }) {
 
         <h1 style={styles.h1}>{name} en Chaturbate</h1>
         <p style={styles.subtitle}>
-          Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio en los últimos 7 días.
+          Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio en los últimos 14 días.
         </p>
 
         <div style={styles.list}>
