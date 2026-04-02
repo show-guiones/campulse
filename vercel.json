@@ -66,6 +66,15 @@
           "value": "s-maxage=1800, stale-while-revalidate=3600"
         }
       ]
+    },
+    {
+      "source": "/top/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=600, stale-while-revalidate=1200"
+        }
+      ]
     }
   ],
   "redirects": [
@@ -85,6 +94,14 @@
     {
       "source": "/rss.xml",
       "destination": "/api/rss"
+    },
+    {
+      "source": "/rss/lexy_fox2",
+      "destination": "/api/rss-lexy"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
     }
   ]
 }
