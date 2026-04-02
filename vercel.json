@@ -90,11 +90,5 @@
             "source": "/sitemap.xml",
             "destination": "/api/sitemap"
         }
-    ],
-    "functions": {
-        "api/hls-proxy.js": {
-            "runtime": "nodejs20.x",
-            "maxDuration": 15
-        }
-    }
+    ]
 }

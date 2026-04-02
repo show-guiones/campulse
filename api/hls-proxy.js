@@ -5,7 +5,8 @@
 // IMPORTANTE: En vercel.json asegúrate de tener:
 // { "functions": { "api/hls-proxy.js": { "runtime": "nodejs20.x" } } }
 
-export const config = { runtime: 'nodejs' };   // Node.js, NO edge
+// Node.js runtime por defecto en Next.js /api/ — no declarar runtime aquí
+export const config = { maxDuration: 15 };
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36';
 const AFF = 'rI8z3';
