@@ -27,7 +27,6 @@ const LANGUAGE_INFO = {
   italian:    { name: "Italiano",   description: "Le migliori modelle Chaturbate italiane" },
 };
 
-// Variantes del idioma tal como aparecen en la columna spoken_languages de Supabase
 const LANG_VARIANTS = {
   spanish:    ["spanish", "español", "espanol", "es"],
   english:    ["english", "inglés", "ingles", "en"],
@@ -121,7 +120,6 @@ export async function getServerSideProps({ params }) {
     const info = LANGUAGE_INFO[lang];
     return { props: { data: { lang, ...info, models, empty: models.length === 0 } } };
   } catch {
-    // En caso de error de BD, mostrar página vacía en lugar de 404
     const info = LANGUAGE_INFO[lang] || { name: lang, description: "" };
     return { props: { data: { lang, ...info, models: [], empty: true } } };
   }
