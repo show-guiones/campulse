@@ -10,7 +10,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: '/', destination: '/app.html', permanent: false },
+      // La home (/) ahora sirve pages/index.js directamente — sin redirect
+      // /app.html sigue accesible desde public/app.html
     ];
   },
   async rewrites() {
@@ -19,5 +20,4 @@ const nextConfig = {
     ];
   },
 };
-
 export default nextConfig;
