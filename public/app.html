@@ -2669,7 +2669,7 @@ function _destroyHls() {
   if (video) { video.pause(); video.src = ''; video.load(); }
 }
 
-function openCardPlayer(e, username, btn) {
+async function openCardPlayer(e, username, btn) {
   e.stopPropagation();
 
   const popup   = document.getElementById('crd-iframe-popup');
@@ -2688,6 +2688,11 @@ function openCardPlayer(e, username, btn) {
     if (prevBtn) prevBtn.innerHTML = _svgPlay;
   }
 
+  // Limpiar iframe dinámico previo si existía
+  const oldIf = document.getElementById('crd-popup-iframe-dyn');
+  if (oldIf) oldIf.remove();
+  video.style.display = 'block';
+
   // Mostrar loading, ocultar error
   if (loading) loading.classList.remove('hidden');
   if (errorEl) errorEl.classList.remove('show');
@@ -2703,42 +2708,76 @@ function openCardPlayer(e, username, btn) {
   _activeCardPlayer = username;
   if (btn) btn.innerHTML = _svgPause;
 
-  // Timeout de seguridad: 15s sin stream → mostrar fallback
+  // Timeout de seguridad: 18s sin stream → mostrar fallback
   _cardPlayerTimeout = setTimeout(() => {
     if (loading && !loading.classList.contains('hidden')) {
       if (loading) loading.classList.add('hidden');
       if (errorEl) errorEl.classList.add('show');
     }
-  }, 15000);
+  }, 18000);
 
-  // Construir el embed URL directamente desde los datos que ya tenemos en memoria
-  // La affiliates API devuelve iframe_embed_url / chat_room_url_revshare
-  // que son URLs de afiliado que Chaturbate permite embeber externamente
-  const AFF = 'rI8z3';
-  const embedUrl = room?.iframe_embed_url
-    || room?.chat_room_url_revshare
-    || `https://chaturbate.com/in/?tour=dT8X&campaign=${AFF}&room=${username}&autoplay=1&mobileRedirect=never&bgcolor=000000`;
+  // ── Obtener URL HLS real via proxy (Node.js — extrae CSRF de Chaturbate) ──
+  try {
+    const proxyRes = await fetch(`/api/hls-proxy?username=${encodeURIComponent(username)}`);
+    const proxyData = await proxyRes.json();
 
-  console.log('[card-player] url:', embedUrl, '| iframe_embed_url:', room?.iframe_embed_url);
+    console.log('[card-player] hls-proxy response:', proxyData);
 
-  const body = document.querySelector('.crd-iframe-body');
-  const existingVideo = document.getElementById('crd-popup-video');
-  if (body && existingVideo) {
-    const oldIf = document.getElementById('crd-popup-iframe-dyn');
-    if (oldIf) oldIf.remove();
-    const ifrm = document.createElement('iframe');
-    ifrm.id = 'crd-popup-iframe-dyn';
-    ifrm.style.cssText = 'width:100%;height:236px;border:none;display:block;background:#000;';
-    ifrm.allow = 'autoplay; fullscreen; encrypted-media';
-    ifrm.allowFullscreen = true;
-    ifrm.referrerPolicy = 'no-referrer-when-downgrade';
-    ifrm.src = embedUrl;
-    existingVideo.style.display = 'none';
-    body.insertBefore(ifrm, existingVideo);
-    ifrm.onload = () => {
+    if (!proxyData.success || !proxyData.url) {
       clearTimeout(_cardPlayerTimeout);
       if (loading) loading.classList.add('hidden');
-    };
+      if (errorEl) errorEl.classList.add('show');
+      return;
+    }
+
+    const hlsUrl = proxyData.url;
+
+    // ── Reproducir con hls.js o nativo ──
+    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+      const hls = new Hls({
+        maxBufferLength: 10,
+        maxMaxBufferLength: 20,
+        liveSyncDurationCount: 2,
+        liveMaxLatencyDurationCount: 4,
+        enableWorker: true,
+      });
+      _hlsInstance = hls;
+      hls.loadSource(hlsUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        clearTimeout(_cardPlayerTimeout);
+        if (loading) loading.classList.add('hidden');
+        video.play().catch(() => {});
+      });
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (data.fatal) {
+          clearTimeout(_cardPlayerTimeout);
+          if (loading) loading.classList.add('hidden');
+          if (errorEl) errorEl.classList.add('show');
+          hls.destroy();
+          _hlsInstance = null;
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari HLS nativo
+      video.src = hlsUrl;
+      video.addEventListener('loadedmetadata', () => {
+        clearTimeout(_cardPlayerTimeout);
+        if (loading) loading.classList.add('hidden');
+        video.play().catch(() => {});
+      }, { once: true });
+    } else {
+      // Fallback: no soporta HLS → mostrar error
+      clearTimeout(_cardPlayerTimeout);
+      if (loading) loading.classList.add('hidden');
+      if (errorEl) errorEl.classList.add('show');
+    }
+
+  } catch (err) {
+    console.error('[card-player] fetch error:', err);
+    clearTimeout(_cardPlayerTimeout);
+    if (loading) loading.classList.add('hidden');
+    if (errorEl) errorEl.classList.add('show');
   }
 }
 

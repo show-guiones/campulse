@@ -1,94 +1,100 @@
 {
-    "buildCommand":  "npm run build",
-    "outputDirectory":  ".next",
-    "framework":  "nextjs",
-    "headers":  [
-                    {
-                        "source":  "/:path*",
-                        "has":  [
-                                    {
-                                        "type":  "host",
-                                        "value":  "campulse-sooty.vercel.app"
-                                    }
-                                ],
-                        "headers":  [
-                                        {
-                                            "key":  "X-Robots-Tag",
-                                            "value":  "noindex, nofollow"
-                                        }
-                                    ]
-                    },
-                    {
-                        "source":  "/model/lexy_fox2",
-                        "headers":  [
-                                        {
-                                            "key":  "Cache-Control",
-                                            "value":  "s-maxage=60, stale-while-revalidate=300"
-                                        },
-                                        {
-                                            "key":  "X-Robots-Tag",
-                                            "value":  "index,follow"
-                                        }
-                                    ]
-                    },
-                    {
-                        "source":  "/country/:path*",
-                        "headers":  [
-                                        {
-                                            "key":  "Cache-Control",
-                                            "value":  "s-maxage=1800, stale-while-revalidate=3600"
-                                        }
-                                    ]
-                    },
-                    {
-                        "source":  "/gender/:path*",
-                        "headers":  [
-                                        {
-                                            "key":  "Cache-Control",
-                                            "value":  "s-maxage=1800, stale-while-revalidate=3600"
-                                        }
-                                    ]
-                    },
-                    {
-                        "source":  "/language/:path*",
-                        "headers":  [
-                                        {
-                                            "key":  "Cache-Control",
-                                            "value":  "s-maxage=1800, stale-while-revalidate=3600"
-                                        }
-                                    ]
-                    },
-                    {
-                        "source":  "/tag/:path*",
-                        "headers":  [
-                                        {
-                                            "key":  "Cache-Control",
-                                            "value":  "s-maxage=1800, stale-while-revalidate=3600"
-                                        }
-                                    ]
-                    },
-                    {
-                        "source":  "/top/:path*",
-                        "headers":  [
-                                        {
-                                            "key":  "Cache-Control",
-                                            "value":  "s-maxage=600, stale-while-revalidate=1200"
-                                        }
-                                    ]
-                    }
-                ],
-    "rewrites":  [
-                     {
-                         "source":  "/rss.xml",
-                         "destination":  "/api/rss"
-                     },
-                     {
-                         "source":  "/rss/lexy_fox2",
-                         "destination":  "/api/rss-lexy"
-                     },
-                     {
-                         "source":  "/sitemap.xml",
-                         "destination":  "/api/sitemap"
-                     }
-                 ]
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "framework": "nextjs",
+    "headers": [
+        {
+            "source": "/:path*",
+            "has": [
+                {
+                    "type": "host",
+                    "value": "campulse-sooty.vercel.app"
+                }
+            ],
+            "headers": [
+                {
+                    "key": "X-Robots-Tag",
+                    "value": "noindex, nofollow"
+                }
+            ]
+        },
+        {
+            "source": "/model/lexy_fox2",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "s-maxage=60, stale-while-revalidate=300"
+                },
+                {
+                    "key": "X-Robots-Tag",
+                    "value": "index,follow"
+                }
+            ]
+        },
+        {
+            "source": "/country/:path*",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "s-maxage=1800, stale-while-revalidate=3600"
+                }
+            ]
+        },
+        {
+            "source": "/gender/:path*",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "s-maxage=1800, stale-while-revalidate=3600"
+                }
+            ]
+        },
+        {
+            "source": "/language/:path*",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "s-maxage=1800, stale-while-revalidate=3600"
+                }
+            ]
+        },
+        {
+            "source": "/tag/:path*",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "s-maxage=1800, stale-while-revalidate=3600"
+                }
+            ]
+        },
+        {
+            "source": "/top/:path*",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "s-maxage=600, stale-while-revalidate=1200"
+                }
+            ]
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/rss.xml",
+            "destination": "/api/rss"
+        },
+        {
+            "source": "/rss/lexy_fox2",
+            "destination": "/api/rss-lexy"
+        },
+        {
+            "source": "/sitemap.xml",
+            "destination": "/api/sitemap"
+        }
+    ],
+    "functions": {
+        "api/hls-proxy.js": {
+            "runtime": "nodejs20.x",
+            "maxDuration": 15
+        }
+    }
 }
