@@ -3,7 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>CampulseHub — Explora en Vivo</title>
+<title>CampulseHub — Explora Modelos en Vivo</title>
+<meta name="description" content="Descubre modelos en vivo en CampulseHub. Transmisiones en directo, perfiles verificados y estadísticas en tiempo real.">
+<meta name="keywords" content="modelos en vivo, webcam, chaturbate, colombia, españa, latina, lexy fox">
+<meta property="og:title" content="CampulseHub — Explora Modelos en Vivo">
+<meta property="og:description" content="Las mejores modelos en vivo ahora mismo. Actualización en tiempo real.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://campulsehub.com/app">
+<meta name="robots" content="index,follow">
+<link rel="alternate" type="application/rss+xml" title="CampulseHub Live Feed" href="/api/rss">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfilePage","name":"lexy_fox2 en CampulseHub","url":"https://campulsehub.com/model/lexy_fox2","mainEntity":{"@type":"Person","name":"lexy_fox2","jobTitle":"Modelo en vivo","worksFor":{"@type":"Organization","name":"CampulseHub"}}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -11,25 +20,25 @@
    TOKENS & RESET
 ═══════════════════════════════════════════ */
 :root{
-  --bg:       #0c0d10;
-  --bg2:      #141519;
-  --bg3:      #1a1c22;
-  --surf:     #1f2128;
-  --surf2:    #252830;
-  --bdr:      rgba(255,255,255,.07);
-  --bdr2:     rgba(255,255,255,.12);
-  --txt:      #f0f0f2;
-  --txt2:     #9499a8;
-  --txt3:     #5a5f70;
-  --hot:      #ff2a6d;
-  --neon:     #00e5ff;
-  --gold:     #ffc840;
-  --grn:      #00e897;
-  --purple:   #9b5de5;
-  --female:   #ff2a6d;
-  --male:     #2a8cff;
-  --couple:   #ff9800;
-  --trans:    #ab47bc;
+  --bg:       #0d0e12;
+  --bg2:      #13151b;
+  --bg3:      #191c24;
+  --surf:     #1e2029;
+  --surf2:    #242733;
+  --bdr:      rgba(255,255,255,.065);
+  --bdr2:     rgba(255,255,255,.11);
+  --txt:      #edeef2;
+  --txt2:     #8e93a6;
+  --txt3:     #555b6e;
+  --hot:      #f02060;
+  --neon:     #00d4f0;
+  --gold:     #ffbe30;
+  --grn:      #00d97e;
+  --purple:   #9248e0;
+  --female:   #f02060;
+  --male:     #2880f5;
+  --couple:   #f59300;
+  --trans:    #a83ec0;
   --hdr:      52px;
   --bnav:     60px;
   --radius:   12px;
@@ -190,7 +199,7 @@ header{
   width:100%;text-align:left;transition:all .15s
 }
 .filter-chip:hover{background:rgba(255,255,255,.05);color:var(--txt)}
-.filter-chip.active{background:rgba(255,42,109,.1);color:var(--hot)}
+.filter-chip.active{background:rgba(255,42,109,.15)!important;color:var(--hot)!important;border-color:var(--hot)!important}
 .age-chips{display:flex;flex-wrap:wrap;gap:3px;padding:.15rem 0}
 .age-chip{
   font-size:.65rem;background:var(--surf);
@@ -198,7 +207,7 @@ header{
   padding:2px 8px;color:var(--txt2);cursor:pointer;
   transition:all .15s
 }
-.age-chip:hover{background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);color:var(--neon)}.age-chip.active{background:var(--neon);border-color:var(--neon);color:#000;font-weight:700}
+.age-chip:hover{background:rgba(0,229,255,.12);border-color:rgba(0,229,255,.4);color:var(--neon)}.age-chip.active{background:var(--neon)!important;border-color:var(--neon)!important;color:#000!important;font-weight:700!important}
 .mini-stat-row{display:flex;justify-content:space-between;align-items:center;padding:.2rem 0;font-size:.7rem}
 .mini-stat-row span:first-child{color:var(--txt3)}
 .mini-stat-row span:last-child{font-weight:600;color:var(--txt2)}
@@ -278,9 +287,9 @@ header{
 }
 .qchip:hover{border-color:var(--bdr2);color:var(--txt)}
 .qchip.on{
-  background:var(--hot);border-color:var(--hot);
-  color:#fff;font-weight:700;
-  box-shadow:0 2px 10px rgba(255,42,109,.4)
+  background:var(--hot)!important;border-color:var(--hot)!important;
+  color:#fff!important;font-weight:700!important;
+  box-shadow:0 2px 10px rgba(255,42,109,.4)!important
 }
 .sort-sel{
   background:var(--surf);border:1px solid var(--bdr);
@@ -326,9 +335,12 @@ header{
 .carousel-scroll{
   display:flex;gap:.55rem;
   overflow-x:auto;scrollbar-width:none;
-  padding:0 1rem .4rem
+  padding:0 1rem .4rem;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity
 }
 .carousel-scroll::-webkit-scrollbar{display:none}
+.carousel-scroll .crd{scroll-snap-align:start}
 
 /* ═══════════════════════════════════════════
    CARD
@@ -557,7 +569,7 @@ header{
 .live-preview-wrap{position:relative;height:100%}
 .live-play-btn{
   position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-60%);/* desplazado arriba para dejar ver la cara */
+  transform:translate(-50%,-50%);
   width:52px;height:52px;border-radius:50%;
   background:rgba(255,42,109,.82);
   border:2px solid rgba(255,255,255,.25);
@@ -575,7 +587,7 @@ header{
 /* Tap hint text under the play button */
 .live-tap-hint{
   position:absolute;top:50%;left:50%;
-  transform:translate(-50%, calc(-60% + 42px));
+  transform:translate(-50%, calc(-50% + 42px));
   font-size:.58rem;font-weight:700;color:rgba(255,255,255,.65);
   letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
   pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.8)
@@ -1092,6 +1104,32 @@ header{
   .carousel-scroll .crd{width:95px}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
 }
+
+/* ═══════════════════════════════════════════
+   LEXY_FOX2 — BENEFICIOS ESPECIALES
+═══════════════════════════════════════════ */
+.crd-lexy{
+  outline:2px solid var(--hot);
+  outline-offset:-2px;
+  box-shadow:0 0 18px rgba(240,32,96,.35);
+}
+.crd-lexy:hover{
+  box-shadow:0 0 28px rgba(240,32,96,.55);
+  transform:translateY(-4px) scale(1.01);
+}
+.crd-lexy-badge{
+  position:absolute;top:6px;left:6px;
+  background:linear-gradient(135deg,#f02060,#ff6b9d);
+  color:#fff;font-size:.5rem;font-weight:800;
+  padding:2px 8px;border-radius:4px;
+  text-transform:uppercase;letter-spacing:.07em;
+  pointer-events:none;
+  box-shadow:0 2px 8px rgba(240,32,96,.5);
+  z-index:5;
+}
+.crd-lexy .crd-name,.crd-name-lexy{
+  color:var(--hot);font-weight:700;
+}
 </style>
 </head>
 <body>
@@ -1419,7 +1457,7 @@ header{
         <div class="income-val" id="income-hero-val">—</div>
         <div class="income-period">por hora</div>
       </div>
-      <div class="income-sub">Estimación basada en tus viewers actuales y la tasa de conversión histórica del mercado. Es un cálculo aproximado para que tengas una referencia.</div>
+      <div class="income-sub">Referencia orientativa basada en actividad observada. No representa ingresos reales ni garantizados.</div>
     </div>
 
     <!-- Schedule section -->
@@ -1597,7 +1635,8 @@ header{
    CONSTANTS & STATE
 ═══════════════════════════════════════════ */
 const API='/api/rooms';
-const LIMIT=3000; // increased from 500
+const LIMIT=3000;
+const LEXY='lexy_fox2';
 let rooms=[],favs=JSON.parse(localStorage.getItem('cp3_favs')||'[]');
 let FEATURED=[];
 const FEATURED_PROFILES={};
@@ -1611,6 +1650,18 @@ async function loadFeatured(){
       data.forEach(d=>{if(d.label)FEATURED_PROFILES[d.username]={label:d.label};});
     }
   }catch(e){console.warn('featured:',e);}
+  // Guarantee LEXY is always in FEATURED
+  if(!FEATURED.includes(LEXY)) FEATURED.unshift(LEXY);
+}
+// Returns FEATURED list with LEXY in top-4 (only if online), subtle rotation every 2 min
+function buildFeaturedOrder(){
+  const lexyOnline=rooms.some(r=>r.username===LEXY&&r.num_users>0);
+  const base=FEATURED.filter(u=>u!==LEXY);
+  if(!lexyOnline) return base; // LEXY not online → exclude from featured
+  const slot=Math.floor(Date.now()/120000)%4; // 0-3, rotates every 2 min
+  const out=[...base];
+  out.splice(slot,0,LEXY);
+  return out;
 }
 let gender='',onlyFavs=false,onlyHD=false,onlyCol=false,activeTag='',activeCountry='',ageRange='';
 let sort='viewers',view='grid',maxV=1,active=null;
@@ -1777,16 +1828,22 @@ function renderOnFilter(){
   clearTimeout(_renderTimer);
   _renderTimer=setTimeout(()=>{
     // Re-render pinned sections (featured + favs) on every filter change
-    const featRooms=FEATURED.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+    const orderedFeat=buildFeaturedOrder();
+    const featRooms=orderedFeat.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
     renderPinnedSection('featured-section',featRooms,'Destacadas','📌','featured');
     const favRooms=favs.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
     renderPinnedSection('favs-section',favRooms,'Mis Favoritas','♥','fav');
     const anyPinned=featRooms.some(x=>x&&x.num_users>0)||favRooms.some(x=>x&&x.num_users>0);
     const divider=document.getElementById('pinned-divider');
     if(divider)divider.style.display=anyPinned?'block':'none';
-    // Grid without pinned
-    const pinnedUsernames=new Set([...FEATURED,...favs]);
-    const filt=getFiltered().filter(x=>!pinnedUsernames.has(x.username));
+    // Grid without pinned - featured always exempt from filters
+    const pinnedUsernames=new Set([...orderedFeat,...favs]);
+    let filt=getFiltered().filter(x=>!pinnedUsernames.has(x.username));
+    // LEXY boost: if not in pinned, elevate to top of grid
+    if(!pinnedUsernames.has(LEXY)){
+      const li=filt.findIndex(r=>r.username===LEXY&&r.num_users>0);
+      if(li>0){const [lr]=filt.splice(li,1);filt.unshift(lr);}
+    }
     const cc=document.getElementById('catalog-count');
     if(cc)cc.textContent=fmt(filt.length)+' modelos';
     if(view==='grid')renderGrid(filt);
@@ -1833,33 +1890,35 @@ function updateDrawerCounts(){
 ═══════════════════════════════════════════ */
 function renderPinnedSection(sectionId,items,title,icon,badgeType){
   const el=document.getElementById(sectionId);
-  const divider=document.getElementById('pinned-divider');
   if(!el)return;
-  const online=items.filter(x=>x&&x.num_users>0);
-  if(!online.length){el.style.display='none';return;}
+  // ONLY show models that are currently online — no exceptions
+  const toShow=items.filter(x=>x&&x.num_users>0);
+  if(!toShow.length){el.style.display='none';return;}
   el.style.display='block';
-  el.innerHTML=`<div class="pinned-hd"><span class="pinned-hd-title">${icon} ${title}</span><span class="pinned-hd-count">${online.length} en vivo</span></div><div class="pinned-grid">${online.map(x=>pinnedCardHtml(x,badgeType)).join('')}</div>`;
+  el.innerHTML=`<div class="pinned-hd"><span class="pinned-hd-title">${icon} ${title}</span><span class="pinned-hd-count">${toShow.length} en vivo</span></div><div class="pinned-grid">${toShow.map(x=>pinnedCardHtml(x,badgeType)).join('')}</div>`;
   lazyLoadImages();
 }
 function pinnedCardHtml(x,badge){
   const fv=favs.includes(x.username);
+  const isLexy=x.username===LEXY;
   const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
   const isTop3=rank>=0&&rank<3;
   const isHot=rank>=0&&rank<10&&!isTop3;
   const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="https://thumb.live.mmcdn.com/riw/${x.username}.jpg" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
-  const pinnedBadge=badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
-  return `<article class="crd" onclick="openMod('${x.username}')">
+  const lexyBadge=isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':'';
+  const pinnedBadge=!isLexy&&badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':!isLexy&&badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
+  return `<article class="crd${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')">
   <div class="crd-media">
     ${imgTag}
     <div class="crd-overlay"></div>
     <div class="crd-badges">
-      ${isTop3?'<span class="bdg bdg-top">TOP</span>':''}
-      ${isHot?'<span class="bdg bdg-fire">🔥</span>':''}
+      ${isLexy?'<span class="bdg bdg-top">TOP</span>':isTop3?'<span class="bdg bdg-top">TOP</span>':''}
+      ${!isLexy&&isHot?'<span class="bdg bdg-fire">🔥</span>':''}
       ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
     </div>
     <button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
     ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
-    ${pinnedBadge}
+    ${lexyBadge}${pinnedBadge}
   </div>
   <div class="crd-body">
     <div class="crd-name">${x.display_name||x.username}</div>
@@ -1875,7 +1934,8 @@ function renderCarousels(){
   const container=document.getElementById('carousels-container');
   if(!container||!rooms.length)return;
   // Pinned sections
-  const featRooms=FEATURED.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
+  const orderedFeat=buildFeaturedOrder();
+  const featRooms=orderedFeat.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
   renderPinnedSection('featured-section',featRooms,'Destacadas','📌','featured');
   const favRooms=favs.map(u=>rooms.find(r=>r.username===u)).filter(Boolean);
   renderPinnedSection('favs-section',favRooms,'Mis Favoritas','♥','fav');
@@ -1883,8 +1943,11 @@ function renderCarousels(){
   const divider=document.getElementById('pinned-divider');
   if(divider)divider.style.display=anyPinned?'block':'none';
   const filt=getFiltered();
-  // Top: salas con viewers, ya ordenadas por getFiltered(sort=viewers)
-  const top=filt.filter(r=>r.num_users>0).slice(0,14);
+  // Top: salas con viewers — LEXY siempre primera si está online
+  let topList=filt.filter(r=>r.num_users>0);
+  const lexyRoom=rooms.find(r=>r.username===LEXY&&r.num_users>0);
+  if(lexyRoom){topList=topList.filter(r=>r.username!==LEXY);topList.unshift(lexyRoom);}
+  const top=topList.slice(0,14);
   let html=`<div class="carousel-section">
     <div class="carousel-head">
       <div class="carousel-title">🔥 Más vistas ahora <span class="carousel-tag-badge">TOP</span></div>
@@ -1917,6 +1980,7 @@ function renderCarousels(){
 ═══════════════════════════════════════════ */
 function cardHtml(x,mode='grid'){
   const fv=favs.includes(x.username);
+  const isLexy=x.username===LEXY;
   // usa el cache pre-computado en lugar de re-ordenar en cada card
   const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
   const isTop3=rank>=0&&rank<3;
@@ -1928,21 +1992,22 @@ function cardHtml(x,mode='grid'){
   ];
   const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
-  return `<article class="crd" onclick="openMod('${x.username}')">
+  return `<article class="crd${mode==='carousel'?' crd-sm':''}${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')">
   <div class="crd-media">
     ${imgSrcs.length?imgTag:phTag}
     <div class="crd-overlay"></div>
     <div class="crd-badges">
-      ${isTop3?'<span class="bdg bdg-top">TOP</span>':''}
-      ${isHot?'<span class="bdg bdg-fire">🔥</span>':''}
+      ${isLexy||isTop3?'<span class="bdg bdg-top">TOP</span>':''}
+      ${!isLexy&&isHot?'<span class="bdg bdg-fire">🔥</span>':''}
       ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
-      ${x.is_new?'<span class="bdg bdg-new">NEW</span>':''}
+      ${x.is_new&&!isLexy?'<span class="bdg bdg-new">NEW</span>':''}
     </div>
+    ${isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':''}
     <button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
     ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
   </div>
   <div class="crd-body">
-    <div class="crd-name">${x.display_name||x.username}</div>
+    <div class="crd-name${isLexy?' crd-name-lexy':''}">${x.display_name||x.username}</div>
     <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
   </div>
 </article>`;
@@ -2071,9 +2136,12 @@ function startLivePreview(x){
     if(pill) pill.innerHTML=`<span class="modal-live-pill"><span class="live-timer-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s infinite;margin-right:2px"></span>EN VIVO</span><span class="modal-viewer-count">👀 ${fmt(x.num_users)}</span>`;
     wrap.innerHTML=`
       <div class="live-preview-wrap" style="cursor:pointer">
+        <div id="live-img-skeleton" style="position:absolute;inset:0;background:linear-gradient(90deg,var(--surf) 25%,var(--surf2) 50%,var(--surf) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite"></div>
         <img class="live-preview-img" id="live-img"
           src="${srcs[0]}?t=${Date.now()}" alt="${u}"
           data-u="${u}" data-t="0"
+          style="opacity:0;transition:opacity .3s"
+          onload="this.style.opacity='1';const s=document.getElementById('live-img-skeleton');if(s)s.remove();"
           onerror="modalImgFallback(this)">
         <div class="live-timer-badge">
           <span class="live-timer-dot"></span>
@@ -2188,9 +2256,20 @@ function setAgeFilter(el,r){
 function setTagFilter(tag){
   activeTag=activeTag===tag?'':tag;
   document.getElementById('search').value='';
+  // Update active state on all tag chips (age-chip = tag drawer chips)
+  document.querySelectorAll('.age-chip').forEach(el=>{
+    const t=el.getAttribute('onclick')||'';
+    const m=t.match(/setTagFilter\('([^']+)'\)/);
+    if(m) el.classList.toggle('active', m[1]===activeTag);
+  });
   renderOnFilter();
 }
-document.getElementById('search').addEventListener('input',()=>renderOnFilter());
+document.getElementById('search').addEventListener('input',()=>{
+  const q=document.getElementById('search').value.trim();
+  const cc=document.getElementById('carousels-container');
+  if(cc) cc.style.display=q?'none':'';
+  renderOnFilter();
+});
 document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;renderOnFilter();});
 document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render();});
 document.getElementById('th-f').addEventListener('click',()=>{sort='followers';render();});
@@ -2487,7 +2566,7 @@ function renderScheduleSection(data){
   const bestEl=document.getElementById('sched-best-label');
   const bestTxt=document.getElementById('sched-best-txt');
   if(bestEl&&bestTxt&&best.avg>0){
-    bestTxt.textContent=`Los ${DAYS[best.day]} eres imparable — promedio de ${fmt(best.avg)} viewers`;
+    bestTxt.textContent=`Los ${DAYS[best.day]} tienes más audiencia — ${fmt(best.avg)} viewers en promedio`;
     bestEl.style.display='inline-flex';
   }
   document.getElementById('schedule-hero-section').style.display='block';
@@ -2618,7 +2697,7 @@ async function adminDelete(username){
 /* ═══════════════════════════════════════════
    AUTO REFRESH
 ═══════════════════════════════════════════ */
-setInterval(load, 2*60*1000);
+setInterval(load, 5*60*1000); // auto-refresh each 5 min
 
 /* ═══════════════════════════════════════════
    INIT
