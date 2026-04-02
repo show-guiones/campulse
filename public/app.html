@@ -1371,6 +1371,8 @@ header{
   color:var(--hot);font-weight:700;
 }
 </style>
+<!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
 </head>
 <body>
 
@@ -1799,25 +1801,29 @@ header{
 
 </div><!-- .page -->
 
-<!-- CARD MINI PLAYER — popup flotante global -->
+<!-- CARD MINI PLAYER — popup flotante global con HLS nativo (sin iframe) -->
 <div class="crd-iframe-popup" id="crd-iframe-popup">
   <div class="crd-iframe-body">
-    <iframe class="crd-iframe" id="crd-popup-iframe" src="about:blank"
-      allow="autoplay; fullscreen; encrypted-media" allowFullscreen
-      referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <!-- Video nativo — hls.js lo alimenta con el .m3u8 de Chaturbate -->
+    <video class="crd-iframe" id="crd-popup-video"
+      playsinline autoplay muted
+      style="width:100%;height:236px;background:#000;display:block;object-fit:contain">
+    </video>
     <div class="crd-iframe-loading" id="crd-popup-loading">
       <div class="crd-iframe-loading-dot"></div>
       <div class="crd-iframe-loading-dot"></div>
       <div class="crd-iframe-loading-dot"></div>
     </div>
     <div class="crd-iframe-error" id="crd-popup-error">
-      <span>&#9888; No se pudo cargar el stream</span>
+      <span>&#9888; Stream no disponible</span>
       <button onclick="cardPlayerOpenFull()">Abrir en Chaturbate &rarr;</button>
     </div>
   </div>
   <div class="crd-iframe-bar">
     <span class="crd-iframe-live">&#9679; LIVE</span>
     <span class="crd-iframe-name" id="crd-popup-name"></span>
+    <!-- Botón mute toggle -->
+    <button id="crd-mute-btn" onclick="cardPlayerToggleMute()" title="Activar sonido">&#128263;</button>
     <button class="crd-iframe-expand" onclick="cardPlayerOpenFull()" title="Abrir completo">&#x26F6;</button>
     <button onclick="closeCardPlayer()">&#x2715;</button>
   </div>
@@ -2646,94 +2652,151 @@ function deactivateEmbed(){
   // Reiniciar preview del modelo activo
   if(active) startLivePreview(active);
 }
-// ─── CARD MINI PLAYER — popup flotante global ───
-let _activeCardPlayer=null;
-let _cardPlayerTimeout=null;
+// ─── CARD MINI PLAYER — HLS nativo con hls.js (sin iframe) ───
+let _activeCardPlayer = null;
+let _cardPlayerTimeout = null;
+let _hlsInstance = null; // instancia actual de hls.js
 
-const _svgPlay='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
-const _svgPause='<svg viewBox="0 0 16 16" fill="#fff"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
+const _svgPlay  = '<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
+const _svgPause = '<svg viewBox="0 0 16 16" fill="#fff"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
 
-function openCardPlayer(e,username,btn){
+function _destroyHls() {
+  if (_hlsInstance) {
+    _hlsInstance.destroy();
+    _hlsInstance = null;
+  }
+  const video = document.getElementById('crd-popup-video');
+  if (video) { video.pause(); video.src = ''; video.load(); }
+}
+
+function openCardPlayer(e, username, btn) {
   e.stopPropagation();
 
-  const popup=document.getElementById('crd-iframe-popup');
-  const iframe=document.getElementById('crd-popup-iframe');
-  const nameEl=document.getElementById('crd-popup-name');
-  const loading=document.getElementById('crd-popup-loading');
-  const errorEl=document.getElementById('crd-popup-error');
-  if(!popup||!iframe) return;
+  const popup   = document.getElementById('crd-iframe-popup');
+  const video   = document.getElementById('crd-popup-video');
+  const nameEl  = document.getElementById('crd-popup-name');
+  const loading = document.getElementById('crd-popup-loading');
+  const errorEl = document.getElementById('crd-popup-error');
+  if (!popup || !video) return;
 
   // Toggle: mismo username → cerrar
-  if(_activeCardPlayer===username){ closeCardPlayer(); return; }
+  if (_activeCardPlayer === username) { closeCardPlayer(); return; }
 
   // Resetear botón previo
-  if(_activeCardPlayer){
-    const prevBtn=document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
-    if(prevBtn) prevBtn.innerHTML=_svgPlay;
+  if (_activeCardPlayer) {
+    const prevBtn = document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
+    if (prevBtn) prevBtn.innerHTML = _svgPlay;
   }
 
   // Mostrar loading, ocultar error
-  if(loading){ loading.classList.remove('hidden'); }
-  if(errorEl){ errorEl.classList.remove('show'); }
+  if (loading) loading.classList.remove('hidden');
+  if (errorEl) errorEl.classList.remove('show');
 
-  // Limpiar iframe primero para evitar que el browser reutilice el documento anterior
-  iframe.src='about:blank';
+  // Destruir instancia HLS anterior
+  _destroyHls();
 
-  // Pequeño delay para que el browser limpie el estado
-  setTimeout(()=>{
-    const room=rooms.find(r=>r.username===username);
-    const displayName=room?.display_name||username;
+  const room = rooms.find(r => r.username === username);
+  const displayName = room?.display_name || username;
+  if (nameEl) nameEl.textContent = displayName;
 
-    // URL del affiliate embed de Chaturbate — única URL que permite embeds externos
-    // El parámetro mobileRedirect=never evita que Chaturbate fuerce la app nativa en móvil
-    iframe.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&autoplay=1&mobileRedirect=never&bgcolor=000000`;
-    if(nameEl) nameEl.textContent=displayName;
+  popup.classList.add('active');
+  _activeCardPlayer = username;
+  if (btn) btn.innerHTML = _svgPause;
 
-    popup.classList.add('active');
-    _activeCardPlayer=username;
-    if(btn) btn.innerHTML=_svgPause;
+  // Timeout de seguridad: 15s sin stream → mostrar fallback
+  _cardPlayerTimeout = setTimeout(() => {
+    if (loading && !loading.classList.contains('hidden')) {
+      if (loading) loading.classList.add('hidden');
+      if (errorEl) errorEl.classList.add('show');
+    }
+  }, 15000);
 
-    // Timeout de seguridad: si en 12s el iframe no cargó, mostrar fallback
-    _cardPlayerTimeout=setTimeout(()=>{
-      if(loading&&!loading.classList.contains('hidden')){
-        if(loading) loading.classList.add('hidden');
-        if(errorEl) errorEl.classList.add('show');
-      }
-    },12000);
+  // 1. Pedir la URL HLS a nuestro proxy Vercel (evita CORS del POST a Chaturbate)
+  fetch(`/api/hls-proxy?username=${encodeURIComponent(username)}`)
+    .then(r => r.json())
+    .then(data => {
+      // Si ya cambió de modelo antes de que llegue la respuesta, ignorar
+      if (_activeCardPlayer !== username) return;
 
-    // Escuchar load del iframe para quitar el loading overlay
-    const onLoad=()=>{
       clearTimeout(_cardPlayerTimeout);
-      if(loading) loading.classList.add('hidden');
-      iframe.removeEventListener('load',onLoad);
-    };
-    iframe.addEventListener('load',onLoad);
-  },80);
+
+      if (!data.success || !data.url || data.room_status !== 'public') {
+        if (loading) loading.classList.add('hidden');
+        if (errorEl) errorEl.classList.add('show');
+        return;
+      }
+
+      const m3u8 = data.url;
+
+      // 2. Reproducir con hls.js (o con soporte nativo en Safari/iOS)
+      if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+        _hlsInstance = new Hls({
+          maxBufferLength: 10,
+          maxMaxBufferLength: 20,
+          liveSyncDurationCount: 3,
+        });
+        _hlsInstance.loadSource(m3u8);
+        _hlsInstance.attachMedia(video);
+        _hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.play().catch(() => {});
+          if (loading) loading.classList.add('hidden');
+        });
+        _hlsInstance.on(Hls.Events.ERROR, (_, errData) => {
+          if (errData.fatal) {
+            if (loading) loading.classList.add('hidden');
+            if (errorEl) errorEl.classList.add('show');
+          }
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari / iOS soportan HLS nativamente
+        video.src = m3u8;
+        video.addEventListener('loadedmetadata', () => {
+          video.play().catch(() => {});
+          if (loading) loading.classList.add('hidden');
+        }, { once: true });
+      } else {
+        // Navegador no soporta HLS — fallback al link directo
+        if (loading) loading.classList.add('hidden');
+        if (errorEl) errorEl.classList.add('show');
+      }
+    })
+    .catch(() => {
+      if (_activeCardPlayer !== username) return;
+      clearTimeout(_cardPlayerTimeout);
+      if (loading) loading.classList.add('hidden');
+      if (errorEl) errorEl.classList.add('show');
+    });
 }
 
-function closeCardPlayer(){
-  const popup=document.getElementById('crd-iframe-popup');
-  const iframe=document.getElementById('crd-popup-iframe');
-  const loading=document.getElementById('crd-popup-loading');
-  const errorEl=document.getElementById('crd-popup-error');
-  if(!popup) return;
+function closeCardPlayer() {
+  const popup   = document.getElementById('crd-iframe-popup');
+  const loading = document.getElementById('crd-popup-loading');
+  const errorEl = document.getElementById('crd-popup-error');
+  if (!popup) return;
 
   clearTimeout(_cardPlayerTimeout);
-  if(iframe) iframe.src='about:blank';
-  if(loading) loading.classList.remove('hidden');
-  if(errorEl) errorEl.classList.remove('show');
+  _destroyHls();
+  if (loading) loading.classList.remove('hidden');
+  if (errorEl) errorEl.classList.remove('show');
   popup.classList.remove('active');
 
-  if(_activeCardPlayer){
-    const btn=document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
-    if(btn) btn.innerHTML=_svgPlay;
+  if (_activeCardPlayer) {
+    const btn = document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
+    if (btn) btn.innerHTML = _svgPlay;
   }
-  _activeCardPlayer=null;
+  _activeCardPlayer = null;
 }
 
-// Abrir en Chaturbate completo (fallback si iframe falla)
-function cardPlayerOpenFull(){
-  if(_activeCardPlayer) window.open(`https://chaturbate.com/${_activeCardPlayer}/`,'_blank');
+function cardPlayerToggleMute() {
+  const video = document.getElementById('crd-popup-video');
+  const btn   = document.getElementById('crd-mute-btn');
+  if (!video) return;
+  video.muted = !video.muted;
+  if (btn) btn.textContent = video.muted ? '\uD83D\uDD07' : '\uD83D\uDD0A';
+}
+
+function cardPlayerOpenFull() {
+  if (_activeCardPlayer) window.open(`https://chaturbate.com/${_activeCardPlayer}/`, '_blank');
 }
 
 
