@@ -521,8 +521,41 @@ header{
 }
 .crd-vw-dot{width:4px;height:4px;border-radius:50%;background:var(--hot);box-shadow:0 0 4px var(--hot)}
 
-/* card body */
-.crd-body{padding:.45rem .55rem .55rem}
+/* card play button */
+.crd-play{
+  position:absolute;bottom:.4rem;right:.4rem;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,42,109,.9);border:none;
+  color:#fff;font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;backdrop-filter:blur(4px);
+  box-shadow:0 2px 8px rgba(255,42,109,.5);
+  z-index:10;cursor:pointer;flex-shrink:0
+}
+.crd-play:hover{transform:scale(1.12);background:var(--hot)}
+.crd-play svg{width:12px;height:12px;fill:#fff;margin-left:2px}
+
+/* card mini iframe player */
+.crd-iframe-wrap{
+  display:none;position:absolute;inset:0;z-index:20;
+  background:#000;flex-direction:column
+}
+.crd-iframe-wrap.active{display:flex}
+.crd-iframe{width:100%;flex:1;border:none;display:block;min-height:0}
+.crd-iframe-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:3px 6px;background:rgba(0,0,0,.85);
+  font-size:.6rem;color:var(--txt2);flex-shrink:0
+}
+.crd-iframe-bar button{
+  background:none;border:none;color:var(--txt2);
+  font-size:.65rem;cursor:pointer;padding:2px 6px;
+  border-radius:4px;transition:background .15s
+}
+.crd-iframe-bar button:hover{background:rgba(255,255,255,.1);color:var(--txt)}
+.crd-iframe-bar .crd-iframe-name{font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px}
+
+
 .crd-name{
   font-size:.72rem;font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)
@@ -2152,6 +2185,14 @@ function pinnedCardHtml(x,badge){
     <button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
     ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
     ${lexyBadge}${pinnedBadge}
+    ${isLivePinned?`<button class="crd-play" onclick="openCardPlayer(event,'${x.username}',this)" title="Ver en vivo"><svg viewBox="0 0 16 16"><path d="M4 3l10 5-10 5z"/></svg></button>`:''}
+    <div class="crd-iframe-wrap" id="crd-iframe-${x.username}">
+      <iframe class="crd-iframe" src="about:blank" allow="autoplay" allowFullscreen></iframe>
+      <div class="crd-iframe-bar">
+        <span class="crd-iframe-name">${x.display_name||x.username}</span>
+        <button onclick="closeCardPlayer(event,'${x.username}')">✕ Cerrar</button>
+      </div>
+    </div>
   </div>
   <div class="crd-body">
     <div class="crd-name">${x.display_name||x.username}</div>
@@ -2241,6 +2282,14 @@ function cardHtml(x,mode='grid'){
     ${isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':''}
     <button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
     ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
+    ${isLive?`<button class="crd-play" onclick="openCardPlayer(event,'${x.username}',this)" title="Ver en vivo"><svg viewBox="0 0 16 16"><path d="M4 3l10 5-10 5z"/></svg></button>`:''}
+    <div class="crd-iframe-wrap" id="crd-iframe-${x.username}">
+      <iframe class="crd-iframe" src="about:blank" allow="autoplay" allowFullscreen></iframe>
+      <div class="crd-iframe-bar">
+        <span class="crd-iframe-name">${x.display_name||x.username}</span>
+        <button onclick="closeCardPlayer(event,'${x.username}')">✕ Cerrar</button>
+      </div>
+    </div>
   </div>
   <div class="crd-body">
     <div class="crd-name${isLexy?' crd-name-lexy':''}">${x.display_name||x.username}</div>
@@ -2520,7 +2569,63 @@ function deactivateEmbed(){
   // Reiniciar preview del modelo activo
   if(active) startLivePreview(active);
 }
-function openInCB(u){window.open(`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`,'_blank','noopener');}
+// ─── CARD MINI PLAYER ───
+let _activeCardPlayer=null; // username del player activo
+
+function openCardPlayer(e,username,btn){
+  e.stopPropagation(); // no abrir modal
+
+  // Cerrar el player anterior si existe
+  if(_activeCardPlayer && _activeCardPlayer!==username){
+    closeCardPlayer(null,_activeCardPlayer);
+  }
+
+  const wrap=document.getElementById(`crd-iframe-${username}`);
+  if(!wrap) return;
+
+  // Si ya está activo, cerrarlo (toggle)
+  if(wrap.classList.contains('active')){
+    closeCardPlayer(e,username);
+    return;
+  }
+
+  // Cargar el embed de Chaturbate
+  const iframe=wrap.querySelector('.crd-iframe');
+  if(iframe && iframe.src==='about:blank'){
+    iframe.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&autoplay=1&mobileRedirect=never`;
+  }
+
+  wrap.classList.add('active');
+  _activeCardPlayer=username;
+
+  // Cambiar el botón de play a "stop"
+  if(btn){
+    btn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
+    btn.title='Detener';
+  }
+}
+
+function closeCardPlayer(e,username){
+  if(e) e.stopPropagation();
+  const wrap=document.getElementById(`crd-iframe-${username}`);
+  if(!wrap) return;
+
+  // Detener el stream descargando el src
+  const iframe=wrap.querySelector('.crd-iframe');
+  if(iframe) iframe.src='about:blank';
+
+  wrap.classList.remove('active');
+  if(_activeCardPlayer===username) _activeCardPlayer=null;
+
+  // Restaurar botón de play
+  const card=document.querySelector(`[data-username="${username}"] .crd-play`);
+  if(card){
+    card.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
+    card.title='Ver en vivo';
+  }
+}
+
+
 function closeMod(e){
   if(!e||e.target===document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
