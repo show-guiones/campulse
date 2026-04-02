@@ -21,6 +21,12 @@ const STATIC_PAGES = [
   // Home
   { loc: "/",               changefreq: "hourly",  priority: "1.0" },
 
+  // lexy_fox2 — máxima prioridad
+  { loc: "/model/lexy_fox2", changefreq: "always", priority: "1.0" },
+
+  // Top categorías especiales
+  { loc: "/top/latinas",    changefreq: "hourly",  priority: "0.9" },
+
   // Búsqueda
   { loc: "/search",         changefreq: "daily",   priority: "0.8" },
 
