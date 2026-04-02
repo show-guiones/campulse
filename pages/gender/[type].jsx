@@ -1,9 +1,9 @@
 // pages/gender/[type].jsx
 // Ruta: pages/gender/[type].jsx
 //
-// Página de modelos por género — SSR (getServerSideProps)
-// Cambiado de getStaticProps+getStaticPaths a getServerSideProps
-// para evitar 404 cacheados cuando la API devolvía datos vacíos.
+// Página de modelos por género — SSR con query directa a Supabase
+// Se eliminó el fetch interno a /api/gender porque Vercel no puede
+// llamarse a sí mismo de forma fiable desde getServerSideProps.
 //
 // URLs: /gender/female  /gender/male  /gender/couple  /gender/trans
 
@@ -12,6 +12,21 @@ import Head from "next/head";
 const SITE = "https://www.campulsehub.com";
 
 const SUPPORTED_GENDERS = ["female", "male", "couple", "trans"];
+
+// Mapa slug → valor CHAR(1) en Supabase
+const GENDER_DB_MAP = {
+  female: "f",
+  male:   "m",
+  couple: "c",
+  trans:  "t",
+};
+
+const GENDER_INFO = {
+  female: { name: "Chicas",  nameEs: "Mujeres", description: "Las mejores modelos femeninas de Chaturbate" },
+  male:   { name: "Chicos",  nameEs: "Hombres", description: "Los mejores modelos masculinos de Chaturbate" },
+  couple: { name: "Parejas", nameEs: "Parejas", description: "Las mejores parejas de Chaturbate en vivo" },
+  trans:  { name: "Trans",   nameEs: "Trans",   description: "Las mejores modelos trans de Chaturbate" },
+};
 
 const COUNTRY_NAMES = {
   CO: "Colombia", MX: "México", AR: "Argentina", CL: "Chile",
@@ -30,11 +45,72 @@ export async function getServerSideProps({ params }) {
     return { notFound: true };
   }
 
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return { notFound: true };
+  }
+
   try {
-    const r = await fetch(`${SITE}/api/gender?gender=${type}&limit=50`);
+    const dbGender = GENDER_DB_MAP[type];
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const url =
+      `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+      `?captured_at=gte.${since}` +
+      `&gender=eq.${dbGender}` +
+      `&select=username,num_users,num_followers,display_name,country` +
+      `&limit=50000`;
+
+    const r = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+    });
+
     if (!r.ok) return { notFound: true };
-    const data = await r.json();
-    if (!data.models || data.models.length === 0) return { notFound: true };
+    const rows = await r.json();
+
+    const map = {};
+    for (const row of rows) {
+      const u = row.username;
+      if (!u) continue;
+      if (!map[u]) {
+        map[u] = {
+          username: u,
+          display_name: row.display_name || u,
+          country: row.country || "",
+          total_viewers: 0,
+          snapshots: 0,
+          max_followers: 0,
+        };
+      }
+      map[u].total_viewers += row.num_users ?? 0;
+      map[u].snapshots += 1;
+      if ((row.num_followers ?? 0) > map[u].max_followers) {
+        map[u].max_followers = row.num_followers ?? 0;
+      }
+    }
+
+    const models = Object.values(map)
+      .filter((m) => m.snapshots >= 3)
+      .map((m) => ({
+        username: m.username,
+        display_name: m.display_name,
+        country: m.country,
+        avg_viewers: Math.round(m.total_viewers / m.snapshots),
+        max_followers: m.max_followers,
+      }))
+      .sort((a, b) => b.avg_viewers - a.avg_viewers)
+      .slice(0, 50);
+
+    if (models.length === 0) return { notFound: true };
+
+    const info = GENDER_INFO[type];
+    const data = { gender: type, ...info, models };
+
     return { props: { data } };
   } catch {
     return { notFound: true };
