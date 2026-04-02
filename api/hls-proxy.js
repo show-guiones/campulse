@@ -63,9 +63,9 @@ export default async function handler(req, res) {
   }
 
   // ── Estrategia 2: URL CDN mmcdn directa ──
-  // Chaturbate usa edge-hls.live.mmcdn.com con CORS abierto.
+  // Chaturbate usa hls.live.mmcdn.com con CORS abierto.
   // El cliente puede intentar reproducir este .m3u8 directamente con hls.js.
-  const cdnUrl = `https://edge-hls.live.mmcdn.com/live-hls/amlst:${username}/index.m3u8`;
+  const cdnUrl = `https://hls.live.mmcdn.com/live-hls/amlst:${username}/index.m3u8`;
   return res.status(200).json({
     success: true, type: 'hls',
     url: cdnUrl,
