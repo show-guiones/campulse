@@ -536,39 +536,76 @@ header{
 .crd-play svg{width:12px;height:12px;fill:#fff;margin-left:2px}
 
 /* card mini iframe player — flota como popup centrado */
-.crd-iframe-wrap{display:none} /* ocultar el wrap inline — no se usa más */
+.crd-iframe-wrap{display:none}
 .crd-iframe-popup{
   display:none;
   position:fixed;
-  bottom:80px;left:50%;transform:translateX(-50%);
-  width:min(360px,94vw);
-  border-radius:12px;overflow:hidden;
+  bottom:72px;left:50%;transform:translateX(-50%);
+  width:min(420px,96vw);
+  border-radius:14px;overflow:hidden;
   background:#000;
-  box-shadow:0 8px 40px rgba(0,0,0,.85);
-  z-index:500;
+  box-shadow:0 12px 48px rgba(0,0,0,.92);
+  z-index:9000;
   flex-direction:column;
+  transition:box-shadow .2s;
 }
 .crd-iframe-popup.active{display:flex}
+/* Aspecto 16/9 real: 420px → 236px */
 .crd-iframe-popup .crd-iframe{
-  width:100%;height:203px;border:none;display:block
+  width:100%;height:236px;border:none;display:block;
+  background:#000;
 }
+/* Overlay de carga */
+.crd-iframe-loading{
+  position:absolute;top:0;left:0;right:0;height:236px;
+  display:flex;align-items:center;justify-content:center;
+  background:#0a0a0f;pointer-events:none;
+  transition:opacity .4s;
+}
+.crd-iframe-loading.hidden{opacity:0;}
+.crd-iframe-loading-dot{
+  width:10px;height:10px;border-radius:50%;background:var(--hot,#e33);
+  animation:dotPulse 1.2s ease-in-out infinite;margin:0 4px;
+}
+.crd-iframe-loading-dot:nth-child(2){animation-delay:.2s}
+.crd-iframe-loading-dot:nth-child(3){animation-delay:.4s}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+/* Error state */
+.crd-iframe-error{
+  position:absolute;top:0;left:0;right:0;height:236px;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:#0a0a0f;color:#888;font-size:.78rem;gap:10px;
+}
+.crd-iframe-error.show{display:flex}
+.crd-iframe-error button{
+  padding:6px 16px;border-radius:8px;border:1px solid #444;
+  background:transparent;color:#ccc;cursor:pointer;font-size:.75rem;
+}
+.crd-iframe-popup .crd-iframe-body{position:relative}
 .crd-iframe-bar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:5px 10px;background:rgba(15,15,20,.95);
-  font-size:.65rem;color:var(--txt2);flex-shrink:0;
-  border-top:1px solid rgba(255,255,255,.07)
+  padding:6px 12px;background:rgba(10,10,18,.97);
+  font-size:.65rem;color:var(--txt2,#888);flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.06);gap:6px;
 }
 .crd-iframe-bar button{
-  background:none;border:none;color:var(--txt2);
-  font-size:.7rem;cursor:pointer;padding:3px 8px;
-  border-radius:6px;transition:background .15s
+  background:none;border:none;color:var(--txt2,#888);
+  font-size:.7rem;cursor:pointer;padding:4px 10px;
+  border-radius:6px;transition:background .15s;white-space:nowrap;
 }
-.crd-iframe-bar button:hover{background:rgba(255,255,255,.1);color:var(--txt)}
+.crd-iframe-bar button:hover{background:rgba(255,255,255,.1);color:var(--txt,#eee)}
 .crd-iframe-bar .crd-iframe-name{
-  font-weight:700;color:var(--txt);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;
-  font-size:.72rem
+  font-weight:700;color:var(--txt,#eee);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:.74rem;flex:1;
 }
+/* Live badge en la barra */
+.crd-iframe-live{
+  background:#e33;color:#fff;font-size:.58rem;font-weight:700;
+  padding:2px 6px;border-radius:4px;letter-spacing:.04em;flex-shrink:0;
+}
+/* Botón expandir */
+.crd-iframe-expand{font-size:.9rem!important;opacity:.7}
 
 
 
@@ -1764,11 +1801,25 @@ header{
 
 <!-- CARD MINI PLAYER — popup flotante global -->
 <div class="crd-iframe-popup" id="crd-iframe-popup">
-  <iframe class="crd-iframe" id="crd-popup-iframe" src="about:blank"
-    allow="autoplay; fullscreen" allowFullscreen></iframe>
+  <div class="crd-iframe-body">
+    <iframe class="crd-iframe" id="crd-popup-iframe" src="about:blank"
+      allow="autoplay; fullscreen; encrypted-media" allowFullscreen
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="crd-iframe-loading" id="crd-popup-loading">
+      <div class="crd-iframe-loading-dot"></div>
+      <div class="crd-iframe-loading-dot"></div>
+      <div class="crd-iframe-loading-dot"></div>
+    </div>
+    <div class="crd-iframe-error" id="crd-popup-error">
+      <span>&#9888; No se pudo cargar el stream</span>
+      <button onclick="cardPlayerOpenFull()">Abrir en Chaturbate &rarr;</button>
+    </div>
+  </div>
   <div class="crd-iframe-bar">
+    <span class="crd-iframe-live">&#9679; LIVE</span>
     <span class="crd-iframe-name" id="crd-popup-name"></span>
-    <button onclick="closeCardPlayer()">✕ Cerrar</button>
+    <button class="crd-iframe-expand" onclick="cardPlayerOpenFull()" title="Abrir completo">&#x26F6;</button>
+    <button onclick="closeCardPlayer()">&#x2715;</button>
   </div>
 </div>
 
@@ -2597,6 +2648,10 @@ function deactivateEmbed(){
 }
 // ─── CARD MINI PLAYER — popup flotante global ───
 let _activeCardPlayer=null;
+let _cardPlayerTimeout=null;
+
+const _svgPlay='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
+const _svgPause='<svg viewBox="0 0 16 16" fill="#fff"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
 
 function openCardPlayer(e,username,btn){
   e.stopPropagation();
@@ -2604,47 +2659,81 @@ function openCardPlayer(e,username,btn){
   const popup=document.getElementById('crd-iframe-popup');
   const iframe=document.getElementById('crd-popup-iframe');
   const nameEl=document.getElementById('crd-popup-name');
+  const loading=document.getElementById('crd-popup-loading');
+  const errorEl=document.getElementById('crd-popup-error');
   if(!popup||!iframe) return;
 
-  // Si el mismo username → cerrar (toggle)
-  if(_activeCardPlayer===username){
-    closeCardPlayer();
-    return;
-  }
+  // Toggle: mismo username → cerrar
+  if(_activeCardPlayer===username){ closeCardPlayer(); return; }
 
-  // Resetear botón anterior si existía
+  // Resetear botón previo
   if(_activeCardPlayer){
     const prevBtn=document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
-    if(prevBtn) prevBtn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
+    if(prevBtn) prevBtn.innerHTML=_svgPlay;
   }
 
-  // Cargar stream
-  const room=rooms.find(r=>r.username===username);
-  const displayName=room?.display_name||username;
-  iframe.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&autoplay=1&mobileRedirect=never`;
-  if(nameEl) nameEl.textContent=displayName;
+  // Mostrar loading, ocultar error
+  if(loading){ loading.classList.remove('hidden'); }
+  if(errorEl){ errorEl.classList.remove('show'); }
 
-  popup.classList.add('active');
-  _activeCardPlayer=username;
+  // Limpiar iframe primero para evitar que el browser reutilice el documento anterior
+  iframe.src='about:blank';
 
-  // Cambiar ícono del botón a pausa
-  if(btn) btn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
+  // Pequeño delay para que el browser limpie el estado
+  setTimeout(()=>{
+    const room=rooms.find(r=>r.username===username);
+    const displayName=room?.display_name||username;
+
+    // URL del affiliate embed de Chaturbate — única URL que permite embeds externos
+    // El parámetro mobileRedirect=never evita que Chaturbate fuerce la app nativa en móvil
+    iframe.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&autoplay=1&mobileRedirect=never&bgcolor=000000`;
+    if(nameEl) nameEl.textContent=displayName;
+
+    popup.classList.add('active');
+    _activeCardPlayer=username;
+    if(btn) btn.innerHTML=_svgPause;
+
+    // Timeout de seguridad: si en 12s el iframe no cargó, mostrar fallback
+    _cardPlayerTimeout=setTimeout(()=>{
+      if(loading&&!loading.classList.contains('hidden')){
+        if(loading) loading.classList.add('hidden');
+        if(errorEl) errorEl.classList.add('show');
+      }
+    },12000);
+
+    // Escuchar load del iframe para quitar el loading overlay
+    const onLoad=()=>{
+      clearTimeout(_cardPlayerTimeout);
+      if(loading) loading.classList.add('hidden');
+      iframe.removeEventListener('load',onLoad);
+    };
+    iframe.addEventListener('load',onLoad);
+  },80);
 }
 
 function closeCardPlayer(){
   const popup=document.getElementById('crd-iframe-popup');
   const iframe=document.getElementById('crd-popup-iframe');
+  const loading=document.getElementById('crd-popup-loading');
+  const errorEl=document.getElementById('crd-popup-error');
   if(!popup) return;
 
+  clearTimeout(_cardPlayerTimeout);
   if(iframe) iframe.src='about:blank';
+  if(loading) loading.classList.remove('hidden');
+  if(errorEl) errorEl.classList.remove('show');
   popup.classList.remove('active');
 
-  // Restaurar ícono del botón activo
   if(_activeCardPlayer){
     const btn=document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
-    if(btn) btn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
+    if(btn) btn.innerHTML=_svgPlay;
   }
   _activeCardPlayer=null;
+}
+
+// Abrir en Chaturbate completo (fallback si iframe falla)
+function cardPlayerOpenFull(){
+  if(_activeCardPlayer) window.open(`https://chaturbate.com/${_activeCardPlayer}/`,'_blank');
 }
 
 
