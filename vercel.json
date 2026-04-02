@@ -77,19 +77,6 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.campulsehub.com"
-        }
-      ],
-      "destination": "https://campulsehub.com/:path*",
-      "permanent": true
-    }
-  ],
   "rewrites": [
     {
       "source": "/rss.xml",
