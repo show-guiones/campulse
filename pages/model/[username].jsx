@@ -1,18 +1,14 @@
 // pages/model/[username].jsx
 //
-// Cambios respecto a versiones anteriores:
-//   · Trae country, display_name y gender del snapshot más reciente
-//   · Link a la página de categoría del país del modelo
-//   · Link a la página de idioma del modelo
-//   · canonical tag → evita duplicados con vercel.app
-//   · title y description con datos reales (viewers, seguidores, mejor horario)
-//   · Schema.org ProfilePage → habilita rich results en Google
-//   · Open Graph para compartir en redes
-//   · base de APIs apunta a campulsehub.com
+// Novedades respecto a la versión anterior:
+//   · Mini gráfico SVG de viewers (sparkline) generado desde el historial
+//   · Sección "En vivo ahora" si el último snapshot tiene viewers > 0
+//   · Peak viewers (máximo histórico) mostrado en métricas
+//   · Tabla de historial con barras proporcionales inline
+//   · Resto idéntico: canonical, Schema.org, OG, links a categorías
 
 import Head from "next/head";
 
-// Detecta el slug de idioma desde el campo spoken_languages de Supabase
 const LANG_VARIANTS = {
   spanish:    ["spanish", "español", "espanol", "es"],
   english:    ["english", "inglés", "ingles", "en"],
@@ -51,28 +47,68 @@ const COUNTRY_NAMES = {
   AU: "Australia", NL: "Países Bajos", SE: "Suecia", TR: "Turquía",
 };
 
-const GENDER_LABELS = {
-  f: "Mujer", m: "Hombre", c: "Pareja", t: "Trans",
-};
+const GENDER_LABELS = { f: "Mujer", m: "Hombre", c: "Pareja", t: "Trans" };
 
 function countryCodeToFlag(code) {
   if (!code || code.length !== 2) return "";
-  return code
-    .toUpperCase()
-    .split("")
-    .map((c) => String.fromCodePoint(0x1f1e0 + c.charCodeAt(0) - 65))
-    .join("");
+  return code.toUpperCase().split("").map((c) => String.fromCodePoint(0x1f1e0 + c.charCodeAt(0) - 65)).join("");
+}
+
+// ── Sparkline SVG ─────────────────────────────────────────────────────────────
+function Sparkline({ data, width = 280, height = 56 }) {
+  if (!data || data.length < 2) return null;
+  const values = data.map((d) => d.num_users ?? 0);
+  const max = Math.max(...values, 1);
+  const step = width / (values.length - 1);
+  const points = values
+    .map((v, i) => `${i * step},${height - (v / max) * (height - 4)}`)
+    .join(" ");
+
+  return (
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      width="100%"
+      height={height}
+      style={{ display: "block", overflow: "visible" }}
+    >
+      <defs>
+        <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {/* Área rellena */}
+      <polygon
+        points={`0,${height} ${points} ${(values.length - 1) * step},${height}`}
+        fill="url(#sg)"
+      />
+      {/* Línea */}
+      <polyline
+        points={points}
+        fill="none"
+        stroke="#a78bfa"
+        strokeWidth="2"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      {/* Punto final (más reciente) */}
+      {(() => {
+        const last = values.length - 1;
+        const x = last * step;
+        const y = height - (values[last] / max) * (height - 4);
+        return <circle cx={x} cy={y} r="4" fill="#a78bfa" />;
+      })()}
+    </svg>
+  );
 }
 
 export async function getServerSideProps({ params }) {
   const { username } = params;
-  const base = SITE;
 
   try {
     const [h, b, s] = await Promise.all([
-      fetch(`${base}/api/history?username=${encodeURIComponent(username)}`),
-      fetch(`${base}/api/best-hours?username=${encodeURIComponent(username)}`),
-      // Trae el snapshot más reciente para obtener country, gender, display_name
+      fetch(`${SITE}/api/history?username=${encodeURIComponent(username)}`),
+      fetch(`${SITE}/api/best-hours?username=${encodeURIComponent(username)}`),
       fetch(
         `${process.env.SUPABASE_URL}/rest/v1/rooms_snapshot` +
         `?username=eq.${encodeURIComponent(username)}` +
@@ -95,24 +131,20 @@ export async function getServerSideProps({ params }) {
     return {
       props: {
         username,
-        history,
-        bestHours,
-        country:     snap.country        || "",
-        gender:      snap.gender         || "",
+        history:    Array.isArray(history) ? history : [],
+        bestHours:  Array.isArray(bestHours) ? bestHours : [],
+        country:    snap.country         || "",
+        gender:     snap.gender          || "",
         displayName: snap.display_name   || "",
-        languages:   snap.spoken_languages || "",
+        languages:  snap.spoken_languages || "",
       },
     };
   } catch {
     return {
       props: {
         username,
-        history: [],
-        bestHours: [],
-        country: "",
-        gender: "",
-        displayName: "",
-        languages: "",
+        history: [], bestHours: [],
+        country: "", gender: "", displayName: "", languages: "",
       },
     };
   }
@@ -128,6 +160,11 @@ export default function ModelPage({
   const followers = last.num_followers ?? null;
   const snapCount = history.length;
   const topHour   = bestHours[0];
+  const peakViewers = history.length > 0
+    ? Math.max(...history.map((r) => r.num_users ?? 0))
+    : null;
+
+  const isLive = viewers != null && viewers > 0;
 
   const countryCode = (country || "").toUpperCase().trim();
   const countryName = COUNTRY_NAMES[countryCode] || countryCode || null;
@@ -136,6 +173,12 @@ export default function ModelPage({
   const name        = displayName || username;
   const langSlug    = detectLangSlug(languages);
   const langName    = langSlug ? LANG_NAMES[langSlug] : null;
+
+  // Últimos 30 puntos para el sparkline
+  const sparkData = history.slice(-30);
+
+  // Máximo para barras de historial
+  const histMax = peakViewers || 1;
 
   // ── SEO ───────────────────────────────────────────────────────────────────
   const pageTitle = viewers != null
@@ -153,7 +196,6 @@ export default function ModelPage({
   }
   if (snapCount > 0) pageDescription += ` ${snapCount} snapshots en los últimos 30 días.`;
 
-  // ── Schema.org ProfilePage ────────────────────────────────────────────────
   const schema = {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
@@ -230,7 +272,12 @@ export default function ModelPage({
 
         {/* Header */}
         <div style={styles.header}>
-          <h1 style={styles.h1}>{name}</h1>
+          <div style={styles.headerTop}>
+            <h1 style={styles.h1}>{name}</h1>
+            {isLive && (
+              <span style={styles.liveBadge}>🔴 EN VIVO</span>
+            )}
+          </div>
           {name !== username && (
             <div style={styles.handle}>@{username}</div>
           )}
@@ -241,7 +288,7 @@ export default function ModelPage({
                 {flag} {countryName}
               </a>
             )}
-            {languages && langSlug ? (
+            {langSlug ? (
               <a href={`/language/${langSlug}`} style={styles.tagLink}>🗣 {langName}</a>
             ) : languages ? (
               <span style={styles.tag}>🗣 {languages}</span>
@@ -252,9 +299,10 @@ export default function ModelPage({
         {/* Métricas */}
         <section style={styles.metrics}>
           {[
-            ["Viewers", viewers],
-            ["Seguidores", followers],
-            ["Snapshots", snapCount || null],
+            ["Viewers ahora", viewers],
+            ["Seguidores",    followers],
+            ["Peak viewers",  peakViewers],
+            ["Snapshots",     snapCount || null],
           ].map(([label, val]) => (
             <div key={label} style={styles.metricCard}>
               <div style={styles.metricVal}>
@@ -265,10 +313,35 @@ export default function ModelPage({
           ))}
         </section>
 
+        {/* Sparkline */}
+        {sparkData.length >= 2 && (
+          <section style={styles.sparkSection}>
+            <div style={styles.sparkHeader}>
+              <span style={styles.h2label}>Viewers últimos 30 días</span>
+              {peakViewers != null && (
+                <span style={styles.sparkPeak}>Máx: {peakViewers.toLocaleString("es")}</span>
+              )}
+            </div>
+            <Sparkline data={sparkData} />
+          </section>
+        )}
+
+        {/* CTA */}
+        <a
+          href={`https://chaturbate.com/${username}/?campaign=rI8z3&track=default`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={isLive ? styles.ctaLive : styles.cta}
+        >
+          {isLive ? "🔴 Ver sala en vivo" : "Ver sala en Chaturbate"}
+        </a>
+
         {/* Mejores horarios */}
         {bestHours.length > 0 && (
           <>
-            <h2 style={styles.h2}>Mejores horarios (EST)</h2>
+            <h2 style={{ ...styles.h2label, marginTop: 32, marginBottom: 12 }}>
+              Mejores horarios (EST)
+            </h2>
             {bestHours.slice(0, 5).map((h, i) => (
               <div key={i} style={styles.hourRow}>
                 <span>
@@ -283,31 +356,31 @@ export default function ModelPage({
           </>
         )}
 
-        {/* Historial reciente */}
+        {/* Historial con barras */}
         {history.length > 0 && (
           <>
-            <h2 style={{ ...styles.h2, marginTop: 28 }}>Historial reciente</h2>
+            <h2 style={{ ...styles.h2label, marginTop: 32, marginBottom: 12 }}>
+              Historial reciente
+            </h2>
             {history
-              .slice(-10)
+              .slice(-15)
               .reverse()
-              .map((r, i) => (
-                <div key={i} style={styles.historyRow}>
-                  {fmtDate(r.captured_at)} —{" "}
-                  <span style={{ color: "#a78bfa" }}>{r.num_users}</span> viewers
-                </div>
-              ))}
+              .map((r, i) => {
+                const pct = histMax > 0 ? ((r.num_users ?? 0) / histMax) * 100 : 0;
+                return (
+                  <div key={i} style={styles.histRow}>
+                    <div style={styles.histDate}>{fmtDate(r.captured_at)}</div>
+                    <div style={styles.histBar}>
+                      <div style={{ ...styles.histBarFill, width: `${pct}%` }} />
+                    </div>
+                    <div style={styles.histViewers}>
+                      {(r.num_users ?? 0).toLocaleString("es")}
+                    </div>
+                  </div>
+                );
+              })}
           </>
         )}
-
-        {/* CTA Chaturbate */}
-        <a
-          href={`https://chaturbate.com/${username}/?campaign=rI8z3&track=default`}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={styles.cta}
-        >
-          Ver sala en vivo
-        </a>
 
         {/* Links a categorías */}
         <div style={styles.categoryLinks}>
@@ -321,6 +394,9 @@ export default function ModelPage({
               🗣 Ver modelos en {langName} →
             </a>
           )}
+          <a href="/" style={{ ...styles.countryLink, color: "#666", fontSize: 13 }}>
+            ← Volver al inicio
+          </a>
         </div>
       </main>
     </>
@@ -328,85 +404,34 @@ export default function ModelPage({
 }
 
 const styles = {
-  main: {
-    fontFamily: "sans-serif",
-    maxWidth: 700,
-    margin: "0 auto",
-    padding: "2rem 1rem",
-    background: "#0d0d0d",
-    minHeight: "100vh",
-    color: "#f0f0f0",
-  },
+  main: { fontFamily: "sans-serif", maxWidth: 700, margin: "0 auto", padding: "2rem 1rem", background: "#0d0d0d", minHeight: "100vh", color: "#f0f0f0" },
   breadcrumbs: { fontSize: 13, color: "#888", marginBottom: 16 },
   link: { color: "#a78bfa", textDecoration: "none" },
   sep: { color: "#555", margin: "0 4px" },
   header: { marginBottom: 24 },
+  headerTop: { display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" },
   h1: { fontSize: 28, marginTop: 8, marginBottom: 4 },
+  liveBadge: { background: "#ff000022", border: "1px solid #ff4444", color: "#ff6666", borderRadius: 20, padding: "4px 12px", fontSize: 11, fontWeight: 700, letterSpacing: 1 },
   handle: { fontSize: 13, color: "#666", marginBottom: 10 },
   tags: { display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 },
-  tag: {
-    background: "#1a1a2e",
-    borderRadius: 20,
-    padding: "4px 12px",
-    fontSize: 12,
-    color: "#aaa",
-  },
-  tagLink: {
-    background: "#1a1a2e",
-    borderRadius: 20,
-    padding: "4px 12px",
-    fontSize: 12,
-    color: "#a78bfa",
-    textDecoration: "none",
-  },
-  metrics: { display: "flex", gap: 16, margin: "24px 0", flexWrap: "wrap" },
-  metricCard: {
-    background: "#1a1a2e",
-    borderRadius: 10,
-    padding: "16px 24px",
-    flex: 1,
-    minWidth: 120,
-  },
-  metricVal: { fontSize: 26, fontWeight: 700, color: "#a78bfa" },
-  metricLabel: { fontSize: 12, color: "#888", marginTop: 4 },
-  h2: { fontSize: 15, color: "#888", marginBottom: 12 },
-  hourRow: {
-    background: "#1a1a2e",
-    borderRadius: 8,
-    padding: "10px 16px",
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: 8,
-    fontSize: 14,
-  },
-  historyRow: {
-    borderTop: "1px solid #222",
-    padding: "8px 0",
-    fontSize: 14,
-  },
-  cta: {
-    display: "block",
-    background: "#a78bfa",
-    color: "#000",
-    textAlign: "center",
-    padding: "14px",
-    borderRadius: 10,
-    fontWeight: 700,
-    textDecoration: "none",
-    fontSize: 16,
-    marginTop: 28,
-  },
-  categoryLinks: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    marginTop: 16,
-  },
-  countryLink: {
-    display: "block",
-    textAlign: "center",
-    color: "#a78bfa",
-    fontSize: 14,
-    textDecoration: "none",
-  },
+  tag: { background: "#1a1a2e", borderRadius: 20, padding: "4px 12px", fontSize: 12, color: "#aaa" },
+  tagLink: { background: "#1a1a2e", borderRadius: 20, padding: "4px 12px", fontSize: 12, color: "#a78bfa", textDecoration: "none" },
+  metrics: { display: "flex", gap: 12, margin: "24px 0", flexWrap: "wrap" },
+  metricCard: { background: "#1a1a2e", borderRadius: 10, padding: "14px 20px", flex: 1, minWidth: 110 },
+  metricVal: { fontSize: 24, fontWeight: 700, color: "#a78bfa" },
+  metricLabel: { fontSize: 11, color: "#666", marginTop: 4 },
+  h2label: { fontSize: 13, color: "#666", textTransform: "uppercase", letterSpacing: 1 },
+  sparkSection: { background: "#111", borderRadius: 12, padding: "16px 20px", marginBottom: 24 },
+  sparkHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
+  sparkPeak: { fontSize: 12, color: "#a78bfa" },
+  cta: { display: "block", background: "#1a1a2e", border: "1px solid #333", color: "#a78bfa", textAlign: "center", padding: "14px", borderRadius: 10, fontWeight: 700, textDecoration: "none", fontSize: 16, marginTop: 28 },
+  ctaLive: { display: "block", background: "#a78bfa", color: "#000", textAlign: "center", padding: "14px", borderRadius: 10, fontWeight: 700, textDecoration: "none", fontSize: 16, marginTop: 28 },
+  hourRow: { background: "#1a1a2e", borderRadius: 8, padding: "10px 16px", display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 14 },
+  histRow: { display: "flex", alignItems: "center", gap: 10, padding: "6px 0", borderTop: "1px solid #1a1a1a" },
+  histDate: { fontSize: 11, color: "#555", width: 140, flexShrink: 0 },
+  histBar: { flex: 1, background: "#1a1a2e", borderRadius: 4, height: 6, overflow: "hidden" },
+  histBarFill: { height: "100%", background: "#a78bfa", borderRadius: 4, minWidth: 2 },
+  histViewers: { fontSize: 12, color: "#a78bfa", width: 50, textAlign: "right", flexShrink: 0 },
+  categoryLinks: { display: "flex", flexDirection: "column", gap: 8, marginTop: 28 },
+  countryLink: { display: "block", textAlign: "center", color: "#a78bfa", fontSize: 14, textDecoration: "none" },
 };
