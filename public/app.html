@@ -2669,7 +2669,7 @@ function _destroyHls() {
   if (video) { video.pause(); video.src = ''; video.load(); }
 }
 
-async function openCardPlayer(e, username, btn) {
+function openCardPlayer(e, username, btn) {
   e.stopPropagation();
 
   const popup   = document.getElementById('crd-iframe-popup');
@@ -2677,7 +2677,7 @@ async function openCardPlayer(e, username, btn) {
   const nameEl  = document.getElementById('crd-popup-name');
   const loading = document.getElementById('crd-popup-loading');
   const errorEl = document.getElementById('crd-popup-error');
-  if (!popup || !video) return;
+  if (!popup) return;
 
   // Toggle: mismo username → cerrar
   if (_activeCardPlayer === username) { closeCardPlayer(); return; }
@@ -2688,17 +2688,14 @@ async function openCardPlayer(e, username, btn) {
     if (prevBtn) prevBtn.innerHTML = _svgPlay;
   }
 
-  // Limpiar iframe dinámico previo si existía
+  // Limpiar estado anterior
   const oldIf = document.getElementById('crd-popup-iframe-dyn');
   if (oldIf) oldIf.remove();
-  video.style.display = 'block';
+  if (video) video.style.display = 'none';
+  _destroyHls();
 
-  // Mostrar loading, ocultar error
   if (loading) loading.classList.remove('hidden');
   if (errorEl) errorEl.classList.remove('show');
-
-  // Destruir instancia HLS anterior
-  _destroyHls();
 
   const room = rooms.find(r => r.username === username);
   const displayName = room?.display_name || username;
@@ -2708,76 +2705,37 @@ async function openCardPlayer(e, username, btn) {
   _activeCardPlayer = username;
   if (btn) btn.innerHTML = _svgPause;
 
-  // Timeout de seguridad: 18s sin stream → mostrar fallback
-  _cardPlayerTimeout = setTimeout(() => {
-    if (loading && !loading.classList.contains('hidden')) {
-      if (loading) loading.classList.add('hidden');
-      if (errorEl) errorEl.classList.add('show');
-    }
-  }, 18000);
+  // ── Embed oficial de Chaturbate para afiliados ──
+  // /embed/{username}/ es el endpoint de embed aprobado por Chaturbate para afiliados.
+  // A diferencia de chaturbate.com/in/ y chaturbate.com/{username}/, este SÍ permite iframes.
+  const AFF = 'rI8z3';
+  const embedUrl = `https://chaturbate.com/embed/${username}/?tour=LQps&campaign=${AFF}&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
 
-  // ── Obtener URL HLS real via proxy (Node.js — extrae CSRF de Chaturbate) ──
-  try {
-    const proxyRes = await fetch(`/api/hls-proxy?username=${encodeURIComponent(username)}`);
-    const proxyData = await proxyRes.json();
+  console.log('[card-player] embed url:', embedUrl);
 
-    console.log('[card-player] hls-proxy response:', proxyData);
+  const body = document.querySelector('.crd-iframe-body');
+  if (body) {
+    const ifrm = document.createElement('iframe');
+    ifrm.id = 'crd-popup-iframe-dyn';
+    ifrm.style.cssText = 'width:100%;height:236px;border:none;display:block;background:#000;';
+    ifrm.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
+    ifrm.allowFullscreen = true;
+    ifrm.referrerPolicy = 'no-referrer-when-downgrade';
+    ifrm.src = embedUrl;
+    body.appendChild(ifrm);
 
-    if (!proxyData.success || !proxyData.url) {
+    // Timeout: si no carga en 12s → mostrar fallback
+    _cardPlayerTimeout = setTimeout(() => {
+      if (loading && !loading.classList.contains('hidden')) {
+        loading.classList.add('hidden');
+        if (errorEl) errorEl.classList.add('show');
+      }
+    }, 12000);
+
+    ifrm.onload = () => {
       clearTimeout(_cardPlayerTimeout);
       if (loading) loading.classList.add('hidden');
-      if (errorEl) errorEl.classList.add('show');
-      return;
-    }
-
-    const hlsUrl = proxyData.url;
-
-    // ── Reproducir con hls.js o nativo ──
-    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-      const hls = new Hls({
-        maxBufferLength: 10,
-        maxMaxBufferLength: 20,
-        liveSyncDurationCount: 2,
-        liveMaxLatencyDurationCount: 4,
-        enableWorker: true,
-      });
-      _hlsInstance = hls;
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        clearTimeout(_cardPlayerTimeout);
-        if (loading) loading.classList.add('hidden');
-        video.play().catch(() => {});
-      });
-      hls.on(Hls.Events.ERROR, (_, data) => {
-        if (data.fatal) {
-          clearTimeout(_cardPlayerTimeout);
-          if (loading) loading.classList.add('hidden');
-          if (errorEl) errorEl.classList.add('show');
-          hls.destroy();
-          _hlsInstance = null;
-        }
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Safari HLS nativo
-      video.src = hlsUrl;
-      video.addEventListener('loadedmetadata', () => {
-        clearTimeout(_cardPlayerTimeout);
-        if (loading) loading.classList.add('hidden');
-        video.play().catch(() => {});
-      }, { once: true });
-    } else {
-      // Fallback: no soporta HLS → mostrar error
-      clearTimeout(_cardPlayerTimeout);
-      if (loading) loading.classList.add('hidden');
-      if (errorEl) errorEl.classList.add('show');
-    }
-
-  } catch (err) {
-    console.error('[card-player] fetch error:', err);
-    clearTimeout(_cardPlayerTimeout);
-    if (loading) loading.classList.add('hidden');
-    if (errorEl) errorEl.classList.add('show');
+    };
   }
 }
 
