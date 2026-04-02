@@ -11,6 +11,40 @@ SITE_URL = os.environ.get("SITE_URL", "https://www.campulsehub.com")
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError("Faltan variables de entorno: SUPABASE_URL y SUPABASE_KEY son requeridas")
 
+HLS_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+
+def get_hls_urls(usernames, max_workers=10):
+    """
+    Obtiene HLS URLs para las salas en vivo via get_edge_hls_url_ajax (sin CSRF).
+    Paralelo con ThreadPoolExecutor. Solo se llama para salas con num_users > 5.
+    Retorna dict: { username -> hls_url or None }
+    """
+    import concurrent.futures
+
+    def fetch_one(username):
+        try:
+            url = f"https://chaturbate.com/get_edge_hls_url_ajax/?room_slug={username}&bandwidth=high"
+            r = requests.get(url, timeout=8, headers={
+                "User-Agent": HLS_UA,
+                "Accept": "application/json, text/javascript, */*; q=0.01",
+                "X-Requested-With": "XMLHttpRequest",
+                "Referer": f"https://chaturbate.com/{username}/",
+            })
+            if r.status_code == 200:
+                data = r.json()
+                return username, data.get("url")
+            return username, None
+        except Exception:
+            return username, None
+
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
+        futures = {ex.submit(fetch_one, u): u for u in usernames}
+        for fut in concurrent.futures.as_completed(futures):
+            uname, hls_url = fut.result()
+            results[uname] = hls_url
+    return results
+
 def get_rooms():
     all_rooms = []
     offset = 0
@@ -160,6 +194,7 @@ def save_snapshot(rooms, platform="chaturbate"):
             "tags": r.get("tags", []) if isinstance(r.get("tags"), list) else [],
             "seconds_online": r.get("seconds_online", 0),
             "platform": platform,
+            "hls_url": r.get("hls_url", None),
         })
     total = 0
     for i in range(0, len(records), 100):
@@ -198,10 +233,21 @@ if __name__ == "__main__":
         else:
             newly_online = []
 
-        # 4. Guardar snapshot
+        # 4. Obtener HLS URLs para salas populares (num_users > 5)
+        #    Se corre desde GitHub Actions donde las IPs no están bloqueadas por Chaturbate.
+        popular = [r.get("username") for r in rooms if r.get("num_users", 0) > 5 and r.get("username")]
+        print(f"[{datetime.now()}] Obteniendo HLS URLs para {len(popular)} salas populares...")
+        hls_map = get_hls_urls(popular, max_workers=15)
+        hls_found = sum(1 for v in hls_map.values() if v)
+        print(f"[{datetime.now()}] HLS URLs obtenidas: {hls_found}/{len(popular)}")
+        # Inyectar hls_url en cada room antes de guardar
+        for r in rooms:
+            r["hls_url"] = hls_map.get(r.get("username"), None)
+
+        # 5. Guardar snapshot (incluye hls_url)
         save_snapshot(rooms)
 
-        # 5. Enviar notificaciones
+        # 6. Enviar notificaciones
         if newly_online:
             send_notifications(newly_online)
 

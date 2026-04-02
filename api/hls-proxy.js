@@ -1,15 +1,12 @@
-// api/hls-proxy.js — Node.js runtime (default en Next.js /api/)
-// Estrategia 1: endpoint GET público de Chaturbate (sin CSRF, sin page scraping)
-// Estrategia 2: URL CDN mmcdn directa como fallback
+// api/hls-proxy.js
+// Lee la hls_url cacheada en Supabase (guardada por campulse.py cada 2h).
+// campulse.py corre en GitHub Actions donde Chaturbate no bloquea las IPs.
+// Vercel solo lee de Supabase — sin tocar Chaturbate directamente.
 
-export const config = { maxDuration: 15 };
+export const config = { maxDuration: 10 };
 
-const UA_POOL = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0',
-];
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,55 +18,55 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'invalid_username' });
   }
 
-  const ua = UA_POOL[Math.floor(Math.random() * UA_POOL.length)];
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return res.status(500).json({ error: 'supabase_not_configured' });
+  }
 
-  // ── Estrategia 1: endpoint GET público (sin CSRF) ──
   try {
-    const endpoint = `https://chaturbate.com/get_edge_hls_url_ajax/?room_slug=${username}&bandwidth=high`;
+    // Leer hls_url del snapshot más reciente para este username
+    const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+      `?username=eq.${encodeURIComponent(username)}` +
+      `&select=hls_url,current_show,captured_at` +
+      `&order=captured_at.desc&limit=1`;
 
-    const r = await fetch(endpoint, {
-      method: 'GET',
+    const r = await fetch(url, {
       headers: {
-        'User-Agent': ua,
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Accept-Language': 'es-ES,es;q=0.9',
-        'Referer': `https://chaturbate.com/${username}/`,
-        'X-Requested-With': 'XMLHttpRequest',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'same-origin',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Accept': 'application/json',
       },
     });
 
-    if (r.ok) {
-      const data = await r.json();
-      if (data.url) {
-        return res.status(200).json({
-          success: true, type: 'hls',
-          url: data.url,
-          room_status: data.room_status || 'public',
-        });
-      }
-      // sala offline/privada — no hay fallback útil
+    if (!r.ok) {
+      return res.status(502).json({ success: false, error: `supabase_http_${r.status}` });
+    }
+
+    const rows = await r.json();
+    const row = rows?.[0];
+
+    if (!row) {
+      return res.status(200).json({ success: false, room_status: 'offline', reason: 'not_in_snapshot' });
+    }
+
+    if (!row.hls_url) {
       return res.status(200).json({
         success: false,
-        room_status: data.room_status || 'offline',
-        _debug: data,
+        room_status: row.current_show || 'offline',
+        reason: 'no_hls_cached',
+        hint: 'hls_url is null — la sala puede estar offline o tener pocos viewers (umbral: >5)',
       });
     }
-    console.warn(`[hls-proxy] s1 HTTP ${r.status}`);
-  } catch (err) {
-    console.warn('[hls-proxy] s1 error:', err.message);
-  }
 
-  // ── Estrategia 2: URL CDN mmcdn directa ──
-  // Chaturbate usa hls.live.mmcdn.com con CORS abierto.
-  // El cliente puede intentar reproducir este .m3u8 directamente con hls.js.
-  const cdnUrl = `https://hls.live.mmcdn.com/live-hls/amlst:${username}/index.m3u8`;
-  return res.status(200).json({
-    success: true, type: 'hls',
-    url: cdnUrl,
-    room_status: 'public',
-    _via: 'cdn_fallback',
-  });
+    return res.status(200).json({
+      success: true,
+      type: 'hls',
+      url: row.hls_url,
+      room_status: row.current_show || 'public',
+      cached_at: row.captured_at,
+    });
+
+  } catch (err) {
+    console.error('[hls-proxy] error:', err.message);
+    return res.status(500).json({ success: false, error: 'proxy_error', message: err.message });
+  }
 }
