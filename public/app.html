@@ -535,25 +535,41 @@ header{
 .crd-play:hover{transform:scale(1.12);background:var(--hot)}
 .crd-play svg{width:12px;height:12px;fill:#fff;margin-left:2px}
 
-/* card mini iframe player */
-.crd-iframe-wrap{
-  display:none;position:absolute;inset:0;z-index:20;
-  background:#000;flex-direction:column
+/* card mini iframe player — flota como popup centrado */
+.crd-iframe-wrap{display:none} /* ocultar el wrap inline — no se usa más */
+.crd-iframe-popup{
+  display:none;
+  position:fixed;
+  bottom:80px;left:50%;transform:translateX(-50%);
+  width:min(360px,94vw);
+  border-radius:12px;overflow:hidden;
+  background:#000;
+  box-shadow:0 8px 40px rgba(0,0,0,.85);
+  z-index:500;
+  flex-direction:column;
 }
-.crd-iframe-wrap.active{display:flex}
-.crd-iframe{width:100%;flex:1;border:none;display:block;min-height:0}
+.crd-iframe-popup.active{display:flex}
+.crd-iframe-popup .crd-iframe{
+  width:100%;height:203px;border:none;display:block
+}
 .crd-iframe-bar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:3px 6px;background:rgba(0,0,0,.85);
-  font-size:.6rem;color:var(--txt2);flex-shrink:0
+  padding:5px 10px;background:rgba(15,15,20,.95);
+  font-size:.65rem;color:var(--txt2);flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.07)
 }
 .crd-iframe-bar button{
   background:none;border:none;color:var(--txt2);
-  font-size:.65rem;cursor:pointer;padding:2px 6px;
-  border-radius:4px;transition:background .15s
+  font-size:.7rem;cursor:pointer;padding:3px 8px;
+  border-radius:6px;transition:background .15s
 }
 .crd-iframe-bar button:hover{background:rgba(255,255,255,.1);color:var(--txt)}
-.crd-iframe-bar .crd-iframe-name{font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px}
+.crd-iframe-bar .crd-iframe-name{
+  font-weight:700;color:var(--txt);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;
+  font-size:.72rem
+}
+
 
 
 .crd-name{
@@ -1746,6 +1762,16 @@ header{
 
 </div><!-- .page -->
 
+<!-- CARD MINI PLAYER — popup flotante global -->
+<div class="crd-iframe-popup" id="crd-iframe-popup">
+  <iframe class="crd-iframe" id="crd-popup-iframe" src="about:blank"
+    allow="autoplay; fullscreen" allowFullscreen></iframe>
+  <div class="crd-iframe-bar">
+    <span class="crd-iframe-name" id="crd-popup-name"></span>
+    <button onclick="closeCardPlayer()">✕ Cerrar</button>
+  </div>
+</div>
+
 <!-- MODAL — ultralight conversion -->
 <div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
   <div class="modal" style="position:relative">
@@ -2569,60 +2595,56 @@ function deactivateEmbed(){
   // Reiniciar preview del modelo activo
   if(active) startLivePreview(active);
 }
-// ─── CARD MINI PLAYER ───
-let _activeCardPlayer=null; // username del player activo
+// ─── CARD MINI PLAYER — popup flotante global ───
+let _activeCardPlayer=null;
 
 function openCardPlayer(e,username,btn){
-  e.stopPropagation(); // no abrir modal
+  e.stopPropagation();
 
-  // Cerrar el player anterior si existe
-  if(_activeCardPlayer && _activeCardPlayer!==username){
-    closeCardPlayer(null,_activeCardPlayer);
-  }
+  const popup=document.getElementById('crd-iframe-popup');
+  const iframe=document.getElementById('crd-popup-iframe');
+  const nameEl=document.getElementById('crd-popup-name');
+  if(!popup||!iframe) return;
 
-  const wrap=document.getElementById(`crd-iframe-${username}`);
-  if(!wrap) return;
-
-  // Si ya está activo, cerrarlo (toggle)
-  if(wrap.classList.contains('active')){
-    closeCardPlayer(e,username);
+  // Si el mismo username → cerrar (toggle)
+  if(_activeCardPlayer===username){
+    closeCardPlayer();
     return;
   }
 
-  // Cargar el embed de Chaturbate
-  const iframe=wrap.querySelector('.crd-iframe');
-  if(iframe && iframe.src==='about:blank'){
-    iframe.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&autoplay=1&mobileRedirect=never`;
+  // Resetear botón anterior si existía
+  if(_activeCardPlayer){
+    const prevBtn=document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
+    if(prevBtn) prevBtn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
   }
 
-  wrap.classList.add('active');
+  // Cargar stream
+  const room=rooms.find(r=>r.username===username);
+  const displayName=room?.display_name||username;
+  iframe.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&autoplay=1&mobileRedirect=never`;
+  if(nameEl) nameEl.textContent=displayName;
+
+  popup.classList.add('active');
   _activeCardPlayer=username;
 
-  // Cambiar el botón de play a "stop"
-  if(btn){
-    btn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
-    btn.title='Detener';
-  }
+  // Cambiar ícono del botón a pausa
+  if(btn) btn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
 }
 
-function closeCardPlayer(e,username){
-  if(e) e.stopPropagation();
-  const wrap=document.getElementById(`crd-iframe-${username}`);
-  if(!wrap) return;
+function closeCardPlayer(){
+  const popup=document.getElementById('crd-iframe-popup');
+  const iframe=document.getElementById('crd-popup-iframe');
+  if(!popup) return;
 
-  // Detener el stream descargando el src
-  const iframe=wrap.querySelector('.crd-iframe');
   if(iframe) iframe.src='about:blank';
+  popup.classList.remove('active');
 
-  wrap.classList.remove('active');
-  if(_activeCardPlayer===username) _activeCardPlayer=null;
-
-  // Restaurar botón de play
-  const card=document.querySelector(`[data-username="${username}"] .crd-play`);
-  if(card){
-    card.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
-    card.title='Ver en vivo';
+  // Restaurar ícono del botón activo
+  if(_activeCardPlayer){
+    const btn=document.querySelector(`[data-username="${_activeCardPlayer}"] .crd-play`);
+    if(btn) btn.innerHTML='<svg viewBox="0 0 16 16" fill="#fff"><path d="M4 3l10 5-10 5z"/></svg>';
   }
+  _activeCardPlayer=null;
 }
 
 
