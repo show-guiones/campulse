@@ -1,8 +1,10 @@
 // pages/language/[lang].jsx
 // Ruta: pages/language/[lang].jsx
 //
-// Página de modelos por idioma.
-// Consulta Supabase directamente para evitar el loop HTTP interno.
+// FIX: cambiado de getStaticProps (ISR) a getServerSideProps
+// para evitar que un notFound quede cacheado si la BD tiene un pico temporal.
+// Consulta Supabase directamente (no fetch interno).
+//
 // URL: /language/spanish  /language/english  /language/portuguese  etc.
 
 import Head from "next/head";
@@ -32,7 +34,7 @@ const LANG_VARIANTS = {
   portuguese: ["portuguese", "portugués", "portugues", "pt"],
   romanian:   ["romanian", "rumano", "română", "ro"],
   russian:    ["russian", "ruso", "русский", "ru"],
-  german:     ["german", "alemán", "alemán", "deutsch", "de"],
+  german:     ["german", "alemán", "aleman", "deutsch", "de"],
   french:     ["french", "francés", "frances", "français", "fr"],
   italian:    ["italian", "italiano", "it"],
 };
@@ -53,15 +55,8 @@ function detectsLang(raw, slug) {
   return LANG_VARIANTS[slug]?.some((v) => val.includes(v)) ?? false;
 }
 
-export function getStaticPaths() {
-  return {
-    paths: SUPPORTED_LANGS.map((lang) => ({ params: { lang } })),
-    fallback: "blocking",
-  };
-}
-
-export async function getStaticProps({ params }) {
-  const lang = params.lang.toLowerCase();
+export async function getServerSideProps({ params }) {
+  const lang = (params.lang || "").toLowerCase();
   if (!SUPPORTED_LANGS.includes(lang)) return { notFound: true };
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -126,10 +121,7 @@ export async function getStaticProps({ params }) {
     if (models.length === 0) return { notFound: true };
 
     const info = LANGUAGE_INFO[lang];
-    return {
-      props: { data: { lang, ...info, models } },
-      revalidate: 1800,
-    };
+    return { props: { data: { lang, ...info, models } } };
   } catch {
     return { notFound: true };
   }
@@ -158,7 +150,7 @@ export default function LanguagePage({ data }) {
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Campulse", item: SITE },
         { "@type": "ListItem", position: 2, name: "Idiomas",  item: `${SITE}/language` },
-        { "@type": "ListItem", position: 3, name: name,       item: `${SITE}/language/${lang}` },
+        { "@type": "ListItem", position: 3, name,            item: `${SITE}/language/${lang}` },
       ],
     },
     hasPart: models.slice(0, 10).map((m) => ({
@@ -187,7 +179,6 @@ export default function LanguagePage({ data }) {
       </Head>
 
       <main style={styles.main}>
-        {/* Breadcrumb */}
         <nav style={styles.breadcrumbs}>
           <a href="/" style={styles.link}>Campulse</a>
           <span style={styles.sep}> › </span>
@@ -201,7 +192,6 @@ export default function LanguagePage({ data }) {
           Top {models.length} modelos ordenadas por viewers promedio en los últimos 30 días.
         </p>
 
-        {/* Lista de modelos */}
         <div style={styles.list}>
           {models.map((m, i) => (
             <a key={m.username} href={`/model/${m.username}`} style={styles.row}>
@@ -240,7 +230,6 @@ export default function LanguagePage({ data }) {
           ))}
         </div>
 
-        {/* SEO text */}
         <section style={styles.seoText}>
           <h2 style={styles.h2}>Modelos de Chaturbate en {name}</h2>
           <p>
@@ -270,15 +259,7 @@ export default function LanguagePage({ data }) {
 }
 
 const styles = {
-  main: {
-    fontFamily: "sans-serif",
-    maxWidth: 800,
-    margin: "0 auto",
-    padding: "2rem 1rem",
-    background: "#0d0d0d",
-    minHeight: "100vh",
-    color: "#f0f0f0",
-  },
+  main: { fontFamily: "sans-serif", maxWidth: 800, margin: "0 auto", padding: "2rem 1rem", background: "#0d0d0d", minHeight: "100vh", color: "#f0f0f0" },
   breadcrumbs: { fontSize: 13, color: "#888", marginBottom: 16 },
   link: { color: "#a78bfa", textDecoration: "none" },
   sep: { color: "#555", margin: "0 4px" },
@@ -286,16 +267,7 @@ const styles = {
   h2: { fontSize: 18, marginBottom: 12, color: "#ccc" },
   subtitle: { color: "#888", fontSize: 14, marginBottom: 28 },
   list: { display: "flex", flexDirection: "column", gap: 8 },
-  row: {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-    background: "#1a1a2e",
-    borderRadius: 10,
-    padding: "14px 18px",
-    textDecoration: "none",
-    color: "#f0f0f0",
-  },
+  row: { display: "flex", alignItems: "center", gap: 16, background: "#1a1a2e", borderRadius: 10, padding: "14px 18px", textDecoration: "none", color: "#f0f0f0" },
   rank: { fontSize: 13, color: "#555", width: 28, flexShrink: 0 },
   info: { flex: 1 },
   username: { fontWeight: 700, fontSize: 15 },
@@ -305,13 +277,5 @@ const styles = {
   statMain: { fontWeight: 700, color: "#a78bfa", fontSize: 16 },
   statLabel: { fontSize: 11, color: "#888", fontWeight: 400 },
   statSub: { fontSize: 11, color: "#666", marginTop: 2 },
-  seoText: {
-    marginTop: 48,
-    padding: "24px",
-    background: "#111",
-    borderRadius: 12,
-    color: "#aaa",
-    fontSize: 14,
-    lineHeight: 1.7,
-  },
+  seoText: { marginTop: 48, padding: "24px", background: "#111", borderRadius: 12, color: "#aaa", fontSize: 14, lineHeight: 1.7 },
 };
