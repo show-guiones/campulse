@@ -118,26 +118,29 @@ export async function getServerSideProps({ params }) {
       .sort((a, b) => b.avg_viewers - a.avg_viewers)
       .slice(0, 50);
 
-    if (models.length === 0) return { notFound: true };
-
     const info = LANGUAGE_INFO[lang];
-    return { props: { data: { lang, ...info, models } } };
+    return { props: { data: { lang, ...info, models, empty: models.length === 0 } } };
   } catch {
-    return { notFound: true };
+    // En caso de error de BD, mostrar página vacía en lugar de 404
+    const info = LANGUAGE_INFO[lang] || { name: lang, description: "" };
+    return { props: { data: { lang, ...info, models: [], empty: true } } };
   }
 }
 
 export default function LanguagePage({ data }) {
-  const { lang, name, models } = data;
+  const { lang, name, models, empty } = data;
   const topModel = models[0];
 
-  const pageTitle = `Modelos Chaturbate en ${name} — Top ${models.length} | Campulse`;
-  const pageDescription =
-    `Las mejores ${models.length} modelos de Chaturbate que hablan ${name}, ordenadas por viewers. ` +
-    (topModel
-      ? `${topModel.display_name} lidera con ${topModel.avg_viewers.toLocaleString("es")} viewers promedio. `
-      : "") +
-    `Estadísticas en tiempo real en Campulse.`;
+  const pageTitle = empty
+    ? `Modelos Chaturbate en ${name} | Campulse`
+    : `Modelos Chaturbate en ${name} — Top ${models.length} | Campulse`;
+  const pageDescription = empty
+    ? `Explora las modelos de Chaturbate que hablan ${name}. Estadísticas en tiempo real en Campulse.`
+    : `Las mejores ${models.length} modelos de Chaturbate que hablan ${name}, ordenadas por viewers. ` +
+      (topModel
+        ? `${topModel.display_name} lidera con ${topModel.avg_viewers.toLocaleString("es")} viewers promedio. `
+        : "") +
+      `Estadísticas en tiempo real en Campulse.`;
 
   const schema = {
     "@context": "https://schema.org",
@@ -165,7 +168,7 @@ export default function LanguagePage({ data }) {
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        <meta name="robots" content="index, follow" />
+        <meta name="robots" content={empty ? "noindex, follow" : "index, follow"} />
         <link rel="canonical" href={`${SITE}/language/${lang}`} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
@@ -189,9 +192,20 @@ export default function LanguagePage({ data }) {
 
         <h1 style={styles.h1}>Modelos Chaturbate en {name}</h1>
         <p style={styles.subtitle}>
-          Top {models.length} modelos ordenadas por viewers promedio en los últimos 30 días.
+          {empty ? "No hay modelos en línea en este idioma en este momento. Vuelve pronto." : `Top ${models.length} modelos ordenadas por viewers promedio en los últimos 30 días.`}
         </p>
 
+        {empty ? (
+          <div style={styles.emptyState}>
+            <div style={styles.emptyIcon}>🎥</div>
+            <p style={styles.emptyTitle}>Sin modelos en línea ahora</p>
+            <p style={styles.emptyText}>
+              No encontramos modelos de {name} activas en este momento.<br/>
+              Los datos se actualizan cada 2 horas — vuelve más tarde.
+            </p>
+            <a href="/language" style={{...styles.link, fontSize:14}}>← Ver otros idiomas</a>
+          </div>
+        ) : (
         <div style={styles.list}>
           {models.map((m, i) => (
             <a key={m.username} href={`/model/${m.username}`} style={styles.row}>
@@ -229,6 +243,7 @@ export default function LanguagePage({ data }) {
             </a>
           ))}
         </div>
+        )}
 
         <section style={styles.seoText}>
           <h2 style={styles.h2}>Modelos de Chaturbate en {name}</h2>
@@ -278,4 +293,8 @@ const styles = {
   statLabel: { fontSize: 11, color: "#888", fontWeight: 400 },
   statSub: { fontSize: 11, color: "#666", marginTop: 2 },
   seoText: { marginTop: 48, padding: "24px", background: "#111", borderRadius: 12, color: "#aaa", fontSize: 14, lineHeight: 1.7 },
+  emptyState: { textAlign: "center", padding: "60px 20px", background: "#111", borderRadius: 12, marginBottom: 32 },
+  emptyIcon: { fontSize: 48, marginBottom: 16 },
+  emptyTitle: { fontSize: 20, fontWeight: 700, color: "#f0f0f0", marginBottom: 8 },
+  emptyText: { color: "#888", fontSize: 14, lineHeight: 1.7, marginBottom: 24 },
 };
