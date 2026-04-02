@@ -17,6 +17,25 @@
           "value": "noindex, nofollow"
         }
       ]
+    },
+    {
+      "source": "/model/lexy_fox2",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=60, stale-while-revalidate=300"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "index,follow"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/rss.xml",
+      "destination": "/api/rss"
     }
   ]
 }
