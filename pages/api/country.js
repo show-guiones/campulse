@@ -1,13 +1,5 @@
-// pages/api/country.js
-//
-// Devuelve datos de modelos filtrados por país.
-//
-// GET /api/country?code=CO          → top modelos de Colombia
-// GET /api/country?list=1           → lista de todos los países con conteo
-//
-// Parámetros opcionales:
-//   limit   — cuántas modelos devolver (default 50, max 200)
-//   days    — ventana de tiempo en días (default 30)
+// pages/api/country.js — v2
+// Fixes: más países en COUNTRY_NAMES, mejor manejo de códigos desconocidos
 
 export const config = { runtime: "edge" };
 
@@ -16,16 +8,32 @@ const DEFAULT_DAYS = 30;
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
 
-// Nombres legibles de países (ISO 3166-1 alpha-2)
-// Agrega más según los países que aparezcan en tu DB
 const COUNTRY_NAMES = {
-  CO: "Colombia", ES: "España", MX: "México", AR: "Argentina",
-  CL: "Chile", PE: "Perú", VE: "Venezuela", EC: "Ecuador",
-  US: "Estados Unidos", BR: "Brasil", RO: "Rumania", RU: "Rusia",
-  DE: "Alemania", FR: "Francia", GB: "Reino Unido", IT: "Italia",
-  PH: "Filipinas", TH: "Tailandia", CZ: "República Checa",
-  UA: "Ucrania", HU: "Hungría", PL: "Polonia", CA: "Canadá",
-  AU: "Australia", NL: "Países Bajos", SE: "Suecia", TR: "Turquía",
+  // América
+  CO: "Colombia", MX: "México", AR: "Argentina", CL: "Chile",
+  PE: "Perú", VE: "Venezuela", EC: "Ecuador", BO: "Bolivia",
+  UY: "Uruguay", PY: "Paraguay", CR: "Costa Rica", PA: "Panamá",
+  DO: "República Dominicana", CU: "Cuba", GT: "Guatemala",
+  HN: "Honduras", SV: "El Salvador", NI: "Nicaragua",
+  US: "Estados Unidos", CA: "Canadá", BR: "Brasil", PR: "Puerto Rico",
+  // Europa
+  ES: "España", RO: "Rumania", RU: "Rusia", DE: "Alemania",
+  FR: "Francia", GB: "Reino Unido", IT: "Italia", UA: "Ucrania",
+  HU: "Hungría", PL: "Polonia", CZ: "República Checa", SE: "Suecia",
+  NL: "Países Bajos", PT: "Portugal", GR: "Grecia", BE: "Bélgica",
+  AT: "Austria", CH: "Suiza", NO: "Noruega", DK: "Dinamarca",
+  FI: "Finlandia", SK: "Eslovaquia", RS: "Serbia", HR: "Croacia",
+  BG: "Bulgaria", MD: "Moldavia", LT: "Lituania", LV: "Letonia",
+  EE: "Estonia", SI: "Eslovenia", MK: "Macedonia", AL: "Albania",
+  ME: "Montenegro", BA: "Bosnia", BY: "Bielorrusia", KZ: "Kazajistán",
+  // Asia / Oceanía
+  PH: "Filipinas", TH: "Tailandia", IN: "India", CN: "China",
+  JP: "Japón", KR: "Corea del Sur", AU: "Australia", NZ: "Nueva Zelanda",
+  ID: "Indonesia", MY: "Malasia", VN: "Vietnam", SG: "Singapur",
+  TR: "Turquía", IL: "Israel", AE: "Emiratos Árabes",
+  // África
+  ZA: "Sudáfrica", NG: "Nigeria", KE: "Kenia", EG: "Egipto",
+  MA: "Marruecos", GH: "Ghana", MG: "Madagascar", TZ: "Tanzania",
 };
 
 export default async function handler(req) {
@@ -44,10 +52,10 @@ export default async function handler(req) {
   }
 
   const { searchParams } = new URL(req.url);
-  const code   = (searchParams.get("code") || "").toUpperCase().trim();
-  const list   = searchParams.get("list") === "1";
-  const days   = Math.min(parseInt(searchParams.get("days") || DEFAULT_DAYS), 90);
-  const limit  = Math.min(parseInt(searchParams.get("limit") || DEFAULT_LIMIT), MAX_LIMIT);
+  const code  = (searchParams.get("code") || "").toUpperCase().trim();
+  const list  = searchParams.get("list") === "1";
+  const days  = Math.min(parseInt(searchParams.get("days") || DEFAULT_DAYS), 90);
+  const limit = Math.min(parseInt(searchParams.get("limit") || DEFAULT_LIMIT), MAX_LIMIT);
 
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
   const sbHeaders = {
@@ -57,7 +65,6 @@ export default async function handler(req) {
 
   try {
     if (list) {
-      // ── Modo lista: devuelve todos los países con su conteo de modelos únicas
       const url =
         `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
         `?captured_at=gte.${since}` +
@@ -67,7 +74,6 @@ export default async function handler(req) {
       const r = await fetch(url, { headers: sbHeaders });
       const rows = await r.json();
 
-      // Agrupar por país contando modelos únicas
       const map = {};
       for (const row of rows) {
         const c = (row.country || "").toUpperCase().trim();
@@ -80,6 +86,7 @@ export default async function handler(req) {
         .map(([code, usernames]) => ({
           code,
           name: COUNTRY_NAMES[code] || code,
+          flag: `https://flagcdn.com/24x18/${code.toLowerCase()}.png`,
           models: usernames.size,
           slug: `/country/${code.toLowerCase()}`,
         }))
@@ -92,12 +99,11 @@ export default async function handler(req) {
 
     if (!code || code.length !== 2) {
       return new Response(
-        JSON.stringify({ error: "Parámetro 'code' requerido (ISO 3166-1 alpha-2, ej: CO)" }),
+        JSON.stringify({ error: "Parámetro 'code' requerido (ej: CO)" }),
         { status: 400, headers }
       );
     }
 
-    // ── Modo país: devuelve top modelos del país ordenadas por viewers promedio
     const url =
       `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
       `?captured_at=gte.${since}` +
@@ -108,7 +114,6 @@ export default async function handler(req) {
     const r = await fetch(url, { headers: sbHeaders });
     const rows = await r.json();
 
-    // Agrupar por username: calcular avg_viewers y max_followers
     const map = {};
     for (const row of rows) {
       const u = row.username;
@@ -130,7 +135,7 @@ export default async function handler(req) {
     }
 
     const models = Object.values(map)
-      .filter((m) => m.snapshots >= 3) // mínimo de datos para ser relevante
+      .filter((m) => m.snapshots >= 3)
       .map((m) => ({
         username: m.username,
         display_name: m.display_name,
@@ -142,10 +147,13 @@ export default async function handler(req) {
       .sort((a, b) => b.avg_viewers - a.avg_viewers)
       .slice(0, limit);
 
-    const countryName = COUNTRY_NAMES[code] || code;
-
     return new Response(
-      JSON.stringify({ code, name: countryName, models }),
+      JSON.stringify({
+        code,
+        name: COUNTRY_NAMES[code] || code,
+        flag: `https://flagcdn.com/24x18/${code.toLowerCase()}.png`,
+        models,
+      }),
       {
         headers: {
           ...headers,
