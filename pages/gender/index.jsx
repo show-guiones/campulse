@@ -1,8 +1,9 @@
 // pages/gender/index.jsx
 // Ruta: pages/gender/index.jsx
 //
-// Página índice de géneros.
-// URL: /gender
+// Página índice de géneros — SSR (getServerSideProps)
+// Cambiado de getStaticProps a getServerSideProps para evitar páginas
+// cacheadas con datos vacíos cuando la API aún no estaba lista.
 
 import Head from "next/head";
 
@@ -10,18 +11,18 @@ const SITE = "https://www.campulsehub.com";
 
 const GENDER_ICONS = {
   female: "♀",
-  male: "♂",
+  male:   "♂",
   couple: "♥",
-  trans: "⚧",
+  trans:  "⚧",
 };
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   try {
     const r = await fetch(`${SITE}/api/gender?list=1`);
     const genders = r.ok ? await r.json() : [];
-    return { props: { genders }, revalidate: 3600 };
+    return { props: { genders } };
   } catch {
-    return { props: { genders: [] }, revalidate: 3600 };
+    return { props: { genders: [] } };
   }
 }
 
@@ -89,7 +90,7 @@ export default function GenderPage({ genders }) {
 
         {genders.length === 0 && (
           <p style={{ color: "#888", textAlign: "center", marginTop: 40 }}>
-            Cargando datos...
+            No hay datos disponibles en este momento.
           </p>
         )}
 
@@ -143,11 +144,7 @@ const styles = {
     display: "block",
     textAlign: "center",
   },
-  icon: {
-    fontSize: 40,
-    marginBottom: 12,
-    color: "#a78bfa",
-  },
+  icon: { fontSize: 40, marginBottom: 12, color: "#a78bfa" },
   cardName: { fontWeight: 700, fontSize: 18, marginBottom: 8 },
   cardDesc: { fontSize: 12, color: "#777", marginBottom: 12, lineHeight: 1.5 },
   cardCount: { fontSize: 13, color: "#a78bfa", fontWeight: 600 },

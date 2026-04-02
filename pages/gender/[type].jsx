@@ -1,8 +1,11 @@
 // pages/gender/[type].jsx
 // Ruta: pages/gender/[type].jsx
 //
-// Página de modelos por género.
-// URL: /gender/female  /gender/male  /gender/couple  /gender/trans
+// Página de modelos por género — SSR (getServerSideProps)
+// Cambiado de getStaticProps+getStaticPaths a getServerSideProps
+// para evitar 404 cacheados cuando la API devolvía datos vacíos.
+//
+// URLs: /gender/female  /gender/male  /gender/couple  /gender/trans
 
 import Head from "next/head";
 
@@ -20,21 +23,20 @@ const COUNTRY_NAMES = {
   PL: "Polonia", CZ: "República Checa", SE: "Suecia",
 };
 
-export async function getStaticPaths() {
-  return {
-    paths: SUPPORTED_GENDERS.map((type) => ({ params: { type } })),
-    fallback: false,
-  };
-}
-
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   const type = params.type.toLowerCase();
+
+  // Rechazar slugs inválidos directamente
+  if (!SUPPORTED_GENDERS.includes(type)) {
+    return { notFound: true };
+  }
+
   try {
     const r = await fetch(`${SITE}/api/gender?gender=${type}&limit=50`);
     if (!r.ok) return { notFound: true };
     const data = await r.json();
     if (!data.models || data.models.length === 0) return { notFound: true };
-    return { props: { data }, revalidate: 1800 };
+    return { props: { data } };
   } catch {
     return { notFound: true };
   }
