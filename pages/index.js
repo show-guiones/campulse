@@ -115,9 +115,10 @@ export default function Home({ totalModels, topModels }) {
   };
 
   const categories = [
-    { href: "/gender",   icon: "⚥", title: "Por Género",  desc: "Chicas, chicos, parejas y trans", color: "#a78bfa" },
-    { href: "/country",  icon: "🌍", title: "Por País",    desc: "Colombia, España, México y más",   color: "#34d399" },
-    { href: "/language", icon: "🗣", title: "Por Idioma",  desc: "Español, inglés, portugués...",    color: "#f59e0b" },
+    { href: "/gender",      icon: "⚥", title: "Por Género",   desc: "Chicas, chicos, parejas y trans", color: "#a78bfa" },
+    { href: "/country",     icon: "🌍", title: "Por País",     desc: "Colombia, España, México y más",  color: "#34d399" },
+    { href: "/language",    icon: "🗣", title: "Por Idioma",   desc: "Español, inglés, portugués...",   color: "#f59e0b" },
+    { href: "/top/latinas", icon: "🌶️", title: "Top Latinas",  desc: "Las mejores latinas en vivo",    color: "#ef4444" },
   ];
 
   return (
@@ -227,6 +228,7 @@ export default function Home({ totalModels, topModels }) {
               { href: "/gender/male",   label: "♂ Chicos" },
               { href: "/gender/couple", label: "♥ Parejas" },
               { href: "/gender/trans",  label: "⚧ Trans" },
+              { href: "/top/latinas",   label: "🌶️ Latinas" },
             ].map((l) => (
               <a key={l.href} href={l.href} style={styles.pill}>{l.label}</a>
             ))}
