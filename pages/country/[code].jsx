@@ -103,7 +103,14 @@ export default function CountryPage({ data }) {
         </nav>
 
         <h1 style={styles.h1}>
-          {countryCodeToFlag(code)} Modelos de {name} en Chaturbate
+          <img
+            src={`https://flagcdn.com/32x24/${code.toLowerCase()}.png`}
+            alt={name}
+            width={32}
+            height={24}
+            style={{ borderRadius: 3, verticalAlign: "middle", marginRight: 10 }}
+          />
+          Modelos de {name} en Chaturbate
         </h1>
         <p style={styles.subtitle}>
           Top {models.length} modelos ordenadas por viewers promedio en los últimos 30 días.

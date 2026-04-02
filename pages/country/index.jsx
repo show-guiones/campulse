@@ -70,10 +70,13 @@ export default function CountriesPage({ countries }) {
           {countries.map((c) => (
             <a key={c.code} href={`/country/${c.code.toLowerCase()}`} style={styles.card}>
               <div style={styles.cardTop}>
-                <span style={styles.flag}>
-                  {/* Emoji de bandera a partir del código ISO */}
-                  {countryCodeToFlag(c.code)}
-                </span>
+                <img
+                  src={`https://flagcdn.com/32x24/${c.code.toLowerCase()}.png`}
+                  alt={c.name}
+                  width={32}
+                  height={24}
+                  style={{ borderRadius: 3 }}
+                />
                 <span style={styles.code}>{c.code}</span>
               </div>
               <div style={styles.cardName}>{c.name}</div>
