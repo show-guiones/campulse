@@ -2715,6 +2715,8 @@ function openCardPlayer(e, username, btn) {
   fetch(`/api/hls-proxy?username=${encodeURIComponent(username)}`)
     .then(r => r.json())
     .then(data => {
+      // DEBUG — ver en F12 > Console qué devuelve el proxy
+      console.log('[hls-proxy] response:', JSON.stringify(data));
       // Si ya cambió de modelo antes de que llegue la respuesta, ignorar
       if (_activeCardPlayer !== username) return;
 
