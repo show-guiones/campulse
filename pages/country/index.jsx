@@ -1,11 +1,11 @@
 // pages/country/index.jsx
+// Ruta: pages/country/index.jsx
 //
 // Página de listado de todos los países disponibles.
 // URL: /country
-//
-// Rankea por: "modelos chaturbate por país", "chaturbate países", etc.
 
 import Head from "next/head";
+import Image from "next/image";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -15,7 +15,7 @@ export async function getStaticProps() {
     const countries = r.ok ? await r.json() : [];
     return {
       props: { countries },
-      revalidate: 3600, // regenerar cada hora
+      revalidate: 3600,
     };
   } catch {
     return { props: { countries: [] }, revalidate: 3600 };
@@ -72,10 +72,10 @@ export default function CountriesPage({ countries }) {
               <div style={styles.cardTop}>
                 <img
                   src={`https://flagcdn.com/32x24/${c.code.toLowerCase()}.png`}
-                  alt={c.name}
+                  alt={`Bandera de ${c.name}`}
                   width={32}
                   height={24}
-                  style={{ borderRadius: 3 }}
+                  style={{ borderRadius: 3, display: "block" }}
                 />
                 <span style={styles.code}>{c.code}</span>
               </div>
@@ -92,18 +92,22 @@ export default function CountriesPage({ countries }) {
             Cargando datos...
           </p>
         )}
+
+        <section style={styles.seoText}>
+          <h2 style={styles.h2}>Modelos de Chaturbate por País</h2>
+          <p>
+            Campulse rastrea en tiempo real las estadísticas de las modelos de
+            Chaturbate de todo el mundo. Filtra por país para encontrar las
+            mejores salas en vivo de Colombia, España, México, Rumania y más.
+          </p>
+          <p>
+            Los datos se actualizan cada 2 horas con el número de viewers,
+            seguidores y los mejores horarios para cada modelo.
+          </p>
+        </section>
       </main>
     </>
   );
-}
-
-// Convierte código ISO (ej: "CO") a emoji de bandera (ej: 🇨🇴)
-function countryCodeToFlag(code) {
-  return code
-    .toUpperCase()
-    .split("")
-    .map((c) => String.fromCodePoint(0x1f1e0 + c.charCodeAt(0) - 65))
-    .join("");
 }
 
 const styles = {
@@ -118,6 +122,7 @@ const styles = {
   },
   breadcrumb: { color: "#a78bfa", fontSize: 14, textDecoration: "none" },
   h1: { fontSize: 32, marginTop: 16, marginBottom: 8 },
+  h2: { fontSize: 18, marginBottom: 12, color: "#ccc" },
   subtitle: { color: "#888", fontSize: 15, marginBottom: 32 },
   grid: {
     display: "grid",
@@ -130,7 +135,6 @@ const styles = {
     padding: "20px 16px",
     textDecoration: "none",
     color: "#f0f0f0",
-    transition: "background 0.2s",
     display: "block",
   },
   cardTop: {
@@ -139,8 +143,16 @@ const styles = {
     alignItems: "center",
     marginBottom: 10,
   },
-  flag: { fontSize: 28 },
   code: { fontSize: 11, color: "#555", fontWeight: 700 },
   cardName: { fontWeight: 700, fontSize: 15, marginBottom: 6 },
   cardCount: { fontSize: 12, color: "#a78bfa" },
+  seoText: {
+    marginTop: 48,
+    padding: "24px",
+    background: "#111",
+    borderRadius: 12,
+    color: "#aaa",
+    fontSize: 14,
+    lineHeight: 1.7,
+  },
 };

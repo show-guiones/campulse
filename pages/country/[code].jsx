@@ -1,27 +1,26 @@
 // pages/country/[code].jsx
+// Ruta: pages/country/[code].jsx
 //
 // Página de modelos por país.
 // URL: /country/co  /country/es  /country/mx  etc.
-//
-// Rankea por: "modelos chaturbate Colombia", "chaturbate España en vivo", etc.
 
 import Head from "next/head";
 
 const SITE = "https://www.campulsehub.com";
 
-// Países soportados — genera estas páginas en build time (SSG)
-// Agrega más códigos según los que aparezcan en tu DB
 const SUPPORTED_COUNTRIES = [
   "co", "es", "mx", "ar", "cl", "pe", "ve", "ec",
   "us", "br", "ro", "ru", "de", "fr", "gb", "it",
   "ph", "th", "cz", "ua", "hu", "pl", "ca", "au",
-  "nl", "se", "tr",
+  "nl", "se", "tr", "za", "in", "kz", "rs", "sk",
+  "mg", "ke", "pt", "gr", "be", "at", "ch", "no",
+  "dk", "fi", "bg", "md", "lt", "lv", "ee", "si",
 ];
 
 export async function getStaticPaths() {
   return {
     paths: SUPPORTED_COUNTRIES.map((code) => ({ params: { code } })),
-    fallback: "blocking", // genera bajo demanda para países no listados
+    fallback: "blocking",
   };
 }
 
@@ -34,7 +33,7 @@ export async function getStaticProps({ params }) {
     if (!data.models || data.models.length === 0) return { notFound: true };
     return {
       props: { data },
-      revalidate: 1800, // regenerar cada 30 minutos
+      revalidate: 1800,
     };
   } catch {
     return { notFound: true };
@@ -44,6 +43,7 @@ export async function getStaticProps({ params }) {
 export default function CountryPage({ data }) {
   const { code, name, models } = data;
   const topModel = models[0];
+  const codeLC = code.toLowerCase();
 
   const pageTitle = `Modelos de ${name} en Chaturbate — Top ${models.length} | Campulse`;
   const pageDescription =
@@ -58,13 +58,13 @@ export default function CountryPage({ data }) {
     "@type": "CollectionPage",
     name: pageTitle,
     description: pageDescription,
-    url: `${SITE}/country/${code.toLowerCase()}`,
+    url: `${SITE}/country/${codeLC}`,
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Campulse", item: SITE },
         { "@type": "ListItem", position: 2, name: "Países", item: `${SITE}/country` },
-        { "@type": "ListItem", position: 3, name: name, item: `${SITE}/country/${code.toLowerCase()}` },
+        { "@type": "ListItem", position: 3, name: name, item: `${SITE}/country/${codeLC}` },
       ],
     },
     hasPart: models.slice(0, 10).map((m) => ({
@@ -80,10 +80,10 @@ export default function CountryPage({ data }) {
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href={`${SITE}/country/${code.toLowerCase()}`} />
+        <link rel="canonical" href={`${SITE}/country/${codeLC}`} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={`${SITE}/country/${code.toLowerCase()}`} />
+        <meta property="og:url" content={`${SITE}/country/${codeLC}`} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Campulse" />
         <script
@@ -104,8 +104,8 @@ export default function CountryPage({ data }) {
 
         <h1 style={styles.h1}>
           <img
-            src={`https://flagcdn.com/32x24/${code.toLowerCase()}.png`}
-            alt={name}
+            src={`https://flagcdn.com/32x24/${codeLC}.png`}
+            alt={`Bandera de ${name}`}
             width={32}
             height={24}
             style={{ borderRadius: 3, verticalAlign: "middle", marginRight: 10 }}
@@ -127,7 +127,7 @@ export default function CountryPage({ data }) {
               </div>
               <div style={styles.stats}>
                 <div style={styles.statMain}>
-                  {m.avg_viewers} <span style={styles.statLabel}>viewers</span>
+                  {m.avg_viewers.toLocaleString("es")} <span style={styles.statLabel}>viewers</span>
                 </div>
                 {m.max_followers > 0 && (
                   <div style={styles.statSub}>
@@ -139,7 +139,7 @@ export default function CountryPage({ data }) {
           ))}
         </div>
 
-        {/* SEO text — contenido textual para Google */}
+        {/* SEO text */}
         <section style={styles.seoText}>
           <h2 style={styles.h2}>Modelos de {name} en Chaturbate</h2>
           <p>
@@ -151,27 +151,19 @@ export default function CountryPage({ data }) {
             <p>
               Actualmente, <strong>{topModel.display_name || topModel.username}</strong> es
               la modelo más vista de {name} con un promedio de{" "}
-              <strong>{topModel.avg_viewers} viewers</strong> y{" "}
+              <strong>{topModel.avg_viewers.toLocaleString("es")} viewers</strong>
               {topModel.max_followers > 0
-                ? `${topModel.max_followers.toLocaleString("es")} seguidores.`
-                : "miles de seguidores."}
+                ? ` y ${topModel.max_followers.toLocaleString("es")} seguidores.`
+                : "."}
             </p>
           )}
           <p>
-            <a href="/country" style={styles.link}>Ver modelos de otros países →</a>
+            <a href="/country" style={styles.link}>← Ver modelos de otros países</a>
           </p>
         </section>
       </main>
     </>
   );
-}
-
-function countryCodeToFlag(code) {
-  return code
-    .toUpperCase()
-    .split("")
-    .map((c) => String.fromCodePoint(0x1f1e0 + c.charCodeAt(0) - 65))
-    .join("");
 }
 
 const styles = {
