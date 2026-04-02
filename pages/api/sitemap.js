@@ -1,20 +1,80 @@
 // pages/api/sitemap.js
 //
-// Sitemap filtrado — solo incluye modelos con datos reales suficientes
-// para que Google las considere dignas de indexar.
+// Sitemap completo — incluye:
+//   · Home y páginas estáticas de categoría (género, país, idioma)
+//   · Modelos individuales filtradas (MIN_SNAPSHOTS + MIN_VIEWERS)
 //
-// Criterios de inclusión (configurable con las constantes de abajo):
+// Criterios de inclusión de modelos (configurable):
 //   · MIN_SNAPSHOTS  — mínimo de snapshots en los últimos DAYS días
 //   · MIN_VIEWERS    — al menos un snapshot con viewers >= este valor
 //   · DAYS           — ventana de tiempo analizada
-//
-// Resultado esperado: eliminar las ~38 páginas "Discovered – not indexed"
-// que Google rechaza por contenido escaso o vacío.
 
 const SITE = "https://www.campulsehub.com";
-const DAYS = 30;           // ventana de tiempo
-const MIN_SNAPSHOTS = 5;   // mínimo de capturas con la modelo online
-const MIN_VIEWERS = 1;     // al menos 1 snapshot con viewers reales (descarta "--")
+const DAYS = 30;
+const MIN_SNAPSHOTS = 5;
+const MIN_VIEWERS = 1;
+
+// ── Páginas estáticas de categoría ────────────────────────────────────────────
+const STATIC_PAGES = [
+  // Home
+  { loc: "/",               changefreq: "hourly",  priority: "1.0" },
+
+  // Índices de categoría
+  { loc: "/gender",         changefreq: "daily",   priority: "0.9" },
+  { loc: "/country",        changefreq: "daily",   priority: "0.9" },
+  { loc: "/language",       changefreq: "daily",   priority: "0.9" },
+
+  // Géneros
+  { loc: "/gender/female",  changefreq: "hourly",  priority: "0.8" },
+  { loc: "/gender/male",    changefreq: "hourly",  priority: "0.8" },
+  { loc: "/gender/couple",  changefreq: "hourly",  priority: "0.8" },
+  { loc: "/gender/trans",   changefreq: "hourly",  priority: "0.8" },
+
+  // Países más activos
+  { loc: "/country/co",     changefreq: "daily",   priority: "0.8" },
+  { loc: "/country/es",     changefreq: "daily",   priority: "0.8" },
+  { loc: "/country/mx",     changefreq: "daily",   priority: "0.8" },
+  { loc: "/country/ar",     changefreq: "daily",   priority: "0.7" },
+  { loc: "/country/ro",     changefreq: "daily",   priority: "0.7" },
+  { loc: "/country/us",     changefreq: "daily",   priority: "0.7" },
+  { loc: "/country/br",     changefreq: "daily",   priority: "0.7" },
+  { loc: "/country/ru",     changefreq: "daily",   priority: "0.7" },
+  { loc: "/country/de",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/fr",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/gb",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/it",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/ph",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/ua",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/cl",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/pe",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/ve",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/ca",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/au",     changefreq: "daily",   priority: "0.6" },
+  { loc: "/country/hu",     changefreq: "daily",   priority: "0.5" },
+  { loc: "/country/pl",     changefreq: "daily",   priority: "0.5" },
+  { loc: "/country/cz",     changefreq: "daily",   priority: "0.5" },
+  { loc: "/country/tr",     changefreq: "daily",   priority: "0.5" },
+
+  // Idiomas
+  { loc: "/language/spanish",    changefreq: "daily",  priority: "0.8" },
+  { loc: "/language/english",    changefreq: "daily",  priority: "0.8" },
+  { loc: "/language/portuguese", changefreq: "daily",  priority: "0.7" },
+  { loc: "/language/romanian",   changefreq: "daily",  priority: "0.7" },
+  { loc: "/language/russian",    changefreq: "daily",  priority: "0.7" },
+  { loc: "/language/german",     changefreq: "daily",  priority: "0.6" },
+  { loc: "/language/french",     changefreq: "daily",  priority: "0.6" },
+  { loc: "/language/italian",    changefreq: "daily",  priority: "0.6" },
+];
+
+function buildUrl({ loc, changefreq, priority }) {
+  return (
+    `  <url>\n` +
+    `    <loc>${SITE}${loc}</loc>\n` +
+    `    <changefreq>${changefreq}</changefreq>\n` +
+    `    <priority>${priority}</priority>\n` +
+    `  </url>`
+  );
+}
 
 export default async function handler(req, res) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -34,10 +94,6 @@ export default async function handler(req, res) {
   let qualifiedUsernames = [];
 
   try {
-    // ── Paso 1: contar snapshots por username en la ventana de tiempo ──────────
-    // Supabase no tiene GROUP BY en REST, así que pedimos los campos necesarios
-    // y agrupamos en memoria. Limitamos a 50.000 filas para cubrir holgadamente
-    // los ~30 días con scraping cada 2 h (~360 ejecuciones × ~3.000 modelos).
     const countUrl =
       `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
       `?captured_at=gte.${since}` +
@@ -50,9 +106,7 @@ export default async function handler(req, res) {
 
     const rows = await r.json();
 
-    // ── Paso 2: agrupar y filtrar en memoria ───────────────────────────────────
-    const stats = {}; // { username: { snapshots: N, maxViewers: N } }
-
+    const stats = {};
     for (const row of rows) {
       const u = row.username;
       if (!u) continue;
@@ -64,21 +118,18 @@ export default async function handler(req, res) {
     }
 
     qualifiedUsernames = Object.entries(stats)
-      .filter(
-        ([, s]) =>
-          s.snapshots >= MIN_SNAPSHOTS && s.maxViewers >= MIN_VIEWERS
-      )
+      .filter(([, s]) => s.snapshots >= MIN_SNAPSHOTS && s.maxViewers >= MIN_VIEWERS)
       .map(([username]) => username)
-      .sort(); // orden alfabético para estabilidad del sitemap
+      .sort();
 
   } catch (e) {
     console.error("[sitemap] Error consultando Supabase:", e.message);
-    // Devolvemos un sitemap mínimo válido en lugar de un 500
-    // para no interrumpir el crawl de Google.
   }
 
-  // ── Paso 3: construir XML ──────────────────────────────────────────────────
-  const modelUrls = qualifiedUsernames
+  // ── Construir XML ──────────────────────────────────────────────────────────
+  const staticSection = STATIC_PAGES.map(buildUrl).join("\n");
+
+  const modelSection = qualifiedUsernames
     .map(
       (u) =>
         `  <url>\n` +
@@ -92,16 +143,11 @@ export default async function handler(req, res) {
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-    `  <url>\n` +
-    `    <loc>${SITE}/</loc>\n` +
-    `    <changefreq>hourly</changefreq>\n` +
-    `    <priority>1.0</priority>\n` +
-    `  </url>\n` +
-    modelUrls +
+    staticSection + "\n" +
+    modelSection +
     `\n</urlset>`;
 
   res.setHeader("Content-Type", "application/xml; charset=UTF-8");
-  // Cache de 6 h en CDN, refresca en background cuando expira
   res.setHeader("Cache-Control", "s-maxage=21600, stale-while-revalidate=3600");
   res.status(200).send(xml);
 }
