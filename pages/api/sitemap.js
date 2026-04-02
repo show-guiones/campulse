@@ -2,6 +2,7 @@
 //
 // Sitemap completo — incluye:
 //   · Home y páginas estáticas de categoría (género, país, idioma)
+//   · Búsqueda
 //   · Tags populares de Chaturbate
 //   · Modelos individuales filtradas (MIN_SNAPSHOTS + MIN_VIEWERS)
 //
@@ -19,6 +20,9 @@ const MIN_VIEWERS = 1;
 const STATIC_PAGES = [
   // Home
   { loc: "/",               changefreq: "hourly",  priority: "1.0" },
+
+  // Búsqueda
+  { loc: "/search",         changefreq: "daily",   priority: "0.8" },
 
   // Índices de categoría
   { loc: "/gender",         changefreq: "daily",   priority: "0.9" },
