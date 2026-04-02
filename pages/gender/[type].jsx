@@ -1,25 +1,12 @@
 // pages/gender/[type].jsx
-// Ruta: pages/gender/[type].jsx
-//
-// Página de modelos por género — SSR con query directa a Supabase
-// Se eliminó el fetch interno a /api/gender porque Vercel no puede
-// llamarse a sí mismo de forma fiable desde getServerSideProps.
-//
-// URLs: /gender/female  /gender/male  /gender/couple  /gender/trans
+// FIX: female timeout — reducir ventana a 7 días y límite de filas a 10000
 
 import Head from "next/head";
 
 const SITE = "https://www.campulsehub.com";
-
 const SUPPORTED_GENDERS = ["female", "male", "couple", "trans"];
 
-// Mapa slug → valor CHAR(1) en Supabase
-const GENDER_DB_MAP = {
-  female: "f",
-  male:   "m",
-  couple: "c",
-  trans:  "t",
-};
+const GENDER_DB_MAP = { female: "f", male: "m", couple: "c", trans: "t" };
 
 const GENDER_INFO = {
   female: { name: "Chicas",  nameEs: "Mujeres", description: "Las mejores modelos femeninas de Chaturbate" },
@@ -40,28 +27,24 @@ const COUNTRY_NAMES = {
 
 export async function getServerSideProps({ params }) {
   const type = params.type.toLowerCase();
-
-  if (!SUPPORTED_GENDERS.includes(type)) {
-    return { notFound: true };
-  }
+  if (!SUPPORTED_GENDERS.includes(type)) return { notFound: true };
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    return { notFound: true };
-  }
+  if (!SUPABASE_URL || !SUPABASE_KEY) return { notFound: true };
 
   try {
     const dbGender = GENDER_DB_MAP[type];
-    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    // Ventana de 7 días (en vez de 30) para reducir volumen de datos
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     const url =
       `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
       `?captured_at=gte.${since}` +
       `&gender=eq.${dbGender}` +
       `&select=username,num_users,num_followers,display_name,country` +
-      `&limit=50000`;
+      `&order=captured_at.desc` +
+      `&limit=10000`;   // máximo razonable
 
     const r = await fetch(url, {
       headers: {
@@ -72,6 +55,7 @@ export async function getServerSideProps({ params }) {
 
     if (!r.ok) return { notFound: true };
     const rows = await r.json();
+    if (!Array.isArray(rows) || rows.length === 0) return { notFound: true };
 
     const map = {};
     for (const row of rows) {
@@ -95,7 +79,7 @@ export async function getServerSideProps({ params }) {
     }
 
     const models = Object.values(map)
-      .filter((m) => m.snapshots >= 3)
+      .filter((m) => m.snapshots >= 2)
       .map((m) => ({
         username: m.username,
         display_name: m.display_name,
@@ -108,9 +92,7 @@ export async function getServerSideProps({ params }) {
 
     if (models.length === 0) return { notFound: true };
 
-    const info = GENDER_INFO[type];
-    const data = { gender: type, ...info, models };
-
+    const data = { gender: type, ...GENDER_INFO[type], models };
     return { props: { data } };
   } catch {
     return { notFound: true };
@@ -124,9 +106,7 @@ export default function GenderTypePage({ data }) {
   const pageTitle = `${name} en Chaturbate — Top ${models.length} | Campulse`;
   const pageDescription =
     `Las mejores ${models.length} ${nameEs.toLowerCase()} de Chaturbate ordenadas por viewers. ` +
-    (topModel
-      ? `${topModel.display_name} lidera con ${topModel.avg_viewers.toLocaleString("es")} viewers promedio. `
-      : "") +
+    (topModel ? `${topModel.display_name} lidera con ${topModel.avg_viewers.toLocaleString("es")} viewers promedio. ` : "") +
     `Estadísticas en tiempo real en Campulse.`;
 
   const schema = {
@@ -162,10 +142,7 @@ export default function GenderTypePage({ data }) {
         <meta property="og:url" content={`${SITE}/gender/${gender}`} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Campulse" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       </Head>
 
       <main style={styles.main}>
@@ -179,7 +156,7 @@ export default function GenderTypePage({ data }) {
 
         <h1 style={styles.h1}>{name} en Chaturbate</h1>
         <p style={styles.subtitle}>
-          Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio en los últimos 30 días.
+          Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio en los últimos 7 días.
         </p>
 
         <div style={styles.list}>
@@ -196,8 +173,7 @@ export default function GenderTypePage({ data }) {
                       <img
                         src={`https://flagcdn.com/16x12/${m.country.toLowerCase()}.png`}
                         alt={COUNTRY_NAMES[m.country] || m.country}
-                        width={16}
-                        height={12}
+                        width={16} height={12}
                         style={{ borderRadius: 2, verticalAlign: "middle", marginRight: 4 }}
                       />
                       {COUNTRY_NAMES[m.country] || m.country}
@@ -210,9 +186,7 @@ export default function GenderTypePage({ data }) {
                   {m.avg_viewers.toLocaleString("es")} <span style={styles.statLabel}>viewers</span>
                 </div>
                 {m.max_followers > 0 && (
-                  <div style={styles.statSub}>
-                    {m.max_followers.toLocaleString("es")} seguidores
-                  </div>
+                  <div style={styles.statSub}>{m.max_followers.toLocaleString("es")} seguidores</div>
                 )}
               </div>
             </a>
@@ -228,12 +202,9 @@ export default function GenderTypePage({ data }) {
           </p>
           {topModel && (
             <p>
-              Actualmente, <strong>{topModel.display_name || topModel.username}</strong> es
-              la modelo más vista con un promedio de{" "}
-              <strong>{topModel.avg_viewers.toLocaleString("es")} viewers</strong>
-              {topModel.max_followers > 0
-                ? ` y ${topModel.max_followers.toLocaleString("es")} seguidores.`
-                : "."}
+              Actualmente, <strong>{topModel.display_name || topModel.username}</strong> lidera con{" "}
+              <strong>{topModel.avg_viewers.toLocaleString("es")} viewers promedio</strong>
+              {topModel.max_followers > 0 ? ` y ${topModel.max_followers.toLocaleString("es")} seguidores.` : "."}
             </p>
           )}
           <p style={{ marginTop: 16 }}>
