@@ -385,6 +385,29 @@ export default function ModelPage({
           {isLive ? "🔴 Ver sala en vivo" : "Ver sala en Chaturbate"}
         </a>
 
+        {/* Embed en vivo — solo cuando está online */}
+        {isLive && (
+          <section style={styles.embedSection}>
+            <div style={styles.embedHeader}>
+              <span style={styles.liveDot}>●</span>
+              <span style={styles.embedLabel}>En vivo ahora · {viewers?.toLocaleString("es")} viewers</span>
+            </div>
+            <div style={styles.embedWrap}>
+              <iframe
+                src={`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&bgcolor=black`}
+                style={styles.embedFrame}
+                allowFullScreen
+                frameBorder="0"
+                scrolling="no"
+                title={`${name} en vivo en Chaturbate`}
+              />
+            </div>
+            <p style={styles.embedNote}>
+              Al ver el stream en Campulse, apoyas a {name} directamente.
+            </p>
+          </section>
+        )}
+
         {/* Mejores horarios */}
         {bestHours.length > 0 && (
           <>
@@ -526,6 +549,15 @@ const styles = {
   histViewers: { fontSize: 12, color: "#a78bfa", width: 50, textAlign: "right", flexShrink: 0 },
   categoryLinks: { display: "flex", flexDirection: "column", gap: 8, marginTop: 28 },
   countryLink: { display: "block", textAlign: "center", color: "#a78bfa", fontSize: 14, textDecoration: "none" },
+  // Modelos similares
+  // Embed en vivo
+  embedSection: { marginTop: 24, marginBottom: 8 },
+  embedHeader: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10 },
+  liveDot: { color: "#ef4444", fontSize: 10, animation: "pulse 2s infinite" },
+  embedLabel: { fontSize: 13, color: "#aaa", fontWeight: 600 },
+  embedWrap: { position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 12, background: "#111" },
+  embedFrame: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 12 },
+  embedNote: { fontSize: 11, color: "#444", marginTop: 8, textAlign: "center" },
   // Modelos similares
   similarSection: { marginTop: 40, paddingTop: 28, borderTop: "1px solid #1a1a1a" },
   similarTitle: { fontSize: 15, color: "#ccc", marginBottom: 16, fontWeight: 600 },
