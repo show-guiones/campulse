@@ -798,8 +798,10 @@ body.modal-open .crd-iframe-popup{display:none!important}
     rgba(14,15,18,.6) 30%,
     rgba(14,15,18,.1) 55%,
     transparent 75%
-  )
+  );
+  transition:opacity .25s;pointer-events:none
 }
+.mhero-v2.embed-active .modal-hero-grad{opacity:0}
 
 /* Play overlay — pequeño, elegante, no tapa la imagen */
 .live-preview-wrap{position:relative;height:100%}
@@ -1581,6 +1583,8 @@ body.modal-open .crd-iframe-popup{display:none!important}
 .crd-lexy .crd-name,.crd-name-lexy{
   color:var(--hot);font-weight:700;
 }
+body.modal-open{overflow:hidden!important}
+body.modal-open .crd-iframe-popup{display:none!important}
 </style>
 <!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js" defer></script>
@@ -1846,6 +1850,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
 
   <!-- Search screen -->
   <div class="rep-search" id="model-search-screen">
+    <button onclick="switchTab('explore')" style="background:none;border:none;color:var(--txt2);font-size:.8rem;cursor:pointer;padding:.25rem 0 .75rem;display:flex;align-items:center;gap:.3rem">← Volver al catálogo</button>
     <div class="rep-search-eyebrow">Para modelos 📊</div>
     <div class="rep-search-title">Descubre<br><em>cuándo eres</em><br>imparable</div>
     <div class="rep-search-sub">Escribe tu username y en segundos sabrás en qué puesto estás, cuánto podrías ganar, y cuál es tu mejor momento para transmitir.</div>
@@ -2088,9 +2093,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
         <button class="btn-sec btn-sec-dual" onclick="showDualPicker()" title="Ver 2 salas en simultáneo">
           ⊞ <span>2 salas</span>
         </button>
-        <button class="btn-sec btn-sec-rep" id="m-rep-toggle" onclick="toggleModalReport()">
-          📊 <span>Stats</span>
-        </button>
+        
         <button class="btn-sec" onclick="openModelReportFromModal()" title="Ver mi reporte completo">
           👤 <span>Reporte</span>
         </button>
@@ -2857,6 +2860,8 @@ function openMod(u){
   if(x.num_users>0){
     // AUTO-EMBED: mostrar video directamente
     if(imgWrap) imgWrap.innerHTML='';
+    const _heroEl=document.getElementById('modal-hero');
+    if(_heroEl) _heroEl.classList.add('embed-active');
     if(embedWrap){
       const loading=document.getElementById('embed-loading');
       if(loading) loading.classList.remove('hidden');
@@ -2867,6 +2872,8 @@ function openMod(u){
     }
   } else {
     // OFFLINE: mostrar imagen de perfil
+    const _heroElOff=document.getElementById('modal-hero');
+    if(_heroElOff) _heroElOff.classList.remove('embed-active');
     if(embedWrap) embedWrap.classList.remove('active');
     if(imgWrap) imgWrap.innerHTML=`
       <div class="mhp-wrap">
@@ -2878,7 +2885,13 @@ function openMod(u){
   }
 
   document.getElementById('modal-bg').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.body.classList.add('modal-open');
+  // Auto-show analytics immediately on open
+  const _ap=document.getElementById('modal-analytics');
+  const _rb=document.getElementById('m-rep-toggle');
+  if(_ap) _ap.style.display='block';
+  if(_rb) _rb.classList.add('on');
+  loadModalAnalytics(x);
   // Close mini card player if open — modal takes priority
   closeCardPlayer();
 }
@@ -3085,7 +3098,7 @@ function filterDpList(q){
   const dpGrid=document.getElementById('dp-grid');
   if(!dpGrid||!q.trim()){showDualPicker&&showDualPicker();return;}
   const lc=q.toLowerCase();
-  const hits=rooms.filter(r=>r.num_users>0&&r.username!==active?.username&&(r.username.includes(lc)||(r.display_name||'').toLowerCase().includes(lc))).slice(0,12);
+  const hits=rooms.filter(r=>r.num_users>0&&r.username!==active?.username&&(r.username.includes(lc)||(r.display_name||'').toLowerCase().includes(lc)));
   dpGrid.innerHTML=hits.map(r=>`
     <div class="dp-card" onclick="openDualView('${active?.username}','${r.username}');closeDualPicker();">
       <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
@@ -3269,7 +3282,7 @@ function cardPlayerOpenFull() {
 function closeMod(e){
   if(!e||e.target===document.getElementById('modal-bg')){
     document.getElementById('modal-bg').classList.remove('open');
-    document.body.style.overflow='';
+    document.body.classList.remove('modal-open');
     clearInterval(prevCd);
     const frame=document.getElementById('live-embed-frame');
     const wrap=document.getElementById('mhero-embed-wrap');
