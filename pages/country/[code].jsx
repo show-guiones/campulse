@@ -1,11 +1,6 @@
 // pages/country/[code].jsx
-// Ruta: pages/country/[code].jsx
-//
-// FIX: cambiado de getStaticProps (SSG + fetch interno) a getServerSideProps
-// con consulta directa a Supabase — elimina 404s cacheados cuando la API
-// falla en build time. También muestra el género de cada modelo.
-//
-// URL: /country/co  /country/es  /country/mx  etc.
+// SEO mejorado: título con viewers del top modelo, keywords por país,
+// descripción menciona modelo #1 y #2, og:image con bandera
 
 import Head from "next/head";
 
@@ -37,6 +32,15 @@ const COUNTRY_NAMES = {
   MG: "Madagascar",
 };
 
+// Gentilicios para descripciones más naturales
+const COUNTRY_DEMONYM = {
+  CO: "colombianas", MX: "mexicanas", AR: "argentinas", CL: "chilenas",
+  ES: "españolas", BR: "brasileñas", RO: "rumanas", RU: "rusas",
+  DE: "alemanas", FR: "francesas", GB: "británicas", IT: "italianas",
+  UA: "ucranianas", PH: "filipinas", US: "estadounidenses", CA: "canadienses",
+  PE: "peruanas", VE: "venezolanas", EC: "ecuatorianas",
+};
+
 const GENDER_LABELS = { f: "Mujer", m: "Hombre", c: "Pareja", t: "Trans" };
 const GENDER_COLORS = { f: "#f472b6", m: "#60a5fa", c: "#34d399", t: "#a78bfa" };
 
@@ -46,10 +50,7 @@ const LIMIT = 50;
 
 export async function getServerSideProps({ params }) {
   const code = (params.code || "").toLowerCase();
-
-  if (!SUPPORTED_COUNTRIES.includes(code)) {
-    return { notFound: true };
-  }
+  if (!SUPPORTED_COUNTRIES.includes(code)) return { notFound: true };
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
@@ -121,15 +122,21 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function CountryPage({ code, codeUC, name, models }) {
-  const topModel = models[0];
+  const top = models[0];
+  const second = models[1];
+  const demonym = COUNTRY_DEMONYM[codeUC] || `de ${name}`;
 
-  const pageTitle = `Modelos de ${name} en Chaturbate — Top ${models.length} | Campulse`;
+  // Título: menciona viewers reales del top modelo
+  const pageTitle = top
+    ? `Top Modelos ${name} en Chaturbate — ${top.display_name} con ${top.avg_viewers.toLocaleString("es")} viewers | Campulse`
+    : `Modelos de ${name} en Chaturbate — Top ${models.length} | Campulse`;
+
+  // Descripción: top 2 modelos + total + gentilicio
   const pageDescription =
-    `Las mejores ${models.length} modelos de Chaturbate de ${name} ordenadas por viewers. ` +
-    (topModel
-      ? `${topModel.display_name} lidera con ${topModel.avg_viewers.toLocaleString("es")} viewers promedio. `
-      : "") +
-    `Estadísticas en tiempo real en Campulse.`;
+    `Las ${models.length} mejores modelos ${demonym} de Chaturbate, ordenadas por viewers promedio. ` +
+    (top ? `${top.display_name} lidera con ${top.avg_viewers.toLocaleString("es")} viewers` : "") +
+    (second ? `, seguida de ${second.display_name} con ${second.avg_viewers.toLocaleString("es")}. ` : ". ") +
+    `Estadísticas actualizadas cada 2 horas en Campulse.`;
 
   const schema = {
     "@context": "https://schema.org",
@@ -147,7 +154,7 @@ export default function CountryPage({ code, codeUC, name, models }) {
     },
     hasPart: models.slice(0, 10).map((m) => ({
       "@type": "WebPage",
-      name: `${m.username} Stats — Campulse`,
+      name: `${m.display_name || m.username} Stats — Campulse`,
       url: `${SITE}/model/${m.username}`,
     })),
   };
@@ -164,6 +171,7 @@ export default function CountryPage({ code, codeUC, name, models }) {
         <meta property="og:url" content={`${SITE}/country/${code}`} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Campulse" />
+        <meta property="og:image" content={`https://flagcdn.com/160x120/${code}.png`} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
@@ -223,19 +231,19 @@ export default function CountryPage({ code, codeUC, name, models }) {
         </div>
 
         <section style={styles.seoText}>
-          <h2 style={styles.h2}>Modelos de {name} en Chaturbate</h2>
+          <h2 style={styles.h2}>Modelos {demonym} en Chaturbate</h2>
           <p>
-            Campulse rastrea en tiempo real las estadísticas de las modelos de{" "}
-            {name} en Chaturbate. Los datos se actualizan cada 2 horas con el
+            Campulse rastrea en tiempo real las estadísticas de las modelos {demonym}{" "}
+            en Chaturbate. Los datos se actualizan cada 2 horas con el
             número de viewers, seguidores y los mejores horarios para cada modelo.
           </p>
-          {topModel && (
+          {top && (
             <p>
-              Actualmente, <strong>{topModel.display_name || topModel.username}</strong> es
+              Actualmente, <strong>{top.display_name || top.username}</strong> es
               la modelo más vista de {name} con un promedio de{" "}
-              <strong>{topModel.avg_viewers.toLocaleString("es")} viewers</strong>
-              {topModel.max_followers > 0
-                ? ` y ${topModel.max_followers.toLocaleString("es")} seguidores.`
+              <strong>{top.avg_viewers.toLocaleString("es")} viewers</strong>
+              {top.max_followers > 0
+                ? ` y ${top.max_followers.toLocaleString("es")} seguidores.`
                 : "."}
             </p>
           )}

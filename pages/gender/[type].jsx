@@ -1,5 +1,5 @@
 // pages/gender/[type].jsx
-// FIX: snapshots >= 1, ventana 14 días para más modelos en el ranking
+// SEO mejorado: título con viewers del top modelo, descripción menciona top 2
 
 import Head from "next/head";
 
@@ -8,10 +8,10 @@ const SUPPORTED_GENDERS = ["female", "male", "couple", "trans"];
 const GENDER_DB_MAP = { female: "f", male: "m", couple: "c", trans: "t" };
 
 const GENDER_INFO = {
-  female: { name: "Chicas",  nameEs: "Mujeres", description: "Las mejores modelos femeninas de Chaturbate" },
-  male:   { name: "Chicos",  nameEs: "Hombres", description: "Los mejores modelos masculinos de Chaturbate" },
-  couple: { name: "Parejas", nameEs: "Parejas", description: "Las mejores parejas de Chaturbate en vivo" },
-  trans:  { name: "Trans",   nameEs: "Trans",   description: "Las mejores modelos trans de Chaturbate" },
+  female: { name: "Chicas",  nameEs: "Mujeres",  emoji: "♀", keywords: "chicas chaturbate, modelos femeninas chaturbate, webcam chicas" },
+  male:   { name: "Chicos",  nameEs: "Hombres",  emoji: "♂", keywords: "chicos chaturbate, modelos masculinos chaturbate, webcam hombres" },
+  couple: { name: "Parejas", nameEs: "Parejas",  emoji: "♥", keywords: "parejas chaturbate, couples chaturbate, webcam parejas" },
+  trans:  { name: "Trans",   nameEs: "Trans",    emoji: "⚧", keywords: "trans chaturbate, modelos trans chaturbate, webcam trans" },
 };
 
 const COUNTRY_NAMES = {
@@ -41,8 +41,7 @@ export async function getServerSideProps({ params }) {
       `?captured_at=gte.${since}` +
       `&gender=eq.${dbGender}` +
       `&select=username,num_users,num_followers,display_name,country` +
-      `&order=captured_at.desc` +
-      `&limit=10000`;
+      `&order=captured_at.desc&limit=10000`;
 
     const r = await fetch(url, {
       headers: {
@@ -98,14 +97,21 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function GenderTypePage({ data }) {
-  const { gender, name, nameEs, models } = data;
-  const topModel = models[0];
+  const { gender, name, nameEs, emoji, keywords, models } = data;
+  const top = models[0];
+  const second = models[1];
 
-  const pageTitle = `${name} en Chaturbate — Top ${models.length} | Campulse`;
+  // Título: incluye emoji de género + viewers del top modelo
+  const pageTitle = top
+    ? `${emoji} ${name} en Chaturbate — ${top.display_name} con ${top.avg_viewers.toLocaleString("es")} viewers | Campulse`
+    : `${name} en Chaturbate — Top ${models.length} | Campulse`;
+
+  // Descripción: menciona top 2 modelos
   const pageDescription =
-    `Las mejores ${models.length} ${nameEs.toLowerCase()} de Chaturbate ordenadas por viewers. ` +
-    (topModel ? `${topModel.display_name} lidera con ${topModel.avg_viewers.toLocaleString("es")} viewers promedio. ` : "") +
-    `Estadísticas en tiempo real en Campulse.`;
+    `Las ${models.length} mejores ${nameEs.toLowerCase()} de Chaturbate ordenadas por viewers. ` +
+    (top ? `${top.display_name} lidera con ${top.avg_viewers.toLocaleString("es")} viewers promedio` : "") +
+    (second ? `, seguida de ${second.display_name} con ${second.avg_viewers.toLocaleString("es")}. ` : ". ") +
+    `Datos actualizados cada 2 horas en Campulse.`;
 
   const schema = {
     "@context": "https://schema.org",
@@ -118,12 +124,12 @@ export default function GenderTypePage({ data }) {
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Campulse", item: SITE },
         { "@type": "ListItem", position: 2, name: "Géneros", item: `${SITE}/gender` },
-        { "@type": "ListItem", position: 3, name: name, item: `${SITE}/gender/${gender}` },
+        { "@type": "ListItem", position: 3, name, item: `${SITE}/gender/${gender}` },
       ],
     },
     hasPart: models.slice(0, 10).map((m) => ({
       "@type": "WebPage",
-      name: `${m.username} Stats — Campulse`,
+      name: `${m.display_name || m.username} Stats — Campulse`,
       url: `${SITE}/model/${m.username}`,
     })),
   };
@@ -133,6 +139,7 @@ export default function GenderTypePage({ data }) {
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
+        <meta name="keywords" content={keywords} />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={`${SITE}/gender/${gender}`} />
         <meta property="og:title" content={pageTitle} />
@@ -152,7 +159,7 @@ export default function GenderTypePage({ data }) {
           <span>{name}</span>
         </nav>
 
-        <h1 style={styles.h1}>{name} en Chaturbate</h1>
+        <h1 style={styles.h1}>{emoji} {name} en Chaturbate</h1>
         <p style={styles.subtitle}>
           Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio en los últimos 14 días.
         </p>
@@ -198,11 +205,11 @@ export default function GenderTypePage({ data }) {
             Chaturbate. Los datos se actualizan cada 2 horas con el número de viewers,
             seguidores y los mejores horarios para cada modelo.
           </p>
-          {topModel && (
+          {top && (
             <p>
-              Actualmente, <strong>{topModel.display_name || topModel.username}</strong> lidera con{" "}
-              <strong>{topModel.avg_viewers.toLocaleString("es")} viewers promedio</strong>
-              {topModel.max_followers > 0 ? ` y ${topModel.max_followers.toLocaleString("es")} seguidores.` : "."}
+              Actualmente, <strong>{top.display_name || top.username}</strong> lidera con{" "}
+              <strong>{top.avg_viewers.toLocaleString("es")} viewers promedio</strong>
+              {top.max_followers > 0 ? ` y ${top.max_followers.toLocaleString("es")} seguidores.` : "."}
             </p>
           )}
           <p style={{ marginTop: 16 }}>

@@ -1,10 +1,5 @@
 // pages/index.js
-// Home de Campulse — hub de navegación + ranking top 10 en vivo
-//
-// Novedades respecto a la versión anterior:
-//   · Sección "Top 10 ahora" con las modelos de mayor audiencia en vivo
-//   · Datos traídos directamente desde Supabase en SSR (sin fetch interno)
-//   · Conteo real de modelos online con count=exact
+// SEO: título y descripción dinámicos usando totalModels y topModel del SSR
 
 import Head from "next/head";
 
@@ -37,28 +32,21 @@ export async function getServerSideProps() {
         Authorization: `Bearer ${SUPABASE_KEY}`,
       };
 
-      // Conteo total con count=exact (no trae filas, solo el header)
       const [countRes, topRes] = await Promise.all([
         fetch(
           `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
-          `?captured_at=gte.${since}` +
-          `&select=username`,
-          {
-            headers: { ...sbHeaders, "Prefer": "count=exact", "Range": "0-0" },
-          }
+          `?captured_at=gte.${since}&select=username`,
+          { headers: { ...sbHeaders, "Prefer": "count=exact", "Range": "0-0" } }
         ),
-        // Top modelos por viewers en el último snapshot (últimas 2h, orden desc)
         fetch(
           `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
           `?captured_at=gte.${since}` +
           `&select=username,display_name,num_users,num_followers,country,gender` +
-          `&order=num_users.desc` +
-          `&limit=200`,
+          `&order=num_users.desc&limit=200`,
           { headers: sbHeaders }
         ),
       ]);
 
-      // Conteo total
       if (countRes.ok) {
         const range = countRes.headers.get("content-range");
         if (range) {
@@ -67,7 +55,6 @@ export async function getServerSideProps() {
         }
       }
 
-      // Top modelos — deduplicar por username (puede haber múltiples snapshots)
       if (topRes.ok) {
         const rows = await topRes.json();
         if (Array.isArray(rows)) {
@@ -96,10 +83,20 @@ export async function getServerSideProps() {
 }
 
 export default function Home({ totalModels, topModels }) {
-  const pageTitle = "Campulse — Estadísticas de Chaturbate en Tiempo Real";
-  const pageDescription =
-    "Campulse rastrea las estadísticas de Chaturbate en tiempo real: viewers, seguidores y mejores horarios. " +
-    "Filtra modelos por género, país e idioma. Datos actualizados cada 2 horas.";
+  const top = topModels[0];
+
+  // Título dinámico: incluye cantidad de modelos online en tiempo real
+  const pageTitle = totalModels > 0
+    ? `Campulse — ${totalModels.toLocaleString("es")} modelos en vivo en Chaturbate ahora`
+    : "Campulse — Estadísticas de Chaturbate en Tiempo Real";
+
+  // Descripción dinámica: menciona al modelo top si existe
+  const pageDescription = top
+    ? `${totalModels.toLocaleString("es")} modelos online en Chaturbate ahora mismo. ` +
+      `${top.display_name} lidera con ${top.num_users.toLocaleString("es")} viewers. ` +
+      `Filtra por país, género e idioma. Datos actualizados cada 2 horas.`
+    : "Campulse rastrea las estadísticas de Chaturbate en tiempo real: viewers, seguidores y mejores horarios. " +
+      "Filtra modelos por género, país e idioma. Datos actualizados cada 2 horas.";
 
   const schema = {
     "@context": "https://schema.org",
@@ -313,8 +310,6 @@ const styles = {
   searchBox: { display: "block", background: "#1a1a2e", border: "1px solid #333", borderRadius: 12, padding: "14px 20px", color: "#666", fontSize: 15, textDecoration: "none", textAlign: "left" },
   section: { marginBottom: 40 },
   h2: { fontSize: 16, color: "#888", marginBottom: 16, textTransform: "uppercase", letterSpacing: 1 },
-
-  // Top 10
   topList: { display: "flex", flexDirection: "column", gap: 6 },
   topRow: { display: "flex", alignItems: "center", gap: 14, background: "#1a1a2e", borderRadius: 10, padding: "12px 16px", textDecoration: "none", color: "#f0f0f0" },
   topRank: { fontSize: 12, color: "#555", width: 24, flexShrink: 0, fontWeight: 700 },
@@ -325,18 +320,13 @@ const styles = {
   topViewerNum: { fontWeight: 700, color: "#a78bfa", fontSize: 15 },
   topViewerLabel: { fontSize: 11, color: "#666" },
   moreLink: { color: "#a78bfa", fontSize: 13, textDecoration: "none" },
-
-  // Cards
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 },
   card: { background: "#1a1a2e", borderRadius: 14, padding: "28px 20px", textDecoration: "none", color: "#f0f0f0", display: "block", textAlign: "center" },
   cardIcon: { fontSize: 36, marginBottom: 12 },
   cardTitle: { fontWeight: 700, fontSize: 17, marginBottom: 6 },
   cardDesc: { fontSize: 13, color: "#777" },
-
-  // Pills
   linkRow: { display: "flex", flexWrap: "wrap", gap: 10 },
   pill: { background: "#1a1a2e", borderRadius: 20, padding: "8px 16px", textDecoration: "none", color: "#a78bfa", fontSize: 14, fontWeight: 500 },
   pillTag: { background: "#1a1a2e", borderRadius: 20, padding: "8px 16px", textDecoration: "none", color: "#34d399", fontSize: 14, fontWeight: 500 },
-
   seoText: { marginTop: 32, padding: "24px", background: "#111", borderRadius: 12, color: "#aaa", fontSize: 14, lineHeight: 1.7 },
 };

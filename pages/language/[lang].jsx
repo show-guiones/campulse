@@ -1,11 +1,5 @@
 // pages/language/[lang].jsx
-// Ruta: pages/language/[lang].jsx
-//
-// FIX: cambiado de getStaticProps (ISR) a getServerSideProps
-// para evitar que un notFound quede cacheado si la BD tiene un pico temporal.
-// Consulta Supabase directamente (no fetch interno).
-//
-// URL: /language/spanish  /language/english  /language/portuguese  etc.
+// SEO mejorado: título con viewers top modelo, keywords por idioma, og:image bandera idioma
 
 import Head from "next/head";
 
@@ -17,14 +11,14 @@ const SUPPORTED_LANGS = [
 ];
 
 const LANGUAGE_INFO = {
-  spanish:    { name: "Español",    description: "Las mejores modelos hispanohablantes de Chaturbate" },
-  english:    { name: "English",    description: "Top English-speaking Chaturbate models" },
-  portuguese: { name: "Português",  description: "As melhores modelos de Chaturbate em português" },
-  romanian:   { name: "Română",     description: "Cele mai bune modele Chaturbate vorbitoare de română" },
-  russian:    { name: "Русский",    description: "Лучшие русскоязычные модели Chaturbate" },
-  german:     { name: "Deutsch",    description: "Die besten deutschsprachigen Chaturbate-Models" },
-  french:     { name: "Français",   description: "Les meilleures modèles Chaturbate francophones" },
-  italian:    { name: "Italiano",   description: "Le migliori modelle Chaturbate italiane" },
+  spanish:    { name: "Español",   flag: "es", keywords: "modelos español chaturbate, webcam español, latinas chaturbate" },
+  english:    { name: "English",   flag: "gb", keywords: "english chaturbate models, webcam english, chaturbate english speakers" },
+  portuguese: { name: "Português", flag: "br", keywords: "modelos português chaturbate, webcam português, brasileiras chaturbate" },
+  romanian:   { name: "Română",    flag: "ro", keywords: "modele chaturbate română, webcam română, chaturbate romania" },
+  russian:    { name: "Русский",   flag: "ru", keywords: "модели chaturbate русский, вебкам русский, chaturbate russia" },
+  german:     { name: "Deutsch",   flag: "de", keywords: "chaturbate deutsch models, webcam deutsch, chaturbate deutschland" },
+  french:     { name: "Français",  flag: "fr", keywords: "modèles chaturbate français, webcam français, chaturbate france" },
+  italian:    { name: "Italiano",  flag: "it", keywords: "modelle chaturbate italiano, webcam italiano, chaturbate italia" },
 };
 
 const LANG_VARIANTS = {
@@ -120,25 +114,30 @@ export async function getServerSideProps({ params }) {
     const info = LANGUAGE_INFO[lang];
     return { props: { data: { lang, ...info, models, empty: models.length === 0 } } };
   } catch {
-    const info = LANGUAGE_INFO[lang] || { name: lang, description: "" };
+    const info = LANGUAGE_INFO[lang] || { name: lang, flag: "", keywords: "", description: "" };
     return { props: { data: { lang, ...info, models: [], empty: true } } };
   }
 }
 
 export default function LanguagePage({ data }) {
-  const { lang, name, models, empty } = data;
-  const topModel = models[0];
+  const { lang, name, flag, keywords, models, empty } = data;
+  const top = models[0];
+  const second = models[1];
 
+  // Título dinámico con viewers del top modelo
   const pageTitle = empty
     ? `Modelos Chaturbate en ${name} | Campulse`
-    : `Modelos Chaturbate en ${name} — Top ${models.length} | Campulse`;
+    : top
+      ? `Modelos Chaturbate en ${name} — ${top.display_name} con ${top.avg_viewers.toLocaleString("es")} viewers | Campulse`
+      : `Modelos Chaturbate en ${name} — Top ${models.length} | Campulse`;
+
+  // Descripción dinámica con top 2
   const pageDescription = empty
     ? `Explora las modelos de Chaturbate que hablan ${name}. Estadísticas en tiempo real en Campulse.`
-    : `Las mejores ${models.length} modelos de Chaturbate que hablan ${name}, ordenadas por viewers. ` +
-      (topModel
-        ? `${topModel.display_name} lidera con ${topModel.avg_viewers.toLocaleString("es")} viewers promedio. `
-        : "") +
-      `Estadísticas en tiempo real en Campulse.`;
+    : `Las ${models.length} mejores modelos de Chaturbate que hablan ${name}, ordenadas por viewers. ` +
+      (top ? `${top.display_name} lidera con ${top.avg_viewers.toLocaleString("es")} viewers promedio` : "") +
+      (second ? `, seguida de ${second.display_name} con ${second.avg_viewers.toLocaleString("es")}. ` : ". ") +
+      `Datos actualizados cada 2 horas en Campulse.`;
 
   const schema = {
     "@context": "https://schema.org",
@@ -156,7 +155,7 @@ export default function LanguagePage({ data }) {
     },
     hasPart: models.slice(0, 10).map((m) => ({
       "@type": "WebPage",
-      name: `${m.username} Stats — Campulse`,
+      name: `${m.display_name || m.username} Stats — Campulse`,
       url: `${SITE}/model/${m.username}`,
     })),
   };
@@ -166,6 +165,7 @@ export default function LanguagePage({ data }) {
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
+        {keywords && <meta name="keywords" content={keywords} />}
         <meta name="robots" content={empty ? "noindex, follow" : "index, follow"} />
         <link rel="canonical" href={`${SITE}/language/${lang}`} />
         <meta property="og:title" content={pageTitle} />
@@ -173,6 +173,7 @@ export default function LanguagePage({ data }) {
         <meta property="og:url" content={`${SITE}/language/${lang}`} />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Campulse" />
+        {flag && <meta property="og:image" content={`https://flagcdn.com/160x120/${flag}.png`} />}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
@@ -190,7 +191,9 @@ export default function LanguagePage({ data }) {
 
         <h1 style={styles.h1}>Modelos Chaturbate en {name}</h1>
         <p style={styles.subtitle}>
-          {empty ? "No hay modelos en línea en este idioma en este momento. Vuelve pronto." : `Top ${models.length} modelos ordenadas por viewers promedio en los últimos 30 días.`}
+          {empty
+            ? "No hay modelos en línea en este idioma en este momento. Vuelve pronto."
+            : `Top ${models.length} modelos ordenadas por viewers promedio en los últimos 30 días.`}
         </p>
 
         {empty ? (
@@ -204,43 +207,42 @@ export default function LanguagePage({ data }) {
             <a href="/language" style={{...styles.link, fontSize:14}}>← Ver otros idiomas</a>
           </div>
         ) : (
-        <div style={styles.list}>
-          {models.map((m, i) => (
-            <a key={m.username} href={`/model/${m.username}`} style={styles.row}>
-              <span style={styles.rank}>#{i + 1}</span>
-              <div style={styles.info}>
-                <div style={styles.username}>{m.display_name || m.username}</div>
-                <div style={styles.meta}>
-                  @{m.username}
-                  {m.country && (
-                    <>
-                      <span style={styles.dot}>·</span>
-                      <img
-                        src={`https://flagcdn.com/16x12/${m.country.toLowerCase()}.png`}
-                        alt={COUNTRY_NAMES[m.country?.toUpperCase()] || m.country}
-                        width={16}
-                        height={12}
-                        style={{ borderRadius: 2, verticalAlign: "middle", marginRight: 4 }}
-                      />
-                      {COUNTRY_NAMES[m.country?.toUpperCase()] || m.country}
-                    </>
+          <div style={styles.list}>
+            {models.map((m, i) => (
+              <a key={m.username} href={`/model/${m.username}`} style={styles.row}>
+                <span style={styles.rank}>#{i + 1}</span>
+                <div style={styles.info}>
+                  <div style={styles.username}>{m.display_name || m.username}</div>
+                  <div style={styles.meta}>
+                    @{m.username}
+                    {m.country && (
+                      <>
+                        <span style={styles.dot}>·</span>
+                        <img
+                          src={`https://flagcdn.com/16x12/${m.country.toLowerCase()}.png`}
+                          alt={COUNTRY_NAMES[m.country?.toUpperCase()] || m.country}
+                          width={16} height={12}
+                          style={{ borderRadius: 2, verticalAlign: "middle", marginRight: 4 }}
+                        />
+                        {COUNTRY_NAMES[m.country?.toUpperCase()] || m.country}
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div style={styles.stats}>
+                  <div style={styles.statMain}>
+                    {m.avg_viewers.toLocaleString("es")}{" "}
+                    <span style={styles.statLabel}>viewers</span>
+                  </div>
+                  {m.max_followers > 0 && (
+                    <div style={styles.statSub}>
+                      {m.max_followers.toLocaleString("es")} seguidores
+                    </div>
                   )}
                 </div>
-              </div>
-              <div style={styles.stats}>
-                <div style={styles.statMain}>
-                  {m.avg_viewers.toLocaleString("es")}{" "}
-                  <span style={styles.statLabel}>viewers</span>
-                </div>
-                {m.max_followers > 0 && (
-                  <div style={styles.statSub}>
-                    {m.max_followers.toLocaleString("es")} seguidores
-                  </div>
-                )}
-              </div>
-            </a>
-          ))}
-        </div>
+              </a>
+            ))}
+          </div>
         )}
 
         <section style={styles.seoText}>
@@ -250,13 +252,13 @@ export default function LanguagePage({ data }) {
             Chaturbate que hablan {name}. Los datos se actualizan cada 2 horas con
             el número de viewers, seguidores y los mejores horarios para cada modelo.
           </p>
-          {topModel && (
+          {top && (
             <p>
-              Actualmente, <strong>{topModel.display_name || topModel.username}</strong> es
+              Actualmente, <strong>{top.display_name || top.username}</strong> es
               la modelo más vista con un promedio de{" "}
-              <strong>{topModel.avg_viewers.toLocaleString("es")} viewers</strong>
-              {topModel.max_followers > 0
-                ? ` y ${topModel.max_followers.toLocaleString("es")} seguidores.`
+              <strong>{top.avg_viewers.toLocaleString("es")} viewers</strong>
+              {top.max_followers > 0
+                ? ` y ${top.max_followers.toLocaleString("es")} seguidores.`
                 : "."}
             </p>
           )}
