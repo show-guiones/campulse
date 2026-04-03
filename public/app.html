@@ -840,9 +840,8 @@ header{
 
 /* ── EMBED EN VIVO ── */
 .embed-wrap{
-  display:none;position:relative;
-  width:100%;aspect-ratio:16/9;
-  background:#000;flex-shrink:0
+  display:none;position:absolute;inset:0;z-index:5;
+  background:#000;
 }
 .embed-wrap.active{display:block}
 .embed-frame{
@@ -964,8 +963,140 @@ header{
 .mhp-cta:hover{background:var(--hot);border-color:var(--hot);color:#fff}
 
 /* ═══════════════════════════════════════════
-   TOAST
+   MODAL V2 — video hero + analytics
 ═══════════════════════════════════════════ */
+.modal-v2{max-height:95dvh;overflow:hidden;display:flex;flex-direction:column}
+.mhero-v2{position:relative;flex-shrink:0;height:240px;overflow:hidden;background:#000}
+.mhero-v2 .embed-wrap{position:absolute;inset:0;z-index:5}
+.mhero-v2 .embed-wrap .embed-frame{width:100%;height:100%;border:none;display:block}
+.mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2}
+.mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover}
+.mhero-v2 .modal-hero-grad{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,.85));z-index:6;pointer-events:none}
+.mhi-v2{position:absolute;bottom:.6rem;left:.75rem;z-index:7;pointer-events:none}
+.mhero-stats{
+  position:absolute;top:.55rem;right:.55rem;z-index:7;
+  display:flex;flex-direction:column;align-items:flex-end;gap:.25rem;
+  pointer-events:none;
+}
+.mhero-stat-chip{
+  background:rgba(0,0,0,.7);border-radius:20px;
+  padding:3px 9px;font-size:.65rem;font-weight:700;color:#fff;
+  backdrop-filter:blur(6px);white-space:nowrap;
+}
+.mhero-stat-chip.hot{background:rgba(232,48,90,.85)}
+.mbody-v2{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:.75rem .9rem .9rem}
+
+/* Analytics panel */
+.modal-analytics{margin-top:.55rem;border-top:1px solid var(--bdr);padding-top:.6rem}
+.man-section{margin-bottom:.9rem}
+.man-title{font-size:.68rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.man-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.man-kpi{background:var(--surf);border-radius:10px;padding:.45rem .5rem;text-align:center}
+.man-kpi-val{display:block;font-size:1.1rem;font-weight:800;color:var(--txt)}
+.man-kpi-lbl{display:block;font-size:.58rem;color:var(--txt3);margin-top:1px}
+/* Days grid */
+.man-days{display:flex;flex-wrap:wrap;gap:3px}
+.man-day{
+  width:16px;height:16px;border-radius:3px;
+  background:var(--surf);border:1px solid var(--bdr);
+  cursor:default;position:relative;
+}
+.man-day.on{background:var(--hot);border-color:var(--hot)}
+.man-day.mid{background:rgba(232,48,90,.4);border-color:rgba(232,48,90,.4)}
+.man-chart-wrap{position:relative;height:80px}
+.man-tags{display:flex;flex-wrap:wrap;gap:4px}
+.man-tag{background:rgba(255,255,255,.07);border-radius:8px;padding:2px 8px;font-size:.62rem;color:var(--txt2)}
+
+/* ═══════════════════════════════════════════
+   DUAL PICKER
+═══════════════════════════════════════════ */
+.dual-picker-bg{
+  display:none;position:fixed;inset:0;z-index:600;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
+  align-items:flex-end;justify-content:center;padding:0;
+}
+.dual-picker-bg.open{display:flex}
+.dual-picker{
+  width:100%;max-width:520px;
+  background:var(--bg2);border-radius:24px 24px 0 0;
+  padding:1rem .9rem 1.5rem;
+  animation:slidemodal .28s cubic-bezier(.22,1,.36,1);
+  max-height:80dvh;overflow-y:auto;overscroll-behavior:contain;
+}
+.dp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.dp-title{font-size:.9rem;font-weight:800;color:var(--txt)}
+.dp-close{background:none;border:none;color:var(--txt2);font-size:1.1rem;cursor:pointer;padding:.2rem .4rem}
+.dp-hint{font-size:.72rem;color:var(--txt2);margin-bottom:.7rem}
+.dp-hint strong{color:var(--txt)}
+.dp-search-row{display:flex;gap:.4rem;margin-bottom:.8rem}
+.dp-input{
+  flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;
+  color:var(--txt);font-size:.8rem;padding:.45rem .7rem;
+  font-family:inherit;outline:none;
+}
+.dp-input:focus{border-color:var(--hot)}
+.dp-go{
+  background:var(--hot);color:#fff;border:none;border-radius:10px;
+  font-size:.78rem;font-weight:700;padding:.45rem .9rem;cursor:pointer;
+  white-space:nowrap;-webkit-tap-highlight-color:transparent;
+}
+.dp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+@media(min-width:420px){.dp-grid{grid-template-columns:repeat(4,1fr)}}
+.dp-card{
+  background:var(--surf);border-radius:10px;overflow:hidden;
+  cursor:pointer;border:2px solid transparent;transition:border .12s;
+  aspect-ratio:3/4;position:relative;
+}
+.dp-card:hover,.dp-card:active{border-color:var(--hot)}
+.dp-card img{width:100%;height:100%;object-fit:cover;display:block}
+.dp-card-name{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));
+  font-size:.58rem;font-weight:700;color:#fff;padding:4px 5px 4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dp-card-vw{position:absolute;top:4px;left:4px;background:rgba(232,48,90,.85);border-radius:8px;padding:1px 5px;font-size:.55rem;font-weight:700;color:#fff}
+
+/* ═══════════════════════════════════════════
+   DUAL VIEW — dos streams
+═══════════════════════════════════════════ */
+.dual-view-bg{
+  position:fixed;inset:0;z-index:700;
+  background:#000;display:flex;flex-direction:column;
+}
+.dual-view{width:100%;height:100%;display:flex;flex-direction:column}
+.dv-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem .75rem;background:rgba(12,13,16,.95);
+  border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;
+}
+.dv-title{font-size:.82rem;font-weight:700;color:var(--txt)}
+.dv-close{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.75rem;font-weight:600;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dv-panels{display:flex;flex:1;overflow:hidden;gap:2px;background:rgba(255,255,255,.06)}
+/* Mobile: vertical stack */
+.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden}
+@media(orientation:landscape),(min-width:640px){
+  .dv-panels{flex-direction:row}
+}
+@media(orientation:portrait) and (max-width:639px){
+  .dv-panels{flex-direction:column}
+}
+.dv-panel-label{
+  position:absolute;top:.4rem;left:.5rem;z-index:10;
+  background:rgba(0,0,0,.7);border-radius:8px;padding:2px 8px;
+  font-size:.65rem;font-weight:700;color:#fff;backdrop-filter:blur(4px);
+  pointer-events:none;
+}
+.dv-embed-wrap{flex:1;position:relative}
+.dv-frame{position:absolute;inset:0;width:100%;height:100%;border:none;display:block}
+.dv-panel-actions{flex-shrink:0;padding:.35rem .5rem;background:rgba(12,13,16,.9)}
+.dv-cta{
+  display:block;width:100%;
+  background:var(--hot);color:#fff;border:none;border-radius:8px;
+  font-size:.72rem;font-weight:700;padding:.4rem;text-align:center;
+  text-decoration:none;-webkit-tap-highlight-color:transparent;
+}
+
 /* ═══════════════════════════════════════════
    ADMIN PANEL
 ═══════════════════════════════════════════ */
@@ -1868,36 +1999,40 @@ header{
   </div>
 </div>
 
-<!-- MODAL — ultralight conversion -->
+<!-- ═══ MODAL PRINCIPAL — video auto-play + analytics ═══ -->
 <div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
-  <div class="modal" style="position:relative">
+  <div class="modal modal-v2" id="modal-main">
     <button class="modal-close" onclick="closeMod()">✕</button>
 
-    <!-- HERO — full image, click = enter room -->
-    <div class="modal-hero" id="modal-hero">
-      <!-- EMBED CONTAINER — shown when user clicks play -->
+    <!-- VIDEO HERO — embed automático al abrir -->
+    <div class="modal-hero mhero-v2" id="modal-hero">
       <div class="embed-wrap" id="mhero-embed-wrap">
         <div class="embed-loading" id="embed-loading">
           <div class="embed-loading-spinner"></div>
-          <span>Cargando stream…</span>
+          <span>Conectando sala…</span>
         </div>
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
-          allow="autoplay; fullscreen" allowFullscreen></iframe>
-        <button class="embed-back-btn" onclick="deactivateEmbed()">← Volver</button>
+          allow="autoplay; fullscreen; encrypted-media" allowFullscreen
+          referrerpolicy="no-referrer-when-downgrade"
+          onload="onEmbedLoad()"></iframe>
       </div>
+      <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
-      <div class="modal-hero-info">
+      <!-- Info overlay en vivo -->
+      <div class="modal-hero-info mhi-v2">
         <div id="m-live-pill"></div>
         <div class="modal-name" id="m-name"></div>
         <div class="modal-sub" id="m-disp"></div>
       </div>
+      <!-- Stats en hero — viewers destacados -->
+      <div class="mhero-stats" id="mhero-stats"></div>
     </div>
 
-    <!-- BODY — CTA first, friction-free -->
-    <div class="modal-body">
+    <!-- BODY scrollable -->
+    <div class="modal-body mbody-v2">
 
-      <!-- PRIMARY CTA — always first, most prominent -->
+      <!-- CTA PRINCIPAL sticky -->
       <div class="modal-acts">
         <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go">
           <span class="btn-go-ico" id="m-cta-ico">▶</span>
@@ -1906,74 +2041,101 @@ header{
         </a>
       </div>
 
-      <!-- Compact stats line -->
-      <div class="modal-stats-row" id="m-stats-row"></div>
-
-      <!-- Secondary -->
-      <div class="modal-secondary">
+      <!-- ACCIONES RÁPIDAS -->
+      <div class="modal-secondary msec-v2">
         <button class="btn-sec" id="m-fav-btn" onclick="favMod()">
-          <span id="m-fav-icon">♥</span>
-          <span id="m-fav-txt">Favorita</span>
+          <span id="m-fav-icon">♥</span><span id="m-fav-txt">Favorita</span>
         </button>
-        <button class="btn-sec" onclick="reportFromModal()">
-          📊 Reporte
+        <button class="btn-sec btn-sec-dual" onclick="showDualPicker()" title="Ver 2 salas en simultáneo">
+          ⊞ <span>2 salas</span>
         </button>
-        <button class="btn-sec" id="m-dual-btn" onclick="openModal2FromModal()" title="Ver dos en vivo">
-          ⊞ +1
+        <button class="btn-sec btn-sec-rep" id="m-rep-toggle" onclick="toggleModalReport()">
+          📊 <span>Stats</span>
         </button>
+      </div>
+
+      <!-- ANALYTICS PANEL — días conexión + views destacados -->
+      <div class="modal-analytics" id="modal-analytics" style="display:none">
+        <div class="man-section">
+          <div class="man-title">📊 Analítica en tiempo real</div>
+          <div class="man-kpis" id="man-kpis">
+            <div class="man-kpi"><span class="man-kpi-val" id="man-viewers">—</span><span class="man-kpi-lbl">viewers ahora</span></div>
+            <div class="man-kpi"><span class="man-kpi-val" id="man-followers">—</span><span class="man-kpi-lbl">seguidores</span></div>
+            <div class="man-kpi"><span class="man-kpi-val" id="man-rank">—</span><span class="man-kpi-lbl">puesto live</span></div>
+          </div>
+        </div>
+        <div class="man-section">
+          <div class="man-title">📅 Días de conexión (últimos 30d)</div>
+          <div class="man-days" id="man-days"></div>
+        </div>
+        <div class="man-section">
+          <div class="man-title">📈 Evolución de viewers</div>
+          <div class="man-chart-wrap"><canvas id="man-chart" height="80"></canvas></div>
+        </div>
+        <div class="man-section">
+          <div class="man-title">🏷️ Tags activos</div>
+          <div class="man-tags" id="man-tags"></div>
+        </div>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- MODAL 2 — segundo modelo en vivo (dual view) -->
-<div class="modal-bg" id="modal2-bg" onclick="closeModal2(event)" style="display:none">
-  <div class="modal" style="position:relative">
-    <button class="modal-close" onclick="closeModal2()">✕</button>
-    <div class="modal-hero" id="modal2-hero">
-      <div class="embed-wrap" id="modal2-embed-wrap">
-        <div class="embed-loading" id="modal2-loading">
-          <div class="embed-loading-spinner"></div>
-          <span>Cargando stream…</span>
-        </div>
-        <iframe id="modal2-embed-frame" class="embed-frame" src="about:blank"
-          allow="autoplay; fullscreen" allowFullscreen></iframe>
-        <button class="embed-back-btn" onclick="closeModal2()">✕ Cerrar</button>
-      </div>
-      <div id="modal2-img-wrap"></div>
-      <div class="modal-hero-grad"></div>
-      <div class="modal-hero-info">
-        <div id="modal2-live-pill"></div>
-        <div class="modal-name" id="modal2-name"></div>
-        <div class="modal-sub" id="modal2-disp"></div>
-      </div>
+<!-- ═══ DUAL PICKER — selector visual de segunda sala ═══ -->
+<div class="dual-picker-bg" id="dual-picker-bg" onclick="closeDualPicker(event)">
+  <div class="dual-picker">
+    <div class="dp-header">
+      <span class="dp-title">⊞ Ver 2 salas en simultáneo</span>
+      <button class="dp-close" onclick="closeDualPicker()">✕</button>
     </div>
-    <div class="modal-body">
-      <div class="modal-acts">
-        <a id="modal2-link" href="#" target="_blank" rel="noopener" class="btn-go">
-          <span>▶</span>
-          <span id="modal2-cta-txt">Entrar a la sala</span>
-          <span class="btn-go-arrow">→</span>
-        </a>
+    <p class="dp-hint">Elige una segunda sala para ver junto a <strong id="dp-current-name">esta</strong></p>
+    <div class="dp-search-row">
+      <input class="dp-input" id="dp-input" type="text" placeholder="Buscar modelo…" oninput="filterDpList(this.value)" onkeydown="if(event.key==='Enter')openDualFromInput()">
+      <button class="dp-go" onclick="openDualFromInput()">Abrir →</button>
+    </div>
+    <div class="dp-grid" id="dp-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ DUAL VIEW — dos salas lado a lado ═══ -->
+<div class="dual-view-bg" id="dual-view-bg" style="display:none">
+  <div class="dual-view">
+    <div class="dv-header">
+      <span class="dv-title">⊞ Vista doble</span>
+      <button class="dv-close" onclick="closeDualView()">✕ Cerrar</button>
+    </div>
+    <div class="dv-panels">
+      <!-- Panel A -->
+      <div class="dv-panel" id="dv-panel-a">
+        <div class="dv-panel-label" id="dv-label-a">—</div>
+        <div class="dv-embed-wrap">
+          <iframe id="dv-frame-a" class="dv-frame" src="about:blank"
+            allow="autoplay; fullscreen; encrypted-media" allowFullscreen
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="dv-panel-actions">
+          <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
+        </div>
       </div>
-      <div class="modal-stats-row" id="modal2-stats-row"></div>
+      <!-- Panel B -->
+      <div class="dv-panel" id="dv-panel-b">
+        <div class="dv-panel-label" id="dv-label-b">—</div>
+        <div class="dv-embed-wrap">
+          <iframe id="dv-frame-b" class="dv-frame" src="about:blank"
+            allow="autoplay; fullscreen; encrypted-media" allowFullscreen
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="dv-panel-actions">
+          <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-   <div style="position:fixed;bottom:0;left:0;right:0;z-index:280;background:rgba(12,13,16,.95);border-top:1px solid rgba(255,255,255,.07);padding:.5rem 1rem;display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
-  <a href="/search" style="color:#9499a8;font-size:.65rem;text-decoration:none">🔍 Buscar</a>
-  <a href="/gender/female" style="color:#9499a8;font-size:.65rem;text-decoration:none">♀ Mujeres</a>
-  <a href="/gender/male" style="color:#9499a8;font-size:.65rem;text-decoration:none">♂ Hombres</a>
-  <a href="/country/co" style="color:#9499a8;font-size:.65rem;text-decoration:none">🇨🇴 Colombia</a>
-  <a href="/country/es" style="color:#9499a8;font-size:.65rem;text-decoration:none">🇪🇸 España</a>
-  <a href="/country/mx" style="color:#9499a8;font-size:.65rem;text-decoration:none">🇲🇽 México</a>
-  <a href="/language/spanish" style="color:#9499a8;font-size:.65rem;text-decoration:none">🗣 Español</a>
-  <a href="/tag/latina" style="color:#9499a8;font-size:.65rem;text-decoration:none">#latina</a>
-  <a href="/tag/lovense" style="color:#9499a8;font-size:.65rem;text-decoration:none">#lovense</a>
-</div>
+
 
 <!-- ADMIN PANEL -->
 <div class="admin-panel-bg" id="admin-panel-bg" onclick="closeAdminPanel(event)">
@@ -2595,125 +2757,97 @@ function renderList(r){
    MODAL
 ═══════════════════════════════════════════ */
 let prevCd=null,prevSec=30;
+/* ═══ MODAL V2 — auto-embed + analytics ═══ */
 function openMod(u){
-  const x=rooms.find(r=>r.username===u);if(!x)return;
+  const x=rooms.find(r=>r.username===u);
+  if(!x)return;
   active=x;
-  // Reset embed state when switching models
+  clearInterval(prevCd);
+
+  // Reset
   const frame=document.getElementById('live-embed-frame');
-  const wrap=document.getElementById('mhero-embed-wrap');
+  const embedWrap=document.getElementById('mhero-embed-wrap');
   const imgWrap=document.getElementById('mhero-img-wrap');
   if(frame) frame.src='about:blank';
-  if(wrap) wrap.classList.remove('active');
-  if(imgWrap) imgWrap.style.display='';
-  document.getElementById('m-name').textContent=x.username;
-  document.getElementById('m-disp').textContent=x.display_name||'';
-  // gender pill now handled inside startLivePreview
-  // Compact stats row: viewers · fans · age · country · tags
-  const statsRow=document.getElementById('m-stats-row');
-  if(statsRow){
-    const parts=[];
-    if(x.num_users)parts.push(`<span class="modal-stat-item"><span class="modal-stat-val" style="color:var(--hot)">${fmt(x.num_users)}</span> viewers</span>`);
-    if(x.num_followers)parts.push(`<span class="modal-stat-item">❤️ <span class="modal-stat-val">${fmt(x.num_followers)}</span></span>`);
-    if(x.age)parts.push(`<span class="modal-stat-item">🎂 <span class="modal-stat-val">${x.age}</span></span>`);
-    if(x.country)parts.push(`<span class="modal-stat-item">🌍 <span class="modal-stat-val">${x.country}</span></span>`);
-    const tags=(x.tags||[]).slice(0,4).map(t=>`<span style="background:rgba(255,255,255,.07);border-radius:8px;padding:1px 7px;font-size:.6rem">#${t}</span>`).join('');
-    statsRow.innerHTML=parts.join('<span style="opacity:.3;margin:0 .15rem">·</span>')+( tags?`<span style="margin-left:.3rem;display:flex;gap:.2rem;flex-wrap:wrap">${tags}</span>`:'' );
-  }
+  if(embedWrap) embedWrap.classList.remove('active');
+
+  // Name + CTA
+  document.getElementById('m-name').textContent=x.display_name||x.username;
+  document.getElementById('m-disp').textContent=x.username!==x.display_name?'@'+x.username:'';
   document.getElementById('m-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${x.username}`;
-  // CTA text: live vs offline
   const ctaTxt=document.getElementById('m-cta-txt');
   const ctaIco=document.getElementById('m-cta-ico');
-  if(ctaTxt){ctaTxt.textContent=x.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';}
-  if(ctaIco){ctaIco.textContent=x.num_users>0?'▶':'';}
+  if(ctaTxt) ctaTxt.textContent=x.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';
+  if(ctaIco) ctaIco.textContent=x.num_users>0?'▶':'';
+
+  // Live pill
+  const pill=document.getElementById('m-live-pill');
+  if(pill) pill.innerHTML=x.num_users>0
+    ?`<span class="modal-live-pill"><span class="live-timer-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s infinite;margin-right:3px"></span>EN VIVO</span>`
+    :'';
+
+  // Hero stats chips (viewers + rank)
+  const heroStats=document.getElementById('mhero-stats');
+  if(heroStats){
+    const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>b.num_users-a.num_users);
+    const rank=sorted.findIndex(r=>r.username===u);
+    heroStats.innerHTML=x.num_users>0
+      ?`<div class="mhero-stat-chip hot">👀 ${fmt(x.num_users)}</div>${rank>=0?`<div class="mhero-stat-chip">#${rank+1} live</div>`:''}`
+      :'';
+  }
+
   updateFavBtn(x.username);
-  startLivePreview(x);
+
+  // Cerrar analytics si abierto al cambiar modelo
+  const analyticsPanel=document.getElementById('modal-analytics');
+  if(analyticsPanel) analyticsPanel.style.display='none';
+  const repBtn=document.getElementById('m-rep-toggle');
+  if(repBtn) repBtn.classList.remove('on');
+
+  if(x.num_users>0){
+    // AUTO-EMBED: mostrar video directamente
+    if(imgWrap) imgWrap.innerHTML='';
+    if(embedWrap){
+      const loading=document.getElementById('embed-loading');
+      if(loading) loading.classList.remove('hidden');
+      embedWrap.classList.add('active');
+    }
+    if(frame){
+      frame.src=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}&autoplay=1&disable_sound=0&mobileRedirect=never`;
+    }
+  } else {
+    // OFFLINE: mostrar imagen de perfil
+    if(embedWrap) embedWrap.classList.remove('active');
+    if(imgWrap) imgWrap.innerHTML=`
+      <div class="mhp-wrap">
+        <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
+        <div class="mhp-name">${x.display_name||u}</div>
+        <div class="mhp-offline"><div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>Offline en este momento</div>
+        <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
+      </div>`;
+  }
+
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow='hidden';
 }
+
 function updateFavBtn(u){
   const fv=favs.includes(u);
   document.getElementById('m-fav-btn').classList.toggle('active',fv);
   document.getElementById('m-fav-icon').textContent=fv?'♥':'♡';
 }
-function startLivePreview(x){
-  clearInterval(prevCd);
-  const wrap=document.getElementById('mhero-img-wrap');
-  const pill=document.getElementById('m-live-pill');
-  const u=x.username;
-  const srcs=[
-    `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
-    `https://thumb.live.mmcdn.com/ri/${u}.jpg`
-  ];
-  if(x.num_users>0){
-    // Live pill badge
-    if(pill) pill.innerHTML=`<span class="modal-live-pill"><span class="live-timer-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s infinite;margin-right:2px"></span>EN VIVO</span><span class="modal-viewer-count">👀 ${fmt(x.num_users)}</span>`;
-    wrap.innerHTML=`
-      <div class="live-preview-wrap" style="cursor:pointer">
-        <div id="live-img-skeleton" style="position:absolute;inset:0;background:linear-gradient(90deg,var(--surf) 25%,var(--surf2) 50%,var(--surf) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite"></div>
-        <img class="live-preview-img" id="live-img"
-          src="${srcs[0]}?t=${Date.now()}" alt="${u}"
-          data-u="${u}" data-t="0"
-          style="opacity:0;transition:opacity .3s"
-          onload="this.style.opacity='1';const s=document.getElementById('live-img-skeleton');if(s)s.remove();"
-          onerror="modalImgFallback(this)">
-        <div class="live-timer-badge">
-          <span class="live-timer-dot"></span>
-          LIVE · <span id="live-timer">30s</span>
-        </div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <div class="live-play-btn" id="modal-play-btn" style="pointer-events:all;cursor:pointer" onclick="activateEmbed('${u}')">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-          <div class="live-tap-hint">Toca para ver en vivo</div>
-        </div>
-      </div>`;
-    prevSec=30;
-    prevCd=setInterval(()=>{
-      prevSec--;
-      const el=document.getElementById('live-timer');
-      if(el) el.textContent=prevSec+'s';
-      if(prevSec<=0){
-        prevSec=30;
-        const img=document.getElementById('live-img');
-        if(img){
-          const ns=srcs[0]+'?t='+Date.now();
-          const tmp=new Image();
-          tmp.onload=()=>{img.src=ns;};
-          tmp.src=ns;
-        }
-      }
-    },1000);
-  }else{
-    if(pill) pill.innerHTML='';
-    wrap.innerHTML=`
-      <div class="mhp-wrap">
-        <div class="mhp-ava">🎥</div>
-        <div class="mhp-name">${x.display_name||u}</div>
-        <div class="mhp-offline">
-          <div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>
-          Offline en este momento
-        </div>
-        <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}"
-           target="_blank" rel="noopener" class="mhp-cta">
-          🔔 Seguirla en Chaturbate →
-        </a>
-      </div>`;
-  }
-}
-/* ─── EMBED EN VIVO ─── */
+
+// startLivePreview kept as stub (no longer used for modal, kept for compatibility)
+function startLivePreview(x){}
+
 function activateEmbed(u){
   const wrap=document.getElementById('mhero-embed-wrap');
-  const imgWrap=document.getElementById('mhero-img-wrap');
   const frame=document.getElementById('live-embed-frame');
   const loading=document.getElementById('embed-loading');
   if(!wrap||!frame)return;
-  // Pausar el interval de thumbnail
   clearInterval(prevCd);
-  // Ocultar imagen, mostrar embed
-  if(imgWrap) imgWrap.style.display='none';
   wrap.classList.add('active');
   if(loading) loading.classList.remove('hidden');
-  // Cargar embed oficial de Chaturbate
   frame.src=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}&autoplay=1&disable_sound=0&mobileRedirect=never`;
 }
 function onEmbedLoad(){
@@ -2722,14 +2856,194 @@ function onEmbedLoad(){
 }
 function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
-  const imgWrap=document.getElementById('mhero-img-wrap');
   const frame=document.getElementById('live-embed-frame');
   if(frame) frame.src='about:blank';
-  wrap.classList.remove('active');
-  if(imgWrap) imgWrap.style.display='';
-  // Reiniciar preview del modelo activo
-  if(active) startLivePreview(active);
+  if(wrap) wrap.classList.remove('active');
 }
+
+/* ── ANALYTICS PANEL ── */
+function toggleModalReport(){
+  if(!active)return;
+  const panel=document.getElementById('modal-analytics');
+  const btn=document.getElementById('m-rep-toggle');
+  const isOpen=panel.style.display!=='none';
+  if(isOpen){
+    panel.style.display='none';
+    if(btn) btn.classList.remove('on');
+    return;
+  }
+  panel.style.display='block';
+  if(btn) btn.classList.add('on');
+  loadModalAnalytics(active);
+}
+
+function loadModalAnalytics(x){
+  const u=x.username;
+  // KPIs
+  const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>b.num_users-a.num_users);
+  const rank=sorted.findIndex(r=>r.username===u);
+  document.getElementById('man-viewers').textContent=x.num_users>0?fmt(x.num_users):'—';
+  document.getElementById('man-followers').textContent=x.num_followers?fmt(x.num_followers):'—';
+  document.getElementById('man-rank').textContent=rank>=0?'#'+(rank+1):'—';
+
+  // Tags
+  const tagsEl=document.getElementById('man-tags');
+  if(tagsEl) tagsEl.innerHTML=(x.tags||[]).slice(0,8).map(t=>`<span class="man-tag">#${t}</span>`).join('')||'<span class="man-tag" style="color:var(--txt3)">Sin tags</span>';
+
+  // Days — fetch history async
+  const daysEl=document.getElementById('man-days');
+  if(daysEl) daysEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Cargando…</span>';
+  const chartCanvas=document.getElementById('man-chart');
+
+  fetch(`/api/history?username=${encodeURIComponent(u)}`)
+    .then(r=>r.ok?r.json():null)
+    .then(data=>{
+      if(!data||!daysEl)return;
+      // Days grid — últimos 30 días
+      const today=new Date();
+      const days=[];
+      for(let i=29;i>=0;i--){
+        const d=new Date(today);d.setDate(today.getDate()-i);
+        const key=d.toISOString().slice(0,10);
+        const val=data.daily?.[key]||0;
+        days.push({key,val});
+      }
+      const maxV=Math.max(...days.map(d=>d.val),1);
+      daysEl.innerHTML=days.map(d=>{
+        const pct=d.val/maxV;
+        const cls=pct>0.6?'on':pct>0.1?'mid':'';
+        const dow=['D','L','M','X','J','V','S'][new Date(d.key+'T12:00:00').getDay()];
+        return `<div class="man-day ${cls}" title="${d.key}: ${fmt(d.val)} viewers"></div>`;
+      }).join('');
+
+      // Mini chart
+      if(chartCanvas&&data.daily){
+        const vals=days.map(d=>d.val);
+        drawMiniChart(chartCanvas,vals);
+      }
+    })
+    .catch(()=>{
+      if(daysEl) daysEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Sin datos históricos</span>';
+    });
+}
+
+function drawMiniChart(canvas,vals){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||canvas.parentElement?.offsetWidth||280;
+  const H=80;
+  canvas.width=W*devicePixelRatio;
+  canvas.height=H*devicePixelRatio;
+  ctx.scale(devicePixelRatio,devicePixelRatio);
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const max=Math.max(...vals,1);
+  const pad=4;
+  const step=(W-pad*2)/Math.max(vals.length-1,1);
+  const pts=vals.map((v,i)=>({x:pad+i*step,y:H-pad-(v/max)*(H-pad*2)}));
+  // Fill
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(232,48,90,.35)');
+  grad.addColorStop(1,'rgba(232,48,90,0)');
+  ctx.beginPath();ctx.moveTo(pts[0].x,H);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x,H);
+  ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  // Line
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle='rgb(232,48,90)';ctx.lineWidth=2;ctx.stroke();
+}
+
+/* ── DUAL PICKER ── */
+function showDualPicker(){
+  if(!active)return;
+  const bg=document.getElementById('dual-picker-bg');
+  const nameEl=document.getElementById('dp-current-name');
+  if(nameEl) nameEl.textContent=active.display_name||active.username;
+  // Populate grid with live rooms (excluding current)
+  const dpGrid=document.getElementById('dp-grid');
+  if(dpGrid){
+    const liveRooms=[...rooms].filter(r=>r.num_users>0&&r.username!==active.username)
+      .sort((a,b)=>b.num_users-a.num_users).slice(0,24);
+    dpGrid.innerHTML=liveRooms.map(r=>`
+      <div class="dp-card" onclick="openDualView('${active.username}','${r.username}');closeDualPicker();">
+        <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
+          onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
+        <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
+        <div class="dp-card-name">${r.display_name||r.username}</div>
+      </div>`).join('');
+  }
+  if(bg){bg.style.display='flex';requestAnimationFrame(()=>bg.classList.add('open'));}
+}
+
+function closeDualPicker(e){
+  if(e&&e.target!==document.getElementById('dual-picker-bg'))return;
+  const bg=document.getElementById('dual-picker-bg');
+  if(!bg)return;
+  bg.classList.remove('open');
+  setTimeout(()=>{bg.style.display='none';},220);
+}
+
+function filterDpList(q){
+  const dpGrid=document.getElementById('dp-grid');
+  if(!dpGrid||!q.trim()){showDualPicker&&showDualPicker();return;}
+  const lc=q.toLowerCase();
+  const hits=rooms.filter(r=>r.num_users>0&&r.username!==active?.username&&(r.username.includes(lc)||(r.display_name||'').toLowerCase().includes(lc))).slice(0,12);
+  dpGrid.innerHTML=hits.map(r=>`
+    <div class="dp-card" onclick="openDualView('${active?.username}','${r.username}');closeDualPicker();">
+      <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
+        onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
+      <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
+      <div class="dp-card-name">${r.display_name||r.username}</div>
+    </div>`).join('')||'<p style="grid-column:1/-1;font-size:.72rem;color:var(--txt3);padding:.5rem">Sin resultados</p>';
+}
+
+function openDualFromInput(){
+  const inp=document.getElementById('dp-input');
+  const u=(inp?.value||'').trim().toLowerCase();
+  if(!u)return;
+  openDualView(active?.username||'',u);
+  closeDualPicker();
+}
+
+/* ── DUAL VIEW ── */
+function openDualView(uA,uB){
+  if(!uA||!uB)return;
+  const bg=document.getElementById('dual-view-bg');
+  const frameA=document.getElementById('dv-frame-a');
+  const frameB=document.getElementById('dv-frame-b');
+  const lblA=document.getElementById('dv-label-a');
+  const lblB=document.getElementById('dv-label-b');
+  const linkA=document.getElementById('dv-link-a');
+  const linkB=document.getElementById('dv-link-b');
+  const mkUrl=(u)=>`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}&autoplay=1&disable_sound=0&mobileRedirect=never`;
+  const mkAffLink=(u)=>`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
+  const rA=rooms.find(r=>r.username===uA)||{username:uA};
+  const rB=rooms.find(r=>r.username===uB)||{username:uB};
+  if(lblA) lblA.textContent=rA.display_name||uA;
+  if(lblB) lblB.textContent=rB.display_name||uB;
+  if(linkA){linkA.href=mkAffLink(uA);linkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
+  if(linkB){linkB.href=mkAffLink(uB);linkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
+  // Small delay so iframes load after display
+  if(bg) bg.style.display='flex';
+  setTimeout(()=>{
+    if(frameA) frameA.src=mkUrl(uA);
+    if(frameB) frameB.src=mkUrl(uB);
+  },120);
+  document.body.style.overflow='hidden';
+  // Close main modal
+  document.getElementById('modal-bg')?.classList.remove('open');
+}
+
+function closeDualView(){
+  const bg=document.getElementById('dual-view-bg');
+  const frameA=document.getElementById('dv-frame-a');
+  const frameB=document.getElementById('dv-frame-b');
+  if(frameA) frameA.src='about:blank';
+  if(frameB) frameB.src='about:blank';
+  if(bg) bg.style.display='none';
+  document.body.style.overflow='';
+}
+
 // ─── CARD MINI PLAYER — HLS nativo con hls.js (sin iframe) ───
 let _activeCardPlayer = null;
 let _cardPlayerTimeout = null;
@@ -2859,93 +3173,25 @@ function closeMod(e){
     document.getElementById('modal-bg').classList.remove('open');
     document.body.style.overflow='';
     clearInterval(prevCd);
-    // Matar el stream del embed
     const frame=document.getElementById('live-embed-frame');
     const wrap=document.getElementById('mhero-embed-wrap');
-    const imgWrap=document.getElementById('mhero-img-wrap');
     if(frame) frame.src='about:blank';
     if(wrap) wrap.classList.remove('active');
-    if(imgWrap) imgWrap.style.display='';
-    // Si hay dual activo, cerrarlo también
-    closeModal2();
+    // Reset analytics panel
+    const analyticsPanel=document.getElementById('modal-analytics');
+    if(analyticsPanel) analyticsPanel.style.display='none';
   }
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMod();closeModal2();}});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeDualView();
+    closeDualPicker();
+    closeMod();
+  }
+});
 
-/* ── DUAL MODAL ── */
-let _modal2Active=null;
-function openModal2(u){
-  const room=rooms.find(r=>r.username===u)||{username:u};
-  _modal2Active=u;
-  // Actualizar link afiliado
-  document.getElementById('modal2-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
-  const ctaTxt=document.getElementById('modal2-cta-txt');
-  if(ctaTxt) ctaTxt.textContent=room.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';
-  document.getElementById('modal2-name').textContent=u;
-  document.getElementById('modal2-disp').textContent=room.display_name||'';
-  // Live pill
-  const pill=document.getElementById('modal2-live-pill');
-  if(pill) pill.innerHTML=room.num_users>0?`<span class="live-badge">🔴 EN VIVO · ${fmt(room.num_users)}</span>`:'';
-  // Stats
-  const statsRow=document.getElementById('modal2-stats-row');
-  if(statsRow){
-    const parts=[];
-    if(room.num_users)parts.push(`<span class="modal-stat-item"><span class="modal-stat-val" style="color:var(--hot)">${fmt(room.num_users)}</span> viewers</span>`);
-    if(room.country)parts.push(`<span class="modal-stat-item">🌍 ${room.country}</span>`);
-    statsRow.innerHTML=parts.join('<span style="opacity:.3;margin:0 .15rem">·</span>');
-  }
-  // Imagen hero
-  const imgWrap=document.getElementById('modal2-img-wrap');
-  if(imgWrap){
-    imgWrap.innerHTML=`<img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:100%;height:100%;object-fit:cover" onerror="this.src='https://thumb.live.mmcdn.com/ri/${u}.jpg'">`;
-  }
-  // Auto-embed si en vivo
-  if(room.num_users>0){
-    const frame=document.getElementById('modal2-embed-frame');
-    const wrap2=document.getElementById('modal2-embed-wrap');
-    const loading=document.getElementById('modal2-loading');
-    if(frame&&wrap2){
-      frame.src=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}&autoplay=1&disable_sound=0&mobileRedirect=never`;
-      wrap2.classList.add('active');
-      if(loading) loading.classList.remove('hidden');
-    }
-  }
-  // Activar clase dual en body para layout CSS
-  document.body.classList.add('dual-active');
-  const bg2=document.getElementById('modal2-bg');
-  bg2.style.display='flex';
-  requestAnimationFrame(()=>bg2.classList.add('open'));
-}
-function openModal2FromModal(){
-  // Abre un picker para elegir segundo modelo (usa prompt simple o abre lista)
-  const u=prompt('Usuario de Chaturbate para ver en paralelo:');
-  if(u&&u.trim()) openModal2(u.trim().toLowerCase());
-}
-function closeModal2(e){
-  if(e&&e.target!==document.getElementById('modal2-bg')&&e.type==='click') return;
-  const bg2=document.getElementById('modal2-bg');
-  if(!bg2) return;
-  bg2.classList.remove('open');
-  bg2.style.display='none';
-  document.body.classList.remove('dual-active');
-  const frame=document.getElementById('modal2-embed-frame');
-  const wrap2=document.getElementById('modal2-embed-wrap');
-  if(frame) frame.src='about:blank';
-  if(wrap2) wrap2.classList.remove('active');
-  _modal2Active=null;
-}
-// Exponer para cards: click derecho / long press abre modal2
-function openMod2FromCard(e,u){
-  e.preventDefault();e.stopPropagation();
-  openModal2(u);
-  return false;
-}
 function reportFromModal(){
-  if(!active)return;
-  closeMod();
-  document.getElementById('model-username-input').value=active.username;
-  switchTab('model');
-  searchModel();
+  toggleModalReport();
 }
 
 /* ═══════════════════════════════════════════
