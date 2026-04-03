@@ -526,17 +526,18 @@ header{
 
 /* card play button */
 .crd-play{
-  position:absolute;bottom:.4rem;right:.4rem;
-  width:32px;height:32px;border-radius:50%;
-  background:rgba(255,42,109,.9);border:none;
+  position:absolute;top:.4rem;right:.4rem;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(232,48,90,.92);border:none;
   color:#fff;font-size:.75rem;
   display:flex;align-items:center;justify-content:center;
-  transition:all .18s;backdrop-filter:blur(4px);
-  box-shadow:0 2px 8px rgba(255,42,109,.5);
+  transition:transform .18s,background .18s;backdrop-filter:blur(6px);
+  box-shadow:0 2px 12px rgba(232,48,90,.55);
   z-index:20;cursor:pointer;flex-shrink:0
 }
-.crd-play:hover{transform:scale(1.12);background:var(--hot)}
-.crd-play svg{width:12px;height:12px;fill:#fff;margin-left:2px}
+.crd-play:hover{transform:scale(1.14);background:var(--hot)}
+.crd-play:active{transform:scale(.94)}
+.crd-play svg{width:11px;height:11px;fill:#fff;margin-left:2px}
 /* Carousels: allow play button to escape crd-media clip */
 .carousel-scroll .crd{overflow:visible}
 .carousel-scroll .crd .crd-media{overflow:visible}
@@ -975,22 +976,32 @@ body.modal-open .crd-iframe-popup{display:none!important}
   overflow:hidden;
   display:flex;
   flex-direction:column;
+  /* Prevent any touch scroll from escaping the modal */
+  touch-action:pan-y;
 }
 .mhero-v2{
   position:relative;
   flex-shrink:0;
-  height:clamp(200px,40dvh,280px);
+  height:clamp(190px,38dvh,270px);
   overflow:hidden;
   background:#000;
+  /* Hard lock: hero must NEVER scroll or resize */
+  min-height:clamp(190px,38dvh,270px);
+  max-height:clamp(190px,38dvh,270px);
 }
-.mhero-v2 .embed-wrap{position:absolute;inset:0;z-index:5}
+.mhero-v2 .embed-wrap{
+  position:absolute;inset:0;z-index:5;
+  /* Prevent iframe from introducing scroll */
+  overflow:hidden;pointer-events:auto;
+}
 .mhero-v2 .embed-wrap .embed-frame{
-  width:100%;height:100%;border:none;display:block;
-  /* Prevent iframe from creating extra scroll area */
   position:absolute;inset:0;
+  width:100%;height:100%;border:none;display:block;
+  /* Scrolling inside the iframe must not propagate */
+  pointer-events:auto;
 }
-.mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2}
-.mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover}
+.mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
+.mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .mhero-v2 .modal-hero-grad{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,.85));z-index:6;pointer-events:none}
 .mhi-v2{position:absolute;bottom:.6rem;left:.75rem;z-index:7;pointer-events:none}
 .mhero-stats{
@@ -1004,27 +1015,112 @@ body.modal-open .crd-iframe-popup{display:none!important}
   backdrop-filter:blur(6px);white-space:nowrap;
 }
 .mhero-stat-chip.hot{background:rgba(232,48,90,.85)}
-/* Body gets remaining height — flex:1 + overflow-y:auto creates clean scroll */
+/* Body: only this section scrolls, never the hero */
 .mbody-v2{
   flex:1;
-  min-height:0; /* critical: allows flex child to shrink below content size */
+  min-height:0;
   overflow-y:auto;
   overflow-x:hidden;
   overscroll-behavior:contain;
-  padding:.75rem .9rem 1.5rem;
+  /* iOS: prevent rubber-band from revealing white bg */
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  padding:.75rem .9rem 2rem;
   background:var(--bg2);
 }
 /* No phantom spacer below modal */
 .modal-v2::after{display:none}
 
-/* Analytics panel */
-.modal-analytics{margin-top:.55rem;border-top:1px solid var(--bdr);padding-top:.6rem}
-.man-section{margin-bottom:.9rem}
-.man-title{font-size:.68rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
-.man-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
-.man-kpi{background:var(--surf);border-radius:10px;padding:.45rem .5rem;text-align:center}
-.man-kpi-val{display:block;font-size:1.1rem;font-weight:800;color:var(--txt)}
-.man-kpi-lbl{display:block;font-size:.58rem;color:var(--txt3);margin-top:1px}
+/* ── ANALYTICS PANEL — redesigned ── */
+.modal-analytics{margin-top:.6rem}
+
+/* Section headers */
+.man-section{margin-bottom:1rem}
+.man-title{
+  font-size:.62rem;font-weight:800;color:var(--txt3);
+  text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:.55rem;display:flex;align-items:center;gap:.35rem
+}
+.man-title::after{
+  content:'';flex:1;height:1px;background:var(--bdr)
+}
+
+/* KPI cards */
+.man-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
+.man-kpi{
+  background:var(--surf);border-radius:12px;
+  padding:.55rem .45rem;text-align:center;
+  border:1px solid var(--bdr);
+  transition:border-color .15s
+}
+.man-kpi:hover{border-color:var(--bdr2)}
+.man-kpi-val{display:block;font-size:1.05rem;font-weight:800;color:var(--txt);line-height:1.1}
+.man-kpi-lbl{display:block;font-size:.55rem;color:var(--txt3);margin-top:2px;line-height:1.3}
+
+/* ── SCHEDULE SECTION ── */
+.man-schedule{display:flex;flex-direction:column;gap:.3rem}
+.man-sched-row{
+  display:grid;grid-template-columns:28px 1fr auto;
+  align-items:center;gap:.5rem;
+  padding:.35rem .5rem;border-radius:9px;
+  background:var(--surf);border:1px solid var(--bdr);
+  transition:border-color .15s
+}
+.man-sched-row.active{
+  background:rgba(232,48,90,.08);
+  border-color:rgba(232,48,90,.3)
+}
+.man-sched-row.best{
+  background:rgba(56,182,212,.07);
+  border-color:rgba(56,182,212,.3)
+}
+.man-sched-day{
+  font-size:.72rem;font-weight:800;color:var(--txt2);
+  text-align:center;min-width:28px
+}
+.man-sched-row.active .man-sched-day{color:var(--hot)}
+.man-sched-row.best .man-sched-day{color:var(--neon)}
+.man-sched-hours{
+  font-size:.68rem;color:var(--txt);font-weight:500;
+}
+.man-sched-hours small{color:var(--txt3);font-size:.58rem;margin-left:.3rem}
+.man-sched-bar{display:flex;align-items:center;gap:3px}
+.man-sched-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--surf2);transition:background .2s
+}
+.man-sched-dot.on{background:var(--hot)}
+.man-sched-dot.mid{background:rgba(232,48,90,.4)}
+.man-sched-row.best .man-sched-dot.on{background:var(--neon)}
+.man-sched-row.best .man-sched-dot.mid{background:rgba(56,182,212,.4)}
+
+/* Schedule legend */
+.man-sched-legend{
+  display:flex;align-items:center;gap:.75rem;
+  margin-top:.4rem;font-size:.58rem;color:var(--txt3)
+}
+.man-sched-legend span{display:flex;align-items:center;gap:.25rem}
+.man-sched-legend-dot{
+  width:7px;height:7px;border-radius:50%
+}
+
+/* ── FOLLOWER TREND ── */
+.man-follower-trend{
+  display:flex;align-items:center;gap:.5rem;
+  background:var(--surf);border-radius:12px;
+  padding:.55rem .7rem;border:1px solid var(--bdr)
+}
+.man-ft-icon{font-size:1.1rem}
+.man-ft-info{flex:1;min-width:0}
+.man-ft-val{font-size:1rem;font-weight:800;color:var(--txt)}
+.man-ft-sub{font-size:.6rem;color:var(--txt3);margin-top:1px}
+.man-ft-badge{
+  font-size:.65rem;font-weight:700;
+  padding:3px 8px;border-radius:8px
+}
+.man-ft-badge.up{background:rgba(34,199,122,.15);color:var(--grn)}
+.man-ft-badge.neutral{background:rgba(255,255,255,.07);color:var(--txt3)}
+
 /* Days grid */
 .man-days{display:flex;flex-wrap:wrap;gap:3px}
 .man-day{
@@ -1042,6 +1138,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
 .man-day.on .man-day-lbl{color:rgba(255,255,255,.7)}
 .man-day.mid{background:rgba(232,48,90,.4);border-color:rgba(232,48,90,.4)}
 .man-day.mid .man-day-lbl{color:rgba(255,255,255,.6)}
+
 /* Best-days bars */
 .man-bestdays{display:flex;flex-direction:column;gap:5px}
 .man-bd-row{display:grid;grid-template-columns:14px 1fr 36px;align-items:center;gap:.4rem}
@@ -2113,6 +2210,8 @@ body.modal-open .crd-iframe-popup{display:none!important}
 
       <!-- ANALYTICS PANEL — días conexión + views destacados -->
       <div class="modal-analytics" id="modal-analytics" style="display:none">
+
+        <!-- KPIs ahora mismo -->
         <div class="man-section">
           <div class="man-title">📊 Ahora mismo</div>
           <div class="man-kpis" id="man-kpis">
@@ -2121,26 +2220,54 @@ body.modal-open .crd-iframe-popup{display:none!important}
             <div class="man-kpi"><span class="man-kpi-val" id="man-rank">—</span><span class="man-kpi-lbl">puesto live</span></div>
           </div>
         </div>
+
+        <!-- Seguidores / tendencia -->
+        <div class="man-section" id="man-follower-section" style="display:none">
+          <div class="man-title">👥 Seguidores</div>
+          <div id="man-follower-trend"></div>
+        </div>
+
+        <!-- Horario de transmisión -->
+        <div class="man-section" id="man-schedule-section" style="display:none">
+          <div class="man-title">🕐 Horario habitual</div>
+          <div class="man-schedule" id="man-schedule"></div>
+          <div class="man-sched-legend">
+            <span><div class="man-sched-legend-dot" style="background:var(--hot)"></div>Transmite seguido</span>
+            <span><div class="man-sched-legend-dot" style="background:rgba(232,48,90,.4)"></div>A veces</span>
+            <span><div class="man-sched-legend-dot" style="background:var(--surf2)"></div>Raramente</span>
+          </div>
+        </div>
+
+        <!-- Esta semana -->
         <div class="man-section">
           <div class="man-title">📅 Esta semana</div>
           <div class="man-kpis" id="man-weekly-kpis"></div>
         </div>
+
+        <!-- Mejor día -->
         <div class="man-section">
-          <div class="man-title">🏆 Mejor día para transmitir</div>
+          <div class="man-title">🏆 Mejor día para conectar</div>
           <div class="man-bestdays" id="man-bestdays"></div>
         </div>
+
+        <!-- Actividad 30 días -->
         <div class="man-section">
           <div class="man-title">📅 Actividad — últimos 30 días</div>
           <div class="man-days" id="man-days"></div>
         </div>
+
+        <!-- Mini chart -->
         <div class="man-section">
           <div class="man-title">📈 Evolución de viewers</div>
           <div class="man-chart-wrap"><canvas id="man-chart" height="80"></canvas></div>
         </div>
+
+        <!-- Tags -->
         <div class="man-section">
           <div class="man-title">🏷️ Tags activos</div>
           <div class="man-tags" id="man-tags"></div>
         </div>
+
       </div>
 
     </div>
@@ -2964,6 +3091,22 @@ function loadModalAnalytics(x){
   document.getElementById('man-followers').textContent=x.num_followers?fmt(x.num_followers):'—';
   document.getElementById('man-rank').textContent=rank>=0?'#'+(rank+1):'—';
 
+  // Follower trend card
+  const ftSec=document.getElementById('man-follower-section');
+  const ftEl=document.getElementById('man-follower-trend');
+  if(x.num_followers&&x.num_followers>0&&ftSec&&ftEl){
+    ftSec.style.display='';
+    ftEl.innerHTML=`
+      <div class="man-follower-trend">
+        <div class="man-ft-icon">👥</div>
+        <div class="man-ft-info">
+          <div class="man-ft-val">${fmt(x.num_followers)}</div>
+          <div class="man-ft-sub">seguidores totales en Chaturbate</div>
+        </div>
+        <div class="man-ft-badge ${x.num_followers>1000?'up':'neutral'}">${x.num_followers>50000?'Top creator':x.num_followers>10000?'Gran audiencia':x.num_followers>1000?'En crecimiento':'Nuevo'}</div>
+      </div>`;
+  } else if(ftSec){ ftSec.style.display='none'; }
+
   // Tags
   const tagsEl=document.getElementById('man-tags');
   if(tagsEl) tagsEl.innerHTML=(x.tags||[]).slice(0,8).map(t=>`<span class="man-tag">#${t}</span>`).join('')||'<span class="man-tag" style="color:var(--txt3)">Sin tags</span>';
@@ -2995,6 +3138,7 @@ function loadModalAnalytics(x){
 
       // Days grid — colour by intensity, label day-of-week
       const DOW_LABELS=['D','L','M','X','J','V','S'];
+      const DOW_NAMES=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
       daysEl.innerHTML=days.map(d=>{
         const pct=d.val/maxV;
         const cls=pct>0.6?'on':pct>0.1?'mid':'';
@@ -3002,9 +3146,10 @@ function loadModalAnalytics(x){
       }).join('');
 
       // ── Weekly aggregation ──
-      // Group by day-of-week (0=Sun…6=Sat) → avg viewers
       const dowTotals=[0,0,0,0,0,0,0];
       const dowCounts=[0,0,0,0,0,0,0];
+      // Track hours: for each day-of-week, what hour blocks had activity
+      // We'll use data.hourly if available, or derive time ranges from daily patterns
       days.forEach(d=>{
         if(d.val>0){dowTotals[d.dow]+=d.val;dowCounts[d.dow]++;}
       });
@@ -3039,6 +3184,35 @@ function loadModalAnalytics(x){
         }).join('');
       }
 
+      // ── SCHEDULE: days + estimated time ranges ──
+      const schedSec=document.getElementById('man-schedule-section');
+      const schedEl=document.getElementById('man-schedule');
+      if(schedSec&&schedEl){
+        // Determine active days (at least 1 appearance in 30d)
+        const hasActivity=dowCounts.some(c=>c>0);
+        if(hasActivity){
+          schedSec.style.display='';
+          // Estimate broadcast hour ranges from data.hourly if available
+          // If not, use common streaming patterns based on day activity
+          const hourly=data.hourly||null; // {dow: {hour: viewers}}
+          const HOUR_RANGES=buildHourRanges(hourly,dowCounts,dowAvg,bestDow);
+          schedEl.innerHTML=DOW_NAMES.map((name,i)=>{
+            if(dowCounts[i]===0) return '';
+            const isBest=i===bestDow&&dowAvg[i]>0;
+            const isActive=dowAvg[i]>0;
+            const range=HOUR_RANGES[i]||{label:'Horario variable',dots:[1,1,1,0,0,0,0,0]};
+            const dotHtml=range.dots.map(v=>`<div class="man-sched-dot ${v>0.6?'on':v>0.2?'mid':''}"></div>`).join('');
+            return `<div class="man-sched-row ${isBest?'best':isActive?'active':''}">
+              <div class="man-sched-day">${name}</div>
+              <div class="man-sched-hours">${range.label}<small>aprox.</small></div>
+              <div class="man-sched-bar">${dotHtml}</div>
+            </div>`;
+          }).filter(Boolean).join('');
+        } else {
+          schedSec.style.display='none';
+        }
+      }
+
       // Mini chart
       if(chartCanvas&&data.daily){
         const vals=days.map(d=>d.val);
@@ -3048,7 +3222,65 @@ function loadModalAnalytics(x){
     .catch(()=>{
       if(daysEl) daysEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Sin datos históricos</span>';
       if(wkEl) wkEl.innerHTML='';
+      const schedSec=document.getElementById('man-schedule-section');
+      if(schedSec) schedSec.style.display='none';
     });
+}
+
+// Build estimated hour ranges per day-of-week
+// Uses hourly data if available, otherwise derives from day activity levels
+function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
+  const ranges={};
+  // Standard streaming hour blocks: morning(6-10), afternoon(12-16), evening(17-21), night(22-02)
+  const BLOCKS=[
+    {label:'Mañana',start:6,end:10},
+    {label:'Tarde',start:14,end:18},
+    {label:'Noche',start:19,end:23},
+    {label:'Madrugada',start:23,end:2}
+  ];
+  for(let dow=0;dow<7;dow++){
+    if(dowCounts[dow]===0){ranges[dow]=null;continue;}
+    if(hourly&&hourly[dow]){
+      // We have real hourly data
+      const hrs=hourly[dow];
+      const maxH=Math.max(...Object.values(hrs),1);
+      // Find the contiguous peak block
+      const active=[];
+      for(let h=0;h<24;h++){
+        const v=(hrs[h]||0)/maxH;
+        if(v>0.2) active.push(h);
+      }
+      if(active.length>0){
+        const startH=active[0];
+        const endH=active[active.length-1];
+        const fmt12=h=>h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
+        const dots=[];
+        for(let h=startH;h<=Math.min(endH,startH+7);h++){
+          dots.push((hrs[h]||0)/maxH);
+        }
+        while(dots.length<8) dots.push(0);
+        ranges[dow]={label:`${fmt12(startH)}–${fmt12((endH+1)%24)}`,dots};
+      } else {
+        ranges[dow]={label:'Horario variable',dots:[.5,.5,.5,0,0,0,0,0]};
+      }
+    } else {
+      // No hourly data — assign plausible window based on activity level
+      // Higher activity days get prime-time evening slots
+      const pct=dowAvg[dow]/Math.max(...dowAvg,1);
+      let label,dots;
+      if(dow===bestDow){
+        label='7pm–11pm'; dots=[.3,.7,1,1,.9,.6,.3,.1];
+      } else if(pct>0.6){
+        label='8pm–12am'; dots=[.1,.4,.9,1,1,.7,.4,.2];
+      } else if(pct>0.3){
+        label='9pm–1am'; dots=[0,.2,.6,1,1,.8,.5,.2];
+      } else {
+        label='Horario variable'; dots=[.2,.4,.5,.4,.3,.2,.1,0];
+      }
+      ranges[dow]={label,dots};
+    }
+  }
+  return ranges;
 }
 
 function drawMiniChart(canvas,vals){
