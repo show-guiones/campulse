@@ -541,23 +541,23 @@ header{
   display:none;
   position:fixed;
   bottom:72px;left:50%;transform:translateX(-50%);
-  width:min(420px,96vw);
-  border-radius:14px;overflow:hidden;
+  width:min(480px,98vw);
+  border-radius:16px;overflow:hidden;
   background:#000;
-  box-shadow:0 12px 48px rgba(0,0,0,.92);
+  box-shadow:0 16px 56px rgba(0,0,0,.95);
   z-index:9000;
   flex-direction:column;
-  transition:box-shadow .2s;
+  transition:box-shadow .2s, width .2s;
 }
 .crd-iframe-popup.active{display:flex}
-/* Aspecto 16/9 real: 420px → 236px */
+/* Aspecto 16/9: 480px → 270px */
 .crd-iframe-popup .crd-iframe{
-  width:100%;height:236px;border:none;display:block;
+  width:100%;height:270px;border:none;display:block;
   background:#000;
 }
 /* Overlay de carga */
 .crd-iframe-loading{
-  position:absolute;top:0;left:0;right:0;height:236px;
+  position:absolute;top:0;left:0;right:0;height:270px;
   display:flex;align-items:center;justify-content:center;
   background:#0a0a0f;pointer-events:none;
   transition:opacity .4s;
@@ -572,7 +572,7 @@ header{
 @keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
 /* Error state */
 .crd-iframe-error{
-  position:absolute;top:0;left:0;right:0;height:236px;
+  position:absolute;top:0;left:0;right:0;height:270px;
   display:none;flex-direction:column;align-items:center;justify-content:center;
   background:#0a0a0f;color:#888;font-size:.78rem;gap:10px;
 }
@@ -584,9 +584,9 @@ header{
 .crd-iframe-popup .crd-iframe-body{position:relative}
 .crd-iframe-bar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:6px 12px;background:rgba(10,10,18,.97);
+  padding:7px 14px;background:rgba(10,10,18,.98);
   font-size:.65rem;color:var(--txt2,#888);flex-shrink:0;
-  border-top:1px solid rgba(255,255,255,.06);gap:6px;
+  border-top:1px solid rgba(255,255,255,.08);gap:8px;
 }
 .crd-iframe-bar button{
   background:none;border:none;color:var(--txt2,#888);
@@ -2717,7 +2717,7 @@ function openCardPlayer(e, username, btn) {
   if (body) {
     const ifrm = document.createElement('iframe');
     ifrm.id = 'crd-popup-iframe-dyn';
-    ifrm.style.cssText = 'width:100%;height:236px;border:none;display:block;background:#000;';
+    ifrm.style.cssText = 'width:100%;height:270px;border:none;display:block;background:#000;';
     ifrm.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
     ifrm.allowFullscreen = true;
     ifrm.referrerPolicy = 'no-referrer-when-downgrade';
