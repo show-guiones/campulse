@@ -1,14 +1,12 @@
 // pages/model/[username].jsx
 //
-// Novedades respecto a la versión anterior:
-//   · noindex automático si snapCount < 3 (páginas sin datos reales)
-//   · Sección "Modelos similares" al final — modelos del mismo país en vivo
-//   · Mini gráfico SVG de viewers (sparkline) generado desde el historial
-//   · Sección "En vivo ahora" si el último snapshot tiene viewers > 0
-//   · Peak viewers (máximo histórico) mostrado en métricas
-//   · Tabla de historial con barras proporcionales inline
-//   · canonical, Schema.org, OG, links a categorías
-//   · fix: deduplicar similarModels por username
+// Refactor: getServerSideProps consulta Supabase directamente (sin fetch interno).
+// Antes: SSR → /api/history → Supabase  (2 saltos de red por dato)
+//        SSR → /api/best-hours → Supabase
+// Ahora: SSR → Supabase  (1 salto, todo en Promise.all paralelo)
+//
+// Los endpoints /api/history y /api/best-hours se conservan para uso
+// desde el cliente (app.html, etc.) — no se eliminan.
 
 import Head from "next/head";
 
@@ -102,62 +100,107 @@ function Sparkline({ data, width = 280, height = 56 }) {
   );
 }
 
+// ── getServerSideProps — 4 queries paralelos directo a Supabase ───────────────
 export async function getServerSideProps({ params }) {
   const { username } = params;
 
-  try {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_KEY;
-    const sbHeaders = {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-    };
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
-    const [h, b, s] = await Promise.all([
-      fetch(`${SITE}/api/history?username=${encodeURIComponent(username)}`),
-      fetch(`${SITE}/api/best-hours?username=${encodeURIComponent(username)}`),
-      fetch(
-        `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
-        `?username=eq.${encodeURIComponent(username)}` +
-        `&select=country,gender,display_name,spoken_languages` +
-        `&order=captured_at.desc&limit=1`,
-        { headers: sbHeaders }
-      ),
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return {
+      props: {
+        username,
+        history: [], bestHours: [],
+        country: "", gender: "", displayName: "", languages: "",
+        similarModels: [],
+      },
+    };
+  }
+
+  const sbHeaders = {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`,
+  };
+
+  const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const since2h  = new Date(Date.now() -  2 * 60 * 60 * 1000).toISOString();
+  const enc      = encodeURIComponent(username);
+
+  try {
+    // Query 1: historial 30 días
+    const historyPromise = fetch(
+      `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+      `?username=eq.${enc}` +
+      `&captured_at=gte.${since30d}` +
+      `&select=captured_at,num_users,num_followers` +
+      `&order=captured_at.asc` +
+      `&limit=1000`,
+      { headers: sbHeaders }
+    );
+
+    // Query 2: best_hours
+    const bestHoursPromise = fetch(
+      `${SUPABASE_URL}/rest/v1/best_hours` +
+      `?username=eq.${enc}` +
+      `&select=day_of_week,hour_est,avg_viewers,peak_viewers,sample_count` +
+      `&order=avg_viewers.desc` +
+      `&limit=168`,
+      { headers: sbHeaders }
+    );
+
+    // Query 3: último snapshot (país, género, display_name, idiomas)
+    const snapPromise = fetch(
+      `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+      `?username=eq.${enc}` +
+      `&select=country,gender,display_name,spoken_languages` +
+      `&order=captured_at.desc` +
+      `&limit=1`,
+      { headers: sbHeaders }
+    );
+
+    const [histRes, bestRes, snapRes] = await Promise.all([
+      historyPromise,
+      bestHoursPromise,
+      snapPromise,
     ]);
 
-    const history   = h.ok ? await h.json() : [];
-    const bestHours = b.ok ? await b.json() : [];
-    const snapRows  = s.ok ? await s.json() : [];
+    const history   = histRes.ok  ? await histRes.json()  : [];
+    const bestHours = bestRes.ok  ? await bestRes.json()  : [];
+    const snapRows  = snapRes.ok  ? await snapRes.json()  : [];
     const snap      = Array.isArray(snapRows) ? snapRows[0] || {} : {};
 
     const countryCode = (snap.country || "").toUpperCase().trim();
     const gender      = snap.gender || "";
 
-    // ── Modelos similares: mismo país en vivo, excluir al propio modelo ──
+    // Query 4: modelos similares (depende de país/género del Query 3)
     let similarModels = [];
-    if (SUPABASE_URL && SUPABASE_KEY && (countryCode || gender)) {
+    if (countryCode || gender) {
       try {
-        const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-        let filter = `captured_at=gte.${since}&username=neq.${encodeURIComponent(username)}&num_users=gt.0`;
+        let filter = `captured_at=gte.${since2h}&username=neq.${enc}&num_users=gt.0`;
         if (countryCode) filter += `&country=eq.${countryCode}`;
-        else if (gender)  filter += `&gender=eq.${gender}`;
+        else if (gender) filter += `&gender=eq.${gender}`;
 
         const simRes = await fetch(
           `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
           `?${filter}` +
           `&select=username,display_name,num_users,country` +
-          `&order=num_users.desc&limit=20`,
+          `&order=num_users.desc` +
+          `&limit=20`,
           { headers: sbHeaders }
         );
+
         if (simRes.ok) {
           const rows = await simRes.json();
           if (Array.isArray(rows)) {
             const seen = new Set();
-            similarModels = rows.filter((r) => {
-              if (seen.has(r.username)) return false;
-              seen.add(r.username);
-              return true;
-            }).slice(0, 6);
+            similarModels = rows
+              .filter((r) => {
+                if (seen.has(r.username)) return false;
+                seen.add(r.username);
+                return true;
+              })
+              .slice(0, 6);
           }
         }
       } catch { /* no bloquea el render */ }
@@ -166,12 +209,12 @@ export async function getServerSideProps({ params }) {
     return {
       props: {
         username,
-        history:      Array.isArray(history) ? history : [],
-        bestHours:    Array.isArray(bestHours) ? bestHours : [],
-        country:      snap.country          || "",
+        history:      Array.isArray(history)   ? history   : [],
+        bestHours:    Array.isArray(bestHours)  ? bestHours : [],
+        country:      snap.country         || "",
         gender,
-        displayName:  snap.display_name     || "",
-        languages:    snap.spoken_languages  || "",
+        displayName:  snap.display_name    || "",
+        languages:    snap.spoken_languages || "",
         similarModels,
       },
     };
@@ -215,10 +258,8 @@ export default function ModelPage({
   const sparkData = history.slice(-30);
   const histMax   = peakViewers || 1;
 
-  // ── noindex para páginas sin datos suficientes ─────────────────────────────
   const shouldIndex = snapCount >= 3;
 
-  // ── SEO ───────────────────────────────────────────────────────────────────
   let pageTitle = viewers != null
     ? `${name} en Chaturbate — ${viewers.toLocaleString("es")} viewers ahora | Campulse`
     : `${name} Stats en Chaturbate | Campulse`;
@@ -312,7 +353,6 @@ export default function ModelPage({
       </Head>
 
       <main style={styles.main}>
-        {/* Breadcrumb */}
         <nav style={styles.breadcrumbs}>
           <a href="/" style={styles.link}>Campulse</a>
           {countryName && countryCode && (
@@ -327,17 +367,12 @@ export default function ModelPage({
           <span>{name}</span>
         </nav>
 
-        {/* Header */}
         <div style={styles.header}>
           <div style={styles.headerTop}>
             <h1 style={styles.h1}>{name}</h1>
-            {isLive && (
-              <span style={styles.liveBadge}>🔴 EN VIVO</span>
-            )}
+            {isLive && <span style={styles.liveBadge}>🔴 EN VIVO</span>}
           </div>
-          {name !== username && (
-            <div style={styles.handle}>@{username}</div>
-          )}
+          {name !== username && <div style={styles.handle}>@{username}</div>}
           <div style={styles.tags}>
             {genderLabel && <span style={styles.tag}>{genderLabel}</span>}
             {countryName && countryCode && (
@@ -353,7 +388,6 @@ export default function ModelPage({
           </div>
         </div>
 
-        {/* Métricas */}
         <section style={styles.metrics}>
           {[
             ["Viewers ahora", viewers],
@@ -362,15 +396,12 @@ export default function ModelPage({
             ["Snapshots",     snapCount || null],
           ].map(([label, val]) => (
             <div key={label} style={styles.metricCard}>
-              <div style={styles.metricVal}>
-                {val != null ? val.toLocaleString("es") : "--"}
-              </div>
+              <div style={styles.metricVal}>{val != null ? val.toLocaleString("es") : "--"}</div>
               <div style={styles.metricLabel}>{label}</div>
             </div>
           ))}
         </section>
 
-        {/* Sparkline */}
         {sparkData.length >= 2 && (
           <section style={styles.sparkSection}>
             <div style={styles.sparkHeader}>
@@ -383,7 +414,6 @@ export default function ModelPage({
           </section>
         )}
 
-        {/* CTA */}
         <a
           href={`https://chaturbate.com/${username}/?campaign=rI8z3&track=default`}
           target="_blank"
@@ -393,7 +423,6 @@ export default function ModelPage({
           {isLive ? "🔴 Ver sala en vivo" : "Ver sala en Chaturbate"}
         </a>
 
-        {/* Embed en vivo — solo cuando está online */}
         {isLive && (
           <section style={styles.embedSection}>
             <div style={styles.embedHeader}>
@@ -410,87 +439,54 @@ export default function ModelPage({
                 title={`${name} en vivo en Chaturbate`}
               />
             </div>
-            <p style={styles.embedNote}>
-              Al ver el stream en Campulse, apoyas a {name} directamente.
-            </p>
+            <p style={styles.embedNote}>Al ver el stream en Campulse, apoyas a {name} directamente.</p>
           </section>
         )}
 
-        {/* Mejores horarios */}
         {bestHours.length > 0 && (
           <>
-            <h2 style={{ ...styles.h2label, marginTop: 32, marginBottom: 12 }}>
-              Mejores horarios (EST)
-            </h2>
+            <h2 style={{ ...styles.h2label, marginTop: 32, marginBottom: 12 }}>Mejores horarios (EST)</h2>
             {bestHours.slice(0, 5).map((h, i) => (
               <div key={i} style={styles.hourRow}>
-                <span>
-                  {days[h.day_of_week]}{" "}
-                  {String(h.hour_est ?? 0).padStart(2, "0")}:00 EST
-                </span>
-                <span style={{ color: "#a78bfa" }}>
-                  {Math.round(h.avg_viewers)} viewers
-                </span>
+                <span>{days[h.day_of_week]}{" "}{String(h.hour_est ?? 0).padStart(2, "0")}:00 EST</span>
+                <span style={{ color: "#a78bfa" }}>{Math.round(h.avg_viewers)} viewers</span>
               </div>
             ))}
           </>
         )}
 
-        {/* Historial con barras */}
         {history.length > 0 && (
           <>
-            <h2 style={{ ...styles.h2label, marginTop: 32, marginBottom: 12 }}>
-              Historial reciente
-            </h2>
-            {history
-              .slice(-15)
-              .reverse()
-              .map((r, i) => {
-                const pct = histMax > 0 ? ((r.num_users ?? 0) / histMax) * 100 : 0;
-                return (
-                  <div key={i} style={styles.histRow}>
-                    <div style={styles.histDate}>{fmtDate(r.captured_at)}</div>
-                    <div style={styles.histBar}>
-                      <div style={{ ...styles.histBarFill, width: `${pct}%` }} />
-                    </div>
-                    <div style={styles.histViewers}>
-                      {(r.num_users ?? 0).toLocaleString("es")}
-                    </div>
+            <h2 style={{ ...styles.h2label, marginTop: 32, marginBottom: 12 }}>Historial reciente</h2>
+            {history.slice(-15).reverse().map((r, i) => {
+              const pct = histMax > 0 ? ((r.num_users ?? 0) / histMax) * 100 : 0;
+              return (
+                <div key={i} style={styles.histRow}>
+                  <div style={styles.histDate}>{fmtDate(r.captured_at)}</div>
+                  <div style={styles.histBar}>
+                    <div style={{ ...styles.histBarFill, width: `${pct}%` }} />
                   </div>
-                );
-              })}
+                  <div style={styles.histViewers}>{(r.num_users ?? 0).toLocaleString("es")}</div>
+                </div>
+              );
+            })}
           </>
         )}
 
-        {/* ── Modelos similares ─────────────────────────────────────────────── */}
         {similarModels.length > 0 && (
           <section style={styles.similarSection}>
             <h2 style={styles.similarTitle}>
-              {countryName
-                ? `Más modelos de ${countryName} en vivo ahora`
-                : "Modelos similares en vivo"}
+              {countryName ? `Más modelos de ${countryName} en vivo ahora` : "Modelos similares en vivo"}
             </h2>
             <div style={styles.similarGrid}>
               {similarModels.map((m) => {
                 const mFlag = countryCodeToFlag(m.country || "");
                 return (
-                  <a
-                    key={m.username}
-                    href={`/model/${m.username}`}
-                    style={styles.similarCard}
-                  >
-                    <div style={styles.similarName}>
-                      {m.display_name || m.username}
-                    </div>
+                  <a key={m.username} href={`/model/${m.username}`} style={styles.similarCard}>
+                    <div style={styles.similarName}>{m.display_name || m.username}</div>
                     <div style={styles.similarHandle}>@{m.username}</div>
-                    <div style={styles.similarViewers}>
-                      👁 {(m.num_users ?? 0).toLocaleString("es")} viewers
-                    </div>
-                    {m.country && (
-                      <div style={styles.similarCountry}>
-                        {mFlag} {m.country.toUpperCase()}
-                      </div>
-                    )}
+                    <div style={styles.similarViewers}>👁 {(m.num_users ?? 0).toLocaleString("es")} viewers</div>
+                    {m.country && <div style={styles.similarCountry}>{mFlag} {m.country.toUpperCase()}</div>}
                   </a>
                 );
               })}
@@ -505,7 +501,6 @@ export default function ModelPage({
           </section>
         )}
 
-        {/* Links a categorías */}
         <div style={styles.categoryLinks}>
           {countryName && countryCode && (
             <a href={`/country/${countryCode.toLowerCase()}`} style={styles.countryLink}>
