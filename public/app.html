@@ -533,10 +533,14 @@ header{
   display:flex;align-items:center;justify-content:center;
   transition:all .18s;backdrop-filter:blur(4px);
   box-shadow:0 2px 8px rgba(255,42,109,.5);
-  z-index:10;cursor:pointer;flex-shrink:0
+  z-index:20;cursor:pointer;flex-shrink:0
 }
 .crd-play:hover{transform:scale(1.12);background:var(--hot)}
 .crd-play svg{width:12px;height:12px;fill:#fff;margin-left:2px}
+/* Carousels: allow play button to escape crd-media clip */
+.carousel-scroll .crd{overflow:visible}
+.carousel-scroll .crd .crd-media{overflow:visible}
+.carousel-scroll .crd .crd-img{border-radius:var(--radius-sm) var(--radius-sm) 0 0}
 
 /* card mini iframe player — flota como popup centrado */
 .crd-iframe-wrap{display:none}
@@ -759,13 +763,8 @@ body.modal-open .crd-iframe-popup{display:none!important}
   max-height:92dvh
 }
 
-/* Drag handle */
-.modal::before{
-  content:'';display:block;
-  width:36px;height:4px;border-radius:2px;
-  background:rgba(255,255,255,.15);
-  margin:10px auto 0;flex-shrink:0
-}
+/* Drag handle — hidden, no blank space */
+.modal::before{display:none}
 
 .modal-close{
   position:absolute;right:.75rem;top:.75rem;
@@ -1015,12 +1014,8 @@ body.modal-open .crd-iframe-popup{display:none!important}
   padding:.75rem .9rem 1.5rem;
   background:var(--bg2);
 }
-/* Ensure modal inner content never creates white space below */
-.modal-v2::after{
-  content:'';display:block;
-  background:var(--bg2);
-  flex-shrink:0;
-}
+/* No phantom spacer below modal */
+.modal-v2::after{display:none}
 
 /* Analytics panel */
 .modal-analytics{margin-top:.55rem;border-top:1px solid var(--bdr);padding-top:.6rem}
@@ -1127,6 +1122,14 @@ body.modal-open .crd-iframe-popup{display:none!important}
 .dv-close{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.75rem;font-weight:600;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .dv-panels{display:flex;flex:1;overflow:hidden;gap:2px;background:rgba(255,255,255,.06)}
 /* Mobile: vertical stack */
+.dv-swap-btn{
+  position:absolute;top:.4rem;right:.5rem;z-index:15;
+  background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.18);
+  color:#fff;font-size:.62rem;font-weight:700;
+  padding:3px 8px;border-radius:6px;cursor:pointer;
+  backdrop-filter:blur(4px);transition:background .15s;
+}
+.dv-swap-btn:hover{background:var(--hot)}
 .dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
@@ -1558,6 +1561,12 @@ body.modal-open .crd-iframe-popup{display:none!important}
 /* ─── Chip feedback animations ─── */
 @keyframes chipPop{0%{transform:scale(.88)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
 .qchip.active{animation:chipPop .18s ease}
+/* Touch: disable hover lift on cards so they don't stay elevated after tap */
+@media(hover:none){
+  .crd:hover{transform:none;box-shadow:none}
+  .crd:hover .crd-img{transform:none}
+  .crd-lexy:hover{box-shadow:0 0 18px rgba(240,32,96,.35);transform:none}
+}
 /* ═══════════════════════════════════════════
    LEXY_FOX2 — BENEFICIOS ESPECIALES
 ═══════════════════════════════════════════ */
@@ -1593,7 +1602,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
 
 <!-- HEADER -->
 <header>
-  <a class="logo" href="/">
+  <a class="logo" href="https://www.campulsehub.com/app.html">
     <div class="logo-icon">CH</div>
     <span class="logo-name">Campulse<em>Hub</em></span>
   </a>
@@ -1850,7 +1859,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
 
   <!-- Search screen -->
   <div class="rep-search" id="model-search-screen">
-    <button onclick="switchTab('explore')" style="background:none;border:none;color:var(--txt2);font-size:.8rem;cursor:pointer;padding:.25rem 0 .75rem;display:flex;align-items:center;gap:.3rem">← Volver al catálogo</button>
+    <button onclick="switchTab('explore')" style="background:none;border:none;color:var(--neon);font-size:.8rem;cursor:pointer;padding:.25rem 0 .75rem;display:flex;align-items:center;gap:.3rem;font-weight:600;text-decoration:underline;text-underline-offset:3px">← Volver al catálogo</button>
     <div class="rep-search-eyebrow">Para modelos 📊</div>
     <div class="rep-search-title">Descubre<br><em>cuándo eres</em><br>imparable</div>
     <div class="rep-search-sub">Escribe tu username y en segundos sabrás en qué puesto estás, cuánto podrías ganar, y cuál es tu mejor momento para transmitir.</div>
@@ -1872,7 +1881,10 @@ body.modal-open .crd-iframe-popup{display:none!important}
 
   <!-- Report view -->
   <div class="rep-view" id="model-report" style="display:none">
-    <button class="rep-back" onclick="resetModelSearch()">← Volver</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem">
+      <button class="rep-back" onclick="resetModelSearch()" style="margin-bottom:0">← Volver</button>
+      <button onclick="switchTab('explore')" style="background:none;border:none;color:var(--neon);font-size:.75rem;cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px;font-family:inherit">🏠 Catálogo</button>
+    </div>
 
     <!-- Profile hero -->
     <div class="rep-hero">
@@ -2162,6 +2174,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
       <!-- Panel A -->
       <div class="dv-panel" id="dv-panel-a">
         <div class="dv-panel-label" id="dv-label-a">—</div>
+        <button class="dv-swap-btn" onclick="swapDualSlot('a')" title="Cambiar sala A">⇄ Cambiar</button>
         <div class="dv-embed-wrap">
           <iframe id="dv-frame-a" class="dv-frame" src="about:blank"
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
@@ -2174,6 +2187,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
       <!-- Panel B -->
       <div class="dv-panel" id="dv-panel-b">
         <div class="dv-panel-label" id="dv-label-b">—</div>
+        <button class="dv-swap-btn" onclick="swapDualSlot('b')" title="Cambiar sala B">⇄ Cambiar</button>
         <div class="dv-embed-wrap">
           <iframe id="dv-frame-b" class="dv-frame" src="about:blank"
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
@@ -2851,12 +2865,6 @@ function openMod(u){
 
   updateFavBtn(x.username);
 
-  // Cerrar analytics si abierto al cambiar modelo
-  const analyticsPanel=document.getElementById('modal-analytics');
-  if(analyticsPanel) analyticsPanel.style.display='none';
-  const repBtn=document.getElementById('m-rep-toggle');
-  if(repBtn) repBtn.classList.remove('on');
-
   if(x.num_users>0){
     // AUTO-EMBED: mostrar video directamente
     if(imgWrap) imgWrap.innerHTML='';
@@ -2944,6 +2952,11 @@ function toggleModalReport(){
 
 function loadModalAnalytics(x){
   const u=x.username;
+  // Fallback: enrich x with live data from rooms array if stats are missing
+  const liveData=rooms.find(r=>r.username===u)||{};
+  if(x.num_users===undefined||x.num_users===null) x.num_users=liveData.num_users||0;
+  if(!x.num_followers) x.num_followers=liveData.num_followers||0;
+  if(!x.tags&&liveData.tags) x.tags=liveData.tags;
   // KPIs
   const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>b.num_users-a.num_users);
   const rank=sorted.findIndex(r=>r.username===u);
@@ -3091,6 +3104,10 @@ function closeDualPicker(e){
   const bg=document.getElementById('dual-picker-bg');
   if(!bg)return;
   bg.classList.remove('open');
+  // Restore hint text if we were in swap mode
+  if(_swapTargetSlot){ _swapTargetSlot=null; }
+  const hint=bg.querySelector('.dp-hint');
+  if(hint&&active) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
   setTimeout(()=>{bg.style.display='none';},220);
 }
 
@@ -3153,6 +3170,50 @@ function closeDualView(){
   if(frameB) frameB.src='about:blank';
   if(bg) bg.style.display='none';
   document.body.style.overflow='';
+}
+
+/* ── SWAP SLOT: change one room without closing dual view ── */
+let _swapTargetSlot = null; // 'a' or 'b'
+function swapDualSlot(slot){
+  _swapTargetSlot = slot;
+  // Show dual picker in swap mode
+  const bg = document.getElementById('dual-picker-bg');
+  const nameEl = document.getElementById('dp-current-name');
+  const otherSlot = slot === 'a' ? 'b' : 'a';
+  const otherLabel = document.getElementById('dv-label-' + otherSlot);
+  if(nameEl) nameEl.textContent = (otherLabel?.textContent||'la otra sala') + ' (sala ' + otherSlot.toUpperCase() + ')';
+  // Populate grid excluding the other slot's current model
+  const dpGrid = document.getElementById('dp-grid');
+  const otherUsername = document.getElementById('dv-frame-' + otherSlot)?.src?.match(/embed\/([^/]+)\//)?.[1] || '';
+  if(dpGrid){
+    const liveRooms = [...rooms].filter(r=>r.num_users>0 && r.username !== otherUsername)
+      .sort((a,b)=>b.num_users - a.num_users);
+    dpGrid.innerHTML = liveRooms.map(r=>`
+      <div class="dp-card" onclick="swapDualConfirm('${r.username}');closeDualPicker();">
+        <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
+          onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
+        <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
+        <div class="dp-card-name">${r.display_name||r.username}</div>
+      </div>`).join('');
+  }
+  // Update hint text
+  const hint = bg?.querySelector('.dp-hint');
+  if(hint) hint.innerHTML = `Elige la sala que reemplazará al <strong>panel ${slot.toUpperCase()}</strong>`;
+  if(bg){bg.style.display='flex';requestAnimationFrame(()=>bg.classList.add('open'));}
+}
+function swapDualConfirm(newUsername){
+  if(!_swapTargetSlot || !newUsername) return;
+  const slot = _swapTargetSlot;
+  _swapTargetSlot = null;
+  const frame = document.getElementById('dv-frame-' + slot);
+  const lblEl = document.getElementById('dv-label-' + slot);
+  const linkEl = document.getElementById('dv-link-' + slot);
+  const r = rooms.find(r=>r.username===newUsername)||{username:newUsername};
+  const mkUrl = u=>`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
+  const mkAffLink = u=>`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
+  if(frame){ frame.src='about:blank'; setTimeout(()=>{frame.src=mkUrl(newUsername);},80); }
+  if(lblEl) lblEl.textContent = r.display_name||newUsername;
+  if(linkEl){ linkEl.href=mkAffLink(newUsername); linkEl.textContent=`Entrar con ${r.display_name||newUsername} ↗`; }
 }
 
 // ─── CARD MINI PLAYER — HLS nativo con hls.js (sin iframe) ───
