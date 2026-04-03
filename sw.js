@@ -15,8 +15,8 @@ self.addEventListener('push', e => {
   const data = e.data.json();
   const options = {
     body: data.body || '',
-    icon: data.icon || '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: data.icon || 'https://www.campulsehub.com/favicon.svg',
+    badge: 'https://www.campulsehub.com/favicon.svg',
     tag: data.tag || 'campulse',
     renotify: true,
     data: { url: data.url || 'https://www.campulsehub.com' },

@@ -367,8 +367,8 @@ header{
   top:calc(var(--hdr) + 41px);border-bottom:1px solid var(--bdr);
   padding:.35rem 1rem .55rem;
   gap:.4rem;
-  -webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);
-  mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);
+  -webkit-mask-image:linear-gradient(to right,black calc(100% - 40px),transparent 100%);
+  mask-image:linear-gradient(to right,black calc(100% - 40px),transparent 100%);
 }
 .srch{
   display:flex;align-items:center;
@@ -676,7 +676,7 @@ header{
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 /* Images INSIDE cards fade in smoothly */
 /* images appear immediately — no opacity flicker */
-.crd-img{opacity:1}
+.crd-img{opacity:0;transition:opacity .3s ease}.crd-img.loaded{opacity:1}
 
 /* ═══════════════════════════════════════════
    EMPTY STATE
@@ -1372,7 +1372,7 @@ header{
 }
 </style>
 <!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js" defer></script>
 </head>
 <body>
 
@@ -1807,7 +1807,7 @@ header{
     <!-- Video nativo — hls.js lo alimenta con el .m3u8 de Chaturbate -->
     <video class="crd-iframe" id="crd-popup-video"
       playsinline autoplay muted
-      style="width:100%;height:236px;background:#000;display:block;object-fit:contain">
+      style="width:100%;height:270px;background:#000;display:block;object-fit:contain">
     </video>
     <div class="crd-iframe-loading" id="crd-popup-loading">
       <div class="crd-iframe-loading-dot"></div>
@@ -2273,7 +2273,7 @@ function pinnedCardHtml(x,badge){
       <iframe class="crd-iframe" src="about:blank" allow="autoplay" allowFullscreen></iframe>
       <div class="crd-iframe-bar">
         <span class="crd-iframe-name">${x.display_name||x.username}</span>
-        <button onclick="closeCardPlayer(event,'${x.username}')">✕ Cerrar</button>
+        <button onclick="closeCardPlayer()">✕ Cerrar</button>
       </div>
     </div>
   </div>
@@ -2370,7 +2370,7 @@ function cardHtml(x,mode='grid'){
       <iframe class="crd-iframe" src="about:blank" allow="autoplay" allowFullscreen></iframe>
       <div class="crd-iframe-bar">
         <span class="crd-iframe-name">${x.display_name||x.username}</span>
-        <button onclick="closeCardPlayer(event,'${x.username}')">✕ Cerrar</button>
+        <button onclick="closeCardPlayer()">✕ Cerrar</button>
       </div>
     </div>
   </div>
@@ -2401,6 +2401,7 @@ function imgFallback(img){
   if(t<srcs.length){
     img.dataset.t=t;
     img.src=srcs[t];
+    img.onload=()=>img.classList.add('loaded');
   } else {
     const ph=document.createElement('div');
     ph.className='crd-ph';
