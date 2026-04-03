@@ -237,7 +237,8 @@ header{
   text-align:left;display:flex;align-items:center;justify-content:space-between;
   transition:all .15s
 }
-.g-btn:hover,.g-btn.active{background:rgba(255,255,255,.06);color:var(--txt)}
+.g-btn:hover{background:rgba(255,255,255,.06);color:var(--txt)}
+.g-btn.active{background:rgba(232,48,90,.15);color:var(--txt);border-left:3px solid var(--hot);font-weight:700}
 .g-btn .gcnt{
   font-size:.6rem;background:var(--surf2);
   border-radius:10px;padding:1px 6px;color:var(--txt3)
@@ -252,6 +253,8 @@ header{
   width:100%;text-align:left;
   transition:background .12s,color .12s;
   user-select:none;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  cursor:pointer;
 }
 .filter-chip:hover:not(.active){background:rgba(255,255,255,.05);color:var(--txt)}
 .filter-chip:focus{outline:none}
@@ -713,6 +716,36 @@ header{
 @keyframes slidemodal{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .modal-bg.open{animation:fademodal .18s ease}
 
+/* ── DUAL MODAL (dos modelos en simultáneo) ── */
+#modal2-bg{z-index:510}
+.dual-active #modal-bg,
+.dual-active #modal2-bg{
+  align-items:center;
+  padding:1rem;
+}
+.dual-active .modal{
+  border-radius:20px;
+  max-height:88dvh;
+}
+@media(min-width:820px){
+  /* Desktop: side by side */
+  .dual-active #modal-bg{
+    background:rgba(0,0,0,.88);
+    justify-content:center;
+    gap:1rem;
+  }
+  .dual-active .modal{
+    max-width:440px;
+    flex:1 1 440px;
+  }
+}
+@media(max-width:819px){
+  /* Mobile/tablet: stack vertically, second modal slides from bottom */
+  .dual-active #modal-bg{padding:0;align-items:flex-end}
+  .dual-active #modal2-bg{padding:0;align-items:flex-end;background:transparent;pointer-events:none}
+  #modal2-bg .modal{pointer-events:all;max-height:60dvh}
+}
+
 .modal{
   background:var(--bg2);
   border-radius:24px 24px 0 0;
@@ -768,11 +801,11 @@ header{
 /* Play overlay — pequeño, elegante, no tapa la imagen */
 .live-preview-wrap{position:relative;height:100%}
 .live-play-btn{
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  width:52px;height:52px;border-radius:50%;
-  background:rgba(255,42,109,.82);
-  border:2px solid rgba(255,255,255,.25);
+  position:absolute;top:.5rem;left:.5rem;
+  transform:none;
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,42,109,.88);
+  border:2px solid rgba(255,255,255,.3);
   display:flex;align-items:center;justify-content:center;
   animation:livepulse 2.4s ease-in-out infinite;
   pointer-events:none;
@@ -786,13 +819,13 @@ header{
 
 /* Tap hint text under the play button */
 .live-tap-hint{
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%, calc(-50% + 42px));
-  font-size:.58rem;font-weight:700;color:rgba(255,255,255,.65);
-  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
-  pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.8)
+  position:absolute;top:.5rem;left:3rem;
+  transform:none;
+  font-size:.55rem;font-weight:700;color:rgba(255,255,255,.7);
+  letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;
+  pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.9);
+  background:rgba(0,0,0,.45);border-radius:6px;padding:2px 6px;
 }
-
 /* LIVE badge — top left */
 .live-timer-badge{
   position:absolute;top:.6rem;left:.6rem;
@@ -877,16 +910,17 @@ header{
 .modal-stat-val{font-weight:700;color:var(--txt)}
 
 /* CTA */
-.modal-acts{display:block;margin-bottom:.55rem}
+.modal-acts{display:block;margin-bottom:.55rem;position:sticky;bottom:0;z-index:10;background:var(--modal-bg,rgba(18,19,26,.98));padding:.5rem 0 .3rem}
 .btn-go{
   width:100%;
   background:var(--hot);
   color:#fff;border:none;border-radius:14px;
-  padding:.9rem 1rem;
+  padding:.9rem 1rem;min-height:52px;
   font-size:.95rem;font-weight:800;letter-spacing:-.01em;
   display:flex;align-items:center;justify-content:center;gap:.5rem;
   transition:all .18s;cursor:pointer;text-decoration:none;
-  box-shadow:0 4px 22px rgba(232,48,90,.4)
+  box-shadow:0 4px 22px rgba(232,48,90,.4);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .btn-go:hover{filter:brightness(1.08);box-shadow:0 6px 28px rgba(232,48,90,.58);transform:translateY(-1px)}
 .btn-go:active{transform:scale(.98);filter:none}
@@ -900,8 +934,9 @@ header{
   flex:1;background:var(--surf);border:1px solid var(--bdr);
   border-radius:11px;color:var(--txt2);
   font-family:inherit;font-size:.7rem;font-weight:600;
-  padding:.5rem;display:flex;align-items:center;justify-content:center;gap:.3rem;
-  transition:all .15s;cursor:pointer
+  padding:.5rem;min-height:40px;display:flex;align-items:center;justify-content:center;gap:.3rem;
+  transition:all .15s;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .btn-sec:hover{background:var(--surf2);color:var(--txt);border-color:var(--bdr2)}
 .btn-sec.on{color:var(--hot);background:rgba(255,42,109,.07);border-color:rgba(255,42,109,.22)}
@@ -1339,6 +1374,10 @@ header{
   .grid{grid-template-columns:repeat(3,1fr);gap:.22rem}
   .carousel-scroll .crd{width:95px}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
+  /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
+  .modal-hero{height:190px!important}
+  /* Nombre más compacto */
+  .modal-name{font-size:1.1rem!important}
 }
 
 
@@ -1495,11 +1534,11 @@ header{
     <div class="drawer-sec">
       <div class="drawer-lbl">Género</div>
       <div class="g-strip">
-        <button class="g-btn active" onclick="setGender(this,'')">Todas <span class="gcnt" id="sd-gc-all"></span></button>
-        <button class="g-btn" onclick="setGender(this,'f')">Mujeres <span class="gcnt" id="sd-gc-f"></span></button>
-        <button class="g-btn" onclick="setGender(this,'m')">Hombres <span class="gcnt" id="sd-gc-m"></span></button>
-        <button class="g-btn" onclick="setGender(this,'c')">Parejas <span class="gcnt" id="sd-gc-c"></span></button>
-        <button class="g-btn" onclick="setGender(this,'t')">Trans <span class="gcnt" id="sd-gc-t"></span></button>
+        <button class="g-btn active" data-g="" onclick="setGender(this,'')">Todas <span class="gcnt" id="sd-gc-all"></span></button>
+        <button class="g-btn" data-g="f" onclick="setGender(this,'f')">Mujeres <span class="gcnt" id="sd-gc-f"></span></button>
+        <button class="g-btn" data-g="m" onclick="setGender(this,'m')">Hombres <span class="gcnt" id="sd-gc-m"></span></button>
+        <button class="g-btn" data-g="c" onclick="setGender(this,'c')">Parejas <span class="gcnt" id="sd-gc-c"></span></button>
+        <button class="g-btn" data-g="t" onclick="setGender(this,'t')">Trans <span class="gcnt" id="sd-gc-t"></span></button>
       </div>
     </div>
     <div class="drawer-div"></div>
@@ -1879,8 +1918,46 @@ header{
         <button class="btn-sec" onclick="reportFromModal()">
           📊 Reporte
         </button>
+        <button class="btn-sec" id="m-dual-btn" onclick="openModal2FromModal()" title="Ver dos en vivo">
+          ⊞ +1
+        </button>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2 — segundo modelo en vivo (dual view) -->
+<div class="modal-bg" id="modal2-bg" onclick="closeModal2(event)" style="display:none">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal2()">✕</button>
+    <div class="modal-hero" id="modal2-hero">
+      <div class="embed-wrap" id="modal2-embed-wrap">
+        <div class="embed-loading" id="modal2-loading">
+          <div class="embed-loading-spinner"></div>
+          <span>Cargando stream…</span>
+        </div>
+        <iframe id="modal2-embed-frame" class="embed-frame" src="about:blank"
+          allow="autoplay; fullscreen" allowFullscreen></iframe>
+        <button class="embed-back-btn" onclick="closeModal2()">✕ Cerrar</button>
+      </div>
+      <div id="modal2-img-wrap"></div>
+      <div class="modal-hero-grad"></div>
+      <div class="modal-hero-info">
+        <div id="modal2-live-pill"></div>
+        <div class="modal-name" id="modal2-name"></div>
+        <div class="modal-sub" id="modal2-disp"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-acts">
+        <a id="modal2-link" href="#" target="_blank" rel="noopener" class="btn-go">
+          <span>▶</span>
+          <span id="modal2-cta-txt">Entrar a la sala</span>
+          <span class="btn-go-arrow">→</span>
+        </a>
+      </div>
+      <div class="modal-stats-row" id="modal2-stats-row"></div>
     </div>
   </div>
 </div>
@@ -2542,7 +2619,7 @@ function openMod(u){
     const tags=(x.tags||[]).slice(0,4).map(t=>`<span style="background:rgba(255,255,255,.07);border-radius:8px;padding:1px 7px;font-size:.6rem">#${t}</span>`).join('');
     statsRow.innerHTML=parts.join('<span style="opacity:.3;margin:0 .15rem">·</span>')+( tags?`<span style="margin-left:.3rem;display:flex;gap:.2rem;flex-wrap:wrap">${tags}</span>`:'' );
   }
-  document.getElementById('m-link').href=`https://chaturbate.com/${x.username}/?campaign=rI8z3&track=default`;
+  document.getElementById('m-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${x.username}`;
   // CTA text: live vs offline
   const ctaTxt=document.getElementById('m-cta-txt');
   const ctaIco=document.getElementById('m-cta-ico');
@@ -2616,7 +2693,7 @@ function startLivePreview(x){
           <div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>
           Offline en este momento
         </div>
-        <a href="https://chaturbate.com/${u}/?campaign=rI8z3&track=default"
+        <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}"
            target="_blank" rel="noopener" class="mhp-cta">
           🔔 Seguirla en Chaturbate →
         </a>
@@ -2637,7 +2714,7 @@ function activateEmbed(u){
   wrap.classList.add('active');
   if(loading) loading.classList.remove('hidden');
   // Cargar embed oficial de Chaturbate
-  frame.src=`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${u}&autoplay=1&mobileRedirect=never`;
+  frame.src=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}&autoplay=1&disable_sound=0&mobileRedirect=never`;
 }
 function onEmbedLoad(){
   const loading=document.getElementById('embed-loading');
@@ -2773,7 +2850,7 @@ function cardPlayerToggleMute() {
 }
 
 function cardPlayerOpenFull() {
-  if (_activeCardPlayer) window.open(`https://chaturbate.com/${_activeCardPlayer}/`, '_blank');
+  if (_activeCardPlayer) window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${_activeCardPlayer}`, '_blank');
 }
 
 
@@ -2789,7 +2866,79 @@ function closeMod(e){
     if(frame) frame.src='about:blank';
     if(wrap) wrap.classList.remove('active');
     if(imgWrap) imgWrap.style.display='';
+    // Si hay dual activo, cerrarlo también
+    closeModal2();
   }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMod();closeModal2();}});
+
+/* ── DUAL MODAL ── */
+let _modal2Active=null;
+function openModal2(u){
+  const room=rooms.find(r=>r.username===u)||{username:u};
+  _modal2Active=u;
+  // Actualizar link afiliado
+  document.getElementById('modal2-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
+  const ctaTxt=document.getElementById('modal2-cta-txt');
+  if(ctaTxt) ctaTxt.textContent=room.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';
+  document.getElementById('modal2-name').textContent=u;
+  document.getElementById('modal2-disp').textContent=room.display_name||'';
+  // Live pill
+  const pill=document.getElementById('modal2-live-pill');
+  if(pill) pill.innerHTML=room.num_users>0?`<span class="live-badge">🔴 EN VIVO · ${fmt(room.num_users)}</span>`:'';
+  // Stats
+  const statsRow=document.getElementById('modal2-stats-row');
+  if(statsRow){
+    const parts=[];
+    if(room.num_users)parts.push(`<span class="modal-stat-item"><span class="modal-stat-val" style="color:var(--hot)">${fmt(room.num_users)}</span> viewers</span>`);
+    if(room.country)parts.push(`<span class="modal-stat-item">🌍 ${room.country}</span>`);
+    statsRow.innerHTML=parts.join('<span style="opacity:.3;margin:0 .15rem">·</span>');
+  }
+  // Imagen hero
+  const imgWrap=document.getElementById('modal2-img-wrap');
+  if(imgWrap){
+    imgWrap.innerHTML=`<img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:100%;height:100%;object-fit:cover" onerror="this.src='https://thumb.live.mmcdn.com/ri/${u}.jpg'">`;
+  }
+  // Auto-embed si en vivo
+  if(room.num_users>0){
+    const frame=document.getElementById('modal2-embed-frame');
+    const wrap2=document.getElementById('modal2-embed-wrap');
+    const loading=document.getElementById('modal2-loading');
+    if(frame&&wrap2){
+      frame.src=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}&autoplay=1&disable_sound=0&mobileRedirect=never`;
+      wrap2.classList.add('active');
+      if(loading) loading.classList.remove('hidden');
+    }
+  }
+  // Activar clase dual en body para layout CSS
+  document.body.classList.add('dual-active');
+  const bg2=document.getElementById('modal2-bg');
+  bg2.style.display='flex';
+  requestAnimationFrame(()=>bg2.classList.add('open'));
+}
+function openModal2FromModal(){
+  // Abre un picker para elegir segundo modelo (usa prompt simple o abre lista)
+  const u=prompt('Usuario de Chaturbate para ver en paralelo:');
+  if(u&&u.trim()) openModal2(u.trim().toLowerCase());
+}
+function closeModal2(e){
+  if(e&&e.target!==document.getElementById('modal2-bg')&&e.type==='click') return;
+  const bg2=document.getElementById('modal2-bg');
+  if(!bg2) return;
+  bg2.classList.remove('open');
+  bg2.style.display='none';
+  document.body.classList.remove('dual-active');
+  const frame=document.getElementById('modal2-embed-frame');
+  const wrap2=document.getElementById('modal2-embed-wrap');
+  if(frame) frame.src='about:blank';
+  if(wrap2) wrap2.classList.remove('active');
+  _modal2Active=null;
+}
+// Exponer para cards: click derecho / long press abre modal2
+function openMod2FromCard(e,u){
+  e.preventDefault();e.stopPropagation();
+  openModal2(u);
+  return false;
 }
 function reportFromModal(){
   if(!active)return;
@@ -2798,7 +2947,6 @@ function reportFromModal(){
   switchTab('model');
   searchModel();
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
 
 /* ═══════════════════════════════════════════
    FAVORITES
@@ -2826,12 +2974,10 @@ function favMod(){if(!active)return;toggleFav({stopPropagation:()=>{}},active.us
 function setGender(btn,g){
   gender=g;
   document.querySelectorAll('.gnav-btn[data-g]').forEach(b=>b.classList.toggle('active',b.dataset.g===g));
-  document.querySelectorAll('.g-btn[data-g],.g-btn[onclick]').forEach(b=>{
-    const match=b.getAttribute('onclick')||'';
-    b.classList.toggle('active',match.includes(`'${g}'`)||(g===''&&match.includes("''")));
-  });
+  document.querySelectorAll('.g-btn[data-g]').forEach(b=>b.classList.toggle('active',b.dataset.g===g));
   renderCarousels();renderOnFilter();
 }
+function openInCB(u){window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`,'_blank','noopener');}
 function toggleFavFilter(btn){
   onlyFavs=!onlyFavs;
   document.querySelectorAll('#sd-fv,#md-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
@@ -3097,7 +3243,7 @@ async function loadModelReport(room,username){
   const stxt=document.getElementById('rp-status-txt');
   if(room&&room.num_users>0){dot.style.background='var(--hot)';stxt.style.color='var(--hot)';stxt.textContent='En vivo ahora';}
   else{dot.style.background='var(--txt3)';stxt.style.color='var(--txt3)';stxt.textContent='Offline en este momento';}
-  document.getElementById('rp-link').href=`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`;
+  document.getElementById('rp-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
 
   // Rank
   const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0));

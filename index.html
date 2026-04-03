@@ -1576,7 +1576,7 @@ function openMod(u){
   const subj=document.getElementById('m-subj');
   if(x.room_subject){subj.textContent='"'+x.room_subject+'"';subj.style.display='block';}else subj.style.display='none';
   document.getElementById('m-tags').innerHTML=(x.tags||[]).slice(0,16).map(t=>`<span class="m-tag">${t}</span>`).join('');
-  document.getElementById('m-link').href=`https://chaturbate.com/${x.username}/?campaign=rI8z3&track=default`;
+  document.getElementById('m-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${x.username}`;
   updateFavBtn(x.username);
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1593,10 +1593,10 @@ function startLivePreview(x){
     prevSec=30;
     prevCd=setInterval(()=>{prevSec--;const el=document.getElementById('live-timer');if(el) el.textContent='·'+prevSec+'s';if(prevSec<=0){prevSec=30;const img=document.getElementById('live-img');if(img){img.classList.add('loading');const ns=`${srcs[0]}?t=${Date.now()}`;const tmp=new Image();tmp.onload=()=>{img.src=ns;img.classList.remove('loading');};tmp.onerror=()=>img.classList.remove('loading');tmp.src=ns;}}},1000);
   }else{
-    wrap.innerHTML=`<div class="modal-hero-placeholder"><div class="mhp-avatar">👤</div><div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text2)">${x.display_name||u}</div><div class="mhp-offline"><span style="width:6px;height:6px;border-radius:50%;background:var(--text3);display:inline-block"></span>Offline en este momento</div><a href="https://chaturbate.com/${u}/?campaign=rI8z3&track=default" target="_blank" rel="noopener" style="margin-top:8px;background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;border-radius:9px;padding:7px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;box-shadow:0 4px 14px rgba(255,45,85,.35)">Ir a su sala ↗</a></div>`;
+    wrap.innerHTML=`<div class="modal-hero-placeholder"><div class="mhp-avatar">👤</div><div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text2)">${x.display_name||u}</div><div class="mhp-offline"><span style="width:6px;height:6px;border-radius:50%;background:var(--text3);display:inline-block"></span>Offline en este momento</div><a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}" target="_blank" rel="noopener" style="margin-top:8px;background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;border-radius:9px;padding:7px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;box-shadow:0 4px 14px rgba(255,45,85,.35)">Ir a su sala ↗</a></div>`;
   }
 }
-function openInCB(u){window.open(`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`,'_blank','noopener');}
+function openInCB(u){window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`,'_blank','noopener');}
 function closeMod(e){if(!e||e.target===document.getElementById('modal-bg')){document.getElementById('modal-bg').classList.remove('open');document.body.style.overflow='';clearInterval(prevCd);}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
 function toggleFav(e,u){e.stopPropagation();const i=favs.indexOf(u);if(i>=0){favs.splice(i,1);toast('Quitada de favoritas');}else{favs.push(u);toast('Guardada en favoritas ♥');}localStorage.setItem('cp3_favs',JSON.stringify(favs));document.getElementById('s-favs').textContent=favs.length;['gc-fv','fd-gc-fv'].forEach(id=>{const el=document.getElementById(id);if(el) el.textContent=favs.length;});render();}
@@ -1681,7 +1681,7 @@ async function loadModelReport(room){
   document.getElementById('rp-name').textContent=room.display_name||u;
   const gls={f:'Mujer',m:'Hombre',c:'Pareja',t:'Trans'};
   document.getElementById('rp-meta').textContent=[gls[room.gender]||'',room.country||'',room.age?room.age+'a':''].filter(Boolean).join(' · ');
-  document.getElementById('rp-link').href=`https://chaturbate.com/${u}/?campaign=rI8z3&track=default`;
+  document.getElementById('rp-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
   const rd=rooms.find(r=>r.username===u);
   const isOnline=rd&&!rd._forced&&(rd.num_users||0)>0;
   document.getElementById('rp-status-dot').style.background=isOnline?'var(--green)':'var(--text3)';

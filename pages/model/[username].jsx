@@ -415,7 +415,7 @@ export default function ModelPage({
         )}
 
         <a
-          href={`https://chaturbate.com/${username}/?campaign=rI8z3&track=default`}
+          href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${username}`}
           target="_blank"
           rel="noopener noreferrer"
           style={isLive ? styles.ctaLive : styles.cta}
@@ -431,7 +431,7 @@ export default function ModelPage({
             </div>
             <div style={styles.embedWrap}>
               <iframe
-                src={`https://chaturbate.com/in/?tour=dT8X&campaign=rI8z3&room=${username}&bgcolor=black`}
+                src={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${username}&bgcolor=black&disable_sound=0`}
                 style={styles.embedFrame}
                 allowFullScreen
                 frameBorder="0"
