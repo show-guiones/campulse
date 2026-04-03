@@ -806,7 +806,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
 /* Play overlay — pequeño, elegante, no tapa la imagen */
 .live-preview-wrap{position:relative;height:100%}
 .live-play-btn{
-  position:absolute;top:.5rem;left:.5rem;
+  position:absolute;top:.5rem;right:.5rem;left:auto;
   transform:none;
   width:40px;height:40px;border-radius:50%;
   background:rgba(255,42,109,.88);
@@ -824,7 +824,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
 
 /* Tap hint text under the play button */
 .live-tap-hint{
-  position:absolute;top:.5rem;left:3rem;
+  position:absolute;top:.5rem;right:3.2rem;left:auto;
   transform:none;
   font-size:.55rem;font-weight:700;color:rgba(255,255,255,.7);
   letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;
@@ -971,12 +971,13 @@ body.modal-open .crd-iframe-popup{display:none!important}
    MODAL V2 — video hero + analytics
 ═══════════════════════════════════════════ */
 .modal-v2{
-  max-height:95dvh;
-  height:95dvh;
+  max-height:92dvh;
+  height:auto;
+  min-height:55dvh;
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  /* Prevent any touch scroll from escaping the modal */
+  /* Solo el body scrollea, el hero es touch-none */
   touch-action:pan-y;
 }
 .mhero-v2{
@@ -988,11 +989,16 @@ body.modal-open .crd-iframe-popup{display:none!important}
   /* Hard lock: hero must NEVER scroll or resize */
   min-height:clamp(190px,38dvh,270px);
   max-height:clamp(190px,38dvh,270px);
+  /* Bloquear gestos táctiles sobre el hero — evita que el video se desplace */
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
 }
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
   /* Prevent iframe from introducing scroll */
   overflow:hidden;pointer-events:auto;
+  touch-action:none;
 }
 .mhero-v2 .embed-wrap .embed-frame{
   position:absolute;inset:0;
@@ -1605,10 +1611,13 @@ body.modal-open .crd-iframe-popup{display:none!important}
    RESPONSIVE
 ═══════════════════════════════════════════ */
 @media(min-width:601px){
-  .modal-bg{align-items:center;padding:1rem}
-  .modal{border-radius:24px;max-height:88dvh}
+  .modal-bg{align-items:center;padding:1.5rem}
+  .modal{border-radius:20px;max-height:88dvh;max-width:500px;width:100%}
   .modal-hero{height:280px}
   .modal::before{display:none}
+  /* modal-v2 en desktop: altura auto, sin hueco blanco */
+  .modal-v2{height:auto;min-height:0;max-height:88dvh;border-radius:20px}
+  .mhero-v2{height:clamp(220px,40dvh,300px);min-height:clamp(220px,40dvh,300px);max-height:clamp(220px,40dvh,300px)}
 }
 @media(max-width:900px){
   .drawer{display:none}
@@ -3421,7 +3430,7 @@ function swapDualSlot(slot){
     const liveRooms = [...rooms].filter(r=>r.num_users>0 && r.username !== otherUsername)
       .sort((a,b)=>b.num_users - a.num_users);
     dpGrid.innerHTML = liveRooms.map(r=>`
-      <div class="dp-card" onclick="swapDualConfirm('${r.username}');closeDualPicker();">
+      <div class="dp-card" onclick="swapDualConfirm('${r.username}');">
         <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
           onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
         <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
@@ -3437,6 +3446,8 @@ function swapDualConfirm(newUsername){
   if(!_swapTargetSlot || !newUsername) return;
   const slot = _swapTargetSlot;
   _swapTargetSlot = null;
+  const _pickerBg = document.getElementById('dual-picker-bg');
+  if(_pickerBg){ _pickerBg.classList.remove('open'); setTimeout(()=>{_pickerBg.style.display='none';},220); }
   const frame = document.getElementById('dv-frame-' + slot);
   const lblEl = document.getElementById('dv-label-' + slot);
   const linkEl = document.getElementById('dv-link-' + slot);
