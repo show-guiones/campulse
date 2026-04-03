@@ -965,10 +965,26 @@ header{
 /* ═══════════════════════════════════════════
    MODAL V2 — video hero + analytics
 ═══════════════════════════════════════════ */
-.modal-v2{max-height:95dvh;overflow:hidden;display:flex;flex-direction:column}
-.mhero-v2{position:relative;flex-shrink:0;height:240px;overflow:hidden;background:#000}
+.modal-v2{
+  max-height:95dvh;
+  height:95dvh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.mhero-v2{
+  position:relative;
+  flex-shrink:0;
+  height:clamp(200px,40dvh,280px);
+  overflow:hidden;
+  background:#000;
+}
 .mhero-v2 .embed-wrap{position:absolute;inset:0;z-index:5}
-.mhero-v2 .embed-wrap .embed-frame{width:100%;height:100%;border:none;display:block}
+.mhero-v2 .embed-wrap .embed-frame{
+  width:100%;height:100%;border:none;display:block;
+  /* Prevent iframe from creating extra scroll area */
+  position:absolute;inset:0;
+}
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover}
 .mhero-v2 .modal-hero-grad{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,.85));z-index:6;pointer-events:none}
@@ -984,7 +1000,16 @@ header{
   backdrop-filter:blur(6px);white-space:nowrap;
 }
 .mhero-stat-chip.hot{background:rgba(232,48,90,.85)}
-.mbody-v2{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:.75rem .9rem .9rem}
+/* Body gets remaining height — flex:1 + overflow-y:auto creates clean scroll */
+.mbody-v2{
+  flex:1;
+  min-height:0; /* critical: allows flex child to shrink below content size */
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  padding:.75rem .9rem 1.5rem;
+  background:var(--bg2);
+}
 
 /* Analytics panel */
 .modal-analytics{margin-top:.55rem;border-top:1px solid var(--bdr);padding-top:.6rem}
@@ -997,12 +1022,29 @@ header{
 /* Days grid */
 .man-days{display:flex;flex-wrap:wrap;gap:3px}
 .man-day{
-  width:16px;height:16px;border-radius:3px;
+  width:18px;height:18px;border-radius:3px;
   background:var(--surf);border:1px solid var(--bdr);
   cursor:default;position:relative;
+  display:flex;align-items:flex-end;justify-content:center;
+  overflow:hidden;
+}
+.man-day-lbl{
+  font-size:7px;font-weight:700;color:rgba(255,255,255,.35);
+  line-height:1;padding-bottom:1px;pointer-events:none;
 }
 .man-day.on{background:var(--hot);border-color:var(--hot)}
+.man-day.on .man-day-lbl{color:rgba(255,255,255,.7)}
 .man-day.mid{background:rgba(232,48,90,.4);border-color:rgba(232,48,90,.4)}
+.man-day.mid .man-day-lbl{color:rgba(255,255,255,.6)}
+/* Best-days bars */
+.man-bestdays{display:flex;flex-direction:column;gap:5px}
+.man-bd-row{display:grid;grid-template-columns:14px 1fr 36px;align-items:center;gap:.4rem}
+.man-bd-row.best .man-bd-fill{background:var(--hot)!important}
+.man-bd-row.best .man-bd-lbl{color:var(--hot);font-weight:800}
+.man-bd-lbl{font-size:.68rem;font-weight:600;color:var(--txt2);text-align:center}
+.man-bd-track{height:8px;background:var(--surf);border-radius:4px;overflow:hidden}
+.man-bd-fill{height:100%;background:var(--neon);border-radius:4px;transition:width .5s ease}
+.man-bd-val{font-size:.6rem;font-weight:700;color:var(--txt2);text-align:right;white-space:nowrap}
 .man-chart-wrap{position:relative;height:80px}
 .man-tags{display:flex;flex-wrap:wrap;gap:4px}
 .man-tag{background:rgba(255,255,255,.07);border-radius:8px;padding:2px 8px;font-size:.62rem;color:var(--txt2)}
@@ -1190,24 +1232,9 @@ header{
 /* ═══════════════════════════════════════════
    BOTTOM NAV (mobile)
 ═══════════════════════════════════════════ */
-.bottom-nav{
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;
-  height:var(--bnav);z-index:290;
-  background:rgba(20,21,25,.95);
-  backdrop-filter:blur(18px);
-  border-top:1px solid var(--bdr)
-}
-.bnav-inner{display:flex;height:100%;max-width:420px;margin:0 auto}
-.bnav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;background:none;border:none;
-  color:var(--txt3);font-size:.55rem;font-weight:600;
-  text-transform:uppercase;letter-spacing:.06em;transition:color .18s
-}
-.bnav-btn svg{width:20px;height:20px;transition:transform .2s}
-.bnav-btn.active{color:var(--hot)}
-.bnav-btn.active svg{transform:scale(1.1)}
+/* bottom-nav removed — kept as hidden no-op */
+.bottom-nav{display:none!important}
+.bnav-inner,.bnav-btn{display:none}
 
 /* ═══════════════════════════════════════════
    MODEL REPORT — redesigned friendly UX
@@ -1421,6 +1448,12 @@ header{
 .sched-day:hover{transform:scale(1.1)}
 .sched-day-lbl{font-size:.42rem;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:1px}
 .sched-day-val{font-size:.55rem;font-weight:700}
+.sched-day-best{box-shadow:0 0 0 2px var(--hot),0 4px 12px rgba(232,48,90,.3)}
+.sched-star{
+  position:absolute;top:-6px;right:-4px;
+  font-size:.55rem;line-height:1;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));
+}
 .sched-best-pill{
   display:inline-flex;align-items:center;gap:.35rem;
   background:rgba(255,200,64,.12);border:1px solid rgba(255,200,64,.3);
@@ -1470,10 +1503,9 @@ header{
   .drawer{display:none}
   .ham-btn{display:flex}
   .dtabs{display:none}
-  .bottom-nav{display:block}
-  body{padding-bottom:var(--bnav)}
-  .page{height:calc(100vh - var(--bnav))}
-  .rep-search{min-height:calc(100vh - var(--hdr) - var(--bnav))}
+  body{padding-bottom:0}
+  .page{height:calc(100vh)}
+  .rep-search{min-height:calc(100vh - var(--hdr))}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .modal-stats{grid-template-columns:repeat(4,1fr)}
 }
@@ -1499,7 +1531,7 @@ header{
   .filter-bar-chips{top:calc(40px + 37px);padding:.3rem .7rem .4rem}
   .gender-nav{top:0}
   .gender-nav{padding:0 .7rem}
-  .toast{bottom:calc(var(--bnav) + .65rem)}
+  .toast{bottom:.65rem}
 }
 @media(max-width:380px){
   .grid{grid-template-columns:repeat(3,1fr);gap:.22rem}
@@ -1558,7 +1590,18 @@ header{
     Live
     <span id="ts-label" style="color:rgba(255,255,255,.28);margin-left:2px">—</span>
   </div>
-  <span style="flex:1"></span>
+  <div class="hdr-tabs">
+    <div class="dtabs">
+      <button class="dtab active" id="tab-explore" onclick="switchTab('explore')">
+        <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Explorar
+      </button>
+      <button class="dtab" id="tab-model" onclick="switchTab('model')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 12c0-2.5 1.8-4 4-4s4 1.5 4 4"/><circle cx="6" cy="4" r="2.5"/><path d="M11 7h4M11 10h3M11 13h4"/></svg>
+        Mi Reporte
+      </button>
+    </div>
+  </div>
   <div class="hdr-r">
     <!-- 👤 Mi Reporte — floating menu button -->
     <div style="position:relative" id="report-menu-wrap">
@@ -1641,19 +1684,7 @@ header{
   </div>
 </div>
 
-<!-- BOTTOM NAV (mobile) -->
-<nav class="bottom-nav">
-  <div class="bnav-inner">
-    <button class="bnav-btn active" id="bnav-explore" onclick="switchTab('explore')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="9" height="9" rx="2"/><rect x="13" y="2" width="9" height="9" rx="2"/><rect x="2" y="13" width="9" height="9" rx="2"/><rect x="13" y="13" width="9" height="9" rx="2"/></svg>
-      Explorar
-    </button>
-    <button class="bnav-btn" id="bnav-model" onclick="switchTab('model')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/><circle cx="8" cy="5" r="3"/><path d="M16 8h6M16 12h4M16 16h5"/></svg>
-      Mi Reporte
-    </button>
-  </div>
-</nav>
+<!-- Bottom nav removed — Explorar and Mi Reporte are now accessible via header tabs and modal -->
 
 <div class="page">
 
@@ -1819,7 +1850,7 @@ header{
     <div class="rep-input-row">
       <div class="rep-input-wrap">
         <input type="text" id="model-username-input" placeholder="Tu username de Chaturbate" aria-label="Tu username de Chaturbate" onkeydown="if(event.key==='Enter')searchModel()">
-        <button onclick="searchModel()">Ver →</button>
+        <button id="model-search-btn" onclick="searchModel()">Ver →</button>
       </div>
     </div>
     <div id="model-search-error" class="rep-error" style="display:none"></div>
@@ -2052,12 +2083,15 @@ header{
         <button class="btn-sec btn-sec-rep" id="m-rep-toggle" onclick="toggleModalReport()">
           📊 <span>Stats</span>
         </button>
+        <button class="btn-sec" onclick="openModelReportFromModal()" title="Ver mi reporte completo">
+          👤 <span>Reporte</span>
+        </button>
       </div>
 
       <!-- ANALYTICS PANEL — días conexión + views destacados -->
       <div class="modal-analytics" id="modal-analytics" style="display:none">
         <div class="man-section">
-          <div class="man-title">📊 Analítica en tiempo real</div>
+          <div class="man-title">📊 Ahora mismo</div>
           <div class="man-kpis" id="man-kpis">
             <div class="man-kpi"><span class="man-kpi-val" id="man-viewers">—</span><span class="man-kpi-lbl">viewers ahora</span></div>
             <div class="man-kpi"><span class="man-kpi-val" id="man-followers">—</span><span class="man-kpi-lbl">seguidores</span></div>
@@ -2065,7 +2099,15 @@ header{
           </div>
         </div>
         <div class="man-section">
-          <div class="man-title">📅 Días de conexión (últimos 30d)</div>
+          <div class="man-title">📅 Esta semana</div>
+          <div class="man-kpis" id="man-weekly-kpis"></div>
+        </div>
+        <div class="man-section">
+          <div class="man-title">🏆 Mejor día para transmitir</div>
+          <div class="man-bestdays" id="man-bestdays"></div>
+        </div>
+        <div class="man-section">
+          <div class="man-title">📅 Actividad — últimos 30 días</div>
           <div class="man-days" id="man-days"></div>
         </div>
         <div class="man-section">
@@ -2890,6 +2932,10 @@ function loadModalAnalytics(x){
   const tagsEl=document.getElementById('man-tags');
   if(tagsEl) tagsEl.innerHTML=(x.tags||[]).slice(0,8).map(t=>`<span class="man-tag">#${t}</span>`).join('')||'<span class="man-tag" style="color:var(--txt3)">Sin tags</span>';
 
+  // Weekly KPIs placeholder
+  const wkEl=document.getElementById('man-weekly-kpis');
+  if(wkEl) wkEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Cargando semana…</span>';
+
   // Days — fetch history async
   const daysEl=document.getElementById('man-days');
   if(daysEl) daysEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Cargando…</span>';
@@ -2899,22 +2945,63 @@ function loadModalAnalytics(x){
     .then(r=>r.ok?r.json():null)
     .then(data=>{
       if(!data||!daysEl)return;
-      // Days grid — últimos 30 días
+
+      // Build last-30-days array
       const today=new Date();
       const days=[];
       for(let i=29;i>=0;i--){
         const d=new Date(today);d.setDate(today.getDate()-i);
         const key=d.toISOString().slice(0,10);
         const val=data.daily?.[key]||0;
-        days.push({key,val});
+        days.push({key,val,dow:d.getDay()});
       }
       const maxV=Math.max(...days.map(d=>d.val),1);
+
+      // Days grid — colour by intensity, label day-of-week
+      const DOW_LABELS=['D','L','M','X','J','V','S'];
       daysEl.innerHTML=days.map(d=>{
         const pct=d.val/maxV;
         const cls=pct>0.6?'on':pct>0.1?'mid':'';
-        const dow=['D','L','M','X','J','V','S'][new Date(d.key+'T12:00:00').getDay()];
-        return `<div class="man-day ${cls}" title="${d.key}: ${fmt(d.val)} viewers"></div>`;
+        return `<div class="man-day ${cls}" title="${d.key}: ${fmt(d.val)} viewers"><span class="man-day-lbl">${DOW_LABELS[d.dow]}</span></div>`;
       }).join('');
+
+      // ── Weekly aggregation ──
+      // Group by day-of-week (0=Sun…6=Sat) → avg viewers
+      const dowTotals=[0,0,0,0,0,0,0];
+      const dowCounts=[0,0,0,0,0,0,0];
+      days.forEach(d=>{
+        if(d.val>0){dowTotals[d.dow]+=d.val;dowCounts[d.dow]++;}
+      });
+      const dowAvg=dowTotals.map((t,i)=>dowCounts[i]>0?Math.round(t/dowCounts[i]):0);
+      const bestDow=dowAvg.indexOf(Math.max(...dowAvg));
+
+      // Viewers this week (last 7 days)
+      const last7=days.slice(-7);
+      const weekTotal=last7.reduce((s,d)=>s+d.val,0);
+      const weekAvg=Math.round(weekTotal/7);
+
+      // Render weekly KPIs
+      if(wkEl){
+        wkEl.innerHTML=`
+          <div class="man-kpi"><span class="man-kpi-val" style="color:var(--neon)">${fmt(weekTotal)}</span><span class="man-kpi-lbl">views esta semana</span></div>
+          <div class="man-kpi"><span class="man-kpi-val">${fmt(weekAvg)}</span><span class="man-kpi-lbl">promedio/día</span></div>
+          <div class="man-kpi" style="background:rgba(232,48,90,.10);border:1px solid rgba(232,48,90,.2)"><span class="man-kpi-val" style="color:var(--hot)">${DOW_LABELS[bestDow]}</span><span class="man-kpi-lbl">mejor día</span></div>`;
+      }
+
+      // ── Best-day-of-week bar chart ──
+      const bdEl=document.getElementById('man-bestdays');
+      if(bdEl){
+        const maxAvg=Math.max(...dowAvg,1);
+        bdEl.innerHTML=DOW_LABELS.map((lbl,i)=>{
+          const pct=Math.round((dowAvg[i]/maxAvg)*100);
+          const isBest=i===bestDow&&dowAvg[i]>0;
+          return `<div class="man-bd-row ${isBest?'best':''}">
+            <span class="man-bd-lbl">${lbl}</span>
+            <div class="man-bd-track"><div class="man-bd-fill" style="width:${pct}%"></div></div>
+            <span class="man-bd-val">${dowAvg[i]>0?fmt(dowAvg[i]):'—'}</span>
+          </div>`;
+        }).join('');
+      }
 
       // Mini chart
       if(chartCanvas&&data.daily){
@@ -2924,6 +3011,7 @@ function loadModalAnalytics(x){
     })
     .catch(()=>{
       if(daysEl) daysEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Sin datos históricos</span>';
+      if(wkEl) wkEl.innerHTML='';
     });
 }
 
@@ -2962,8 +3050,8 @@ function showDualPicker(){
   // Populate grid with live rooms (excluding current)
   const dpGrid=document.getElementById('dp-grid');
   if(dpGrid){
-    const liveRooms=[...rooms].filter(r=>r.num_users>0&&r.username!==active.username)
-      .sort((a,b)=>b.num_users-a.num_users).slice(0,24);
+  const liveRooms=[...rooms].filter(r=>r.num_users>0&&r.username!==active.username)
+      .sort((a,b)=>b.num_users-a.num_users);
     dpGrid.innerHTML=liveRooms.map(r=>`
       <div class="dp-card" onclick="openDualView('${active.username}','${r.username}');closeDualPicker();">
         <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
@@ -3194,6 +3282,21 @@ function reportFromModal(){
   toggleModalReport();
 }
 
+function openModelReportFromModal(){
+  if(!active)return;
+  // Pre-fill the username inputs
+  const u=active.username;
+  const inp=document.getElementById('model-username-input');
+  const inpMenu=document.getElementById('model-username-input-menu');
+  if(inp) inp.value=u;
+  if(inpMenu) inpMenu.value=u;
+  // Close modal
+  closeMod();
+  // Switch to model tab and load report
+  switchTab('model');
+  searchModel();
+}
+
 /* ═══════════════════════════════════════════
    FAVORITES
 ═══════════════════════════════════════════ */
@@ -3421,10 +3524,8 @@ function switchTab(tab){
   const explore=document.getElementById('page-explore');
   const model=document.getElementById('model-view');
   ['tab-explore','tab-model'].forEach(id=>{
-    document.getElementById(id).classList.toggle('active',id===`tab-${tab}`);
-  });
-  ['bnav-explore','bnav-model'].forEach(id=>{
-    document.getElementById(id).classList.toggle('active',id===`bnav-${tab}`);
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('active',id===`tab-${tab}`);
   });
   if(tab==='explore'){
     explore.classList.remove('hide');
@@ -3460,16 +3561,29 @@ function resetModelSearch(){
 async function searchModel(){
   const u=document.getElementById('model-username-input').value.trim().toLowerCase();
   const err=document.getElementById('model-search-error');
+  const btn=document.getElementById('model-search-btn');
   if(!u){err.style.display='block';err.textContent='Escribe tu username primero';return;}
   err.style.display='none';
+  // Show loading state
+  if(btn){btn.disabled=true;btn.textContent='Buscando…';}
   let room=rooms.find(r=>r.username===u)||null;
   if(!room){
     try{
-      const res=await fetch(`/api/rooms?username=${encodeURIComponent(u)}`);
-      const d=await res.json();
-      room=(d.results||[]).find(r=>r.username===u)||null;
-    }catch(e){}
+      // Try with small limit first (faster)
+      const ac=new AbortController();
+      const tid=setTimeout(()=>ac.abort(),8000);
+      const res=await fetch(`/api/rooms?username=${encodeURIComponent(u)}&limit=10`,{signal:ac.signal});
+      clearTimeout(tid);
+      if(res.ok){
+        const d=await res.json();
+        room=(d.results||[]).find(r=>r.username===u)||null;
+      }
+    }catch(e){
+      // 504 / timeout — proceed with null room (offline model)
+      room=null;
+    }
   }
+  if(btn){btn.disabled=false;btn.textContent='Buscar';}
   curModel=room;
   loadModelReport(room,u);
 }
@@ -3528,7 +3642,10 @@ async function loadModelReport(room,username){
 async function loadHistoricalData(username,room){
   const days=30;
   try{
-    const res=await fetch(`/api/history?username=${encodeURIComponent(username)}&days=${days}`);
+    const ac=new AbortController();
+    const tid=setTimeout(()=>ac.abort(),10000);
+    const res=await fetch(`/api/history?username=${encodeURIComponent(username)}&days=${days}`,{signal:ac.signal});
+    clearTimeout(tid);
     const data=await res.json();
     if(!data.length){
       el('rp-avg','—');el('rp-peak','—');el('rp-snaps','0 registros');
@@ -3570,7 +3687,12 @@ async function loadHistoricalData(username,room){
     renderTrendChart(data,dayAvgs,avg,peak,data.length);
     renderFollowersChart(data);
     renderScheduleSection(data);
-  }catch(e){el('rp-avg','—');el('rp-peak','—');}
+  }catch(e){
+    el('rp-avg','—');el('rp-peak','—');
+    // Show friendly error in charts
+    const cont=document.getElementById('heatmap-container');
+    if(cont) cont.innerHTML='<div class="chart-no-data" style="color:var(--txt3)">No se pudieron cargar los datos históricos. Intenta de nuevo en unos segundos.</div>';
+  }
 }
 
 function renderTrendChart(data,dayAvgs,avg,peak,snaps){
@@ -3652,17 +3774,20 @@ function renderScheduleSection(data){
   const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   const cont=document.getElementById('schedule-days-grid');
   if(!cont)return;
+  const best=avgByDay.reduce((b,c)=>c.avg>b.avg?c:b,avgByDay[0]);
   cont.innerHTML=avgByDay.map(({day,avg})=>{
     const pct=avg/mx;
+    const isBest=day===best.day&&avg>0;
     const opacity=0.1+pct*0.9;
-    const bg=`rgba(0,232,148,${opacity})`;
-    const txtColor=pct>0.6?'#000':'var(--txt)';
-    return`<div class="sched-day" style="background:${bg}" title="${DAYS[day]}: ${fmt(avg)} viewers promedio">
-      <div class="sched-day-lbl" style="color:${pct>0.6?'rgba(0,0,0,.7)':'var(--txt3)'}">${DAYS[day]}</div>
+    const bg=isBest?`rgba(232,48,90,${opacity})`:`rgba(0,232,148,${opacity})`;
+    const txtColor=pct>0.6?'#fff':'var(--txt)';
+    const border=isBest?'2px solid var(--hot)':'2px solid transparent';
+    return`<div class="sched-day${isBest?' sched-day-best':''}" style="background:${bg};border:${border}" title="${DAYS[day]}: ${fmt(avg)} viewers promedio">
+      ${isBest?'<div class="sched-star">⭐</div>':''}
+      <div class="sched-day-lbl" style="color:${pct>0.6?'rgba(255,255,255,.7)':'var(--txt3)'}">${DAYS[day]}</div>
       <div class="sched-day-val" style="color:${txtColor}">${fmt(avg)}</div>
     </div>`;
   }).join('');
-  const best=avgByDay.reduce((b,c)=>c.avg>b.avg?c:b,avgByDay[0]);
   const bestEl=document.getElementById('sched-best-label');
   const bestTxt=document.getElementById('sched-best-txt');
   if(bestEl&&bestTxt&&best.avg>0){
