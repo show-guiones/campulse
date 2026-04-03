@@ -1033,6 +1033,8 @@ body.modal-open .crd-iframe-popup{display:none!important}
   scroll-behavior:smooth;
   padding:.75rem .9rem 2rem;
   background:var(--bg2);
+  /* Evitar que el body crezca más allá del modal */
+  max-height:100%;
 }
 /* No phantom spacer below modal */
 .modal-v2::after{display:none}
@@ -1227,12 +1229,17 @@ body.modal-open .crd-iframe-popup{display:none!important}
 /* Mobile: vertical stack */
 .dv-swap-btn{
   position:absolute;top:.4rem;right:.5rem;z-index:15;
-  background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.18);
-  color:#fff;font-size:.62rem;font-weight:700;
-  padding:3px 8px;border-radius:6px;cursor:pointer;
-  backdrop-filter:blur(4px);transition:background .15s;
+  background:rgba(232,48,90,.82);border:1px solid rgba(255,255,255,.25);
+  color:#fff;font-size:.65rem;font-weight:800;
+  padding:5px 11px;border-radius:8px;cursor:pointer;
+  backdrop-filter:blur(6px);transition:background .15s;
+  letter-spacing:.02em;
+  /* Asegurar tap area mínima en mobile */
+  min-height:30px;min-width:70px;
+  display:flex;align-items:center;justify-content:center;gap:3px;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
-.dv-swap-btn:hover{background:var(--hot)}
+.dv-swap-btn:hover,.dv-swap-btn:active{background:var(--hot);transform:scale(1.04)}
 .dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
@@ -1644,6 +1651,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
   .rep-search-title{font-size:1.6rem}
   .modal-bg{padding:0;align-items:flex-end}
   .modal{border-radius:24px 24px 0 0;max-height:90dvh;width:100%}
+  .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:90dvh}
   .modal-hero{height:250px}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
@@ -3415,48 +3423,69 @@ function closeDualView(){
 
 /* ── SWAP SLOT: change one room without closing dual view ── */
 let _swapTargetSlot = null; // 'a' or 'b'
+
+/* ── SWAP: abre el picker en modo swap para el slot indicado ── */
 function swapDualSlot(slot){
   _swapTargetSlot = slot;
-  // Show dual picker in swap mode
   const bg = document.getElementById('dual-picker-bg');
-  const nameEl = document.getElementById('dp-current-name');
+  if(!bg) return;
+
+  // Título del hint
+  const hint = bg.querySelector('.dp-hint');
+  if(hint) hint.innerHTML = `Elige la sala que reemplazará al <strong>Panel ${slot.toUpperCase()}</strong>`;
+
+  // Excluir la sala del slot contrario
   const otherSlot = slot === 'a' ? 'b' : 'a';
-  const otherLabel = document.getElementById('dv-label-' + otherSlot);
-  if(nameEl) nameEl.textContent = (otherLabel?.textContent||'la otra sala') + ' (sala ' + otherSlot.toUpperCase() + ')';
-  // Populate grid excluding the other slot's current model
+  const otherFrame = document.getElementById('dv-frame-' + otherSlot);
+  const otherUsername = otherFrame?.src?.match(/embed\/([^/]+)\//)?.[1] || '';
+
+  // Poblar grid — al clickear llama swapDualConfirm con slot hardcoded en el onclick
   const dpGrid = document.getElementById('dp-grid');
-  const otherUsername = document.getElementById('dv-frame-' + otherSlot)?.src?.match(/embed\/([^/]+)\//)?.[1] || '';
   if(dpGrid){
-    const liveRooms = [...rooms].filter(r=>r.num_users>0 && r.username !== otherUsername)
-      .sort((a,b)=>b.num_users - a.num_users);
+    const liveRooms = [...rooms]
+      .filter(r => r.num_users > 0 && r.username !== otherUsername)
+      .sort((a,b) => b.num_users - a.num_users);
     dpGrid.innerHTML = liveRooms.map(r=>`
-      <div class="dp-card" onclick="swapDualConfirm('${r.username}');">
+      <div class="dp-card" onclick="swapDualConfirm('${slot}','${r.username}')">
         <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
           onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
         <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
         <div class="dp-card-name">${r.display_name||r.username}</div>
       </div>`).join('');
   }
-  // Update hint text
-  const hint = bg?.querySelector('.dp-hint');
-  if(hint) hint.innerHTML = `Elige la sala que reemplazará al <strong>panel ${slot.toUpperCase()}</strong>`;
-  if(bg){bg.style.display='flex';requestAnimationFrame(()=>bg.classList.add('open'));}
+
+  // Limpiar input de búsqueda
+  const inp = document.getElementById('dp-input');
+  if(inp) inp.value = '';
+
+  // Abrir picker
+  bg.style.display = 'flex';
+  requestAnimationFrame(() => bg.classList.add('open'));
 }
-function swapDualConfirm(newUsername){
-  if(!_swapTargetSlot || !newUsername) return;
-  const slot = _swapTargetSlot;
-  _swapTargetSlot = null;
-  const _pickerBg = document.getElementById('dual-picker-bg');
-  if(_pickerBg){ _pickerBg.classList.remove('open'); setTimeout(()=>{_pickerBg.style.display='none';},220); }
-  const frame = document.getElementById('dv-frame-' + slot);
-  const lblEl = document.getElementById('dv-label-' + slot);
-  const linkEl = document.getElementById('dv-link-' + slot);
-  const r = rooms.find(r=>r.username===newUsername)||{username:newUsername};
-  const mkUrl = u=>`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
-  const mkAffLink = u=>`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
-  if(frame){ frame.src='about:blank'; setTimeout(()=>{frame.src=mkUrl(newUsername);},80); }
-  if(lblEl) lblEl.textContent = r.display_name||newUsername;
-  if(linkEl){ linkEl.href=mkAffLink(newUsername); linkEl.textContent=`Entrar con ${r.display_name||newUsername} ↗`; }
+
+/* ── SWAP CONFIRM: slot y username llegan como args — sin estado global ── */
+function swapDualConfirm(slot, newUsername){
+  if(!slot || !newUsername) return;
+  _swapTargetSlot = null; // limpiar estado
+
+  // Cerrar el picker
+  const pickerBg = document.getElementById('dual-picker-bg');
+  if(pickerBg){
+    pickerBg.classList.remove('open');
+    setTimeout(() => { pickerBg.style.display = 'none'; }, 220);
+  }
+
+  // Actualizar el iframe del slot
+  const frame  = document.getElementById('dv-frame-'  + slot);
+  const lblEl  = document.getElementById('dv-label-'  + slot);
+  const linkEl = document.getElementById('dv-link-'   + slot);
+  const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
+  const mkUrl = u => `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
+  const mkAffLink = u => `https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
+
+  if(frame){ frame.src = 'about:blank'; setTimeout(() => { frame.src = mkUrl(newUsername); }, 100); }
+  if(lblEl)  lblEl.textContent = r.display_name || newUsername;
+  if(linkEl){ linkEl.href = mkAffLink(newUsername); linkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
 }
 
 // ─── CARD MINI PLAYER — HLS nativo con hls.js (sin iframe) ───
