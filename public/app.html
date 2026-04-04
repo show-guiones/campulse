@@ -1220,6 +1220,11 @@ header{
   pointer-events:none;
 }
 .dv-embed-wrap{flex:1;position:relative;background:#000}
+/* Overlay transparente sobre el iframe — intercepta click y redirige con afiliado */
+.dv-iframe-overlay{
+  position:absolute;inset:0;z-index:5;cursor:pointer;
+  background:transparent;
+}
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
   content:'';
@@ -2295,6 +2300,7 @@ body.modal-open{overflow:hidden!important}
           <iframe id="dv-frame-a" class="dv-frame" src="about:blank"
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
@@ -2308,6 +2314,7 @@ body.modal-open{overflow:hidden!important}
           <iframe id="dv-frame-b" class="dv-frame" src="about:blank"
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
@@ -3391,8 +3398,15 @@ function openDualFromInput(){
 }
 
 /* ── DUAL VIEW ── */
+let dvSlotUser={a:'',b:''};
+function openDvSlot(slot){
+  const u=dvSlotUser[slot];
+  if(!u) return;
+  window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');
+}
 function openDualView(uA,uB){
   if(!uA||!uB)return;
+  dvSlotUser.a=uA; dvSlotUser.b=uB;
   const bg=document.getElementById('dual-view-bg');
   const frameA=document.getElementById('dv-frame-a');
   const frameB=document.getElementById('dv-frame-b');
@@ -3493,6 +3507,8 @@ function swapDualConfirm(slot, newUsername){
   }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
   if(linkEl){ linkEl.href = mkAffLink(newUsername); linkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
+  // Actualizar username del slot para el overlay de click
+  dvSlotUser[slot] = newUsername;
 }
 function closeMod(e){
   if(!e||e.target===document.getElementById('modal-bg')){
