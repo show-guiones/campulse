@@ -822,12 +822,28 @@ header{
   transition:background .15s
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
-/* embed-click-overlay desactivado: pointer-events:none permite interactuar
-   con el iframe (volumen, fullscreen). El CTA "Entrar a la sala" en el body
-   ya cubre la redirección con afiliado. */
+/* Capa transparente sobre el iframe — intercepta clicks y redirige con afiliado.
+   Dos rectángulos cubren todo EXCEPTO la esquina inf-izq (80x60px) del volumen CB. */
 .embed-click-overlay{
-  display:none;
+  position:absolute;inset:0;z-index:9;
+  background:transparent;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:none;
   pointer-events:none;
+}
+/* Rectángulo superior: todo el ancho, hasta 60px del fondo */
+.embed-click-overlay::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;bottom:60px;
+  cursor:pointer;pointer-events:auto;
+}
+/* Rectángulo inf-derecho: desde 80px izq, últimos 60px de alto */
+.embed-click-overlay::after{
+  content:'';
+  position:absolute;
+  left:80px;right:0;bottom:0;height:60px;
+  cursor:pointer;pointer-events:auto;
 }
 
 /* Name & meta over hero */
@@ -1245,9 +1261,24 @@ header{
 /* dv-iframe-overlay desactivado: pointer-events:none permite interactuar
    directamente con el iframe (volumen, fullscreen). El CTA "Entrar sala ↗"
    ya provee el enlace de afiliado — el overlay era redundante en dual view. */
+/* Dos rectángulos cubren todo EXCEPTO la esquina inf-izq (80x60px) del volumen CB. */
 .dv-iframe-overlay{
-  display:none;
+  position:absolute;inset:0;
+  z-index:5;
+  background:transparent;
   pointer-events:none;
+}
+.dv-iframe-overlay::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;bottom:60px;
+  cursor:pointer;pointer-events:auto;
+}
+.dv-iframe-overlay::after{
+  content:'';
+  position:absolute;
+  left:80px;right:0;bottom:0;height:60px;
+  cursor:pointer;pointer-events:auto;
 }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
