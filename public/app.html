@@ -692,6 +692,10 @@ header{
   height:260px;
   overflow:hidden;cursor:pointer;flex-shrink:0
 }
+/* mhero-v2 usa aspect-ratio — no imponer height fija para evitar espacio en blanco */
+.modal-hero.mhero-v2{
+  height:auto;
+}
 .modal-hero img,.live-preview-img{
   width:100%;height:100%;object-fit:cover;
   transition:transform .4s ease
@@ -856,7 +860,7 @@ header{
 
 /* Offline */
 .mhp-wrap{
-  height:240px;display:flex;flex-direction:column;
+  position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:.55rem;
   background:linear-gradient(160deg,var(--bg3),var(--surf))
 }
@@ -1534,6 +1538,8 @@ header{
   .modal-bg{align-items:center;padding:1.5rem}
   .modal{border-radius:20px;max-height:88dvh;max-width:500px;width:100%}
   .modal-hero{height:280px}
+  /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
+  .modal-hero.mhero-v2{height:auto}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
@@ -1581,6 +1587,7 @@ header{
   .modal{border-radius:24px 24px 0 0;max-height:90dvh;width:100%}
   .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:90dvh}
   .modal-hero{height:250px}
+  .modal-hero.mhero-v2{height:auto}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar-top{padding:.35rem .7rem;top:40px}
@@ -1595,6 +1602,7 @@ header{
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
   /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
   .modal-hero{height:190px!important}
+  .modal-hero.mhero-v2{height:auto!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
 }
@@ -2771,6 +2779,13 @@ function lazyLoadImages(){
   document.querySelectorAll('.crd[data-username][data-live="1"]').forEach(art => {
     observer.observe(art);
   });
+
+  // Marcar imágenes ya cargadas desde caché (complete=true pero onload no se dispara)
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.crd-img:not(.loaded)').forEach(img=>{
+      if(img.complete && img.naturalWidth>0) img.classList.add('loaded');
+    });
+  });
 }
 
 function startCardPreview(art, u){
@@ -2787,7 +2802,12 @@ function startCardPreview(art, u){
   const refreshImg = () => {
     const newSrc = srcs[tick % srcs.length] + '?t=' + Date.now();
     const tmp = new Image();
-    tmp.onload = () => { if(img && img.parentElement) img.src = newSrc; };
+    tmp.onload = () => {
+      if(img && img.parentElement){
+        img.src = newSrc;
+        img.classList.add('loaded');
+      }
+    };
     tmp.src = newSrc;
     tick++;
   };
