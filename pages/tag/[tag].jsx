@@ -1,4 +1,11 @@
 // pages/tag/[tag].jsx
+//
+// Refactor: getServerSideProps consulta Supabase directamente (sin fetch interno).
+// Antes: SSR → /api/tag → Supabase  (2 saltos de red)
+// Ahora: SSR → Supabase  (1 salto directo)
+//
+// El endpoint /api/tag se conserva para uso desde el cliente (app.html, etc.)
+
 import Head from "next/head";
 
 const SITE = "https://www.campulsehub.com";
@@ -11,9 +18,40 @@ const COUNTRY_FLAGS = {
 
 export async function getServerSideProps({ params }) {
   const { tag } = params;
+
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return { props: { tag, models: [] } };
+  }
+
+  const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+  const sbHeaders = {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`,
+  };
+
   try {
-    const r = await fetch(`${SITE}/api/tag?tag=${encodeURIComponent(tag)}&limit=100`);
-    const models = r.ok ? await r.json() : [];
+    const url =
+      `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+      `?captured_at=gte.${since}` +
+      `&tags=cs.{"${tag}"}` +
+      `&select=username,display_name,num_users,country,gender` +
+      `&order=num_users.desc` +
+      `&limit=100`;
+
+    const r = await fetch(url, { headers: sbHeaders });
+    const data = r.ok ? await r.json() : [];
+
+    // Deduplicar por username
+    const seen = new Set();
+    const models = (Array.isArray(data) ? data : []).filter((row) => {
+      if (seen.has(row.username)) return false;
+      seen.add(row.username);
+      return true;
+    });
+
     return { props: { tag, models } };
   } catch {
     return { props: { tag, models: [] } };
