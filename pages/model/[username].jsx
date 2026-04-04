@@ -431,11 +431,13 @@ export default function ModelPage({
             </div>
             <div style={styles.embedWrap}>
               <iframe
-                src={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${username}&bgcolor=black&disable_sound=0`}
+                src={`https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never`}
                 style={styles.embedFrame}
+                allow="autoplay; fullscreen; encrypted-media"
                 allowFullScreen
                 frameBorder="0"
                 scrolling="no"
+                referrerPolicy="no-referrer-when-downgrade"
                 title={`${name} en vivo en Chaturbate`}
               />
             </div>
