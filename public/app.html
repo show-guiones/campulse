@@ -822,34 +822,12 @@ header{
   transition:background .15s
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
-/* Capa transparente sobre el iframe — intercepta clicks y redirige con afiliado.
-   Volumen CB está en esquina INF-IZQ sobre el scrollbar.
-   Hueco: 80px ancho x 52px alto en esquina inferior izquierda. */
+/* Capa transparente sobre el iframe — intercepta clicks y redirige con params de afiliado */
 .embed-click-overlay{
-  position:absolute;
-  top:0;left:0;right:0;
-  bottom:17px;
-  z-index:9;
-  background:transparent;
+  position:absolute;inset:0;z-index:9;
+  background:transparent;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   touch-action:none;
-  pointer-events:none;
-}
-/* Rectángulo superior: todo el ancho, hasta 52px del fondo */
-.embed-click-overlay::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;
-  bottom:52px;
-  cursor:pointer;pointer-events:auto;
-}
-/* Rectángulo inf-derecho: desde 80px izq, últimos 52px de alto */
-.embed-click-overlay::after{
-  content:'';
-  position:absolute;
-  left:80px;right:0;
-  bottom:0;height:52px;
-  cursor:pointer;pointer-events:auto;
 }
 
 /* Name & meta over hero */
@@ -1250,7 +1228,7 @@ header{
   backdrop-filter:blur(4px);transition:background .15s;
 }
 .dv-swap-btn:hover{background:var(--hot)}
-.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:visible}
+.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
 }
@@ -1263,19 +1241,16 @@ header{
   font-size:.65rem;font-weight:700;color:#fff;backdrop-filter:blur(4px);
   pointer-events:none;
 }
-.dv-embed-wrap{flex:1;position:relative;background:#000;overflow:hidden}
-/* dv-iframe-overlay desactivado: pointer-events:none permite interactuar
-   directamente con el iframe (volumen, fullscreen). El CTA "Entrar sala ↗"
-   ya provee el enlace de afiliado — el overlay era redundante en dual view. */
-/* Overlay cubre todo EXCEPTO la franja inferior (52px):
-   scrollbar 17px + control de volumen 35px = libres para interacción. */
+.dv-embed-wrap{flex:1;position:relative;background:#000}
+/* Overlay transparente sobre el iframe — intercepta click y redirige con afiliado.
+   bottom:17px excluye la franja del scrollbar horizontal del iframe para que
+   el usuario pueda desplazarse a izquierda/derecha sin activar el enlace. */
 .dv-iframe-overlay{
   position:absolute;
-  top:0;left:0;right:0;
-  bottom:52px;
-  z-index:5;
+  top:40px;left:0;right:0;
+  bottom:17px;
+  z-index:5;cursor:pointer;
   background:transparent;
-  cursor:pointer;
 }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
