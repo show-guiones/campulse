@@ -759,20 +759,29 @@ header{
 /* ── EMBED EN VIVO ── */
 .embed-wrap{
   display:none;position:absolute;inset:0;z-index:5;
-  background:#000;
+  /* Sin background: el thumbnail de z-index:2 es visible durante carga */
+  background:transparent;
 }
 .embed-wrap.active{display:block}
 .embed-frame{
   width:100%;height:100%;border:none;display:block
 }
+/* embed-loading: capa negra ENCIMA del iframe — tapa el blanco de Chaturbate
+   z-index:8 > iframe (no tiene z-index, auto) pero < embed-back-btn(z-index:10) */
 .embed-loading{
-  position:absolute;inset:0;display:flex;
+  position:absolute;inset:0;z-index:8;display:flex;
   align-items:center;justify-content:center;
   background:#000;color:var(--txt2);font-size:.75rem;
   gap:.5rem;flex-direction:column;pointer-events:none;
-  transition:opacity .3s
+  transition:opacity .6s ease;
 }
-.embed-loading.hidden{opacity:0}
+/* Cuando video-ready: fade-out del negro — el iframe ya renderiza frames reales */
+.embed-wrap.video-ready .embed-loading{
+  opacity:0;
+  pointer-events:none;
+}
+/* .hidden ya no se usa para el loading — lo controla video-ready */
+.embed-loading.hidden{opacity:0;pointer-events:none}
 .embed-loading-spinner{
   width:28px;height:28px;border-radius:50%;
   border:2px solid rgba(255,255,255,.12);
@@ -912,14 +921,8 @@ header{
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
   overflow:hidden;pointer-events:auto;touch-action:none;
-  background:#000;
-  /* Empieza invisible — el thumbnail se ve detrás mientras carga el stream */
-  opacity:0;
-  transition:opacity 1.2s ease;
-}
-/* Cuando el stream está listo, fade-in del iframe sobre el thumbnail */
-.mhero-v2 .embed-wrap.video-ready{
-  opacity:1;
+  /* Transparente: el embed-loading negro (z-index:8) tapa el iframe hasta video-ready */
+  background:transparent;
 }
 .mhero-v2 .embed-wrap .embed-frame{
   position:absolute;top:0;left:0;
@@ -2890,7 +2893,13 @@ function openMod(u){
   const embedWrap=document.getElementById('mhero-embed-wrap');
   const imgWrap=document.getElementById('mhero-img-wrap');
   if(frame) frame.src='about:blank';
-  if(embedWrap){ embedWrap.classList.remove('active'); embedWrap.classList.remove('video-ready'); }
+  if(embedWrap){
+    embedWrap.classList.remove('active');
+    embedWrap.classList.remove('video-ready');
+  }
+  // Resetear embed-loading: quitar clase hidden para que esté listo (negro) en próxima apertura
+  const loadingEl=document.getElementById('embed-loading');
+  if(loadingEl) loadingEl.classList.remove('hidden');
 
   // Thumbnail de fondo — siempre visible, evita cualquier espacio blanco
   const heroThumb=document.getElementById('hero-thumb');
@@ -2986,16 +2995,20 @@ function activateEmbed(u){
 function onEmbedLoad(){
   const loading=document.getElementById('embed-loading');
   const wrap=document.getElementById('mhero-embed-wrap');
-  if(loading) loading.classList.add('hidden');
-  // Fade-in del iframe sobre el thumbnail después de 2s
-  // (tiempo para que el stream de Chaturbate empiece a renderizar frames)
-  if(wrap) setTimeout(()=>wrap.classList.add('video-ready'), 2000);
+  // NO ocultar embed-loading aquí — el negro debe permanecer hasta que
+  // Chaturbate empieza a renderizar frames reales (~2.5s después de load)
+  // video-ready activa el fade-out del embed-loading via CSS
+  if(wrap) setTimeout(()=>{
+    wrap.classList.add('video-ready');
+  }, 2500);
 }
 function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
   const frame=document.getElementById('live-embed-frame');
+  const loading=document.getElementById('embed-loading');
   if(frame) frame.src='about:blank';
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); }
+  if(loading) loading.classList.remove('hidden');
 }
 
 /* ── ANALYTICS PANEL ── */
