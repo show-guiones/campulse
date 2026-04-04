@@ -1,25 +1,98 @@
 // pages/gender/index.jsx
-// Ruta: pages/gender/index.jsx
 //
-// Página índice de géneros — SSR (getServerSideProps)
-// Cambiado de getStaticProps a getServerSideProps para evitar páginas
-// cacheadas con datos vacíos cuando la API aún no estaba lista.
+// Refactor: getServerSideProps consulta Supabase directamente (sin fetch interno).
+// Antes: SSR → /api/gender?list=1 → Supabase  (2 saltos de red)
+// Ahora: SSR → Supabase  (1 salto directo)
+//
+// El endpoint /api/gender se conserva para uso desde el cliente.
 
 import Head from "next/head";
 
 const SITE = "https://www.campulsehub.com";
 
-const GENDER_ICONS = {
-  female: "♀",
-  male:   "♂",
-  couple: "♥",
-  trans:  "⚧",
+// Mapa inverso: valor BD (CHAR 1) → slug URL
+const DB_TO_SLUG = { f: "female", m: "male", c: "couple", t: "trans" };
+
+const GENDER_INFO = {
+  female: {
+    name: "Chicas",
+    nameEs: "Mujeres",
+    emoji: "♀️",
+    description: "Las mejores modelos femeninas de Chaturbate",
+    icon: "♀",
+  },
+  male: {
+    name: "Chicos",
+    nameEs: "Hombres",
+    emoji: "♂️",
+    description: "Los mejores modelos masculinos de Chaturbate",
+    icon: "♂",
+  },
+  couple: {
+    name: "Parejas",
+    nameEs: "Parejas",
+    emoji: "👫",
+    description: "Las mejores parejas de Chaturbate en vivo",
+    icon: "♥",
+  },
+  trans: {
+    name: "Trans",
+    nameEs: "Trans",
+    emoji: "⚧️",
+    description: "Las mejores modelos trans de Chaturbate",
+    icon: "⚧",
+  },
 };
 
+const DAYS = 30;
+
 export async function getServerSideProps() {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return { props: { genders: [] } };
+  }
+
+  const since = new Date(Date.now() - DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const sbHeaders = {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`,
+  };
+
   try {
-    const r = await fetch(`${SITE}/api/gender?list=1`);
-    const genders = r.ok ? await r.json() : [];
+    const url =
+      `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+      `?captured_at=gte.${since}` +
+      `&select=username,gender` +
+      `&limit=50000`;
+
+    const r = await fetch(url, { headers: sbHeaders });
+    const rows = r.ok ? await r.json() : [];
+
+    // Agrupa por slug URL (convirtiendo CHAR 1 → slug)
+    const map = {};
+    for (const row of (Array.isArray(rows) ? rows : [])) {
+      const dbVal = (row.gender || "").toLowerCase().trim();
+      const slug = DB_TO_SLUG[dbVal];
+      if (!slug || !GENDER_INFO[slug]) continue;
+      if (!map[slug]) map[slug] = new Set();
+      map[slug].add(row.username);
+    }
+
+    const genders = Object.entries(GENDER_INFO)
+      .map(([key, info]) => ({
+        gender: key,
+        name: info.name,
+        nameEs: info.nameEs,
+        emoji: info.emoji,
+        description: info.description,
+        models: map[key] ? map[key].size : 0,
+        slug: `/gender/${key}`,
+      }))
+      .filter((g) => g.models > 0)
+      .sort((a, b) => b.models - a.models);
+
     return { props: { genders } };
   } catch {
     return { props: { genders: [] } };
@@ -31,6 +104,13 @@ export default function GenderPage({ genders }) {
   const pageDescription =
     "Explora modelos de Chaturbate por género: chicas, chicos, parejas y trans. " +
     "Ranking en tiempo real ordenado por viewers. Estadísticas actualizadas cada 2 horas.";
+
+  const GENDER_ICONS = {
+    female: "♀",
+    male:   "♂",
+    couple: "♥",
+    trans:  "⚧",
+  };
 
   const schema = {
     "@context": "https://schema.org",
