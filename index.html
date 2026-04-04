@@ -350,14 +350,27 @@ header{
 .gf-btn.on-c{background:rgba(176,96,255,.12);border-color:var(--couple);color:var(--couple)}
 .gf-btn.on-t{background:rgba(0,255,204,.08);border-color:var(--trans);color:var(--trans)}
 .qchip{
-  display:flex;align-items:center;gap:3px;flex-shrink:0;
+  display:flex;align-items:center;gap:4px;flex-shrink:0;
   background:var(--surf);border:1px solid var(--bdr);color:var(--txt3);
-  border-radius:6px;font-size:.66rem;font-weight:600;
-  padding:.27rem .55rem;cursor:pointer;transition:all .14s;white-space:nowrap;
+  border-radius:20px;font-size:.66rem;font-weight:700;
+  padding:.3rem .65rem;cursor:pointer;transition:all .18s;white-space:nowrap;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  user-select:none;
 }
-.qchip:hover{color:var(--txt2);border-color:rgba(255,255,255,.11)}
-.qchip.on{background:rgba(255,26,78,.14);border-color:var(--hot);color:var(--hot2)}
-.qchip.on-g{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.35);color:var(--gold)}
+.qchip:hover{color:var(--txt2);border-color:rgba(255,255,255,.18);background:var(--surf2)}
+/* Estado ACTIVO — visualmente claro */
+.qchip.on{
+  background:var(--hot);border-color:var(--hot);
+  color:#fff;
+  box-shadow:0 0 10px rgba(255,26,78,.45);
+}
+.qchip.on-g{
+  background:rgba(245,200,66,.18);border-color:rgba(245,200,66,.55);
+  color:var(--gold);font-weight:800;
+}
+/* Age chips — variante para rangos de edad */
+.qchip.age{color:var(--txt3)}
+.qchip.age.on{background:rgba(0,212,255,.18);border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.3);}
 .sort-sel{
   background:var(--surf);border:1px solid var(--bdr);border-radius:7px;
   color:var(--txt2);font-family:'DM Sans',sans-serif;font-size:.66rem;font-weight:600;
@@ -472,7 +485,7 @@ header{
 
 /* Badges — top left */
 .crd-top{
-  position:absolute;top:7px;left:7px;right:7px;
+  position:absolute;top:5px;left:5px;right:5px;
   display:flex;align-items:flex-start;justify-content:space-between;
   z-index:2;
 }
@@ -487,15 +500,27 @@ header{
 .bdg-hd{background:rgba(0,212,255,.85);color:#001a22;font-size:.44rem}
 .bdg-new{background:rgba(0,232,122,.85);color:#001a0a;font-size:.44rem}
 .crd-fav{
-  width:24px;height:24px;border-radius:50%;
-  background:rgba(0,0,0,.5);border:none;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,.55);border:none;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,.3);font-size:.68rem;
-  transition:transform .2s,color .15s;
-  backdrop-filter:blur(4px);
+  color:rgba(255,255,255,.35);font-size:.82rem;
+  transition:transform .18s,color .15s,background .15s;
+  backdrop-filter:blur(6px);
+  /* Elimina el delay de 300ms en tap en iOS/Android */
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  /* Área táctil extendida invisible — mínimo 44×44px recomendado por Apple/Google */
+  position:relative;
 }
-.crd-fav:hover{transform:scale(1.2);color:rgba(255,255,255,.7)}
-.crd-fav.is-fav{color:var(--hot);text-shadow:0 0 8px var(--hot)}
+.crd-fav::after{
+  content:'';
+  position:absolute;
+  inset:-8px;
+  border-radius:50%;
+}
+.crd-fav:hover{transform:scale(1.15);color:rgba(255,255,255,.8);background:rgba(0,0,0,.7)}
+.crd-fav.is-fav{color:var(--hot);background:rgba(255,26,78,.2);text-shadow:0 0 10px var(--hot)}
+.crd-fav.is-fav:hover{background:rgba(255,26,78,.35)}
 
 /* Viewer count — bottom left, sobre overlay */
 .crd-vw{
@@ -860,7 +885,9 @@ header{
   .crd-name{font-size:.62rem}
   .crd-sub{font-size:.5rem}
   .crd-vw{font-size:.48rem;bottom:36px;padding:1px 5px}
-  .crd-fav{width:20px;height:20px;font-size:.6rem}
+  /* Favorito en móvil: 36px visible + pseudo-elemento para zona táctil de 48px */
+  .crd-fav{width:36px;height:36px;font-size:.8rem}
+  .crd-fav::after{inset:-6px}
   .bdg{font-size:.4rem;padding:1px 4px}
   /* Report */
   .report-search-screen{padding:2rem 1rem;gap:.85rem}
@@ -1106,9 +1133,15 @@ header{
         <button class="gf-btn" data-g="t">⚧</button>
       </div>
       <div class="fb-div"></div>
-      <button class="qchip" id="tb-co">🇨🇴</button>
+      <button class="qchip" id="tb-co">🇨🇴 CO</button>
       <button class="qchip" id="tb-fv">♥ Favs</button>
       <button class="qchip" id="tb-hd">HD</button>
+      <div class="fb-div"></div>
+      <button class="qchip age" id="tb-age-18" onclick="setAgeFilter('18-21')">18–21</button>
+      <button class="qchip age" id="tb-age-22" onclick="setAgeFilter('22-25')">22–25</button>
+      <button class="qchip age" id="tb-age-26" onclick="setAgeFilter('26-30')">26–30</button>
+      <button class="qchip age" id="tb-age-31" onclick="setAgeFilter('31-40')">31–40</button>
+      <button class="qchip age" id="tb-age-40" onclick="setAgeFilter('40+')">40+</button>
       <div class="fb-div"></div>
       <select class="sort-sel" id="srt">
         <option value="viewers">↓ Viewers</option>
@@ -1523,7 +1556,17 @@ function setTagFilter(t){activeTag=activeTag===t?'':t;updateTagFilter();render()
 function setCountryFilter(c){activeCountry=activeCountry===c?'':c;updateCountryFilter();render();}
 function setAgeFilter(r){
   ageRange=ageRange===r?'':r;
-  ['18-21','22-25','26-30','31-40','40+'].forEach(rv=>{['age-','fd-age-'].forEach(p=>{const el=document.getElementById(p+rv.split('-')[0]);if(el) el.classList.toggle('active',ageRange===rv);});});render();
+  // Sync drawer + sidebar age pills
+  ['18-21','22-25','26-30','31-40','40+'].forEach(rv=>{
+    ['age-','fd-age-'].forEach(p=>{const el=document.getElementById(p+rv.split('-')[0]);if(el) el.classList.toggle('active',ageRange===rv);});
+  });
+  // Sync new filter-bar age qchips
+  ['18-21','22-25','26-30','31-40','40+'].forEach(rv=>{
+    const key='tb-age-'+rv.split('-')[0];
+    const el=document.getElementById(key);
+    if(el) el.classList.toggle('on',ageRange===rv);
+  });
+  render();
 }
 function updateCountryFilter(){
   const F={US:'🇺🇸',CO:'🇨🇴',MX:'🇲🇽',BR:'🇧🇷',RO:'🇷🇴',DE:'🇩🇪',ES:'🇪🇸',RU:'🇷🇺',PL:'🇵🇱',CZ:'🇨🇿',HU:'🇭🇺',UA:'🇺🇦',IT:'🇮🇹',FR:'🇫🇷',GB:'🇬🇧',AR:'🇦🇷',CA:'🇨🇦',VE:'🇻🇪'};
@@ -1599,7 +1642,20 @@ function startLivePreview(x){
 function openInCB(u){window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`,'_blank','noopener');}
 function closeMod(e){if(!e||e.target===document.getElementById('modal-bg')){document.getElementById('modal-bg').classList.remove('open');document.body.style.overflow='';clearInterval(prevCd);}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
-function toggleFav(e,u){e.stopPropagation();const i=favs.indexOf(u);if(i>=0){favs.splice(i,1);toast('Quitada de favoritas');}else{favs.push(u);toast('Guardada en favoritas ♥');}localStorage.setItem('cp3_favs',JSON.stringify(favs));document.getElementById('s-favs').textContent=favs.length;['gc-fv','fd-gc-fv'].forEach(id=>{const el=document.getElementById(id);if(el) el.textContent=favs.length;});render();}
+function toggleFav(e,u){
+  e.stopPropagation();
+  if(navigator.vibrate){navigator.vibrate(30);}
+  const btn=e.currentTarget;
+  btn.style.transform='scale(1.45)';
+  setTimeout(()=>{btn.style.transform='';},180);
+  const i=favs.indexOf(u);
+  if(i>=0){favs.splice(i,1);toast('Quitada de favoritas');}
+  else{favs.push(u);toast('Guardada en favoritas ♥');}
+  localStorage.setItem('cp3_favs',JSON.stringify(favs));
+  document.getElementById('s-favs').textContent=favs.length;
+  ['gc-fv','fd-gc-fv'].forEach(id=>{const el=document.getElementById(id);if(el) el.textContent=favs.length;});
+  render();
+}
 function favMod(){if(!active) return;toggleFav({stopPropagation:()=>{}},active.username);updateFavBtn(active.username);}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 
@@ -1613,13 +1669,17 @@ document.querySelectorAll('[data-g]').forEach(b=>{
   });
 });
 
-document.getElementById('sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active');render();});
-document.getElementById('sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active');render();});
-document.getElementById('fd-sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active');render();});
-document.getElementById('fd-sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active');render();});
-document.getElementById('tb-co').addEventListener('click',function(){setCountryFilter('CO');this.classList.toggle('on-g');});
-document.getElementById('tb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('on');render();});
-document.getElementById('tb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('on');render();});
+document.getElementById('sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active',onlyFavs);document.getElementById('tb-fv').classList.toggle('on',onlyFavs);render();});
+document.getElementById('sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active',onlyHD);document.getElementById('tb-hd').classList.toggle('on',onlyHD);render();});
+document.getElementById('fd-sb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('active',onlyFavs);document.getElementById('tb-fv').classList.toggle('on',onlyFavs);render();});
+document.getElementById('fd-sb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('active',onlyHD);document.getElementById('tb-hd').classList.toggle('on',onlyHD);render();});
+document.getElementById('tb-co').addEventListener('click',function(){
+  setCountryFilter('CO');
+  // Sync visual state with actual filter (not simple toggle)
+  this.classList.toggle('on-g', activeCountry==='CO');
+});
+document.getElementById('tb-fv').addEventListener('click',function(){onlyFavs=!onlyFavs;this.classList.toggle('on',onlyFavs);render();});
+document.getElementById('tb-hd').addEventListener('click',function(){onlyHD=!onlyHD;this.classList.toggle('on',onlyHD);render();});
 document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;render();});
 document.getElementById('search').addEventListener('input',()=>render());
 document.getElementById('ref-btn').addEventListener('click',load);
