@@ -594,9 +594,8 @@ header{
 .sk-body{padding:.45rem .55rem .55rem}
 .sk-line{height:.5rem;border-radius:4px;background:var(--surf2);margin-bottom:.3rem;animation:shimmer 1.6s infinite}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-/* Images INSIDE cards fade in smoothly */
-/* images appear immediately — no opacity flicker */
-.crd-img{opacity:0;transition:opacity .3s ease}.crd-img.loaded{opacity:1}
+/* Images appear immediately — crd-media background is the placeholder */
+.crd-img{opacity:1;transition:transform .3s}
 
 /* ═══════════════════════════════════════════
    EMPTY STATE
@@ -917,6 +916,14 @@ header{
 .mhero-v2 .hero-thumb{
   position:absolute;inset:0;z-index:2;
   width:100%;height:100%;object-fit:cover;display:block;
+  /* Ocultar cuando src está vacío para evitar placeholder blanco del browser */
+  background:#000;
+  color:transparent; /* oculta el alt text */
+}
+/* Sin src válido el img se colapsa visualmente sin mostrar blanco */
+.mhero-v2 .hero-thumb:not([src]), 
+.mhero-v2 .hero-thumb[src=""] {
+  visibility:hidden;
 }
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
@@ -1176,7 +1183,16 @@ header{
   font-size:.65rem;font-weight:700;color:#fff;backdrop-filter:blur(4px);
   pointer-events:none;
 }
-.dv-embed-wrap{flex:1;position:relative}
+.dv-embed-wrap{flex:1;position:relative;background:#000}
+/* Capa negra sobre los iframes de dual view hasta que el stream cargue */
+.dv-embed-wrap::before{
+  content:'';
+  position:absolute;inset:0;z-index:3;
+  background:#000;
+  transition:opacity .8s ease;
+  pointer-events:none;
+}
+.dv-embed-wrap.stream-ready::before{opacity:0;pointer-events:none}
 .dv-frame{position:absolute;inset:0;width:100%;height:100%;border:none;display:block}
 .dv-panel-actions{flex-shrink:0;padding:.35rem .5rem;background:rgba(12,13,16,.9)}
 .dv-cta{
@@ -3332,11 +3348,21 @@ function openDualView(uA,uB){
   if(lblB) lblB.textContent=rB.display_name||uB;
   if(linkA){linkA.href=mkAffLink(uA);linkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
   if(linkB){linkB.href=mkAffLink(uB);linkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
-  // Small delay so iframes load after display
+  // Reset cubiertas negras — evita flash blanco de Chaturbate
+  const wrapA=document.getElementById('dv-panel-a')?.querySelector('.dv-embed-wrap');
+  const wrapB=document.getElementById('dv-panel-b')?.querySelector('.dv-embed-wrap');
+  if(wrapA) wrapA.classList.remove('stream-ready');
+  if(wrapB) wrapB.classList.remove('stream-ready');
   if(bg) bg.style.display='flex';
   setTimeout(()=>{
-    if(frameA) frameA.src=mkUrl(uA);
-    if(frameB) frameB.src=mkUrl(uB);
+    if(frameA){
+      frameA.src=mkUrl(uA);
+      frameA.onload=()=>setTimeout(()=>wrapA&&wrapA.classList.add('stream-ready'),2500);
+    }
+    if(frameB){
+      frameB.src=mkUrl(uB);
+      frameB.onload=()=>setTimeout(()=>wrapB&&wrapB.classList.add('stream-ready'),2500);
+    }
   },120);
   document.body.style.overflow='hidden';
   // Cerrar picker y modal principal
@@ -3348,8 +3374,10 @@ function closeDualView(){
   const bg=document.getElementById('dual-view-bg');
   const frameA=document.getElementById('dv-frame-a');
   const frameB=document.getElementById('dv-frame-b');
-  if(frameA) frameA.src='about:blank';
-  if(frameB) frameB.src='about:blank';
+  if(frameA){ frameA.onload=null; frameA.src='about:blank'; }
+  if(frameB){ frameB.onload=null; frameB.src='about:blank'; }
+  // Resetear cubiertas para próxima apertura
+  document.querySelectorAll('.dv-embed-wrap').forEach(w=>w.classList.remove('stream-ready'));
   if(bg) bg.style.display='none';
   document.body.style.overflow='';
 }
@@ -3394,7 +3422,15 @@ function swapDualConfirm(slot, newUsername){
   const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
   const mkUrl = u => `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
   const mkAffLink = u => `https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
-  if(frame){ frame.src = 'about:blank'; setTimeout(() => { frame.src = mkUrl(newUsername); }, 100); }
+  if(frame){
+    const wrapEl=frame.closest('.dv-embed-wrap');
+    if(wrapEl) wrapEl.classList.remove('stream-ready');
+    frame.src='about:blank';
+    setTimeout(()=>{
+      frame.src=mkUrl(newUsername);
+      frame.onload=()=>setTimeout(()=>wrapEl&&wrapEl.classList.add('stream-ready'),2500);
+    },100);
+  }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
   if(linkEl){ linkEl.href = mkAffLink(newUsername); linkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
 }
