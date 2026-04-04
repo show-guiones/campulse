@@ -3093,8 +3093,22 @@ function loadModalAnalytics(x){
 
   fetch(`/api/history?username=${encodeURIComponent(u)}`)
     .then(r=>r.ok?r.json():null)
-    .then(data=>{
-      if(!data||!daysEl)return;
+    .then(raw=>{
+      if(!raw||!daysEl)return;
+
+      // La API devuelve un array de snapshots: [{captured_at, num_users, ...}]
+      // Convertir a data.daily = {"YYYY-MM-DD": maxViewers del día}
+      let data = raw;
+      if(Array.isArray(raw)){
+        const dailyMap={};
+        raw.forEach(snap=>{
+          if(!snap.captured_at) return;
+          const key=snap.captured_at.slice(0,10);
+          const v=snap.num_users||0;
+          if(!dailyMap[key]||v>dailyMap[key]) dailyMap[key]=v;
+        });
+        data={daily:dailyMap};
+      }
 
       // Build last-30-days array
       const today=new Date();
