@@ -2966,7 +2966,7 @@ function openMod(u){
   // Name + CTA
   document.getElementById('m-name').textContent=x.display_name||x.username;
   document.getElementById('m-disp').textContent=x.username!==x.display_name?'@'+x.username:'';
-  document.getElementById('m-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${x.username}`;
+  document.getElementById('m-link').href=`https://es.chaturbate.com/${x.username}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${x.username}&tour=LQps&track=default`;
   const ctaTxt=document.getElementById('m-cta-txt');
   const ctaIco=document.getElementById('m-cta-ico');
   if(ctaTxt) ctaTxt.textContent=x.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';
@@ -3013,7 +3013,7 @@ function openMod(u){
         <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
         <div class="mhp-name">${x.display_name||u}</div>
         <div class="mhp-offline"><div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>Offline en este momento</div>
-        <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
+        <a href="https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
       </div>`;
   }
 
@@ -3061,7 +3061,7 @@ function onEmbedLoad(){
 function openActiveRoomAffiliate(){
   if(!active) return;
   const u=active.username;
-  const url=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}&disable_sound=0&join_overlay=1`;
+  const url=`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
   window.open(url,'_blank','noopener');
 }
 function deactivateEmbed(){
@@ -3401,7 +3401,7 @@ function openDualView(uA,uB){
   const linkA=document.getElementById('dv-link-a');
   const linkB=document.getElementById('dv-link-b');
   const mkUrl=(u)=>`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
-  const mkAffLink=(u)=>`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`;
+  const mkAffLink=(u)=>`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
   const rA=rooms.find(r=>r.username===uA)||{username:uA};
   const rB=rooms.find(r=>r.username===uB)||{username:uB};
   if(lblA) lblA.textContent=rA.display_name||uA;
@@ -3481,7 +3481,7 @@ function swapDualConfirm(slot, newUsername){
   const linkEl = document.getElementById('dv-link-'   + slot);
   const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
   const mkUrl = u => `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
-  const mkAffLink = u => `https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`;
+  const mkAffLink = u => `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
   if(frame){
     const wrapEl=frame.closest('.dv-embed-wrap');
     if(wrapEl) wrapEl.classList.remove('stream-ready');
@@ -3569,7 +3569,7 @@ function setGender(btn,g){
   document.querySelectorAll('.g-btn[data-g]').forEach(b=>b.classList.toggle('active',b.dataset.g===g));
   renderCarousels();renderOnFilter();
 }
-function openInCB(u){window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`,'_blank','noopener');}
+function openInCB(u){window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');}
 function toggleFavFilter(btn){
   onlyFavs=!onlyFavs;
   document.querySelectorAll('#sd-fv,#md-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
@@ -3685,9 +3685,7 @@ document.getElementById('vl').addEventListener('click',()=>{
   document.getElementById('vl').classList.add('active');
   render();
 });
-document.getElementById('tb-co').addEventListener('click',function(){toggleColFilter(this);});
-document.getElementById('tb-fv').addEventListener('click',function(){toggleFavFilter(this);});
-document.getElementById('tb-hd').addEventListener('click',function(){toggleHDFilter(this);});
+// tb-fv, tb-hd, tb-co usan onclick directamente en el HTML — sin duplicar listeners
 // ref-btn puede no existir en versiones sin botón de refresh
 const _refBtn=document.getElementById('ref-btn');
 if(_refBtn) _refBtn.addEventListener('click',load);
@@ -3846,7 +3844,7 @@ async function loadModelReport(room,username){
   const stxt=document.getElementById('rp-status-txt');
   if(room&&room.num_users>0){dot.style.background='var(--hot)';stxt.style.color='var(--hot)';stxt.textContent='En vivo ahora';}
   else{dot.style.background='var(--txt3)';stxt.style.color='var(--txt3)';stxt.textContent='Offline en este momento';}
-  document.getElementById('rp-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`;
+  document.getElementById('rp-link').href=`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
 
   // Rank
   const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
