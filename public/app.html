@@ -3522,21 +3522,16 @@ function toggleDvAudio(slot, e){
   const frame = document.getElementById('dv-frame-'+slot);
   const btn = document.getElementById('dv-audio-'+slot);
   if(!frame || !btn) return;
-  // Unmute via postMessage (Chaturbate accepts this)
-  try {
-    frame.contentWindow.postMessage({event:'mute', muted:false}, '*');
-  } catch(err){}
-  // Toggle muted on the frame element as fallback
-  try {
-    const video = frame.contentDocument?.querySelector('video');
-    if(video){ video.muted = !video.muted; }
-  } catch(err){}
-  const isMuted = btn.classList.toggle('muted');
-  btn.textContent = isMuted ? '🔇' : '🔊';
-  // Open the room with affiliate link if can't control audio cross-origin
-  if(btn.classList.contains('muted') === false){
-    // Successfully toggled — do nothing else
-  }
+  const u = dvSlotUser[slot];
+  if(!u) return;
+  // Toggle state
+  const wasMuted = btn.classList.contains('muted');
+  const nowMuted = !wasMuted;
+  btn.classList.toggle('muted', nowMuted);
+  btn.textContent = nowMuted ? '🔇' : '🔊';
+  // Reload iframe with disable_sound param — única forma de controlar audio cross-origin
+  const sound = nowMuted ? 1 : 0;
+  frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=${sound}&mobileRedirect=never`;
 }
 
 function openDvSlot(slot){
