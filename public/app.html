@@ -1267,32 +1267,15 @@ header{
 /* dv-iframe-overlay desactivado: pointer-events:none permite interactuar
    directamente con el iframe (volumen, fullscreen). El CTA "Entrar sala ↗"
    ya provee el enlace de afiliado — el overlay era redundante en dual view. */
-/* Dos rectángulos cubren todo EXCEPTO la esquina inf-izq donde está el volumen CB.
-   El ícono 🔇 está sobre el scrollbar: bottom:17px (scrollbar) + 35px control = 52px total.
-   Hueco: 80px ancho x 52px alto en esquina inferior izquierda. */
+/* Overlay cubre todo EXCEPTO la franja inferior (52px):
+   scrollbar 17px + control de volumen 35px = libres para interacción. */
 .dv-iframe-overlay{
   position:absolute;
   top:0;left:0;right:0;
-  bottom:0; /* scrollbar libre via overflow:visible en dv-panel */
+  bottom:52px;
   z-index:5;
   background:transparent;
-  pointer-events:none;
-}
-/* Rectángulo superior: todo el ancho, desde arriba hasta 52px del fondo del overlay */
-.dv-iframe-overlay::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;
-  bottom:52px;
-  cursor:pointer;pointer-events:auto;
-}
-/* Rectángulo inf-derecho: desde 80px izq, últimos 52px de alto del overlay */
-.dv-iframe-overlay::after{
-  content:'';
-  position:absolute;
-  left:80px;right:0;
-  bottom:0;height:52px;
-  cursor:pointer;pointer-events:auto;
+  cursor:pointer;
 }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
