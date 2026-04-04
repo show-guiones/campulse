@@ -822,19 +822,17 @@ header{
   transition:background .15s
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
-/* Overlay de afiliado — cuatro franjas que dejan libre la esquina inferior-izquierda
-   donde Chaturbate muestra el botón de audio (~140px × 55px) */
-.embed-click-overlay{
-  position:absolute;inset:0;z-index:9;
-  background:transparent;cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:none;
-  /* Excluye esquina inferior-izquierda: polígono que cubre todo EXCEPTO 140×55px */
-  clip-path:polygon(
-    0 0,100% 0,100% 100%,
-    140px 100%,140px calc(100% - 55px),
-    0 calc(100% - 55px)
-  );
+/* Overlay afiliado modal principal: display:contents agrupa sin cubrir nada */
+.embed-click-overlay{ display:contents; }
+.embed-ov-main{
+  position:absolute;top:0;left:0;right:0;bottom:55px;
+  z-index:9;cursor:pointer;background:transparent;
+  -webkit-tap-highlight-color:transparent;touch-action:none;
+}
+.embed-ov-bottom-right{
+  position:absolute;bottom:0;left:140px;right:0;height:55px;
+  z-index:9;cursor:pointer;background:transparent;
+  -webkit-tap-highlight-color:transparent;touch-action:none;
 }
 
 /* Name & meta over hero */
@@ -1252,17 +1250,16 @@ header{
 /* Overlay dual-view — intercepta click y redirige con afiliado.
    top:40px protege el label superior; clip-path excluye esquina inferior-izquierda
    donde vive el botón de audio de Chaturbate (~140px × 55px desde abajo). */
-.dv-iframe-overlay{
-  position:absolute;
-  top:40px;left:0;right:0;
-  bottom:0;
-  z-index:5;cursor:pointer;
-  background:transparent;
-  clip-path:polygon(
-    0 0,100% 0,100% 100%,
-    140px 100%,140px calc(100% - 55px),
-    0 calc(100% - 55px)
-  );
+/* Overlay afiliado dual-view: 4 franjas que dejan libre esquina inferior-izquierda
+   donde vive el botón de audio de Chaturbate (~140px ancho x 55px alto) */
+.dv-iframe-overlay{ display:contents; }
+.dv-ov-top{
+  position:absolute;top:40px;left:0;right:0;height:calc(100% - 40px - 55px);
+  z-index:5;cursor:pointer;background:transparent;
+}
+.dv-ov-bottom-right{
+  position:absolute;bottom:0;left:140px;right:0;height:55px;
+  z-index:5;cursor:pointer;background:transparent;
 }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
@@ -2200,7 +2197,10 @@ body.modal-open{overflow:hidden!important}
           allow="autoplay; fullscreen; encrypted-media" allowFullscreen
           referrerpolicy="no-referrer-when-downgrade"></iframe>
         <!-- Intercepta clicks en el iframe — abre sala con params de afiliado -->
-        <div class="embed-click-overlay" id="embed-click-overlay" onclick="openActiveRoomAffiliate()"></div>
+        <div class="embed-click-overlay" id="embed-click-overlay">
+          <div class="embed-ov-main" onclick="openActiveRoomAffiliate()"></div>
+          <div class="embed-ov-bottom-right" onclick="openActiveRoomAffiliate()"></div>
+        </div>
       </div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
@@ -2364,7 +2364,10 @@ body.modal-open{overflow:hidden!important}
           <iframe id="dv-frame-a" class="dv-frame" src="about:blank"
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
+          <div class="dv-iframe-overlay" id="dv-overlay-a">
+            <div class="dv-ov-top" onclick="openDvSlot('a')"></div>
+            <div class="dv-ov-bottom-right" onclick="openDvSlot('a')"></div>
+          </div>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
@@ -2378,7 +2381,10 @@ body.modal-open{overflow:hidden!important}
           <iframe id="dv-frame-b" class="dv-frame" src="about:blank"
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
+          <div class="dv-iframe-overlay" id="dv-overlay-b">
+            <div class="dv-ov-top" onclick="openDvSlot('b')"></div>
+            <div class="dv-ov-bottom-right" onclick="openDvSlot('b')"></div>
+          </div>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
