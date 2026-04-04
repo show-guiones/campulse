@@ -905,31 +905,29 @@ header{
   /* Sin height ni max-height: el navegador calcula alto = ancho * 9/16 */
 }
 .mhero-v2 .embed-wrap{
-  /* Llenar el contenedor — sobresale por todos lados para ocultar
-     la UI de Chaturbate (top bar + bottom bar) */
+  /* iframe exactamente al tamaño del hero — sin stretch ni letterbox */
   position:absolute;
-  top:-45px;left:-2px;right:-2px;bottom:-45px;
+  inset:0;
   z-index:5;
   overflow:hidden;
   pointer-events:auto;
   touch-action:none;
   background:#000;
 }
-/* Capa negra extra encima del embed hasta que el video arranque */
+/* Capa negra que cubre TODO hasta que video-ready se active */
 .mhero-v2 .embed-wrap::before{
   content:'';
   position:absolute;inset:0;
   background:#000;
-  z-index:2;
+  z-index:10;
   opacity:1;
-  transition:opacity 1s ease 2s; /* fade out 1s, con delay de 2s */
+  transition:opacity .6s ease;
   pointer-events:none;
 }
 .mhero-v2 .embed-wrap.video-ready::before{
   opacity:0;
 }
 .mhero-v2 .embed-wrap .embed-frame{
-  /* Iframe escala para llenar el wrap (que ya sobresale 45px arriba/abajo) */
   position:absolute;
   top:0;left:0;
   width:100%;
@@ -939,6 +937,24 @@ header{
   pointer-events:auto;
   scrolling:no;
   z-index:1;
+}
+/* Franjas negras que ocultan la barra superior e inferior de Chaturbate.
+   Están sobre el iframe (z-index:8) pero dentro de mhero-v2.
+   El iframe sigue siendo 100%×100% → Chaturbate renderiza 16:9 sin letterbox. */
+.mhero-v2 .cb-mask-top,
+.mhero-v2 .cb-mask-bottom{
+  position:absolute;left:0;right:0;
+  background:#000;
+  z-index:8;
+  pointer-events:none;
+}
+.mhero-v2 .cb-mask-top{
+  top:0;
+  height:36px; /* cubre barra superior de Chaturbate ~35px */
+}
+.mhero-v2 .cb-mask-bottom{
+  bottom:0;
+  height:26px; /* cubre barra inferior de Chaturbate ~25px */
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -2111,6 +2127,9 @@ body.modal-open{overflow:hidden!important}
           allow="autoplay; fullscreen; encrypted-media" allowFullscreen
           referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
+      <!-- Franjas negras que ocultan barras UI de Chaturbate -->
+      <div class="cb-mask-top"></div>
+      <div class="cb-mask-bottom"></div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
@@ -2990,11 +3009,10 @@ function activateEmbed(u){
 function onEmbedLoad(){
   const loading=document.getElementById('embed-loading');
   const wrap=document.getElementById('mhero-embed-wrap');
-  // Ocultar spinner inmediatamente
   if(loading) loading.classList.add('hidden');
-  // La capa negra (::before) se mantiene hasta que el video arranque (~2s)
-  // Luego fade-out suave de 1s (controlado por CSS transition con delay:2s)
-  if(wrap) setTimeout(()=>wrap.classList.add('video-ready'), 500);
+  // Quitar la capa negra de carga tras 1.5s — las máscaras top/bottom
+  // permanentes (cb-mask-top, cb-mask-bottom) ya ocultan la UI de Chaturbate
+  if(wrap) setTimeout(()=>wrap.classList.add('video-ready'), 1500);
 }
 function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
