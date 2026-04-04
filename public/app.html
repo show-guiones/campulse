@@ -1243,24 +1243,14 @@ header{
 .dv-embed-wrap{flex:1;position:relative;background:#000;overflow:hidden;touch-action:none;}
 /* Overlay dual-view — intercepta click y redirige con afiliado.
    top:40px protege el label superior; clip-path excluye esquina inferior-izquierda
-/* Overlay afiliado dual-view: cubre TODO el iframe para afiliado */
+/* Overlay dual-view: solo intercepta clicks en zona central (no audio, no scrollbar)
+   El CTA "Entrar con X" en la parte inferior maneja el link de afiliado */
 .dv-iframe-overlay{
-  position:absolute;inset:0;z-index:5;
-  cursor:pointer;background:transparent;
-  touch-action:none;
+  position:absolute;
+  top:35px;left:0;right:0;bottom:60px;
+  z-index:5;cursor:pointer;background:transparent;
 }
-/* Botón de audio propio — esquina inferior izquierda, sobre el overlay */
-.dv-audio-btn{
-  position:absolute;bottom:.4rem;left:.4rem;z-index:10;
-  background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.2);
-  border-radius:50%;width:32px;height:32px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:#fff;font-size:14px;
-  backdrop-filter:blur(4px);transition:background .15s;
-  -webkit-tap-highlight-color:transparent;
-}
-.dv-audio-btn:hover{background:rgba(232,48,90,.7);}
-.dv-audio-btn.muted{opacity:.6;}
+
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
   content:'';
@@ -2362,7 +2352,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
-          <button class="dv-audio-btn muted" id="dv-audio-a" onclick="toggleDvAudio('a',event)" title="Activar audio">🔇</button>
+          
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
@@ -2377,7 +2367,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
-          <button class="dv-audio-btn muted" id="dv-audio-b" onclick="toggleDvAudio('b',event)" title="Activar audio">🔇</button>
+          
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
