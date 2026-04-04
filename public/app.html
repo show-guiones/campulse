@@ -799,6 +799,13 @@ header{
   transition:background .15s
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
+/* Capa transparente sobre el iframe — intercepta clicks y redirige con params de afiliado */
+.embed-click-overlay{
+  position:absolute;inset:0;z-index:9;
+  background:transparent;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:none;
+}
 
 /* Name & meta over hero */
 .modal-hero-info{
@@ -2125,6 +2132,8 @@ body.modal-open{overflow:hidden!important}
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
           allow="autoplay; fullscreen; encrypted-media" allowFullscreen
           referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <!-- Intercepta clicks en el iframe — abre sala con params de afiliado -->
+        <div class="embed-click-overlay" id="embed-click-overlay" onclick="openActiveRoomAffiliate()"></div>
       </div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
@@ -2934,7 +2943,7 @@ function openMod(u){
   // Name + CTA
   document.getElementById('m-name').textContent=x.display_name||x.username;
   document.getElementById('m-disp').textContent=x.username!==x.display_name?'@'+x.username:'';
-  document.getElementById('m-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${x.username}`;
+  document.getElementById('m-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${x.username}`;
   const ctaTxt=document.getElementById('m-cta-txt');
   const ctaIco=document.getElementById('m-cta-ico');
   if(ctaTxt) ctaTxt.textContent=x.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';
@@ -2981,7 +2990,7 @@ function openMod(u){
         <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
         <div class="mhp-name">${x.display_name||u}</div>
         <div class="mhp-offline"><div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>Offline en este momento</div>
-        <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
+        <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
       </div>`;
   }
 
@@ -3024,6 +3033,13 @@ function onEmbedLoad(){
   if(wrap) setTimeout(()=>{
     wrap.classList.add('video-ready');
   }, 2500);
+}
+/* Abre la sala activa con URL de afiliado completa cuando el usuario toca el video */
+function openActiveRoomAffiliate(){
+  if(!active) return;
+  const u=active.username;
+  const url=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}&disable_sound=0&join_overlay=1`;
+  window.open(url,'_blank','noopener');
 }
 function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
@@ -3362,7 +3378,7 @@ function openDualView(uA,uB){
   const linkA=document.getElementById('dv-link-a');
   const linkB=document.getElementById('dv-link-b');
   const mkUrl=(u)=>`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
-  const mkAffLink=(u)=>`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
+  const mkAffLink=(u)=>`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`;
   const rA=rooms.find(r=>r.username===uA)||{username:uA};
   const rB=rooms.find(r=>r.username===uB)||{username:uB};
   if(lblA) lblA.textContent=rA.display_name||uA;
@@ -3442,7 +3458,7 @@ function swapDualConfirm(slot, newUsername){
   const linkEl = document.getElementById('dv-link-'   + slot);
   const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
   const mkUrl = u => `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
-  const mkAffLink = u => `https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
+  const mkAffLink = u => `https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`;
   if(frame){
     const wrapEl=frame.closest('.dv-embed-wrap');
     if(wrapEl) wrapEl.classList.remove('stream-ready');
@@ -3525,7 +3541,7 @@ function setGender(btn,g){
   document.querySelectorAll('.g-btn[data-g]').forEach(b=>b.classList.toggle('active',b.dataset.g===g));
   renderCarousels();renderOnFilter();
 }
-function openInCB(u){window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`,'_blank','noopener');}
+function openInCB(u){window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`,'_blank','noopener');}
 function toggleFavFilter(btn){
   onlyFavs=!onlyFavs;
   document.querySelectorAll('#sd-fv,#md-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
@@ -3802,7 +3818,7 @@ async function loadModelReport(room,username){
   const stxt=document.getElementById('rp-status-txt');
   if(room&&room.num_users>0){dot.style.background='var(--hot)';stxt.style.color='var(--hot)';stxt.textContent='En vivo ahora';}
   else{dot.style.background='var(--txt3)';stxt.style.color='var(--txt3)';stxt.textContent='Offline en este momento';}
-  document.getElementById('rp-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`;
+  document.getElementById('rp-link').href=`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&disable_sound=0&join_overlay=1&room=${u}`;
 
   // Rank
   const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
