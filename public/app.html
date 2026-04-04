@@ -823,26 +823,32 @@ header{
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
 /* Capa transparente sobre el iframe — intercepta clicks y redirige con afiliado.
-   Dos rectángulos cubren todo EXCEPTO la esquina inf-izq (80x60px) del volumen CB. */
+   Volumen CB está en esquina INF-IZQ sobre el scrollbar.
+   Hueco: 80px ancho x 52px alto en esquina inferior izquierda. */
 .embed-click-overlay{
-  position:absolute;inset:0;z-index:9;
+  position:absolute;
+  top:0;left:0;right:0;
+  bottom:17px;
+  z-index:9;
   background:transparent;
   -webkit-tap-highlight-color:transparent;
   touch-action:none;
   pointer-events:none;
 }
-/* Rectángulo superior: todo el ancho, hasta 60px del fondo */
+/* Rectángulo superior: todo el ancho, hasta 52px del fondo */
 .embed-click-overlay::before{
   content:'';
   position:absolute;
-  top:0;left:0;right:0;bottom:60px;
+  top:0;left:0;right:0;
+  bottom:52px;
   cursor:pointer;pointer-events:auto;
 }
-/* Rectángulo inf-derecho: desde 80px izq, últimos 60px de alto */
+/* Rectángulo inf-derecho: desde 80px izq, últimos 52px de alto */
 .embed-click-overlay::after{
   content:'';
   position:absolute;
-  left:80px;right:0;bottom:0;height:60px;
+  left:80px;right:0;
+  bottom:0;height:52px;
   cursor:pointer;pointer-events:auto;
 }
 
@@ -1244,7 +1250,7 @@ header{
   backdrop-filter:blur(4px);transition:background .15s;
 }
 .dv-swap-btn:hover{background:var(--hot)}
-.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden}
+.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:visible}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
 }
@@ -1257,27 +1263,35 @@ header{
   font-size:.65rem;font-weight:700;color:#fff;backdrop-filter:blur(4px);
   pointer-events:none;
 }
-.dv-embed-wrap{flex:1;position:relative;background:#000}
+.dv-embed-wrap{flex:1;position:relative;background:#000;overflow:hidden}
 /* dv-iframe-overlay desactivado: pointer-events:none permite interactuar
    directamente con el iframe (volumen, fullscreen). El CTA "Entrar sala ↗"
    ya provee el enlace de afiliado — el overlay era redundante en dual view. */
-/* Dos rectángulos cubren todo EXCEPTO la esquina inf-izq (80x60px) del volumen CB. */
+/* Dos rectángulos cubren todo EXCEPTO la esquina inf-izq donde está el volumen CB.
+   El ícono 🔇 está sobre el scrollbar: bottom:17px (scrollbar) + 35px control = 52px total.
+   Hueco: 80px ancho x 52px alto en esquina inferior izquierda. */
 .dv-iframe-overlay{
-  position:absolute;inset:0;
+  position:absolute;
+  top:0;left:0;right:0;
+  bottom:0; /* scrollbar libre via overflow:visible en dv-panel */
   z-index:5;
   background:transparent;
   pointer-events:none;
 }
+/* Rectángulo superior: todo el ancho, desde arriba hasta 52px del fondo del overlay */
 .dv-iframe-overlay::before{
   content:'';
   position:absolute;
-  top:0;left:0;right:0;bottom:60px;
+  top:0;left:0;right:0;
+  bottom:52px;
   cursor:pointer;pointer-events:auto;
 }
+/* Rectángulo inf-derecho: desde 80px izq, últimos 52px de alto del overlay */
 .dv-iframe-overlay::after{
   content:'';
   position:absolute;
-  left:80px;right:0;bottom:0;height:60px;
+  left:80px;right:0;
+  bottom:0;height:52px;
   cursor:pointer;pointer-events:auto;
 }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
