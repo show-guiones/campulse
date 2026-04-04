@@ -890,29 +890,35 @@ header{
 .mhero-v2{
   position:relative;
   flex-shrink:0;
-  /* 16:9 del ancho real del modal — sin altura arbitraria */
   width:100%;
+  /* aspect-ratio controla el alto proporcional — sin max-height que lo contradiga */
   aspect-ratio:16/9;
-  height:auto;
-  min-height:0;
-  max-height:min(56.25vw,320px);
   overflow:hidden;
   background:#000;
   touch-action:none;
   user-select:none;
   -webkit-user-select:none;
+  /* Sin height ni max-height: el navegador calcula alto = ancho * 9/16 */
 }
 .mhero-v2 .embed-wrap{
-  position:absolute;inset:0;z-index:5;
-  overflow:hidden;pointer-events:auto;
+  /* Llenar el contenedor completamente */
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  z-index:5;
+  overflow:hidden;
+  pointer-events:auto;
   touch-action:none;
-  width:100%;height:100%;
 }
 .mhero-v2 .embed-wrap .embed-frame{
-  position:absolute;inset:0;
-  width:100%;height:100%;border:none;display:block;
-  /* Scrolling inside the iframe must not propagate */
+  /* Iframe ocupa exactamente el contenedor — sin scrollbar interno */
+  position:absolute;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  border:none;
+  display:block;
   pointer-events:auto;
+  scrolling:no;
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -1538,11 +1544,8 @@ header{
     display:flex;
     flex-direction:column;
   }
-  /* Hero 16:9: modal 500px ancho → 281px alto exacto */
-  .mhero-v2{
-    max-height:281px;
-    /* aspect-ratio ya controla el alto proporcional */
-  }
+  /* Hero 16:9: en desktop el modal es 500px → aspect-ratio da 281px exactos
+     No sobreescribir con max-height — dejar que aspect-ratio lo controle */
   /* Body ocupa el espacio restante hasta el límite del modal */
   .mbody-v2{
     flex:1;
