@@ -1243,13 +1243,25 @@ header{
 .dv-embed-wrap{flex:1;position:relative;background:#000;overflow:hidden;touch-action:none;}
 /* Overlay dual-view — intercepta click y redirige con afiliado.
    top:40px protege el label superior; clip-path excluye esquina inferior-izquierda
-/* Overlay dual-view: solo intercepta clicks en zona central (no audio, no scrollbar)
-   El CTA "Entrar con X" en la parte inferior maneja el link de afiliado */
+/* Overlay dual-view: zona central para afiliado, deja libre top y bottom */
 .dv-iframe-overlay{
   position:absolute;
   top:35px;left:0;right:0;bottom:60px;
   z-index:5;cursor:pointer;background:transparent;
 }
+/* Botón de audio por panel — grande y claro */
+.dv-audio-btn{
+  position:absolute;bottom:.5rem;left:50%;transform:translateX(-50%);
+  z-index:10;
+  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  display:flex;align-items:center;gap:.35rem;
+  cursor:pointer;color:#fff;font-size:.7rem;font-weight:700;
+  backdrop-filter:blur(6px);transition:background .15s;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;
+}
+.dv-audio-btn:hover{background:rgba(232,48,90,.75);}
+.dv-audio-btn.active{background:rgba(232,48,90,.9);border-color:var(--hot);}
 
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
@@ -2352,6 +2364,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
+          <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a',event)">🔇 Sin audio</button>
           
         </div>
         <div class="dv-panel-actions">
@@ -2367,6 +2380,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
+          <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b',event)">🔇 Sin audio</button>
           
         </div>
         <div class="dv-panel-actions">
@@ -3061,7 +3075,7 @@ function openMod(u){
       embedWrap.classList.add('active');
     }
     if(frame){
-      frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
+      frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never`;
     }
   } else {
     // OFFLINE: mostrar imagen de perfil
@@ -3105,7 +3119,7 @@ function activateEmbed(u){
   clearInterval(prevCd);
   wrap.classList.add('active');
   if(loading) loading.classList.remove('hidden');
-  frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
+  frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never`;
 }
 function onEmbedLoad(){
   const loading=document.getElementById('embed-loading');
@@ -3524,12 +3538,42 @@ function toggleDvAudio(slot, e){
   frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=${sound}&mobileRedirect=never`;
 }
 
+/* ── Control de audio por panel — silenciado por defecto ── */
+const _dvAudioState = {a: false, b: false}; // false = muted
+
+function toggleDvAudio(slot, e){
+  e.stopPropagation();
+  const frame = document.getElementById('dv-frame-' + slot);
+  const btn   = document.getElementById('dv-audio-' + slot);
+  const u     = dvSlotUser[slot];
+  if(!frame || !btn || !u) return;
+
+  const nowActive = !_dvAudioState[slot];
+  _dvAudioState[slot] = nowActive;
+
+  // Recargar iframe con audio según estado — independiente del otro panel
+  const sound = nowActive ? 0 : 1;
+  frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=${sound}&mobileRedirect=never`;
+
+  btn.classList.toggle('active', nowActive);
+  btn.textContent = nowActive ? '🔊 Audio ON' : '🔇 Sin audio';
+}
+
+function _resetDvAudio(){
+  ['a','b'].forEach(slot => {
+    _dvAudioState[slot] = false;
+    const btn = document.getElementById('dv-audio-' + slot);
+    if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Sin audio'; }
+  });
+}
+
 function openDvSlot(slot){
   const u=dvSlotUser[slot];
   if(!u) return;
   window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');
 }
 function openDualView(uA,uB){
+  _resetDvAudio();
   if(!uA||!uB)return;
   dvSlotUser.a=uA; dvSlotUser.b=uB;
   const bg=document.getElementById('dual-view-bg');
@@ -3539,7 +3583,7 @@ function openDualView(uA,uB){
   const lblB=document.getElementById('dv-label-b');
   const linkA=document.getElementById('dv-link-a');
   const linkB=document.getElementById('dv-link-b');
-  const mkUrl=(u)=>`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
+  const mkUrl=(u)=>`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never`;
   const mkAffLink=(u)=>`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
   const rA=rooms.find(r=>r.username===uA)||{username:uA};
   const rB=rooms.find(r=>r.username===uB)||{username:uB};
@@ -3583,6 +3627,7 @@ function closeDualView(){
 
 /* ── SWAP SLOT: change one room without closing dual view ── */
 function swapDualSlot(slot){
+  _dvAudioState[slot]=false; const _ab=document.getElementById('dv-audio-'+slot); if(_ab){_ab.classList.remove('active');_ab.textContent='🔇 Sin audio';}
   const bg = document.getElementById('dual-picker-bg');
   if(!bg) return;
   _dpSlot = slot;
@@ -3601,7 +3646,7 @@ function swapDualConfirm(slot, newUsername){
   const lblEl  = document.getElementById('dv-label-'  + slot);
   const linkEl = document.getElementById('dv-link-'   + slot);
   const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
-  const mkUrl = u => `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
+  const mkUrl = u => `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never`;
   const mkAffLink = u => `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
   if(frame){
     const wrapEl=frame.closest('.dv-embed-wrap');
