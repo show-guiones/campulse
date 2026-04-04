@@ -822,17 +822,12 @@ header{
   transition:background .15s
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
-/* Capa transparente sobre el iframe — intercepta clicks y redirige con params de afiliado.
-   Solo cubre el 60% superior: deja libre la barra de controles inferior de Chaturbate
-   (volumen, fullscreen, etc.) para que el usuario pueda interactuar con ellos. */
+/* embed-click-overlay desactivado: pointer-events:none permite interactuar
+   con el iframe (volumen, fullscreen). El CTA "Entrar a la sala" en el body
+   ya cubre la redirección con afiliado. */
 .embed-click-overlay{
-  position:absolute;
-  top:0;left:0;right:0;
-  bottom:40%;
-  z-index:9;
-  background:transparent;cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:none;
+  display:none;
+  pointer-events:none;
 }
 
 /* Name & meta over hero */
@@ -1247,15 +1242,12 @@ header{
   pointer-events:none;
 }
 .dv-embed-wrap{flex:1;position:relative;background:#000}
-/* Overlay transparente sobre el iframe — intercepta click y redirige con afiliado.
-   Solo cubre el 60% superior del iframe: deja libre la barra inferior de controles
-   de Chaturbate (volumen, fullscreen, etc.) para que el usuario pueda interactuar. */
+/* dv-iframe-overlay desactivado: pointer-events:none permite interactuar
+   directamente con el iframe (volumen, fullscreen). El CTA "Entrar sala ↗"
+   ya provee el enlace de afiliado — el overlay era redundante en dual view. */
 .dv-iframe-overlay{
-  position:absolute;
-  top:0;left:0;right:0;
-  bottom:40%;
-  z-index:5;cursor:pointer;
-  background:transparent;
+  display:none;
+  pointer-events:none;
 }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
