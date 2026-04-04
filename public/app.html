@@ -822,18 +822,14 @@ header{
   transition:background .15s
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
-/* Overlay afiliado modal principal: display:contents agrupa sin cubrir nada */
+/* Overlay afiliado modal principal: deja libre franja inferior completa */
 .embed-click-overlay{ display:contents; }
 .embed-ov-main{
   position:absolute;top:0;left:0;right:0;bottom:55px;
   z-index:9;cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;touch-action:none;
 }
-.embed-ov-bottom-right{
-  position:absolute;bottom:0;left:140px;right:0;height:55px;
-  z-index:9;cursor:pointer;background:transparent;
-  -webkit-tap-highlight-color:transparent;touch-action:none;
-}
+.embed-ov-bottom-right{ display:none; }
 
 /* Name & meta over hero */
 .modal-hero-info{
@@ -1250,17 +1246,14 @@ header{
 /* Overlay dual-view — intercepta click y redirige con afiliado.
    top:40px protege el label superior; clip-path excluye esquina inferior-izquierda
    donde vive el botón de audio de Chaturbate (~140px × 55px desde abajo). */
-/* Overlay afiliado dual-view: 4 franjas que dejan libre esquina inferior-izquierda
-   donde vive el botón de audio de Chaturbate (~140px ancho x 55px alto) */
+/* Overlay afiliado dual-view: cubre el área central dejando libre
+   la franja inferior completa (audio + scrollbar de Chaturbate) */
 .dv-iframe-overlay{ display:contents; }
 .dv-ov-top{
-  position:absolute;top:40px;left:0;right:0;height:calc(100% - 40px - 55px);
+  position:absolute;top:40px;left:0;right:0;bottom:55px;
   z-index:5;cursor:pointer;background:transparent;
 }
-.dv-ov-bottom-right{
-  position:absolute;bottom:0;left:140px;right:0;height:55px;
-  z-index:5;cursor:pointer;background:transparent;
-}
+.dv-ov-bottom-right{ display:none; }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
   content:'';
