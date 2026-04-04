@@ -119,6 +119,8 @@ header{
 }
 .rep-menu-label{display:none}
 @media(min-width:600px){.rep-menu-label{display:inline}}
+/* En desktop los tabs centrales ya tienen Mi Reporte — ocultar botón derecho redundante */
+@media(min-width:901px){#report-menu-wrap{display:none}}
 .rep-menu-dropdown{
   display:none;position:absolute;top:calc(100% + 8px);right:0;
   width:280px;background:var(--bg2);
@@ -1703,9 +1705,9 @@ body.modal-open{overflow:hidden!important}
   <div class="hdr-r">
     <!-- 👤 Mi Reporte — floating menu button -->
     <div style="position:relative" id="report-menu-wrap">
-      <button class="rep-menu-btn" id="rep-menu-btn" onclick="toggleReportMenu()" title="Mi Reporte">
+      <button class="rep-menu-btn" id="rep-menu-btn" onclick="toggleReportMenu()" title="Mis estadísticas">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 14c0-3 2.2-5 5-5s5 2 5 5"/><circle cx="8" cy="5" r="3"/></svg>
-        <span class="rep-menu-label">Mi Reporte</span>
+        <span class="rep-menu-label">Stats</span>
       </button>
       <div class="rep-menu-dropdown" id="rep-menu-dropdown">
         <div class="rep-menu-title">Tu panel de modelo</div>
