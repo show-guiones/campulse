@@ -1080,14 +1080,20 @@ header{
   background:var(--bg2);border-radius:24px 24px 0 0;
   padding:1rem .9rem 1.5rem;
   animation:slidemodal .28s cubic-bezier(.22,1,.36,1);
-  max-height:80dvh;overflow-y:auto;overscroll-behavior:contain;
+  max-height:80dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
 }
 .dp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
 .dp-title{font-size:.9rem;font-weight:800;color:var(--txt)}
 .dp-close{background:none;border:none;color:var(--txt2);font-size:1.1rem;cursor:pointer;padding:.2rem .4rem}
 .dp-hint{font-size:.72rem;color:var(--txt2);margin-bottom:.7rem}
 .dp-hint strong{color:var(--txt)}
-.dp-search-row{display:flex;gap:.4rem;margin-bottom:.8rem}
+.dp-search-row{
+  display:flex;gap:.4rem;margin-bottom:.8rem;
+  position:sticky;top:0;z-index:10;
+  background:var(--bg2);
+  padding:.4rem 0 .6rem;
+  margin-top:-.2rem;
+}
 .dp-input{
   flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;
   color:var(--txt);font-size:.8rem;padding:.45rem .7rem;
@@ -1523,19 +1529,25 @@ header{
   .modal{border-radius:20px;max-height:88dvh;max-width:500px;width:100%}
   .modal-hero{height:280px}
   .modal::before{display:none}
-  /* modal-v2 en desktop: encuadra al contenido, sin espacios blancos */
+  /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
     height:auto;
     max-height:88dvh;
     border-radius:20px;
+    /* flex column: hero fijo arriba, body scrollea abajo */
+    display:flex;
+    flex-direction:column;
   }
-  /* El hero 16:9 en desktop: ancho=500px → alto=281px máx */
+  /* Hero 16:9: modal 500px ancho → 281px alto exacto */
   .mhero-v2{
     max-height:281px;
+    /* aspect-ratio ya controla el alto proporcional */
   }
-  /* El body scrolleable no crece más allá del espacio disponible */
+  /* Body ocupa el espacio restante hasta el límite del modal */
   .mbody-v2{
-    max-height:calc(88dvh - min(500px * 9/16, 281px));
+    flex:1;
+    min-height:0;
+    max-height:calc(88dvh - 281px);
     overflow-y:auto;
   }
 }
@@ -2179,7 +2191,7 @@ body.modal-open{overflow:hidden!important}
 
 <!-- ═══ DUAL PICKER — selector visual de segunda sala ═══ -->
 <div class="dual-picker-bg" id="dual-picker-bg" onclick="closeDualPicker(event)">
-  <div class="dual-picker">
+  <div class="dual-picker" onclick="event.stopPropagation()">
     <div class="dp-header">
       <span class="dp-title">⊞ Ver 2 salas en simultáneo</span>
       <button class="dp-close" onclick="closeDualPicker()">✕</button>
@@ -3218,15 +3230,14 @@ function showDualPicker(){
 }
 
 function closeDualPicker(e){
-  if(e&&e.target!==document.getElementById('dual-picker-bg'))return;
+  // Si viene de click en el backdrop, solo cerrar si fue click directo (no burbujeo desde hijos)
+  if(e && e.currentTarget === e.target && e.target.id !== 'dual-picker-bg') return;
   const bg=document.getElementById('dual-picker-bg');
   if(!bg)return;
   bg.classList.remove('open');
-  // Restore hint text if we were in swap mode
-  if(_swapTargetSlot){ _swapTargetSlot=null; }
+  bg.style.display='none';
   const hint=bg.querySelector('.dp-hint');
   if(hint&&active) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
-  setTimeout(()=>{bg.style.display='none';},220);
 }
 
 function filterDpList(q){
@@ -3276,7 +3287,8 @@ function openDualView(uA,uB){
     if(frameB) frameB.src=mkUrl(uB);
   },120);
   document.body.style.overflow='hidden';
-  // Close main modal
+  // Cerrar picker y modal principal
+  closeDualPicker();
   document.getElementById('modal-bg')?.classList.remove('open');
 }
 
@@ -3322,11 +3334,7 @@ function swapDualSlot(slot){
 }
 function swapDualConfirm(slot, newUsername){
   if(!slot || !newUsername) return;
-  // Cerrar picker directamente sin pasar por el guard del backdrop
-  const bg = document.getElementById('dual-picker-bg');
-  if(bg){ bg.classList.remove('open'); setTimeout(()=>{ bg.style.display='none'; }, 220); }
-  const hint = bg?.querySelector('.dp-hint');
-  if(hint && active) hint.innerHTML = `Elige una segunda sala para ver junto a <strong>${active.display_name||active.username}</strong>`;
+  closeDualPicker(); // cierra sin evento — sin guard
   // Actualizar iframe + label + link del slot elegido
   const frame  = document.getElementById('dv-frame-'  + slot);
   const lblEl  = document.getElementById('dv-label-'  + slot);
