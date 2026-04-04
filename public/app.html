@@ -422,8 +422,9 @@ header{
   border:1px solid var(--bdr);border-radius:6px;
   display:flex;align-items:center;justify-content:center;transition:all .15s
 }
-.vtb.active{background:var(--surf2);border-color:var(--bdr2)}
-.vtb svg{width:11px;height:11px;fill:var(--txt3)}
+.vtb.active{background:rgba(232,48,90,.15);border-color:var(--hot)}
+.vtb svg{width:11px;height:11px;fill:var(--txt3);transition:fill .15s}
+.vtb.active svg{fill:var(--hot)}
 .vtb.on svg{fill:var(--txt)}
 
 /* ═══════════════════════════════════════════
@@ -3779,6 +3780,9 @@ document.getElementById('vg').addEventListener('click',()=>{
   document.getElementById('lw').classList.add('hide');
   document.getElementById('vg').classList.add('active');
   document.getElementById('vl').classList.remove('active');
+  // Restaurar carruseles al volver a grid
+  const cc=document.getElementById('carousels-container');
+  if(cc) cc.style.display='';
   render();
 });
 document.getElementById('vl').addEventListener('click',()=>{
@@ -3787,7 +3791,15 @@ document.getElementById('vl').addEventListener('click',()=>{
   document.getElementById('lw').classList.remove('hide');
   document.getElementById('vg').classList.remove('active');
   document.getElementById('vl').classList.add('active');
+  // Ocultar carruseles para que la lista aparezca inmediatamente arriba
+  const ccl=document.getElementById('carousels-container');
+  if(ccl) ccl.style.display='none';
   render();
+  // Scroll al inicio del catálogo para ver la lista de inmediato
+  requestAnimationFrame(()=>{
+    const cat=document.getElementById('catalog-section');
+    if(cat) cat.scrollIntoView({behavior:'smooth',block:'start'});
+  });
 });
 // tb-fv, tb-hd, tb-co usan onclick directamente en el HTML — sin duplicar listeners
 // ref-btn puede no existir en versiones sin botón de refresh
