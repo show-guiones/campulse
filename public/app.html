@@ -262,10 +262,11 @@ header{
 .filter-chip:focus{outline:none}
 .filter-chip:focus:not(.active){background:var(--surf);color:var(--txt2)}
 .filter-chip.active{
-  background:rgba(240,32,96,.12)!important;
+  background:rgba(240,32,96,.18)!important;
   color:var(--hot)!important;
-  border-color:rgba(240,32,96,.3)!important;
-  font-weight:600!important;
+  border-color:rgba(240,32,96,.45)!important;
+  font-weight:700!important;
+  box-shadow:inset 0 0 0 1px rgba(240,32,96,.2);
 }
 .filter-chip.active::before{content:"✓ ";font-size:.65rem}
 .age-chips{display:flex;flex-wrap:wrap;gap:3px;padding:.15rem 0}
@@ -391,18 +392,21 @@ header{
 .fb-sep{width:1px;height:18px;background:var(--bdr);flex-shrink:0}
 .qchip{
   background:var(--surf);border:1px solid var(--bdr);
-  border-radius:20px;padding:4px 12px;
+  border-radius:20px;padding:5px 13px;
   color:var(--txt2);font-size:.72rem;font-weight:600;
   white-space:nowrap;transition:background .12s,color .12s,border-color .12s,box-shadow .12s;
   flex-shrink:0;user-select:none;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  cursor:pointer;
 }
 .qchip:hover{background:var(--surf2);border-color:var(--bdr2);color:var(--txt)}
 .qchip.active{
   background:var(--hot)!important;border-color:var(--hot)!important;
   color:#fff!important;font-weight:700!important;
-  box-shadow:0 2px 12px rgba(240,32,96,.35)!important
+  box-shadow:0 2px 14px rgba(240,32,96,.4)!important;
 }
-.qchip:active{transform:scale(.95)}
+.qchip.active::before{content:"✓ ";font-size:.65rem;opacity:.85}
+.qchip:active{transform:scale(.93)}
 .qchip:focus{outline:none}
 .qchip:focus:not(.active){background:var(--surf);border-color:var(--bdr);color:var(--txt2)}
 .sort-sel{
@@ -507,14 +511,32 @@ header{
 
 /* fav btn */
 .crd-fav{
-  position:absolute;top:.4rem;right:.4rem;
-  width:26px;height:26px;border-radius:50%;
-  background:rgba(0,0,0,.5);border:none;
-  color:rgba(255,255,255,.4);font-size:.75rem;
+  position:absolute;top:.35rem;right:.35rem;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(0,0,0,.55);border:none;
+  color:rgba(255,255,255,.4);font-size:.85rem;
   display:flex;align-items:center;justify-content:center;
-  transition:all .18s;backdrop-filter:blur(4px)
+  transition:transform .18s,color .15s,background .15s,box-shadow .15s;
+  backdrop-filter:blur(6px);
+  /* Elimina delay 300ms en iOS/Android */
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  cursor:pointer;
 }
-.crd-fav:hover,.crd-fav.is-fav{color:var(--hot);background:rgba(255,42,109,.25)}
+/* Área táctil invisible extendida a ~48px */
+.crd-fav::after{
+  content:'';position:absolute;inset:-7px;border-radius:50%;
+}
+.crd-fav:hover{color:rgba(255,255,255,.75);background:rgba(0,0,0,.7)}
+.crd-fav.is-fav{
+  color:var(--hot);
+  background:rgba(255,42,109,.25);
+  box-shadow:0 0 10px rgba(255,42,109,.4);
+}
+.crd-fav.is-fav:hover{background:rgba(255,42,109,.4)}
+/* Animación pop al tocar */
+@keyframes favPop{0%{transform:scale(1)}40%{transform:scale(1.45)}70%{transform:scale(.92)}100%{transform:scale(1)}}
+.crd-fav.pop{animation:favPop .28s ease}
 
 /* viewers badge */
 .crd-vw{
@@ -1645,8 +1667,9 @@ header{
 
 
 /* ─── Chip feedback animations ─── */
-@keyframes chipPop{0%{transform:scale(.88)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
-.qchip.active{animation:chipPop .18s ease}
+@keyframes chipPop{0%{transform:scale(.88)}55%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes chipOff{0%{transform:scale(1.05)}100%{transform:scale(1)}}
+.qchip.active{animation:chipPop .2s ease}
 /* Touch: disable hover lift on cards so they don't stay elevated after tap */
 @media(hover:none){
   .crd:hover{transform:none;box-shadow:none}
@@ -3517,6 +3540,11 @@ function openModelReportFromModal(){
 ═══════════════════════════════════════════ */
 function toggleFav(e,u){
   e.stopPropagation();
+  // Feedback háptico
+  if(navigator.vibrate) navigator.vibrate(30);
+  // Animación pop en el botón tocado
+  const btn=e.currentTarget||e.target;
+  if(btn&&btn.classList){btn.classList.add('pop');setTimeout(()=>btn.classList.remove('pop'),300);}
   const i=favs.indexOf(u);
   if(i>=0)favs.splice(i,1);else favs.push(u);
   localStorage.setItem('cp3_favs',JSON.stringify(favs));
