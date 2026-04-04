@@ -4172,9 +4172,7 @@ let _adminSecret='';
 let _adminUnlocked=false;
 
 function openAdminPanel(){
-  document.getElementById('admin-panel-bg').classList.add('open');
-  document.body.style.overflow='hidden';
-  if(_adminUnlocked) adminLoadList();
+  window.open('/admin-featured.html','_blank');
 }
 function closeAdminPanel(e){
   if(!e||e.target===document.getElementById('admin-panel-bg')){
