@@ -1639,7 +1639,7 @@ function startLivePreview(x){
     wrap.innerHTML=`<div class="modal-hero-placeholder"><div class="mhp-avatar">👤</div><div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text2)">${x.display_name||u}</div><div class="mhp-offline"><span style="width:6px;height:6px;border-radius:50%;background:var(--text3);display:inline-block"></span>Offline en este momento</div><a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}" target="_blank" rel="noopener" style="margin-top:8px;background:linear-gradient(135deg,var(--hot),var(--neon));color:#fff;border:none;border-radius:9px;padding:7px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;box-shadow:0 4px 14px rgba(255,45,85,.35)">Ir a su sala ↗</a></div>`;
   }
 }
-function openInCB(u){window.open(`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${u}`,'_blank','noopener');}
+function openInCB(u){window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');}
 function closeMod(e){if(!e||e.target===document.getElementById('modal-bg')){document.getElementById('modal-bg').classList.remove('open');document.body.style.overflow='';clearInterval(prevCd);}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
 function toggleFav(e,u){
