@@ -905,25 +905,40 @@ header{
   /* Sin height ni max-height: el navegador calcula alto = ancho * 9/16 */
 }
 .mhero-v2 .embed-wrap{
-  /* Llenar el contenedor completamente */
+  /* Llenar el contenedor — sobresale por todos lados para ocultar
+     la UI de Chaturbate (top bar + bottom bar) */
   position:absolute;
-  top:0;left:0;right:0;bottom:0;
+  top:-45px;left:-2px;right:-2px;bottom:-45px;
   z-index:5;
   overflow:hidden;
   pointer-events:auto;
   touch-action:none;
+  background:#000;
+}
+/* Capa negra extra encima del embed hasta que el video arranque */
+.mhero-v2 .embed-wrap::before{
+  content:'';
+  position:absolute;inset:0;
+  background:#000;
+  z-index:2;
+  opacity:1;
+  transition:opacity 1s ease 2s; /* fade out 1s, con delay de 2s */
+  pointer-events:none;
+}
+.mhero-v2 .embed-wrap.video-ready::before{
+  opacity:0;
 }
 .mhero-v2 .embed-wrap .embed-frame{
-  /* Iframe offset: sube 45px para ocultar barra superior de Chaturbate,
-     compensa con altura extra para que el video llene el contenedor */
+  /* Iframe escala para llenar el wrap (que ya sobresale 45px arriba/abajo) */
   position:absolute;
-  top:-45px;left:0;
+  top:0;left:0;
   width:100%;
-  height:calc(100% + 45px);
+  height:100%;
   border:none;
   display:block;
   pointer-events:auto;
   scrolling:no;
+  z-index:1;
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -2886,7 +2901,7 @@ function openMod(u){
   const embedWrap=document.getElementById('mhero-embed-wrap');
   const imgWrap=document.getElementById('mhero-img-wrap');
   if(frame) frame.src='about:blank';
-  if(embedWrap) embedWrap.classList.remove('active');
+  if(embedWrap){ embedWrap.classList.remove('active'); embedWrap.classList.remove('video-ready'); }
 
   // Name + CTA
   document.getElementById('m-name').textContent=x.display_name||x.username;
@@ -2974,13 +2989,18 @@ function activateEmbed(u){
 }
 function onEmbedLoad(){
   const loading=document.getElementById('embed-loading');
+  const wrap=document.getElementById('mhero-embed-wrap');
+  // Ocultar spinner inmediatamente
   if(loading) loading.classList.add('hidden');
+  // La capa negra (::before) se mantiene hasta que el video arranque (~2s)
+  // Luego fade-out suave de 1s (controlado por CSS transition con delay:2s)
+  if(wrap) setTimeout(()=>wrap.classList.add('video-ready'), 500);
 }
 function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
   const frame=document.getElementById('live-embed-frame');
   if(frame) frame.src='about:blank';
-  if(wrap) wrap.classList.remove('active');
+  if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); }
 }
 
 /* ── ANALYTICS PANEL ── */
