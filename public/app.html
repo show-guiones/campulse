@@ -1181,6 +1181,27 @@ header{
 }
 .dp-card-vw{position:absolute;top:4px;left:4px;background:rgba(232,48,90,.85);border-radius:8px;padding:1px 5px;font-size:.55rem;font-weight:700;color:#fff}
 
+/* ── DP FILTERS ── */
+.dp-filters{
+  display:flex;flex-direction:column;gap:.45rem;
+  margin-bottom:.8rem;padding-bottom:.6rem;
+  border-bottom:1px solid var(--bdr);
+}
+.dp-filter-row{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.dp-filter-lbl{font-size:.6rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;min-width:3.2rem}
+.dp-chip{
+  display:inline-flex;align-items:center;gap:.25rem;
+  background:var(--surf);border:1px solid var(--bdr);border-radius:20px;
+  color:var(--txt2);font-size:.65rem;font-weight:600;padding:.22rem .6rem;
+  cursor:pointer;transition:background .1s,border-color .1s,color .1s;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;
+}
+.dp-chip:hover{background:var(--surf2);border-color:var(--bdr2);color:var(--txt)}
+.dp-chip.active{background:rgba(232,48,90,.18);border-color:var(--hot);color:var(--hot);font-weight:700}
+.dp-chip.active::before{content:"✓ ";font-size:.6rem}
+.dp-chip-age{border-color:rgba(56,182,212,.3);color:var(--neon)}
+.dp-chip-age.active{background:var(--neon)!important;border-color:var(--neon)!important;color:#000!important}
+
 /* ═══════════════════════════════════════════
    DUAL VIEW — dos streams
 ═══════════════════════════════════════════ */
@@ -2277,8 +2298,33 @@ body.modal-open{overflow:hidden!important}
     </div>
     <p class="dp-hint">Elige una segunda sala para ver junto a <strong id="dp-current-name">esta</strong></p>
     <div class="dp-search-row">
-      <input class="dp-input" id="dp-input" type="text" placeholder="Buscar modelo…" oninput="filterDpList(this.value)" onkeydown="if(event.key==='Enter')openDualFromInput()">
+      <input class="dp-input" id="dp-input" type="text" placeholder="Buscar modelo…" oninput="renderDpGrid()" onkeydown="if(event.key==='Enter')openDualFromInput()">
       <button class="dp-go" onclick="openDualFromInput()">Abrir →</button>
+    </div>
+    <!-- DP Filters -->
+    <div class="dp-filters" id="dp-filters">
+      <div class="dp-filter-row">
+        <span class="dp-filter-lbl">Género</span>
+        <button class="dp-chip dp-gf active" data-dpg="" onclick="dpSetGender(this,'')">Todas</button>
+        <button class="dp-chip dp-gf" data-dpg="f" onclick="dpSetGender(this,'f')">♀ Mujeres</button>
+        <button class="dp-chip dp-gf" data-dpg="m" onclick="dpSetGender(this,'m')">♂ Hombres</button>
+        <button class="dp-chip dp-gf" data-dpg="c" onclick="dpSetGender(this,'c')">⚭ Parejas</button>
+        <button class="dp-chip dp-gf" data-dpg="t" onclick="dpSetGender(this,'t')">⚧ Trans</button>
+      </div>
+      <div class="dp-filter-row">
+        <span class="dp-filter-lbl">Filtros</span>
+        <button class="dp-chip" id="dp-fav" onclick="dpToggle('dpFav',this)">♥ Favs</button>
+        <button class="dp-chip" id="dp-hd"  onclick="dpToggle('dpHD',this)">HD</button>
+        <button class="dp-chip" id="dp-co"  onclick="dpToggle('dpCo',this)">🇨🇴 Colombia</button>
+      </div>
+      <div class="dp-filter-row">
+        <span class="dp-filter-lbl">Edad</span>
+        <button class="dp-chip dp-chip-age" data-dpa="18-21" onclick="dpSetAge(this,'18-21')">18–21</button>
+        <button class="dp-chip dp-chip-age" data-dpa="22-25" onclick="dpSetAge(this,'22-25')">22–25</button>
+        <button class="dp-chip dp-chip-age" data-dpa="26-30" onclick="dpSetAge(this,'26-30')">26–30</button>
+        <button class="dp-chip dp-chip-age" data-dpa="31-40" onclick="dpSetAge(this,'31-40')">31–40</button>
+        <button class="dp-chip dp-chip-age" data-dpa="40+"   onclick="dpSetAge(this,'40+')">40+</button>
+      </div>
     </div>
     <div class="dp-grid" id="dp-grid"></div>
   </div>
@@ -3342,52 +3388,107 @@ function drawMiniChart(canvas,vals){
   ctx.strokeStyle='rgb(232,48,90)';ctx.lineWidth=2;ctx.stroke();
 }
 
-/* ── DUAL PICKER ── */
+/* ── DUAL PICKER — local filter state (isolated from main catalog) ── */
+let _dpSlot=null; // 'a'|'b'|null — set by swapDualSlot
+let _dpGender='', _dpFav=false, _dpHD=false, _dpCo=false, _dpAge='';
+
+function dpSetGender(btn,g){
+  _dpGender=g;
+  document.querySelectorAll('.dp-gf').forEach(b=>b.classList.toggle('active',b.dataset.dpg===g));
+  renderDpGrid();
+}
+function dpToggle(stateKey,btn){
+  if(stateKey==='dpFav')  _dpFav=!_dpFav;
+  if(stateKey==='dpHD')   _dpHD=!_dpHD;
+  if(stateKey==='dpCo')   _dpCo=!_dpCo;
+  btn.classList.toggle('active');
+  renderDpGrid();
+}
+function dpSetAge(btn,r){
+  _dpAge=_dpAge===r?'':r;
+  document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.toggle('active',b.dataset.dpa===_dpAge));
+  renderDpGrid();
+}
+function _dpResetFilters(){
+  _dpGender='';_dpFav=false;_dpHD=false;_dpCo=false;_dpAge='';
+  document.querySelectorAll('.dp-gf').forEach(b=>b.classList.toggle('active',b.dataset.dpg===''));
+  ['dp-fav','dp-hd','dp-co'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.remove('active'));
+  const inp=document.getElementById('dp-input');if(inp)inp.value='';
+}
+
+function renderDpGrid(){
+  const dpGrid=document.getElementById('dp-grid');
+  if(!dpGrid) return;
+  // Determine excluded username based on context
+  const excludeUser = _dpSlot
+    ? (document.getElementById('dv-frame-'+(_dpSlot==='a'?'b':'a'))?.src||'').match(/embed\/([^/?]+)/)?.[1]||''
+    : (active?.username||'');
+  const q=(document.getElementById('dp-input')?.value||'').trim().toLowerCase();
+  let list=[...rooms].filter(r=>{
+    if(!r.num_users) return false;
+    if(r.username===excludeUser) return false;
+    if(_dpGender && r.gender!==_dpGender) return false;
+    if(_dpFav && !favs.includes(r.username)) return false;
+    if(_dpHD && !r.is_hd) return false;
+    if(_dpCo && r.country!=='CO') return false;
+    if(_dpAge){
+      const age=r.age; if(!age) return false;
+      if(_dpAge==='18-21'&&(age<18||age>21)) return false;
+      if(_dpAge==='22-25'&&(age<22||age>25)) return false;
+      if(_dpAge==='26-30'&&(age<26||age>30)) return false;
+      if(_dpAge==='31-40'&&(age<31||age>40)) return false;
+      if(_dpAge==='40+'&&age<40) return false;
+    }
+    if(q){
+      const hay=(r.username+' '+(r.display_name||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+
+  if(!list.length){
+    dpGrid.innerHTML='<p style="grid-column:1/-1;font-size:.72rem;color:var(--txt3);padding:.5rem">Sin resultados</p>';
+    return;
+  }
+  dpGrid.innerHTML=list.map(r=>{
+    const cb=_dpSlot
+      ? `swapDualConfirm('${_dpSlot}','${r.username}')`
+      : `openDualView('${active?.username||''}','${r.username}');closeDualPicker()`;
+    return `<div class="dp-card" onclick="${cb}">
+      <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
+        onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
+      <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
+      <div class="dp-card-name">${r.display_name||r.username}</div>
+    </div>`;
+  }).join('');
+}
+
 function showDualPicker(){
   if(!active)return;
+  _dpSlot=null;
+  _dpResetFilters();
   const bg=document.getElementById('dual-picker-bg');
   const nameEl=document.getElementById('dp-current-name');
   if(nameEl) nameEl.textContent=active.display_name||active.username;
-  // Populate grid with live rooms (excluding current)
-  const dpGrid=document.getElementById('dp-grid');
-  if(dpGrid){
-  const liveRooms=[...rooms].filter(r=>r.num_users>0&&r.username!==active.username)
-      .sort((a,b)=>b.num_users-a.num_users);
-    dpGrid.innerHTML=liveRooms.map(r=>`
-      <div class="dp-card" onclick="openDualView('${active.username}','${r.username}');closeDualPicker();">
-        <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
-          onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
-        <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
-        <div class="dp-card-name">${r.display_name||r.username}</div>
-      </div>`).join('');
-  }
+  const hint=bg?.querySelector('.dp-hint');
+  if(hint) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
+  renderDpGrid();
   if(bg){bg.style.display='flex';requestAnimationFrame(()=>bg.classList.add('open'));}
 }
 
 function closeDualPicker(e){
-  // Si viene de click en el backdrop, solo cerrar si fue click directo (no burbujeo desde hijos)
   if(e && e.currentTarget === e.target && e.target.id !== 'dual-picker-bg') return;
   const bg=document.getElementById('dual-picker-bg');
   if(!bg)return;
+  _dpSlot=null;
   bg.classList.remove('open');
   bg.style.display='none';
   const hint=bg.querySelector('.dp-hint');
   if(hint&&active) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
 }
 
-function filterDpList(q){
-  const dpGrid=document.getElementById('dp-grid');
-  if(!dpGrid||!q.trim()){showDualPicker&&showDualPicker();return;}
-  const lc=q.toLowerCase();
-  const hits=rooms.filter(r=>r.num_users>0&&r.username!==active?.username&&(r.username.includes(lc)||(r.display_name||'').toLowerCase().includes(lc)));
-  dpGrid.innerHTML=hits.map(r=>`
-    <div class="dp-card" onclick="openDualView('${active?.username}','${r.username}');closeDualPicker();">
-      <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
-        onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
-      <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
-      <div class="dp-card-name">${r.display_name||r.username}</div>
-    </div>`).join('')||'<p style="grid-column:1/-1;font-size:.72rem;color:var(--txt3);padding:.5rem">Sin resultados</p>';
-}
+function filterDpList(q){ renderDpGrid(); }
 
 function openDualFromInput(){
   const inp=document.getElementById('dp-input');
@@ -3460,29 +3561,11 @@ function closeDualView(){
 function swapDualSlot(slot){
   const bg = document.getElementById('dual-picker-bg');
   if(!bg) return;
-  // Hint text
+  _dpSlot = slot;
+  _dpResetFilters();
   const hint = bg.querySelector('.dp-hint');
   if(hint) hint.innerHTML = `Elige la sala para reemplazar el <strong>Panel ${slot.toUpperCase()}</strong>`;
-  // Excluir la sala del slot contrario del grid
-  const otherSlot = slot === 'a' ? 'b' : 'a';
-  const otherSrc = document.getElementById('dv-frame-' + otherSlot)?.src || '';
-  const otherUsername = otherSrc.match(/embed\/([^/?]+)/)?.[1] || '';
-  const dpGrid = document.getElementById('dp-grid');
-  if(dpGrid){
-    const liveRooms = [...rooms]
-      .filter(r => r.num_users > 0 && r.username !== otherUsername)
-      .sort((a,b) => b.num_users - a.num_users);
-    // slot se incrusta hardcoded en cada onclick — sin estado global
-    dpGrid.innerHTML = liveRooms.map(r => `
-      <div class="dp-card" onclick="swapDualConfirm('${slot}','${r.username}')">
-        <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
-          onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
-        <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
-        <div class="dp-card-name">${r.display_name||r.username}</div>
-      </div>`).join('');
-  }
-  const inp = document.getElementById('dp-input');
-  if(inp) inp.value = '';
+  renderDpGrid();
   bg.style.display = 'flex';
   requestAnimationFrame(() => bg.classList.add('open'));
 }
