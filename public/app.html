@@ -904,57 +904,28 @@ header{
   -webkit-user-select:none;
   /* Sin height ni max-height: el navegador calcula alto = ancho * 9/16 */
 }
+/* ── Thumbnail del modelo como fondo — siempre visible, nunca blanco ── */
+.mhero-v2 .hero-thumb{
+  position:absolute;inset:0;z-index:2;
+  width:100%;height:100%;object-fit:cover;display:block;
+}
 .mhero-v2 .embed-wrap{
-  /* iframe exactamente al tamaño del hero — sin stretch ni letterbox */
-  position:absolute;
-  inset:0;
-  z-index:5;
-  overflow:hidden;
-  pointer-events:auto;
-  touch-action:none;
+  position:absolute;inset:0;z-index:5;
+  overflow:hidden;pointer-events:auto;touch-action:none;
   background:#000;
-}
-/* Capa negra que cubre TODO hasta que video-ready se active */
-.mhero-v2 .embed-wrap::before{
-  content:'';
-  position:absolute;inset:0;
-  background:#000;
-  z-index:10;
-  opacity:1;
-  transition:opacity .6s ease;
-  pointer-events:none;
-}
-.mhero-v2 .embed-wrap.video-ready::before{
+  /* Empieza invisible — el thumbnail se ve detrás mientras carga el stream */
   opacity:0;
+  transition:opacity 1.2s ease;
+}
+/* Cuando el stream está listo, fade-in del iframe sobre el thumbnail */
+.mhero-v2 .embed-wrap.video-ready{
+  opacity:1;
 }
 .mhero-v2 .embed-wrap .embed-frame{
-  position:absolute;
-  top:0;left:0;
-  width:100%;
-  height:100%;
-  border:none;
-  display:block;
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  border:none;display:block;
   pointer-events:auto;
-  scrolling:no;
-  z-index:1;
-}
-/* Franjas negras que ocultan la barra superior e inferior de Chaturbate.
-   Están sobre el iframe (z-index:8) pero dentro de mhero-v2.
-   El iframe sigue siendo 100%×100% → Chaturbate renderiza 16:9 sin letterbox. */
-.mhero-v2 .cb-mask-top,
-.mhero-v2 .cb-mask-bottom{
-  position:absolute;left:0;right:0;
-  background:#000;
-  z-index:8;
-  pointer-events:none;
-}
-.mhero-v2 .cb-mask-top{
-  top:0;
-  height:36px; /* cubre barra superior de Chaturbate ~35px */
-}
-.mhero-v2 .cb-mask-bottom{
-  bottom:0;
-  height:26px; /* cubre barra inferior de Chaturbate ~25px */
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -2118,6 +2089,8 @@ body.modal-open{overflow:hidden!important}
 
     <!-- VIDEO HERO — embed automático al abrir -->
     <div class="modal-hero mhero-v2" id="modal-hero">
+      <!-- Thumbnail siempre visible detrás — nunca espacio blanco -->
+      <img class="hero-thumb" id="hero-thumb" src="" alt="" aria-hidden="true">
       <div class="embed-wrap" id="mhero-embed-wrap">
         <div class="embed-loading" id="embed-loading">
           <div class="embed-loading-spinner"></div>
@@ -2127,9 +2100,6 @@ body.modal-open{overflow:hidden!important}
           allow="autoplay; fullscreen; encrypted-media" allowFullscreen
           referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
-      <!-- Franjas negras que ocultan barras UI de Chaturbate -->
-      <div class="cb-mask-top"></div>
-      <div class="cb-mask-bottom"></div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
@@ -2922,6 +2892,13 @@ function openMod(u){
   if(frame) frame.src='about:blank';
   if(embedWrap){ embedWrap.classList.remove('active'); embedWrap.classList.remove('video-ready'); }
 
+  // Thumbnail de fondo — siempre visible, evita cualquier espacio blanco
+  const heroThumb=document.getElementById('hero-thumb');
+  if(heroThumb){
+    heroThumb.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
+    heroThumb.onerror=()=>{ heroThumb.src=`https://thumb.live.mmcdn.com/ri/${u}.jpg`; };
+  }
+
   // Name + CTA
   document.getElementById('m-name').textContent=x.display_name||x.username;
   document.getElementById('m-disp').textContent=x.username!==x.display_name?'@'+x.username:'';
@@ -3010,9 +2987,9 @@ function onEmbedLoad(){
   const loading=document.getElementById('embed-loading');
   const wrap=document.getElementById('mhero-embed-wrap');
   if(loading) loading.classList.add('hidden');
-  // Quitar la capa negra de carga tras 1.5s — las máscaras top/bottom
-  // permanentes (cb-mask-top, cb-mask-bottom) ya ocultan la UI de Chaturbate
-  if(wrap) setTimeout(()=>wrap.classList.add('video-ready'), 1500);
+  // Fade-in del iframe sobre el thumbnail después de 2s
+  // (tiempo para que el stream de Chaturbate empiece a renderizar frames)
+  if(wrap) setTimeout(()=>wrap.classList.add('video-ready'), 2000);
 }
 function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
