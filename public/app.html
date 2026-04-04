@@ -1241,9 +1241,14 @@ header{
   pointer-events:none;
 }
 .dv-embed-wrap{flex:1;position:relative;background:#000}
-/* Overlay transparente sobre el iframe — intercepta click y redirige con afiliado */
+/* Overlay transparente sobre el iframe — intercepta click y redirige con afiliado.
+   bottom:17px excluye la franja del scrollbar horizontal del iframe para que
+   el usuario pueda desplazarse a izquierda/derecha sin activar el enlace. */
 .dv-iframe-overlay{
-  position:absolute;inset:0;z-index:5;cursor:pointer;
+  position:absolute;
+  top:0;left:0;right:0;
+  bottom:17px;
+  z-index:5;cursor:pointer;
   background:transparent;
 }
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
