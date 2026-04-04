@@ -3,390 +3,723 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin — Featured Models · CampulseHub</title>
+<title>Admin · CampulseHub</title>
 <meta name="robots" content="noindex,nofollow">
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#0d0d14;--bg2:#13131f;--bg3:#1a1a2e;
-    --bdr:#2a2a3a;--neon:#e040fb;--grn:#00e87a;
-    --red:#ff4444;--gold:#f5c842;
-    --txt:#f0f0f0;--txt2:#9ca3af;--txt3:#6b7280;
-  }
-  body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--bg2:#0f0f1a;--bg3:#161626;--bg4:#1c1c2e;
+  --bdr:#232336;--bdr2:#2e2e48;
+  --hot:#e8305a;--hot2:rgba(232,48,90,.12);
+  --neon:#7c3aed;--neon2:rgba(124,58,237,.15);
+  --grn:#00d166;--grn2:rgba(0,209,102,.12);
+  --gold:#f5c842;
+  --blue:#38b2dc;
+  --txt:#eeeef5;--txt2:#8888aa;--txt3:#555570;
+  --r:12px;--rsm:8px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:4px}
 
-  /* ── HEADER ── */
-  header{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-  .logo span:first-child{color:var(--neon);font-weight:800;font-size:18px}
-  .logo span:last-child{color:var(--txt);font-weight:800;font-size:18px}
-  .logo-sub{color:var(--txt3);font-size:12px;margin-left:8px}
-  .header-right{display:flex;align-items:center;gap:10px}
-  #auth-status{font-size:12px;color:var(--txt3)}
+/* HEADER */
+header{background:rgba(8,8,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--hot),var(--neon));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0}
+.logo-txt{font-size:14px;font-weight:800;letter-spacing:-.3px}
+.logo-txt em{color:var(--hot);font-style:normal}
+.logo-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(124,58,237,.15);color:var(--neon);border:1px solid rgba(124,58,237,.25);letter-spacing:.06em;text-transform:uppercase}
+.hdr-r{display:flex;align-items:center;gap:8px}
+#auth-tag{font-size:11px;color:var(--grn);font-weight:700;display:none;padding:3px 9px;border-radius:99px;background:rgba(0,209,102,.1);border:1px solid rgba(0,209,102,.2)}
+#saving{font-size:11px;color:var(--txt3);display:none;animation:pulse 1.2s ease infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
 
-  /* ── LOGIN ── */
-  #login-screen{display:flex;align-items:center;justify-content:center;min-height:80vh}
-  .login-box{background:var(--bg2);border:1px solid var(--bdr);border-radius:16px;padding:32px;width:100%;max-width:360px}
-  .login-box h2{font-size:20px;margin-bottom:8px}
-  .login-box p{color:var(--txt3);font-size:13px;margin-bottom:24px}
-  .field{margin-bottom:16px}
-  .field label{display:block;font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-  .field input{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;color:var(--txt);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-  .field input:focus{border-color:rgba(224,64,251,.5)}
-  .btn{width:100%;background:var(--neon);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
-  .btn:hover{opacity:.88}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
-  .btn.secondary{background:transparent;border:1px solid var(--bdr);color:var(--txt2)}
-  .btn.danger{background:var(--red)}
-  .btn.small{padding:6px 12px;font-size:12px;width:auto;border-radius:6px}
-  .error-msg{color:var(--red);font-size:12px;margin-top:8px;min-height:16px}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .14s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.btn-primary{background:var(--hot);color:#fff;padding:8px 16px}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:transparent;border:1px solid var(--bdr);color:var(--txt2);padding:7px 13px}
+.btn-ghost:hover{border-color:var(--bdr2);color:var(--txt)}
+.btn-danger{background:transparent;border:1px solid var(--bdr);color:var(--txt3);padding:5px 7px;border-radius:6px;font-size:13px}
+.btn-danger:hover{border-color:var(--hot);color:var(--hot);background:var(--hot2)}
+.btn-sm{font-size:11px;padding:5px 11px}
 
-  /* ── MAIN ── */
-  #main-screen{display:none;padding:24px;max-width:900px;margin:0 auto}
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:90vh;padding:20px}
+.login-box{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:32px 28px;width:100%;max-width:360px;box-shadow:0 4px 32px rgba(0,0,0,.5)}
+.login-box h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.login-box p{color:var(--txt2);font-size:12px;margin-bottom:24px;line-height:1.5}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--rsm);padding:9px 12px;color:var(--txt);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus{border-color:rgba(232,48,90,.45)}
+.field select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555570'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
+.error-msg{color:var(--hot);font-size:12px;margin-top:6px;min-height:15px}
 
-  /* ── ADD FORM ── */
-  .add-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:20px;margin-bottom:28px}
-  .add-card h3{font-size:15px;font-weight:700;margin-bottom:16px;color:var(--txt)}
-  .add-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-  .add-row .field{margin:0;flex:1;min-width:140px}
-  .preview-img{width:44px;height:59px;border-radius:6px;object-fit:cover;border:1px solid var(--bdr);display:none;flex-shrink:0}
+/* LAYOUT */
+#main-screen{display:none}
+.layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 53px)}
+@media(max-width:740px){.layout{grid-template-columns:1fr}}
 
-  /* ── LIST ── */
-  .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .list-header h3{font-size:15px;font-weight:700}
-  .list-hint{font-size:12px;color:var(--txt3)}
-  .empty-state{text-align:center;padding:48px 0;color:var(--txt3);font-size:14px}
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--bdr);padding:16px 12px;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.nav-lbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;padding:10px 10px 4px;margin-top:4px}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--rsm);cursor:pointer;border:none;background:none;color:var(--txt2);font-family:inherit;font-size:12px;font-weight:500;transition:all .12s;text-align:left;width:100%}
+.nav-btn:hover{background:var(--bg3);color:var(--txt)}
+.nav-btn.active{background:rgba(232,48,90,.1);color:var(--hot);font-weight:700;border:1px solid rgba(232,48,90,.18)}
+.nav-btn .ico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nav-btn .bdg{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--bg4);color:var(--txt3)}
+.nav-btn.active .bdg{background:rgba(232,48,90,.15);color:var(--hot)}
+.sidebar-foot{margin-top:auto;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--bdr)}
+.sf-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px}
+.sf-row span:first-child{color:var(--txt3)}
+.sf-row span:last-child{font-weight:700;color:var(--txt)}
+.sf-live{color:var(--grn)!important}
+@media(max-width:740px){.sidebar{display:none}}
 
-  /* ── ITEM ── */
-  .item{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;cursor:grab;transition:border-color .15s,transform .15s,box-shadow .15s;user-select:none}
-  .item:hover{border-color:rgba(224,64,251,.3)}
-  .item.dragging{opacity:.5;transform:scale(.98);border-color:var(--neon);box-shadow:0 0 0 2px rgba(224,64,251,.3)}
-  .item.drag-over{border-color:var(--neon);box-shadow:0 0 0 2px rgba(224,64,251,.4);transform:scale(1.01)}
-  .item.inactive{opacity:.45}
-  .drag-handle{color:var(--txt3);font-size:16px;cursor:grab;flex-shrink:0;padding:0 2px}
-  .item-pos{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--neon);flex-shrink:0}
-  .item-pos.pos-1{background:rgba(245,200,66,.1);border-color:var(--gold);color:var(--gold)}
-  .item-pos.pos-2{background:rgba(176,184,196,.1);border-color:#b0b8c4;color:#b0b8c4}
-  .item-pos.pos-3{background:rgba(192,112,48,.1);border-color:#c07030;color:#c07030}
-  .item-thumb{width:40px;height:53px;border-radius:6px;object-fit:cover;border:1px solid var(--bdr);flex-shrink:0}
-  .item-info{flex:1;min-width:0}
-  .item-username{font-size:14px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .item-meta{font-size:11px;color:var(--txt3);margin-top:2px}
-  .item-label{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(224,64,251,.15);color:var(--neon);border:1px solid rgba(224,64,251,.3);margin-top:4px}
-  .item-actions{display:flex;gap:6px;flex-shrink:0}
-  .toggle-btn{background:transparent;border:1px solid var(--bdr);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--txt2);transition:all .15s}
-  .toggle-btn:hover{border-color:var(--neon);color:var(--neon)}
-  .toggle-btn.active-btn{background:rgba(0,232,122,.1);border-color:var(--grn);color:var(--grn)}
-  .del-btn{background:transparent;border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;color:var(--txt3);transition:all .15s}
-  .del-btn:hover{border-color:var(--red);color:var(--red)}
+/* CONTENT */
+.content{padding:20px;overflow-y:auto;height:calc(100vh - 53px)}
 
-  /* ── TOAST ── */
-  #toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:999}
-  #toast.show{opacity:1}
-  #toast.ok{border-color:var(--grn);color:var(--grn)}
-  #toast.err{border-color:var(--red);color:var(--red)}
+/* PAGE HEADER */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.ph-title{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.ph-sub{font-size:11px;color:var(--txt3);margin-top:2px}
 
-  /* ── PATCH INDICATOR ── */
-  #saving{font-size:11px;color:var(--txt3);display:none}
-  #saving.show{display:inline}
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:800px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+.scard{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.scard.c-red::before{background:linear-gradient(90deg,var(--hot),transparent)}
+.scard.c-purple::before{background:linear-gradient(90deg,var(--neon),transparent)}
+.scard.c-green::before{background:linear-gradient(90deg,var(--grn),transparent)}
+.scard.c-blue::before{background:linear-gradient(90deg,var(--blue),transparent)}
+.scard-ico{font-size:18px;margin-bottom:6px}
+.scard-val{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.scard-lbl{font-size:10px;color:var(--txt3);margin-top:2px}
 
-  @media(max-width:600px){
-    .add-row{flex-direction:column}
-    .item-actions{flex-direction:column}
-    #main-screen{padding:14px}
-  }
+/* TOOLBAR */
+.toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.srch{position:relative;flex:1;min-width:180px}
+.srch-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--txt3);font-size:12px;pointer-events:none}
+.srch input{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rsm);padding:8px 11px 8px 30px;color:var(--txt);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s}
+.srch input:focus{border-color:rgba(232,48,90,.35)}
+.fpill{display:inline-flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--bdr);border-radius:99px;padding:6px 11px;font-size:11px;font-weight:600;color:var(--txt2);cursor:pointer;transition:all .12s;white-space:nowrap}
+.fpill:hover{border-color:var(--bdr2);color:var(--txt)}
+.fpill.on{background:rgba(232,48,90,.1);border-color:rgba(232,48,90,.35);color:var(--hot)}
+.fpill.on::before{content:'✓ ';font-size:9px}
+select.fpill{appearance:none;padding-right:22px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23555570'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;cursor:pointer}
+
+/* SECTION HEAD */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:700;color:var(--txt3);letter-spacing:.04em;text-transform:uppercase}
+.sh-count{font-size:10px;color:var(--txt3);background:var(--bg3);border-radius:99px;padding:2px 8px}
+
+/* ITEMS */
+.item{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:grab;transition:border-color .14s,transform .1s;user-select:none;position:relative;overflow:hidden}
+.item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background .14s;border-radius:3px 0 0 3px}
+.item:hover{border-color:var(--bdr2)}
+.item:hover::before{background:var(--hot)}
+.item.dragging{opacity:.4;transform:scale(.98);border-color:var(--hot)}
+.item.drag-over{border-color:var(--hot);box-shadow:0 0 0 2px rgba(232,48,90,.12);transform:translateY(-2px)}
+.item.inactive{opacity:.4}
+.item.live::after{content:'● LIVE';position:absolute;top:7px;right:10px;font-size:8px;font-weight:800;color:var(--grn);letter-spacing:.06em;padding:2px 6px;border-radius:99px;background:rgba(0,209,102,.1);border:1px solid rgba(0,209,102,.18)}
+.dh{color:var(--txt3);font-size:14px;cursor:grab;flex-shrink:0;padding:0 2px}
+.ipos{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;background:var(--bg4);border:1px solid var(--bdr);color:var(--txt3)}
+.ipos.p1{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.35);color:var(--gold)}
+.ipos.p2{background:rgba(176,184,196,.08);border-color:rgba(176,184,196,.25);color:#c0c8d4}
+.ipos.p3{background:rgba(192,112,48,.1);border-color:rgba(192,112,48,.3);color:#e08840}
+.ithumb{width:36px;height:48px;border-radius:5px;object-fit:cover;border:1px solid var(--bdr);flex-shrink:0;background:var(--bg4)}
+.iinfo{flex:1;min-width:0}
+.iname{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.imeta{font-size:10px;color:var(--txt3);margin-top:1px;display:flex;gap:7px;flex-wrap:wrap}
+.itag{display:inline-block;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px;margin-top:3px;background:rgba(124,58,237,.12);color:var(--neon);border:1px solid rgba(124,58,237,.2)}
+.iactions{display:flex;gap:4px;flex-shrink:0;align-items:center;flex-wrap:wrap}
+.abt{background:transparent;border:1px solid var(--bdr);border-radius:6px;padding:4px 9px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--txt2);transition:all .12s;white-space:nowrap}
+.abt:hover{border-color:var(--bdr2);color:var(--txt)}
+.pos-wrap{display:flex;align-items:center;gap:3px}
+.parr{background:none;border:1px solid var(--bdr);border-radius:4px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--txt3);cursor:pointer;font-size:11px;transition:all .12s}
+.parr:hover{border-color:var(--bdr2);color:var(--txt)}
+.pnum{width:28px;height:20px;background:var(--bg4);border:1px solid var(--bdr);border-radius:4px;color:var(--txt);font-size:11px;font-weight:700;text-align:center;font-family:inherit;outline:none;cursor:pointer}
+.pnum:focus{border-color:var(--hot)}
+.empty{text-align:center;padding:48px 0;color:var(--txt3);font-size:13px}
+.empty .ico{font-size:32px;margin-bottom:10px}
+
+/* ROOMS GRID */
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.rcard{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color .14s,transform .14s;position:relative}
+.rcard:hover{border-color:rgba(232,48,90,.4);transform:translateY(-2px)}
+.rcard.is-feat{border-color:rgba(124,58,237,.4)}
+.rcard.is-feat::after{content:'★';position:absolute;top:5px;right:5px;font-size:10px;color:var(--gold);text-shadow:0 0 5px rgba(245,200,66,.7)}
+.rthumb{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--bg4)}
+.rinfo{padding:6px 8px}
+.rname{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rvw{font-size:9px;color:var(--txt3);margin-top:1px}
+.rover{position:absolute;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .14s;backdrop-filter:blur(3px);flex-direction:column;gap:6px;padding:8px}
+.rcard:hover .rover{opacity:1}
+.rover-name{font-size:11px;font-weight:800;color:#fff;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.rover-vw{font-size:10px;color:rgba(255,255,255,.5)}
+.radd{background:var(--hot);color:#fff;border:none;border-radius:5px;padding:5px 12px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter .12s}
+.radd:hover{filter:brightness(1.1)}
+.radd.already{background:var(--neon)}
+
+/* ADD PANEL */
+.apanel{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.apanel h3{font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.arow{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end}
+.arow .field{margin:0;flex:1;min-width:120px}
+.prev-img{width:40px;height:53px;border-radius:5px;object-fit:cover;border:1px solid var(--bdr);display:none;flex-shrink:0;align-self:flex-end}
+
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px}
+.mbg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bdr2);border-radius:16px;padding:24px;width:100%;max-width:420px;box-shadow:0 20px 70px rgba(0,0,0,.6);animation:min .2s cubic-bezier(.22,1,.36,1)}
+@keyframes min{from{transform:scale(.93) translateY(10px);opacity:0}to{transform:scale(1);opacity:1}}
+.mtitle{font-size:15px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.mthumb{width:56px;height:74px;border-radius:7px;object-fit:cover;border:1px solid var(--bdr);float:right;margin-left:12px}
+.mfooter{display:flex;gap:7px;margin-top:20px;justify-content:flex-end}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--bg2);border:1px solid var(--bdr);border-radius:9px;padding:9px 16px;font-size:12px;font-weight:700;opacity:0;transform:translateY(6px);pointer-events:none;transition:all .18s}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.ok{border-color:rgba(0,209,102,.4);color:var(--grn)}
+#toast.err{border-color:rgba(232,48,90,.4);color:var(--hot)}
+#toast.inf{border-color:var(--bdr2);color:var(--txt2)}
+
+@media(max-width:600px){
+  .content{padding:12px}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .iactions{flex-direction:column;gap:2px}
+  .rgrid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}
+  header{padding:10px 13px}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div style="display:flex;align-items:center;gap:8px">
-    <div class="logo"><span>CAMPULSE</span><span>HUB</span></div>
-    <span class="logo-sub">/ Admin</span>
+  <div class="logo">
+    <div class="logo-mark">CH</div>
+    <div>
+      <div class="logo-txt"><em>CAMPULSE</em>HUB</div>
+    </div>
+    <div class="logo-badge">Admin</div>
   </div>
-  <div class="header-right">
-    <span id="saving">Guardando...</span>
-    <span id="auth-status"></span>
-    <button class="btn secondary small" onclick="logout()" id="logout-btn" style="display:none">Salir</button>
+  <div class="hdr-r">
+    <span id="saving">Guardando…</span>
+    <span id="auth-tag">● Admin</span>
+    <button class="btn btn-ghost btn-sm" onclick="logout()" id="logout-btn" style="display:none">Salir</button>
   </div>
 </header>
 
-<!-- LOGIN -->
+<!-- ═══ LOGIN ═══ -->
 <div id="login-screen">
   <div class="login-box">
-    <h2>🔐 Panel de Admin</h2>
-    <p>Ingresa la clave de administrador para gestionar las modelos destacadas.</p>
-    <div class="field">
-      <label>Clave de Admin</label>
-      <input type="password" id="secret-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <div class="logo-mark" style="width:38px;height:38px;font-size:16px">CH</div>
+      <div><div style="font-size:15px;font-weight:800">Panel Admin</div><div style="font-size:11px;color:var(--txt3)">CampulseHub</div></div>
     </div>
-    <button class="btn" onclick="login()">Entrar</button>
+    <h2>Bienvenido 👋</h2>
+    <p>Ingresa la clave de administrador para gestionar las modelos destacadas y el catálogo.</p>
+    <div class="field" style="margin-top:20px">
+      <label>Clave de Admin</label>
+      <input type="password" id="secret-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:10px;font-size:13px;margin-top:4px" onclick="login()">Entrar al panel</button>
     <div class="error-msg" id="login-error"></div>
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- ═══ MAIN ═══ -->
 <div id="main-screen">
+  <div class="layout">
 
-  <!-- Add form -->
-  <div class="add-card">
-    <h3>➕ Agregar modelo destacada</h3>
-    <div class="add-row">
-      <div class="field" style="flex:2">
-        <label>Username de Chaturbate</label>
-        <input type="text" id="add-username" placeholder="ej: sweetangelxxx" oninput="previewThumb()" onkeydown="if(event.key==='Enter')addFeatured()">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="nav-lbl">Gestión</div>
+      <button class="nav-btn active" id="nav-featured" onclick="showPage('featured')">
+        <span class="ico">📌</span>Destacadas
+        <span class="bdg" id="nb-feat">—</span>
+      </button>
+      <button class="nav-btn" id="nav-live" onclick="showPage('live')">
+        <span class="ico">🔴</span>En Vivo
+        <span class="bdg" id="nb-live">—</span>
+      </button>
+      <div class="nav-lbl">Agregar</div>
+      <button class="nav-btn" id="nav-add" onclick="showPage('add')">
+        <span class="ico">➕</span>Agregar modelo
+      </button>
+
+      <div class="sidebar-foot">
+        <div class="sf-row"><span>Salas live</span><span class="sf-live" id="sf-live">—</span></div>
+        <div class="sf-row"><span>Destacadas</span><span id="sf-feat">—</span></div>
+        <div class="sf-row"><span>Viewers totales</span><span id="sf-views">—</span></div>
+        <div class="sf-row"><span>Actualizado</span><span id="sf-time">—</span></div>
       </div>
-      <div class="field">
-        <label>Posición</label>
-        <input type="number" id="add-position" placeholder="Auto" min="1" style="width:90px">
+    </aside>
+
+    <div class="content">
+
+      <!-- PAGE: DESTACADAS -->
+      <div id="page-featured">
+        <div class="ph">
+          <div>
+            <div class="ph-title">📌 Modelos Destacadas</div>
+            <div class="ph-sub">Arrastra para reordenar · Los cambios se guardan automáticamente</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showPage('add')">+ Agregar</button>
+        </div>
+
+        <div class="stat-row">
+          <div class="scard c-purple"><div class="scard-ico">📌</div><div class="scard-val" id="fs-tot">—</div><div class="scard-lbl">Total</div></div>
+          <div class="scard c-green"><div class="scard-ico">✅</div><div class="scard-val" id="fs-act">—</div><div class="scard-lbl">Activas</div></div>
+          <div class="scard c-red"><div class="scard-ico">🔴</div><div class="scard-val" id="fs-lv">—</div><div class="scard-lbl">En vivo ahora</div></div>
+          <div class="scard c-blue"><div class="scard-ico">👀</div><div class="scard-val" id="fs-vw">—</div><div class="scard-lbl">Viewers combinados</div></div>
+        </div>
+
+        <div class="toolbar">
+          <div class="srch">
+            <span class="srch-ico">🔍</span>
+            <input placeholder="Buscar por username o etiqueta…" id="feat-q" oninput="renderFeatured()">
+          </div>
+          <button class="fpill" id="fp-act" onclick="toggleFP('act')">✅ Activas</button>
+          <button class="fpill" id="fp-lv" onclick="toggleFP('lv')">🔴 En Vivo</button>
+          <button class="fpill" id="fp-off" onclick="toggleFP('off')">⏸ Inactivas</button>
+        </div>
+
+        <div class="sh">
+          <span class="sh-title">Lista</span>
+          <span class="sh-count" id="feat-cnt">0</span>
+        </div>
+        <div id="feat-list"><div class="empty"><div class="ico">⏳</div>Cargando…</div></div>
       </div>
-      <div class="field">
-        <label>Etiqueta (opcional)</label>
-        <input type="text" id="add-label" placeholder="VIP, Patrocinada...">
+
+      <!-- PAGE: EN VIVO -->
+      <div id="page-live" style="display:none">
+        <div class="ph">
+          <div>
+            <div class="ph-title">🔴 Salas En Vivo</div>
+            <div class="ph-sub">Click en una sala para agregarla a Destacadas · ★ = ya destacada</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadRooms()">↺ Refrescar</button>
+        </div>
+        <div class="toolbar">
+          <div class="srch">
+            <span class="srch-ico">🔍</span>
+            <input placeholder="Buscar sala…" id="live-q" oninput="renderRooms()">
+          </div>
+          <select class="fpill" id="live-g" onchange="renderRooms()">
+            <option value="">Todos los géneros</option>
+            <option value="f">♀ Mujeres</option>
+            <option value="m">♂ Hombres</option>
+            <option value="c">⚭ Parejas</option>
+            <option value="t">⚧ Trans</option>
+          </select>
+          <button class="fpill" id="lp-co" onclick="toggleLP('co')">🇨🇴 Colombia</button>
+          <button class="fpill" id="lp-hd" onclick="toggleLP('hd')">HD</button>
+          <select class="fpill" id="live-s" onchange="renderRooms()">
+            <option value="viewers">↓ Más viewers</option>
+            <option value="name">A → Z</option>
+            <option value="new">Nuevas</option>
+          </select>
+        </div>
+        <div id="rooms-load" style="text-align:center;padding:36px;color:var(--txt3);font-size:13px">Cargando salas…</div>
+        <div class="rgrid" id="rooms-grid" style="display:none"></div>
       </div>
-      <img id="preview-img" class="preview-img" alt="preview">
-      <button class="btn small" onclick="addFeatured()" style="margin-bottom:0;flex-shrink:0">Agregar</button>
+
+      <!-- PAGE: AGREGAR -->
+      <div id="page-add" style="display:none">
+        <div class="ph">
+          <div>
+            <div class="ph-title">➕ Agregar Modelo</div>
+            <div class="ph-sub">Agrega un username de Chaturbate a las destacadas</div>
+          </div>
+        </div>
+        <div class="apanel">
+          <h3>📋 Datos del modelo</h3>
+          <div class="arow">
+            <div class="field" style="flex:2">
+              <label>Username de Chaturbate</label>
+              <input type="text" id="add-u" placeholder="ej: sweetangelxxx" oninput="prevThumb()" onkeydown="if(event.key==='Enter')addFeat()">
+            </div>
+            <div class="field" style="flex:none;width:90px">
+              <label>Posición</label>
+              <input type="number" id="add-pos" placeholder="Auto" min="1">
+            </div>
+          </div>
+          <div style="height:10px"></div>
+          <div class="arow">
+            <div class="field">
+              <label>Etiqueta (opcional)</label>
+              <input type="text" id="add-lbl" placeholder="VIP, Patrocinada, Top…">
+            </div>
+            <img id="prev-img" class="prev-img" alt="preview">
+          </div>
+          <div class="error-msg" id="add-err"></div>
+          <div style="height:14px"></div>
+          <button class="btn btn-primary" onclick="addFeat()">+ Agregar a destacadas</button>
+        </div>
+        <div class="apanel" style="background:var(--bg3)">
+          <h3>💡 Tips rápidos</h3>
+          <div style="font-size:11px;color:var(--txt3);line-height:1.8">
+            <div>• El username debe ser exactamente el de Chaturbate (minúsculas, sin espacios)</div>
+            <div>• Posición 1 = aparece primera en el catálogo</div>
+            <div>• Si dejas posición vacía, se agrega al final automáticamente</div>
+            <div>• También puedes destacar desde la pestaña "En Vivo" con un click</div>
+            <div>• Las modelos inactivas no aparecen en el catálogo público</div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="error-msg" id="add-error"></div>
   </div>
+</div>
 
-  <!-- List -->
-  <div class="list-header">
-    <h3>📌 Modelos destacadas</h3>
-    <span class="list-hint" id="list-hint">Arrastra para reordenar</span>
+<!-- EDIT MODAL -->
+<div class="mbg" id="edit-modal" onclick="if(event.target===this)closeEdit()">
+  <div class="modal">
+    <div class="mtitle">✏️ Editar modelo</div>
+    <img id="edit-thumb" class="mthumb" src="" alt="">
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="edit-u" readonly style="opacity:.45;cursor:not-allowed">
+    </div>
+    <div class="field">
+      <label>Etiqueta</label>
+      <input type="text" id="edit-lbl" placeholder="VIP, Patrocinada…">
+    </div>
+    <div class="field">
+      <label>Posición</label>
+      <input type="number" id="edit-pos" min="1">
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select id="edit-act">
+        <option value="true">✅ Activa — aparece en catálogo</option>
+        <option value="false">⏸ Inactiva — oculta del catálogo</option>
+      </select>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="closeEdit()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Guardar cambios</button>
+    </div>
   </div>
-  <div id="featured-list">
-    <div class="empty-state">Cargando...</div>
-  </div>
-
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ─── CONFIG ──────────────────────────────────────────────────────
 const API_BASE = '/api/featured-models';
-let SECRET = '';
-let items = [];
-let dragSrc = null;
-let saveTimer = null;
+const ROOMS_API = '/api/rooms?limit=500';
+let SECRET = '', items = [], rooms = [], dragSrc = null, saveTimer = null, editTarget = null, toastTimer;
+const fpState = {act:false,lv:false,off:false};
+const lpState = {co:false,hd:false};
 
-// ─── AUTH ─────────────────────────────────────────────────────────
+/* ── AUTH ─────────────────────────────────────────────────── */
 function login() {
-  const val = document.getElementById('secret-input').value.trim();
-  if (!val) { document.getElementById('login-error').textContent = 'Ingresa la clave.'; return; }
-  SECRET = val;
-  // Verificar haciendo un GET con auth
+  const v = document.getElementById('secret-input').value.trim();
+  if (!v) { document.getElementById('login-error').textContent = 'Ingresa la clave.'; return; }
+  SECRET = v;
   fetchFeatured().then(() => {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
-    document.getElementById('logout-btn').style.display = 'inline';
-    document.getElementById('auth-status').textContent = 'Admin';
+    document.getElementById('logout-btn').style.display = 'inline-flex';
+    document.getElementById('auth-tag').style.display = 'inline';
     document.getElementById('login-error').textContent = '';
-  }).catch(() => {
-    SECRET = '';
-    document.getElementById('login-error').textContent = 'Clave incorrecta o error de conexión.';
-  });
+    loadRooms();
+  }).catch(() => { SECRET=''; document.getElementById('login-error').textContent = 'Clave incorrecta o error de conexión.'; });
 }
-
 function logout() {
-  SECRET = '';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('main-screen').style.display = 'none';
-  document.getElementById('logout-btn').style.display = 'none';
-  document.getElementById('auth-status').textContent = '';
-  document.getElementById('secret-input').value = '';
+  SECRET='';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('main-screen').style.display='none';
+  document.getElementById('logout-btn').style.display='none';
+  document.getElementById('auth-tag').style.display='none';
+  document.getElementById('secret-input').value='';
 }
 
-// ─── API CALLS ────────────────────────────────────────────────────
-async function apiFetch(method, body) {
-  const opts = {
-    method,
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SECRET}` },
-  };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(API_BASE, opts);
-  if (res.status === 401) throw new Error('No autorizado');
-  return res.json();
+/* ── NAV ──────────────────────────────────────────────────── */
+function showPage(p) {
+  ['featured','live','add'].forEach(id => {
+    document.getElementById('page-'+id).style.display = id===p?'block':'none';
+    const nb=document.getElementById('nav-'+id);
+    if(nb) nb.classList.toggle('active', id===p);
+  });
 }
 
+/* ── API ──────────────────────────────────────────────────── */
+async function api(method, body) {
+  const opts={method,headers:{'Content-Type':'application/json','Authorization':`Bearer ${SECRET}`}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(API_BASE,opts);
+  if(r.status===401) throw new Error('401');
+  return r.json();
+}
 async function fetchFeatured() {
-  const res = await fetch(API_BASE + '?_t=' + Date.now(), {
-    headers: { 'Authorization': `Bearer ${SECRET}` }
-  });
-  if (!res.ok) throw new Error('Error');
-  const data = await res.json();
-  if (!Array.isArray(data)) throw new Error('Respuesta inválida');
-  items = data;
-  renderList();
+  const r=await fetch(API_BASE+'?_t='+Date.now(),{headers:{'Authorization':`Bearer ${SECRET}`}});
+  if(!r.ok) throw new Error('err');
+  const d=await r.json();
+  if(!Array.isArray(d)) throw new Error('inv');
+  items=d; sidebar(); featStats(); renderFeatured();
+}
+async function loadRooms() {
+  document.getElementById('rooms-load').style.display='block';
+  document.getElementById('rooms-grid').style.display='none';
+  try {
+    const r=await fetch(ROOMS_API);
+    const d=await r.json();
+    rooms=(d.results||[]).filter(r=>r.num_users>0);
+    document.getElementById('nb-live').textContent=fmt(rooms.length);
+    document.getElementById('sf-live').textContent=fmt(rooms.length);
+    document.getElementById('sf-views').textContent=fmt(rooms.reduce((s,r)=>s+(r.num_users||0),0));
+    document.getElementById('sf-time').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+    featStats(); renderRooms();
+  } catch(e){ toast('Error cargando salas','err'); }
+  finally{
+    document.getElementById('rooms-load').style.display='none';
+    document.getElementById('rooms-grid').style.display='grid';
+  }
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────
-function renderList() {
-  const el = document.getElementById('featured-list');
-  document.getElementById('list-hint').textContent = items.length
-    ? `${items.length} modelo${items.length > 1 ? 's' : ''} · Arrastra para reordenar`
-    : '';
+/* ── STATS ────────────────────────────────────────────────── */
+function sidebar() {
+  const act=items.filter(i=>i.active!==false).length;
+  document.getElementById('nb-feat').textContent=items.length;
+  document.getElementById('sf-feat').textContent=act;
+}
+function featStats() {
+  const act=items.filter(i=>i.active!==false);
+  const ls=new Set(rooms.map(r=>r.username));
+  const lv=act.filter(i=>ls.has(i.username));
+  const vw=lv.reduce((s,i)=>s+(rooms.find(r=>r.username===i.username)?.num_users||0),0);
+  document.getElementById('fs-tot').textContent=items.length;
+  document.getElementById('fs-act').textContent=act.length;
+  document.getElementById('fs-lv').textContent=lv.length;
+  document.getElementById('fs-vw').textContent=fmt(vw);
+}
+function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':String(n||0)}
 
-  if (!items.length) {
-    el.innerHTML = '<div class="empty-state">No hay modelos destacadas. Agrega la primera arriba.</div>';
-    return;
-  }
-
-  el.innerHTML = items.map((item, i) => `
-    <div class="item${item.active === false ? ' inactive' : ''}"
-      draggable="true"
-      data-username="${item.username}"
-      data-index="${i}"
-      ondragstart="onDragStart(event)"
-      ondragover="onDragOver(event)"
-      ondrop="onDrop(event)"
-      ondragend="onDragEnd(event)">
-      <span class="drag-handle">⠿</span>
-      <div class="item-pos pos-${item.position}">${item.position}</div>
-      <img class="item-thumb"
-        src="https://thumb.live.mmcdn.com/riw/${item.username}.jpg"
-        onerror="this.src='https://thumb.live.mmcdn.com/ri/${item.username}.jpg'"
-        alt="${item.username}">
-      <div class="item-info">
-        <div class="item-username">${item.username}</div>
-        <div class="item-meta">Posición ${item.position}${item.active === false ? ' · Inactiva' : ' · Activa'}</div>
-        ${item.label ? `<div class="item-label">${item.label}</div>` : ''}
+/* ── RENDER FEATURED ──────────────────────────────────────── */
+function renderFeatured() {
+  const q=(document.getElementById('feat-q')?.value||'').trim().toLowerCase();
+  const ls=new Set(rooms.map(r=>r.username));
+  let list=[...items].filter(it=>{
+    if(fpState.act && it.active===false) return false;
+    if(fpState.off && it.active!==false) return false;
+    if(fpState.lv  && !ls.has(it.username)) return false;
+    if(q && !it.username.includes(q) && !(it.label||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('feat-cnt').textContent=list.length+' modelo'+(list.length!==1?'s':'');
+  const el=document.getElementById('feat-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ico">🔍</div>Sin resultados</div>';return;}
+  el.innerHTML=list.map((it,i)=>{
+    const lv=ls.has(it.username);
+    const r=rooms.find(r=>r.username===it.username);
+    const pc=it.position===1?'p1':it.position===2?'p2':it.position===3?'p3':'';
+    return `<div class="item${it.active===false?' inactive':''}${lv?' live':''}"
+      draggable="true" data-u="${it.username}" data-i="${i}"
+      ondragstart="dStart(event)" ondragover="dOver(event)" ondrop="dDrop(event)" ondragend="dEnd(event)">
+      <span class="dh">⠿</span>
+      <div class="ipos ${pc}">${it.position}</div>
+      <img class="ithumb" src="https://thumb.live.mmcdn.com/riw/${it.username}.jpg"
+        onerror="this.src='https://thumb.live.mmcdn.com/ri/${it.username}.jpg'">
+      <div class="iinfo">
+        <div class="iname">${it.username}</div>
+        <div class="imeta">
+          ${lv?`<span>👀 ${fmt(r?.num_users||0)}</span>`:'<span>Offline</span>'}
+          <span>${it.active===false?'⏸ Inactiva':'✅ Activa'}</span>
+        </div>
+        ${it.label?`<div class="itag">${it.label}</div>`:''}
       </div>
-      <div class="item-actions">
-        <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${item.username}" target="_blank" rel="noopener"
-          class="toggle-btn" style="text-decoration:none">Ver ↗</a>
-        <button class="toggle-btn${item.active !== false ? ' active-btn' : ''}"
-          onclick="toggleActive('${item.username}', ${item.active !== false})">
-          ${item.active !== false ? '✓ Activa' : '○ Inactiva'}
+      <div class="iactions">
+        <button class="abt" onclick="openEdit('${it.username}')">✏️ Editar</button>
+        <div class="pos-wrap">
+          <button class="parr" onclick="shiftPos('${it.username}',-1)" title="Subir">▲</button>
+          <input class="pnum" type="number" value="${it.position}" min="1"
+            onchange="setPosInline('${it.username}',this.value)" onclick="event.stopPropagation()">
+          <button class="parr" onclick="shiftPos('${it.username}',1)" title="Bajar">▼</button>
+        </div>
+        <a href="https://chaturbate.com/${it.username}/" target="_blank" rel="noopener"
+          class="abt" style="text-decoration:none">↗</a>
+        <button class="btn-danger" onclick="delFeat('${it.username}')" title="Eliminar">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── FILTER PILLS ─────────────────────────────────────────── */
+function toggleFP(k) {
+  if(k==='act'&&fpState.off) fpState.off=false;
+  if(k==='off'&&fpState.act) fpState.act=false;
+  fpState[k]=!fpState[k];
+  ['act','lv','off'].forEach(x=>document.getElementById('fp-'+x).classList.toggle('on',fpState[x]));
+  renderFeatured();
+}
+function toggleLP(k) {
+  lpState[k]=!lpState[k];
+  document.getElementById('lp-'+k).classList.toggle('on',lpState[k]);
+  renderRooms();
+}
+
+/* ── RENDER ROOMS ─────────────────────────────────────────── */
+function renderRooms() {
+  const q=(document.getElementById('live-q')?.value||'').trim().toLowerCase();
+  const g=document.getElementById('live-g')?.value||'';
+  const s=document.getElementById('live-s')?.value||'viewers';
+  const fs=new Set(items.map(i=>i.username));
+  let list=rooms.filter(r=>{
+    if(g&&r.gender!==g) return false;
+    if(lpState.co&&r.country!=='CO') return false;
+    if(lpState.hd&&!r.is_hd) return false;
+    if(q&&!(r.username+' '+(r.display_name||'')).toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>s==='viewers'?(b.num_users||0)-(a.num_users||0):s==='name'?a.username.localeCompare(b.username):(b.is_new?1:0)-(a.is_new?1:0));
+  const g2=document.getElementById('rooms-grid');
+  if(!list.length){g2.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ico">🔍</div>Sin resultados</div>';return;}
+  g2.innerHTML=list.map(r=>{
+    const isFeat=fs.has(r.username);
+    return `<div class="rcard${isFeat?' is-feat':''}" title="${r.display_name||r.username}">
+      <img class="rthumb" src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg"
+        onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'" loading="lazy">
+      <div class="rinfo">
+        <div class="rname">${r.display_name||r.username}</div>
+        <div class="rvw">👀 ${fmt(r.num_users||0)}${r.country?' · '+r.country:''}</div>
+      </div>
+      <div class="rover">
+        <div class="rover-name">${r.display_name||r.username}</div>
+        <div class="rover-vw">👀 ${fmt(r.num_users||0)}</div>
+        <button class="radd${isFeat?' already':''}" onclick="quickAdd('${r.username}')">
+          ${isFeat?'★ Ya destacada':'+ Destacar'}
         </button>
-        <button class="del-btn" onclick="deleteFeatured('${item.username}')" title="Eliminar">🗑</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
-// ─── ADD ──────────────────────────────────────────────────────────
-async function addFeatured() {
-  const username = document.getElementById('add-username').value.trim().toLowerCase();
-  const position = parseInt(document.getElementById('add-position').value) || null;
-  const label = document.getElementById('add-label').value.trim() || null;
-  const errEl = document.getElementById('add-error');
+/* ── QUICK ADD ────────────────────────────────────────────── */
+async function quickAdd(username) {
+  if(new Set(items.map(i=>i.username)).has(username)){toast(`${username} ya está destacada`,'inf');return;}
+  try{
+    await api('POST',{username,label:null,position:null});
+    await fetchFeatured(); renderRooms();
+    toast(`✓ ${username} destacada`,'ok');
+  }catch(e){toast('Error al agregar','err');}
+}
 
-  errEl.textContent = '';
-  if (!username) { errEl.textContent = 'Ingresa el username.'; return; }
-
-  try {
-    await apiFetch('POST', { username, position, label });
-    document.getElementById('add-username').value = '';
-    document.getElementById('add-position').value = '';
-    document.getElementById('add-label').value = '';
-    document.getElementById('preview-img').style.display = 'none';
+/* ── ADD FORM ─────────────────────────────────────────────── */
+async function addFeat() {
+  const u=document.getElementById('add-u').value.trim().toLowerCase();
+  const pos=parseInt(document.getElementById('add-pos').value)||null;
+  const lbl=document.getElementById('add-lbl').value.trim()||null;
+  const err=document.getElementById('add-err');
+  err.textContent='';
+  if(!u){err.textContent='Ingresa el username.';return;}
+  try{
+    await api('POST',{username:u,position:pos,label:lbl});
+    ['add-u','add-pos','add-lbl'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('prev-img').style.display='none';
     await fetchFeatured();
-    toast('Modelo agregada ✓', 'ok');
-  } catch (e) {
-    errEl.textContent = 'Error al agregar. ¿El username ya existe?';
-    toast('Error al agregar', 'err');
-  }
+    toast('Modelo agregada ✓','ok');
+    showPage('featured');
+  }catch(e){err.textContent='Error al agregar. ¿El username ya existe?';toast('Error al agregar','err');}
+}
+function prevThumb() {
+  const u=document.getElementById('add-u').value.trim().toLowerCase();
+  const img=document.getElementById('prev-img');
+  if(u.length<3){img.style.display='none';return;}
+  img.style.display='block';
+  img.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
+  img.onerror=()=>{img.src=`https://thumb.live.mmcdn.com/ri/${u}.jpg`;};
 }
 
-// ─── TOGGLE ACTIVE ────────────────────────────────────────────────
-async function toggleActive(username, currentlyActive) {
-  try {
-    await apiFetch('PUT', { username, active: !currentlyActive });
-    await fetchFeatured();
-    toast(currentlyActive ? 'Modelo desactivada' : 'Modelo activada ✓', 'ok');
-  } catch (e) {
-    toast('Error al actualizar', 'err');
-  }
+/* ── EDIT ─────────────────────────────────────────────────── */
+function openEdit(username) {
+  const it=items.find(i=>i.username===username);
+  if(!it) return;
+  editTarget=username;
+  document.getElementById('edit-u').value=username;
+  document.getElementById('edit-lbl').value=it.label||'';
+  document.getElementById('edit-pos').value=it.position;
+  document.getElementById('edit-act').value=String(it.active!==false);
+  const th=document.getElementById('edit-thumb');
+  th.src=`https://thumb.live.mmcdn.com/riw/${username}.jpg`;
+  th.onerror=()=>{th.src=`https://thumb.live.mmcdn.com/ri/${username}.jpg`;};
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEdit(){document.getElementById('edit-modal').classList.remove('open');editTarget=null;}
+async function saveEdit() {
+  if(!editTarget) return;
+  const lbl=document.getElementById('edit-lbl').value.trim()||null;
+  const pos=parseInt(document.getElementById('edit-pos').value)||undefined;
+  const act=document.getElementById('edit-act').value==='true';
+  try{
+    await api('PUT',{username:editTarget,label:lbl,position:pos,active:act});
+    closeEdit(); await fetchFeatured(); toast('Guardado ✓','ok');
+  }catch(e){toast('Error al guardar','err');}
 }
 
-// ─── DELETE ───────────────────────────────────────────────────────
-async function deleteFeatured(username) {
-  if (!confirm(`¿Eliminar "${username}" de las destacadas?`)) return;
-  try {
-    await apiFetch('DELETE', { username });
-    await fetchFeatured();
-    toast('Modelo eliminada', 'ok');
-  } catch (e) {
-    toast('Error al eliminar', 'err');
-  }
+/* ── POSITION INLINE ──────────────────────────────────────── */
+function setPosInline(username,v) {
+  const pos=parseInt(v); if(!pos||pos<1) return;
+  const it=items.find(i=>i.username===username);
+  if(!it||it.position===pos) return;
+  it.position=pos;
+  items.sort((a,b)=>a.position-b.position);
+  items.forEach((x,i)=>{x.position=i+1;});
+  renderFeatured(); scheduleSave();
+}
+function shiftPos(username,dir) {
+  const idx=items.findIndex(i=>i.username===username);
+  if(idx===-1) return;
+  const ni=idx+dir;
+  if(ni<0||ni>=items.length) return;
+  [items[idx],items[ni]]=[items[ni],items[idx]];
+  items.forEach((x,i)=>{x.position=i+1;});
+  renderFeatured(); scheduleSave();
 }
 
-// ─── DRAG & DROP REORDER ─────────────────────────────────────────
-function onDragStart(e) {
-  dragSrc = e.currentTarget;
-  dragSrc.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
+/* ── DELETE ───────────────────────────────────────────────── */
+async function delFeat(username) {
+  if(!confirm(`¿Eliminar "${username}" de las destacadas?`)) return;
+  try{await api('DELETE',{username});await fetchFeatured();toast('Eliminada','ok');}
+  catch(e){toast('Error al eliminar','err');}
 }
 
-function onDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  document.querySelectorAll('.item').forEach(el => el.classList.remove('drag-over'));
-  e.currentTarget.classList.add('drag-over');
+/* ── DRAG & DROP ──────────────────────────────────────────── */
+function dStart(e){dragSrc=e.currentTarget;dragSrc.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function dOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';document.querySelectorAll('.item').forEach(el=>el.classList.remove('drag-over'));e.currentTarget.classList.add('drag-over');}
+function dDrop(e){
+  e.preventDefault();const t=e.currentTarget;if(t===dragSrc)return;
+  const si=parseInt(dragSrc.dataset.i),ti=parseInt(t.dataset.i);
+  const m=items.splice(si,1)[0];items.splice(ti,0,m);
+  items.forEach((x,i)=>{x.position=i+1;});
+  renderFeatured();scheduleSave();
 }
+function dEnd(e){document.querySelectorAll('.item').forEach(el=>el.classList.remove('dragging','drag-over'));dragSrc=null;}
 
-function onDrop(e) {
-  e.preventDefault();
-  const target = e.currentTarget;
-  if (target === dragSrc) return;
-
-  const srcIdx = parseInt(dragSrc.dataset.index);
-  const tgtIdx = parseInt(target.dataset.index);
-
-  // Reorder array
-  const moved = items.splice(srcIdx, 1)[0];
-  items.splice(tgtIdx, 0, moved);
-
-  // Reassign positions
-  items.forEach((item, i) => { item.position = i + 1; });
-
-  renderList();
-  scheduleSave();
-}
-
-function onDragEnd(e) {
-  document.querySelectorAll('.item').forEach(el => {
-    el.classList.remove('dragging', 'drag-over');
-  });
-  dragSrc = null;
-}
-
-// ─── SAVE POSITIONS (debounced) ───────────────────────────────────
+/* ── SAVE ─────────────────────────────────────────────────── */
 function scheduleSave() {
   clearTimeout(saveTimer);
-  document.getElementById('saving').classList.add('show');
-  saveTimer = setTimeout(async () => {
-    try {
-      await Promise.all(items.map(item =>
-        apiFetch('PUT', { username: item.username, position: item.position })
-      ));
-      toast('Orden guardado ✓', 'ok');
-    } catch (e) {
-      toast('Error guardando orden', 'err');
-    } finally {
-      document.getElementById('saving').classList.remove('show');
-    }
-  }, 800);
+  document.getElementById('saving').style.display='inline';
+  saveTimer=setTimeout(async()=>{
+    try{
+      await Promise.all(items.map(it=>api('PUT',{username:it.username,position:it.position})));
+      toast('Orden guardado ✓','ok');
+    }catch(e){toast('Error guardando orden','err');}
+    finally{document.getElementById('saving').style.display='none';}
+  },800);
 }
 
-// ─── PREVIEW THUMB ───────────────────────────────────────────────
-function previewThumb() {
-  const u = document.getElementById('add-username').value.trim().toLowerCase();
-  const img = document.getElementById('preview-img');
-  if (u.length < 3) { img.style.display = 'none'; return; }
-  img.style.display = 'block';
-  img.src = `https://thumb.live.mmcdn.com/riw/${u}.jpg`;
-  img.onerror = () => { img.src = `https://thumb.live.mmcdn.com/ri/${u}.jpg`; };
+/* ── TOAST ────────────────────────────────────────────────── */
+function toast(msg,type='ok') {
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className=`show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{el.className='';},2800);
 }
 
-// ─── TOAST ───────────────────────────────────────────────────────
-function toast(msg, type = 'ok') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `show ${type}`;
-  setTimeout(() => { el.className = ''; }, 2500);
-}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEdit();});
 </script>
 </body>
 </html>
