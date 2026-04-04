@@ -524,9 +524,9 @@ header{
 }
 .crd-vw-dot{width:4px;height:4px;border-radius:50%;background:var(--hot);box-shadow:0 0 4px var(--hot)}
 
-/* card play button */
+/* card play button — bottom-right (único corner libre) */
 .crd-play{
-  position:absolute;top:.4rem;right:.4rem;
+  position:absolute;bottom:.4rem;right:.4rem;
   width:30px;height:30px;border-radius:50%;
   background:rgba(232,48,90,.92);border:none;
   color:#fff;font-size:.75rem;
@@ -973,11 +973,10 @@ body.modal-open .crd-iframe-popup{display:none!important}
 .modal-v2{
   max-height:92dvh;
   height:auto;
-  min-height:55dvh;
+  /* Sin min-height: el modal ocupa solo lo que necesita */
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  /* Solo el body scrollea, el hero es touch-none */
   touch-action:pan-y;
 }
 .mhero-v2{
@@ -1164,7 +1163,7 @@ body.modal-open .crd-iframe-popup{display:none!important}
    DUAL PICKER
 ═══════════════════════════════════════════ */
 .dual-picker-bg{
-  display:none;position:fixed;inset:0;z-index:600;
+  display:none;position:fixed;inset:0;z-index:800;
   background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
   align-items:flex-end;justify-content:center;padding:0;
 }
@@ -1622,9 +1621,23 @@ body.modal-open .crd-iframe-popup{display:none!important}
   .modal{border-radius:20px;max-height:88dvh;max-width:500px;width:100%}
   .modal-hero{height:280px}
   .modal::before{display:none}
-  /* modal-v2 en desktop: altura auto, sin hueco blanco */
-  .modal-v2{height:auto;min-height:0;max-height:88dvh;border-radius:20px}
-  .mhero-v2{height:clamp(220px,40dvh,300px);min-height:clamp(220px,40dvh,300px);max-height:clamp(220px,40dvh,300px)}
+  /* modal-v2 en desktop: sólo ocupa lo que su contenido necesita */
+  .modal-v2{
+    height:auto;
+    max-height:88dvh;
+    border-radius:20px;
+    /* Forzar que el flex container no se expanda más allá del contenido */
+    align-self:center;
+  }
+  .mhero-v2{
+    height:clamp(220px,40dvh,300px);
+    min-height:clamp(220px,40dvh,300px);
+    max-height:clamp(220px,40dvh,300px);
+  }
+  /* El body scrolleable en desktop tiene altura máxima explícita */
+  .mbody-v2{
+    max-height:calc(88dvh - clamp(220px,40dvh,300px));
+  }
 }
 @media(max-width:900px){
   .drawer{display:none}
@@ -3349,12 +3362,15 @@ function showDualPicker(){
 }
 
 function closeDualPicker(e){
-  if(e&&e.target!==document.getElementById('dual-picker-bg'))return;
+  // Solo cerrar si se hizo click directamente en el backdrop (no en hijos)
+  if(e && e.target !== document.getElementById('dual-picker-bg')) return;
+  _closeDualPickerNow();
+}
+function _closeDualPickerNow(){
   const bg=document.getElementById('dual-picker-bg');
   if(!bg)return;
   bg.classList.remove('open');
-  // Restore hint text if we were in swap mode
-  if(_swapTargetSlot){ _swapTargetSlot=null; }
+  _swapTargetSlot=null;
   const hint=bg.querySelector('.dp-hint');
   if(hint&&active) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
   setTimeout(()=>{bg.style.display='none';},220);
@@ -3468,12 +3484,8 @@ function swapDualConfirm(slot, newUsername){
   if(!slot || !newUsername) return;
   _swapTargetSlot = null; // limpiar estado
 
-  // Cerrar el picker
-  const pickerBg = document.getElementById('dual-picker-bg');
-  if(pickerBg){
-    pickerBg.classList.remove('open');
-    setTimeout(() => { pickerBg.style.display = 'none'; }, 220);
-  }
+  // Cerrar el picker usando la función central
+  _closeDualPickerNow();
 
   // Actualizar el iframe del slot
   const frame  = document.getElementById('dv-frame-'  + slot);
