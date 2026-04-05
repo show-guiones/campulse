@@ -3121,6 +3121,7 @@ function openMod(u){
       // Si la pref era audio ON, restaurar estado del botón sin hacer segundo reload
       if(_savedAudio){
         _modalAudioActive = true;
+        _activeAudioContext = 'modal';
         const _ab=document.getElementById('modal-audio-btn');
         if(_ab){ _ab.classList.add('active'); _ab.textContent='🔊 Audio ON'; }
       }
@@ -3713,7 +3714,7 @@ function _killModalAudio(){
   _modalAudioActive = false;
   _activeAudioContext = null;
   const frame = document.getElementById('live-embed-frame');
-  if(frame){ frame.onload = null; frame.src = 'about:blank'; }
+  if(frame) frame.src = 'about:blank';
   const btn = document.getElementById('modal-audio-btn');
   if(btn){ btn.classList.remove('active','visible'); btn.textContent = '🔇 Sin audio'; }
 }
@@ -3788,6 +3789,20 @@ function openDualView(uA,uB){
   if(lblB) lblB.textContent=rB.display_name||uB;
   if(linkA){linkA.href=mkAffLink(uA);linkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
   if(linkB){linkB.href=mkAffLink(uB);linkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
+  // Sincronizar estado de audio con preferencias guardadas
+  const _prefA = _getAudioPref(uA);
+  const _prefB = _getAudioPref(uB);
+  // Mutex: si ambas tienen pref=true, solo activar A (no puede haber dos con audio)
+  const _activeA = _prefA;
+  const _activeB = !_prefA && _prefB;
+  _dvAudioState.a = _activeA;
+  _dvAudioState.b = _activeB;
+  if(_activeA){ _dvActiveAudioSlot='a'; _activeAudioContext='dv-a'; }
+  else if(_activeB){ _dvActiveAudioSlot='b'; _activeAudioContext='dv-b'; }
+  const _btnA=document.getElementById('dv-audio-a');
+  const _btnB=document.getElementById('dv-audio-b');
+  if(_btnA){ _btnA.classList.toggle('active',_activeA); _btnA.textContent=_activeA?'🔊 Audio ON':'🔇 Sin audio'; }
+  if(_btnB){ _btnB.classList.toggle('active',_activeB); _btnB.textContent=_activeB?'🔊 Audio ON':'🔇 Sin audio'; }
   // Reset cubiertas negras — evita flash blanco de Chaturbate
   const wrapA=document.getElementById('dv-panel-a')?.querySelector('.dv-embed-wrap');
   const wrapB=document.getElementById('dv-panel-b')?.querySelector('.dv-embed-wrap');
