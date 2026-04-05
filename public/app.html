@@ -860,7 +860,7 @@ header{
 /* Botón de audio del modal — visible encima del overlay */
 .modal-audio-btn{
   position:absolute;bottom:.6rem;left:50%;transform:translateX(-50%);
-  z-index:10;
+  z-index:20; /* por encima de todo: embed-wrap(5), overlay(9), loading(8) */
   background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
   border-radius:20px;padding:5px 14px;
   display:none; /* oculto hasta que el embed esté activo */
@@ -870,7 +870,8 @@ header{
   -webkit-tap-highlight-color:transparent;white-space:nowrap;
   pointer-events:auto;
 }
-.embed-wrap.active .modal-audio-btn{display:flex;}
+/* Ahora el botón es hijo de modal-hero, no de embed-wrap — activar con clase en modal-hero */
+.mhero-v2.embed-active .modal-audio-btn{display:flex;}
 .modal-audio-btn:hover{background:rgba(232,48,90,.75);}
 .modal-audio-btn.active{background:rgba(232,48,90,.9);border-color:var(--hot);box-shadow:0 0 0 3px rgba(232,48,90,.3);animation:dv-audio-pulse 2s ease-in-out infinite;}
 
@@ -2200,9 +2201,9 @@ body.modal-open{overflow:hidden!important}
           referrerpolicy="no-referrer-when-downgrade"></iframe>
         <!-- Intercepta clicks en el iframe — abre sala con params de afiliado -->
         <div class="embed-click-overlay" id="embed-click-overlay" onclick="openActiveRoomAffiliate()"></div>
-        <!-- Botón de audio del modal — encima del overlay -->
-        <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Sin audio</button>
       </div>
+      <!-- Botón de audio FUERA del embed-wrap — evita ser recortado por overflow:hidden y estar bajo el overlay -->
+      <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Sin audio</button>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
@@ -3104,7 +3105,11 @@ function openMod(u){
       embedWrap.classList.add('active');
     }
     if(frame){
-      // Mejora: cargar con preferencia guardada de audio (evita reload innecesario si ya sabe que quiere audio)
+      // Reconectar listener al frame actual — puede ser un elemento recreado por _reloadEmbedWithFade
+      // El listener original (línea de inicio) apunta al elemento viejo si hubo destroy+recreate
+      frame.removeEventListener('load', onEmbedLoad);
+      frame.addEventListener('load', onEmbedLoad);
+      // Cargar con preferencia guardada de audio (evita reload innecesario)
       const _savedAudio = _getAudioPref(u);
       const _initSound  = _savedAudio ? 0 : 1;
       frame.src=_mkEmbedUrl(u, _initSound===0);
@@ -3619,9 +3624,10 @@ function _reloadEmbedWithFade(frame, wrap, u, withAudio){
     parent.appendChild(newFrame);
 
     if(isModal){
-      // Reconectar el listener de onEmbedLoad
-      newFrame.addEventListener('load', onEmbedLoad);
+      // Flag PRIMERO — antes de addEventListener y antes de .src para evitar race condition
+      // Si Chaturbate responde desde caché, 'load' puede disparar antes de que JS asigne el flag
       newFrame._fadeReload = true;
+      newFrame.addEventListener('load', onEmbedLoad);
     } else {
       newFrame.onload = ()=>{
         newFrame.onload = null;
