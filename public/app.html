@@ -457,7 +457,8 @@ header{
   scrollbar-color:var(--surf2) transparent;
   padding:0 1rem .7rem;
   -webkit-overflow-scrolling:touch;
-  scroll-snap-type:x proximity;
+  scroll-snap-type:x mandatory;
+  align-items:stretch; /* todas las tarjetas misma altura */
 }
 .carousel-scroll::-webkit-scrollbar{height:4px}
 .carousel-scroll::-webkit-scrollbar-track{background:transparent;margin:0 1rem}
@@ -473,9 +474,11 @@ header{
   background:var(--surf);cursor:pointer;
   transition:transform .18s,box-shadow .18s;
   position:relative;flex-shrink:0;
+  min-width:0; /* evita colapso en flex */
   z-index:0;
+  isolation:isolate; /* contexto de apilamiento propio — hover no se solapa */
 }
-.crd:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.crd:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.5);z-index:2;}
 .crd-media{
   position:relative;width:100%;padding-top:133%;
   background:var(--surf2);overflow:hidden
@@ -549,11 +552,12 @@ header{
 }
 .crd-vw-dot{width:4px;height:4px;border-radius:50%;background:var(--hot);box-shadow:0 0 4px var(--hot)}
 
-/* Carousels: allow play button to escape crd-media clip */
-.carousel-scroll .crd{overflow:visible}
-.carousel-scroll .crd .crd-media{overflow:visible}
+/* Carousels: card keeps overflow:hidden para no solaparse — la imagen bordea por arriba */
+.carousel-scroll .crd{overflow:hidden;width:140px;flex-shrink:0}
+.carousel-scroll .crd .crd-media{overflow:hidden}
 .carousel-scroll .crd .crd-img{border-radius:var(--radius-sm) var(--radius-sm) 0 0}
 
+.crd-body{padding:.4rem .45rem .45rem;overflow:hidden}
 .crd-name{
   font-size:.72rem;font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)
@@ -828,6 +832,22 @@ header{
   cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;touch-action:none;
 }
+/* Botón de audio del modal — visible encima del overlay */
+.modal-audio-btn{
+  position:absolute;bottom:.6rem;left:50%;transform:translateX(-50%);
+  z-index:10;
+  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  display:none; /* oculto hasta que el embed esté activo */
+  align-items:center;gap:.35rem;
+  cursor:pointer;color:#fff;font-size:.7rem;font-weight:700;
+  backdrop-filter:blur(6px);transition:background .15s;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;
+  pointer-events:auto;
+}
+.embed-wrap.active .modal-audio-btn{display:flex;}
+.modal-audio-btn:hover{background:rgba(232,48,90,.75);}
+.modal-audio-btn.active{background:rgba(232,48,90,.9);border-color:var(--hot);box-shadow:0 0 0 3px rgba(232,48,90,.3);animation:dv-audio-pulse 2s ease-in-out infinite;}
 
 /* Name & meta over hero */
 .modal-hero-info{
@@ -1246,8 +1266,9 @@ header{
 /* Overlay dual-view: zona central para afiliado, deja libre top y bottom */
 .dv-iframe-overlay{
   position:absolute;
-  top:35px;left:0;right:0;bottom:60px;
+  top:30px;left:0;right:0;bottom:52px;
   z-index:5;cursor:pointer;background:transparent;
+  -webkit-tap-highlight-color:transparent;
 }
 /* Botón de audio por panel — grande y claro */
 .dv-audio-btn{
@@ -1682,7 +1703,7 @@ header{
   .catalog-section{padding:.65rem .7rem .4rem}
   .carousel-section{padding:.65rem 0 .2rem}
   .carousel-scroll{padding:0 .7rem .3rem}
-  .carousel-scroll .crd{width:110px}
+  .carousel-scroll .crd{width:110px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:147px}
   .rep-search{padding:1.5rem 1rem}
   .rep-search-title{font-size:1.6rem}
@@ -1701,7 +1722,7 @@ header{
 }
 @media(max-width:380px){
   .grid{grid-template-columns:repeat(3,1fr);gap:.22rem}
-  .carousel-scroll .crd{width:95px}
+  .carousel-scroll .crd{width:95px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
   /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
   .modal-hero{height:190px!important}
@@ -2202,6 +2223,8 @@ body.modal-open{overflow:hidden!important}
           referrerpolicy="no-referrer-when-downgrade"></iframe>
         <!-- Intercepta clicks en el iframe — abre sala con params de afiliado -->
         <div class="embed-click-overlay" id="embed-click-overlay" onclick="openActiveRoomAffiliate()"></div>
+        <!-- Botón de audio del modal — encima del overlay -->
+        <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Sin audio</button>
       </div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
@@ -3019,6 +3042,9 @@ function openMod(u){
   active=x;
   clearInterval(prevCd);
 
+  // Reset audio button state
+  _resetModalAudio();
+
   // Reset
   const frame=document.getElementById('live-embed-frame');
   const embedWrap=document.getElementById('mhero-embed-wrap');
@@ -3147,6 +3173,7 @@ function deactivateEmbed(){
   if(frame) frame.src='about:blank';
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); }
   if(loading) loading.classList.remove('hidden');
+  _resetModalAudio();
 }
 
 /* ── ANALYTICS PANEL ── */
@@ -3574,6 +3601,30 @@ function _resetDvAudio(){
   });
 }
 
+/* ── MODAL AUDIO — mismo patrón que Dual View ── */
+let _modalAudioActive = false;
+
+function toggleModalAudio(e){
+  e.stopPropagation();
+  if(!active) return;
+  const frame = document.getElementById('live-embed-frame');
+  const btn   = document.getElementById('modal-audio-btn');
+  if(!frame || !btn) return;
+
+  _modalAudioActive = !_modalAudioActive;
+  const sound = _modalAudioActive ? 0 : 1;
+  const u = active.username;
+  frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=${sound}&mobileRedirect=never`;
+  btn.classList.toggle('active', _modalAudioActive);
+  btn.textContent = _modalAudioActive ? '🔊 Audio ON' : '🔇 Sin audio';
+}
+
+function _resetModalAudio(){
+  _modalAudioActive = false;
+  const btn = document.getElementById('modal-audio-btn');
+  if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Sin audio'; }
+}
+
 function openDvSlot(slot){
   const u=dvSlotUser[slot];
   if(!u) return;
@@ -3680,6 +3731,7 @@ function closeMod(e){
     const wrap=document.getElementById('mhero-embed-wrap');
     if(frame) frame.src='about:blank';
     if(wrap) wrap.classList.remove('active');
+    _resetModalAudio();
     // Reset analytics panel
     const analyticsPanel=document.getElementById('modal-analytics');
     if(analyticsPanel) analyticsPanel.style.display='none';
