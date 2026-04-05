@@ -155,16 +155,6 @@ header{
 
 .hdr-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
 /* Hamburger */
-.ham-btn{
-  width:36px;height:36px;background:var(--surf);
-  border:1px solid var(--bdr);border-radius:9px;
-  display:none;align-items:center;justify-content:center;
-  flex-direction:column;gap:4px;padding:8px
-}
-.ham-btn span{width:16px;height:2px;background:var(--txt2);border-radius:2px;transition:all .2s;display:block}
-.ham-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-.ham-btn.open span:nth-child(2){opacity:0}
-.ham-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 .ref-btn{
   width:36px;height:36px;background:var(--surf);
   border:1px solid var(--bdr);border-radius:9px;
@@ -206,8 +196,8 @@ header{
 /* ═══════════════════════════════════════════
    SIDE DRAWER (desktop sidebar / mobile drawer)
 ═══════════════════════════════════════════ */
-.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:350;backdrop-filter:blur(4px)}
-.drawer-overlay.open{display:block}
+/* ═══════════════════════════════════════════
+   CONTENT AREA
 .drawer{
   width:220px;min-width:220px;
   height:calc(100vh - var(--hdr));
@@ -284,22 +274,6 @@ header{
 .mini-stat-row span:first-child{color:var(--txt3)}
 .mini-stat-row span:last-child{font-weight:600;color:var(--txt2)}
 
-/* Mobile drawer */
-.mob-drawer{
-  position:fixed;left:0;top:var(--hdr);bottom:0;
-  width:260px;max-width:85vw;
-  background:var(--bg2);border-right:1px solid var(--bdr);
-  z-index:360;overflow-y:scroll;
-  transform:translateX(-100%);
-  transition:transform .25s ease;
-  padding:.75rem 0;
-  scrollbar-width:thin;
-  scrollbar-color:var(--surf2) transparent;
-}
-.mob-drawer::-webkit-scrollbar{width:4px}
-.mob-drawer::-webkit-scrollbar-track{background:transparent}
-.mob-drawer::-webkit-scrollbar-thumb{background:var(--surf2);border-radius:4px}
-.mob-drawer.open{transform:translateX(0)}
 
 /* ═══════════════════════════════════════════
    CONTENT AREA
@@ -369,6 +343,38 @@ header{
 }
 .filter-bar-top::-webkit-scrollbar{height:3px}
 .filter-bar-top::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:3px}
+/* Tag strip inline */
+.tag-strip{
+  display:flex;align-items:center;gap:.35rem;
+  padding:.3rem .9rem .35rem;
+  border-bottom:1px solid var(--bdr);
+  background:var(--bg);
+  flex-wrap:wrap;
+  overflow:hidden;
+  max-height:0;padding-top:0;padding-bottom:0;
+  transition:max-height .28s cubic-bezier(.4,0,.2,1),padding .28s cubic-bezier(.4,0,.2,1);
+}
+.tag-strip.open{max-height:140px;padding:.3rem .9rem .35rem}
+.tag-strip-toggle{
+  display:flex;align-items:center;gap:.28rem;
+  padding:.18rem .55rem;
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:20px;font-size:.62rem;font-weight:600;
+  color:var(--txt2);cursor:pointer;white-space:nowrap;
+  transition:border-color .15s,color .15s;flex-shrink:0;
+}
+.tag-strip-toggle.active{border-color:var(--neon);color:var(--neon)}
+.tag-strip-toggle svg{width:10px;height:10px;transition:transform .22s}
+.tag-strip-toggle.open svg{transform:rotate(180deg)}
+.tag-chip{
+  font-size:.6rem;padding:.18rem .45rem;
+  background:var(--surf);border:1px solid var(--bdr2);
+  border-radius:20px;color:var(--txt2);cursor:pointer;
+  white-space:nowrap;transition:border-color .15s,color .15s,background .15s;
+}
+.tag-chip:hover{border-color:var(--neon);color:var(--neon)}
+.tag-chip.active{background:rgba(0,232,148,.12);border-color:var(--neon);color:var(--neon);font-weight:600}
+.tag-chip .tag-count{opacity:.45;font-size:.52rem;margin-left:2px}
 .filter-bar-chips{
   top:calc(var(--hdr) + 41px);border-bottom:1px solid var(--bdr);
   padding:.35rem 1rem .55rem;
@@ -1707,7 +1713,6 @@ header{
 }
 @media(max-width:900px){
   .drawer{display:none}
-  .ham-btn{display:flex}
   .dtabs{display:none}
   body{padding-bottom:0}
   .page{height:calc(100vh)}
@@ -1838,68 +1843,8 @@ body.modal-open{overflow:hidden!important}
         </div>
       </div>
     </div>
-    <button class="ham-btn" id="ham-btn" onclick="toggleDrawer()">
-      <span></span><span></span><span></span>
-    </button>
   </div>
 </header>
-
-<!-- DRAWER OVERLAY -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
-
-<!-- MOBILE DRAWER -->
-<div class="mob-drawer" id="mob-drawer">
-  <div class="drawer-sec">
-    <div class="drawer-lbl">Género</div>
-    <div class="g-strip" id="md-gender-strip">
-      <button class="g-btn active" data-g="" onclick="setGender(this,'')">Todas las categorías <span class="gcnt" id="md-gc-all"></span></button>
-      <button class="g-btn" data-g="f" onclick="setGender(this,'f')">Mujeres <span class="gcnt" id="md-gc-f"></span></button>
-      <button class="g-btn" data-g="m" onclick="setGender(this,'m')">Hombres <span class="gcnt" id="md-gc-m"></span></button>
-      <button class="g-btn" data-g="c" onclick="setGender(this,'c')">Parejas <span class="gcnt" id="md-gc-c"></span></button>
-      <button class="g-btn" data-g="t" onclick="setGender(this,'t')">Trans <span class="gcnt" id="md-gc-t"></span></button>
-    </div>
-  </div>
-  <div class="drawer-div"></div>
-  <div class="drawer-sec">
-    <div class="drawer-lbl">Filtros</div>
-    <button class="filter-chip" id="md-fv" onclick="toggleFavFilter(this)">♥ Favoritas <span id="md-gc-fv">0</span></button>
-    <button class="filter-chip" id="md-hd" onclick="toggleHDFilter(this)">HD Solo HD</button>
-  </div>
-  <div class="drawer-div"></div>
-  <div class="drawer-sec">
-    <div class="drawer-lbl">Edad</div>
-    <div class="age-chips" id="md-age-chips">
-      <span class="age-chip" onclick="setAgeFilter(this,'18-21')">18–21</span>
-      <span class="age-chip" onclick="setAgeFilter(this,'22-25')">22–25</span>
-      <span class="age-chip" onclick="setAgeFilter(this,'26-30')">26–30</span>
-      <span class="age-chip" onclick="setAgeFilter(this,'31-40')">31–40</span>
-      <span class="age-chip" onclick="setAgeFilter(this,'40+')">40+</span>
-    </div>
-  </div>
-  <div class="drawer-div"></div>
-  <div class="drawer-sec">
-    <div class="drawer-lbl">País</div>
-    <div id="md-country-list"></div>
-  </div>
-  <div class="drawer-div"></div>
-  <div class="drawer-sec">
-    <div class="drawer-lbl">Filtros rápidos</div>
-    <button class="filter-chip" id="md-co" onclick="toggleColFilter(this)">🇨🇴 Colombia</button>
-  </div>
-  <div class="drawer-div"></div>
-  <div class="drawer-sec">
-    <div class="drawer-lbl">Tags populares</div>
-    <div id="md-tag-list" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.3rem"></div>
-  </div>
-  <div class="drawer-div"></div>
-  <div class="drawer-sec">
-    <div class="drawer-lbl">Stats en vivo</div>
-    <div class="mini-stat-row"><span>Salas online</span><span id="md-ms-total">—</span></div>
-    <div class="mini-stat-row"><span>Viewers totales</span><span id="md-ms-views">—</span></div>
-    <div class="mini-stat-row"><span>Promedio</span><span id="md-ms-avg">—</span></div>
-    <div class="mini-stat-row"><span>Peak actual</span><span id="md-ms-peak">—</span></div>
-  </div>
-</div>
 
 <!-- Bottom nav removed — Explorar and Mi Reporte are now accessible via header tabs and modal -->
 
@@ -2016,6 +1961,21 @@ body.modal-open{overflow:hidden!important}
         <span id="tb-filter-summary" style="font-size:.65rem;color:var(--hot);font-weight:700;white-space:nowrap"></span>
         <button onclick="clearAllFilters()" style="background:none;border:none;color:var(--txt3);font-size:.7rem;cursor:pointer;padding:2px 4px;border-radius:4px" title="Limpiar filtros">✕</button>
       </div>
+    </div>
+
+    </div>
+
+    <!-- Tag strip colapsable -->
+    <div style="display:flex;align-items:center;padding:.3rem .9rem .0rem;border-bottom:1px solid var(--bdr);gap:.5rem;background:var(--bg)">
+      <button class="tag-strip-toggle" id="tag-strip-btn" onclick="toggleTagStrip()">
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 3h8M2.5 5.5h5M4 8h2"/></svg>
+        Tags
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5L5 6.5L8 3.5"/></svg>
+      </button>
+      <div id="tag-strip-preview" style="display:flex;gap:.3rem;overflow:hidden;flex:1"></div>
+    </div>
+    <div class="tag-strip" id="tag-strip">
+      <div id="main-tag-list" style="display:flex;flex-wrap:wrap;gap:.3rem"></div>
     </div>
 
     <!-- Pinned sections: Favs primero, luego Destacadas -->
@@ -2751,33 +2711,37 @@ function updateStats(){
     el(p+'-ms-avg',fmt(avg));
     el(p+'-ms-peak',fmt(peak));
   });
-  // tag cloud in sidebar
+  // tag cloud — sidebar + main inline strip
   const tagCount={};
   rooms.forEach(r=>(r.tags||[]).forEach(t=>{tagCount[t]=(tagCount[t]||0)+1;}));
   const topTags=Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,20);
   const tagHtml=topTags.map(([t,c])=>
-    `<span class="age-chip${activeTag===t?' active':''}" onclick="setTagFilter('${t}')">#${t}<span style="opacity:.5;font-size:.55rem;margin-left:3px">${c}</span></span>`
+    `<span class="tag-chip${activeTag===t?' active':''}" onclick="setTagFilter('${t}')">#${t}<span class="tag-count">${c}</span></span>`
   ).join('');
-  ['sd-tag-list','md-tag-list'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML=tagHtml;
-  });
+  const mainEl=document.getElementById('main-tag-list');
+  if(mainEl) mainEl.innerHTML=tagHtml;
+  const preview=document.getElementById('tag-strip-preview');
+  if(preview) preview.innerHTML=topTags.slice(0,6).map(([t])=>
+    `<span class="tag-chip${activeTag===t?' active':''}" style="pointer-events:none;opacity:.6">#${t}</span>`
+  ).join('');
+  const sdEl=document.getElementById('sd-tag-list');
+  if(sdEl) sdEl.innerHTML=tagHtml;
 }
 
 function updateDrawerCounts(){
   const counts={all:0,f:0,m:0,c:0,t:0};
   rooms.forEach(r=>{counts.all++;counts[r.gender]=(counts[r.gender]||0)+1;});
   [['all','all'],['f','f'],['m','m'],['c','c'],['t','t']].forEach(([k,id])=>{
-    ['sd-gc-','md-gc-'].forEach(p=>{
+    ['sd-gc-'].forEach(p=>{
       const el=document.getElementById(p+id);if(el)el.textContent=fmt(counts[k]||0);
     });
   });
   const fc=favs.length;
-  ['sd-gc-fv','md-gc-fv'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=fc;});
+  ['sd-gc-fv'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=fc;});
   // Sync filter active states on all sidebar/bar buttons
-  document.querySelectorAll('#sd-fv,#md-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
-  document.querySelectorAll('#sd-hd,#md-hd,#tb-hd').forEach(b=>b.classList.toggle('active',onlyHD));
-  document.querySelectorAll('#tb-co,#sd-co,#md-co').forEach(b=>b.classList.toggle('active',onlyCol));
+  document.querySelectorAll('#sd-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
+  document.querySelectorAll('#sd-hd,#tb-hd').forEach(b=>b.classList.toggle('active',onlyHD));
+  document.querySelectorAll('#tb-co,#sd-co').forEach(b=>b.classList.toggle('active',onlyCol));
   syncAgeUI();
   updateActiveFilterSummary();
 }
@@ -3815,7 +3779,7 @@ function toggleFav(e,u){
     const m=onclick.match(/openMod\('([^']+)'\)/);
     if(m&&m[1]===u)btn.classList.toggle('is-fav',favs.includes(u));
   });
-  ['sd-gc-fv','md-gc-fv'].forEach(id=>{const el2=document.getElementById(id);if(el2)el2.textContent=favs.length;});
+  ['sd-gc-fv'].forEach(id=>{const el2=document.getElementById(id);if(el2)el2.textContent=favs.length;});
   toast(favs.includes(u)?'Guardada en favoritas ♥':'Quitada de favoritas');
 }
 function favMod(){if(!active)return;toggleFav({stopPropagation:()=>{}},active.username);updateFavBtn(active.username);}
@@ -3832,17 +3796,17 @@ function setGender(btn,g){
 function openInCB(u){window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');}
 function toggleFavFilter(btn){
   onlyFavs=!onlyFavs;
-  document.querySelectorAll('#sd-fv,#md-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
+  document.querySelectorAll('#sd-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
   updateActiveFilterSummary();renderOnFilter();
 }
 function toggleHDFilter(btn){
   onlyHD=!onlyHD;
-  document.querySelectorAll('#sd-hd,#md-hd,#tb-hd').forEach(b=>b.classList.toggle('active',onlyHD));
+  document.querySelectorAll('#sd-hd,#tb-hd').forEach(b=>b.classList.toggle('active',onlyHD));
   updateActiveFilterSummary();renderOnFilter();
 }
 function toggleColFilter(btn){
   onlyCol=!onlyCol;
-  document.querySelectorAll('#tb-co,#sd-co,#md-co').forEach(b=>b.classList.toggle('active',onlyCol));
+  document.querySelectorAll('#tb-co,#sd-co').forEach(b=>b.classList.toggle('active',onlyCol));
   updateActiveFilterSummary();renderOnFilter();
 }
 function syncAgeUI(){
@@ -3872,9 +3836,9 @@ function clearAllFilters(){
   gender='';onlyFavs=false;onlyHD=false;onlyCol=false;activeTag='';activeCountry='';ageRange='';
   document.querySelectorAll('.gnav-btn[data-g]').forEach(b=>b.classList.toggle('active',b.dataset.g===''));
   document.querySelectorAll('.g-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('#sd-gc-all,#md-gc-all').forEach(b=>{if(b)b.closest('.g-btn')?.classList.add('active');});
+  document.querySelectorAll('#sd-gc-all').forEach(b=>{if(b)b.closest('.g-btn')?.classList.add('active');});
   document.querySelectorAll('.g-btn:first-child').forEach(b=>b.classList.add('active'));
-  document.querySelectorAll('#tb-fv,#sd-fv,#md-fv,#tb-hd,#sd-hd,#md-hd,#tb-co,#sd-co,#md-co').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#tb-fv,#sd-fv,#tb-hd,#sd-hd,#tb-co,#sd-co').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.age-chip,#tb-18,#tb-22,#tb-26,#tb-31,#tb-40').forEach(b=>b.classList.remove('active'));
   document.getElementById('search').value='';
   // Restore carousels
@@ -3971,20 +3935,13 @@ if(_embedFrame) _embedFrame.addEventListener('load',onEmbedLoad);
 /* ═══════════════════════════════════════════
    DRAWER / HAMBURGER
 ═══════════════════════════════════════════ */
-function toggleDrawer(){
-  const d=document.getElementById('mob-drawer');
-  const ov=document.getElementById('drawer-overlay');
-  const btn=document.getElementById('ham-btn');
-  const open=d.classList.toggle('open');
-  ov.classList.toggle('open',open);
+function toggleTagStrip(){
+  const strip=document.getElementById('tag-strip');
+  const btn=document.getElementById('tag-strip-btn');
+  const preview=document.getElementById('tag-strip-preview');
+  const open=strip.classList.toggle('open');
   btn.classList.toggle('open',open);
-  document.body.style.overflow=open?'hidden':'';
-}
-function closeDrawer(){
-  document.getElementById('mob-drawer').classList.remove('open');
-  document.getElementById('drawer-overlay').classList.remove('open');
-  document.getElementById('ham-btn').classList.remove('open');
-  document.body.style.overflow='';
+  if(preview) preview.style.opacity=open?'0':'1';
 }
 
 /* ═══════════════════════════════════════════
