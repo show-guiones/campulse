@@ -857,23 +857,23 @@ header{
   cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;touch-action:none;
 }
-/* Botón de audio del modal — visible encima del overlay */
+/* Botón de audio: position:fixed para escapar de TODOS los overflow:hidden del árbol.
+   Se posiciona dinámicamente via JS (_positionAudioBtn) sobre el borde inferior del hero. */
 .modal-audio-btn{
-  position:absolute;bottom:.6rem;left:50%;transform:translateX(-50%);
-  z-index:20; /* por encima de todo: embed-wrap(5), overlay(9), loading(8) */
-  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
-  border-radius:20px;padding:5px 14px;
-  display:none; /* oculto hasta que el embed esté activo */
+  position:fixed;left:50%;transform:translateX(-50%);
+  z-index:810;
+  background:rgba(0,0,0,.88);border:1px solid rgba(255,255,255,.3);
+  border-radius:20px;padding:6px 16px;
+  display:none;
   align-items:center;gap:.35rem;
-  cursor:pointer;color:#fff;font-size:.7rem;font-weight:700;
-  backdrop-filter:blur(6px);transition:background .15s;
+  cursor:pointer;color:#fff;font-size:.72rem;font-weight:700;
+  backdrop-filter:blur(8px);transition:background .15s,box-shadow .15s;
   -webkit-tap-highlight-color:transparent;white-space:nowrap;
   pointer-events:auto;
 }
-/* Ahora el botón es hijo de modal-hero, no de embed-wrap — activar con clase en modal-hero */
-.mhero-v2.embed-active .modal-audio-btn{display:flex;}
+.modal-audio-btn.visible{display:flex;}
 .modal-audio-btn:hover{background:rgba(232,48,90,.75);}
-.modal-audio-btn.active{background:rgba(232,48,90,.9);border-color:var(--hot);box-shadow:0 0 0 3px rgba(232,48,90,.3);animation:dv-audio-pulse 2s ease-in-out infinite;}
+.modal-audio-btn.active{background:rgba(232,48,90,.92);border-color:var(--hot);box-shadow:0 0 0 3px rgba(232,48,90,.3);animation:dv-audio-pulse 2s ease-in-out infinite;}
 
 /* Name & meta over hero */
 .modal-hero-info{
@@ -2202,8 +2202,6 @@ body.modal-open{overflow:hidden!important}
         <!-- Intercepta clicks en el iframe — abre sala con params de afiliado -->
         <div class="embed-click-overlay" id="embed-click-overlay" onclick="openActiveRoomAffiliate()"></div>
       </div>
-      <!-- Botón de audio FUERA del embed-wrap — evita ser recortado por overflow:hidden y estar bajo el overlay -->
-      <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Sin audio</button>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
@@ -2216,6 +2214,9 @@ body.modal-open{overflow:hidden!important}
       <!-- Stats en hero — viewers destacados -->
       <div class="mhero-stats" id="mhero-stats"></div>
     </div>
+    <!-- Botón de audio: position:fixed, fuera del árbol hero — escapa de todos overflow:hidden -->
+    <!-- JS lo posiciona via _positionAudioBtn() y lo muestra con clase .visible -->
+    <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Sin audio</button>
 
     <!-- BODY scrollable -->
     <div class="modal-body mbody-v2">
@@ -3104,6 +3105,9 @@ function openMod(u){
       if(loading) loading.classList.remove('hidden');
       embedWrap.classList.add('active');
     }
+    // Mostrar y posicionar botón de audio (position:fixed — necesita coords de viewport)
+    const _audioBtn=document.getElementById('modal-audio-btn');
+    if(_audioBtn){ _positionAudioBtn(); _audioBtn.classList.add('visible'); }
     if(frame){
       // Reconectar listener al frame actual — puede ser un elemento recreado por _reloadEmbedWithFade
       // El listener original (línea de inicio) apunta al elemento viejo si hubo destroy+recreate
@@ -3699,8 +3703,19 @@ function _resetDvAudio(){
 /* ── MODAL AUDIO — mismo patrón que Dual View ── */
 let _modalAudioActive = false;
 
+/* Posiciona el botón de audio justo encima del borde inferior del hero.
+   position:fixed necesita coordenadas de viewport — getBoundingClientRect lo da. */
+function _positionAudioBtn(){
+  const hero = document.getElementById('modal-hero');
+  const btn  = document.getElementById('modal-audio-btn');
+  if(!hero || !btn) return;
+  const r = hero.getBoundingClientRect();
+  btn.style.top = Math.max(r.bottom - 40, r.top + 8) + 'px';
+}
+
 function toggleModalAudio(e){
   e.stopPropagation();
+  e.preventDefault();
   if(!active) return;
   const frame = document.getElementById('live-embed-frame');
   const wrap  = document.getElementById('mhero-embed-wrap');
@@ -3723,7 +3738,7 @@ function toggleModalAudio(e){
 function _resetModalAudio(){
   _modalAudioActive = false;
   const btn = document.getElementById('modal-audio-btn');
-  if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Sin audio'; }
+  if(btn){ btn.classList.remove('active','visible'); btn.textContent = '🔇 Sin audio'; }
 }
 
 function openDvSlot(slot){
@@ -4516,6 +4531,8 @@ setInterval(load, 5*60*1000); // auto-refresh each 5 min
    INIT
 ═══════════════════════════════════════════ */
 load();
+// Reposicionar botón de audio si cambia el tamaño de ventana/orientación
+window.addEventListener('resize', ()=>{ _positionAudioBtn(); }, {passive:true});
 </script>
 </body>
 </html>
