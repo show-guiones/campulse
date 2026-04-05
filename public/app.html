@@ -3668,9 +3668,11 @@ function _muteSlot(slot){
 
 function toggleDvAudio(slot, e){
   e.stopPropagation();
-  const frame = document.getElementById('dv-frame-' + slot);
-  const btn   = document.getElementById('dv-audio-' + slot);
-  const u     = dvSlotUser[slot];
+  e.preventDefault();
+  const frame   = document.getElementById('dv-frame-' + slot);
+  const btn     = document.getElementById('dv-audio-' + slot);
+  const overlay = document.getElementById('dv-overlay-' + slot);
+  const u       = dvSlotUser[slot];
   if(!frame || !btn || !u) return;
 
   const isActivating = !_dvAudioState[slot];
@@ -3681,6 +3683,10 @@ function toggleDvAudio(slot, e){
       if(s !== slot && _dvAudioState[s]) _muteSlot(s);
     });
     _dvActiveAudioSlot = slot;
+    // Quitar overlay temporalmente — el click del usuario desbloquea autoplay del browser
+    if(overlay) overlay.style.pointerEvents = 'none';
+    frame.focus();
+    setTimeout(()=>{ if(overlay) overlay.style.pointerEvents = ''; }, 400);
   } else {
     _dvActiveAudioSlot = null;
   }
@@ -3733,9 +3739,10 @@ function toggleModalAudio(e){
   e.stopPropagation();
   e.preventDefault();
   if(!active) return;
-  const frame = document.getElementById('live-embed-frame');
-  const wrap  = document.getElementById('mhero-embed-wrap');
-  const btn   = document.getElementById('modal-audio-btn');
+  const frame   = document.getElementById('live-embed-frame');
+  const wrap    = document.getElementById('mhero-embed-wrap');
+  const btn     = document.getElementById('modal-audio-btn');
+  const overlay = document.getElementById('embed-click-overlay');
   if(!frame || !btn) return;
 
   _modalAudioActive = !_modalAudioActive;
@@ -3746,12 +3753,20 @@ function toggleModalAudio(e){
     _resetDvAudio();
   }
   _activeAudioContext = _modalAudioActive ? 'modal' : null;
-
-  // Guardar preferencia en localStorage
   _setAudioPref(u, _modalAudioActive);
 
-  // Fade out → reload → fade in
-  _reloadEmbedWithFade(frame, wrap, u, _modalAudioActive);
+  if(_modalAudioActive){
+    // Activar audio: quitar overlay temporalmente para que el click llegue al iframe
+    // El browser solo permite audio si detecta interacción directa del usuario sobre el elemento
+    if(overlay) overlay.style.pointerEvents = 'none';
+    frame.focus();
+    setTimeout(()=>{ if(overlay) overlay.style.pointerEvents = ''; }, 400);
+    // Reload con disable_sound=0 — la interacción del usuario (este click) desbloquea autoplay
+    _reloadEmbedWithFade(frame, wrap, u, true);
+  } else {
+    // Silenciar: reload con disable_sound=1
+    _reloadEmbedWithFade(frame, wrap, u, false);
+  }
 
   btn.classList.toggle('active', _modalAudioActive);
   btn.textContent = _modalAudioActive ? '🔊 Audio ON' : '🔇 Sin audio';
