@@ -352,7 +352,7 @@ header{
   max-height:0;padding-top:0;padding-bottom:0;
   transition:max-height .28s cubic-bezier(.4,0,.2,1),padding .28s cubic-bezier(.4,0,.2,1);
 }
-.tag-strip.open{max-height:140px;padding:.3rem .9rem .35rem}
+.tag-strip.open{max-height:200px;padding:.3rem .9rem .35rem;overflow:visible}
 .tag-strip-toggle{
   display:flex;align-items:center;gap:.28rem;
   padding:.18rem .55rem;
@@ -1962,7 +1962,7 @@ body.modal-open{overflow:hidden!important}
     </div>
 
     <!-- Tag strip colapsable -->
-    <div id="tag-strip-row" style="display:flex;align-items:center;padding:.3rem .9rem .0rem;border-bottom:1px solid var(--bdr);gap:.5rem;background:var(--bg);position:sticky;top:calc(var(--hdr) + 82px);z-index:98;flex-shrink:0">
+    <div id="tag-strip-row" style="display:flex;align-items:center;padding:.3rem .9rem .0rem;border-bottom:1px solid var(--bdr);gap:.5rem;background:var(--bg)">
       <button class="tag-strip-toggle" id="tag-strip-btn" onclick="toggleTagStrip()">
         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 3h8M2.5 5.5h5M4 8h2"/></svg>
         Tags
