@@ -3166,14 +3166,21 @@ function activateEmbed(u){
   }
 }
 function onEmbedLoad(){
+  const frame=document.getElementById('live-embed-frame');
   const loading=document.getElementById('embed-loading');
   const wrap=document.getElementById('mhero-embed-wrap');
-  // NO ocultar embed-loading aquí — el negro debe permanecer hasta que
-  // Chaturbate empieza a renderizar frames reales (~2.5s después de load)
-  // video-ready activa el fade-out del embed-loading via CSS
-  if(wrap) setTimeout(()=>{
-    wrap.classList.add('video-ready');
-  }, 2500);
+  const isFadeReload = frame && frame._fadeReload;
+  if(frame) frame._fadeReload = false; // consumir flag
+  if(isFadeReload){
+    // Reload de audio — fade-in suave sin mostrar embed-loading
+    setTimeout(()=>{
+      frame.style.opacity='1';
+      if(wrap) wrap.classList.add('video-ready');
+    }, 2200);
+  } else {
+    // Carga inicial — mantener negro hasta que Chaturbate renderice frames reales
+    if(wrap) setTimeout(()=>{ wrap.classList.add('video-ready'); }, 2500);
+  }
 }
 /* Abre la sala activa con URL de afiliado completa cuando el usuario toca el video */
 function openActiveRoomAffiliate(){
@@ -3579,22 +3586,30 @@ function _setAudioPref(u, on){
   try{ if(on) localStorage.setItem('cb_audio_'+u,'1'); else localStorage.removeItem('cb_audio_'+u); }catch(e){}
 }
 
-/* Fade-out → swap src → fade-in via video-ready cycle
-   wrap puede ser null (modal no siempre tiene wrapper visible) */
+/* Fade-out → swap src → fade-in.
+   Para el modal frame (live-embed-frame) onEmbedLoad ya está conectado
+   via addEventListener — usamos el flag _fadeReload para que haga el fade-in.
+   Para dual view frames usamos un listener one-shot. */
 function _reloadEmbedWithFade(frame, wrap, u, withAudio){
   if(!frame) return;
-  // Fade out: bajar opacidad del frame mientras carga
   frame.style.transition='opacity .25s';
   frame.style.opacity='0';
-  if(wrap){ wrap.classList.remove('video-ready'); }
+  if(wrap) wrap.classList.remove('video-ready');
+  if(frame.id === 'live-embed-frame'){
+    frame._fadeReload = true;
+  } else {
+    // Limpiar cualquier .onload previo (openDualView/swapDualConfirm usan propiedad)
+    frame.onload = null;
+    const onLoad = ()=>{
+      frame.removeEventListener('load', onLoad);
+      setTimeout(()=>{
+        frame.style.opacity='1';
+        if(wrap) wrap.classList.add('stream-ready');
+      }, 2200);
+    };
+    frame.addEventListener('load', onLoad);
+  }
   frame.src = _mkEmbedUrl(u, withAudio);
-  frame.onload = ()=>{
-    // Pequeño delay para que Chaturbate empiece a renderizar frames reales
-    setTimeout(()=>{
-      frame.style.opacity='1';
-      if(wrap){ wrap.classList.add('video-ready'); }
-    }, 2200);
-  };
 }
 
 /* ── Audio mutex — solo 1 sala con audio a la vez ── */
