@@ -540,24 +540,27 @@ header{
 @keyframes favPop{0%{transform:scale(1)}40%{transform:scale(1.45)}70%{transform:scale(.92)}100%{transform:scale(1)}}
 .crd-fav.pop{animation:favPop .28s ease}
 
-/* Fav en carrusel — visible, esquina superior derecha de la imagen (igual que grid pero compacto) */
+/* Fav en carrusel — anclado al article, esquina superior derecha sobre la imagen */
 .carousel-scroll .crd .crd-fav{
+  position:absolute;
   top:.3rem;
   right:.3rem;
   bottom:auto;
-  width:28px;height:28px;font-size:.78rem;
-  background:rgba(0,0,0,.65);
+  width:30px;height:30px;font-size:.8rem;
+  background:rgba(0,0,0,.72);
+  border:1px solid rgba(255,255,255,.15);
   backdrop-filter:blur(4px);
-  color:rgba(255,255,255,.5);
+  color:rgba(255,255,255,.6);
   box-shadow:none;
-  z-index:6;
+  z-index:10;
 }
 .carousel-scroll .crd .crd-fav::after{inset:-5px}
-.carousel-scroll .crd .crd-fav:hover{color:#fff;background:rgba(0,0,0,.82);}
+.carousel-scroll .crd .crd-fav:hover{color:#fff;background:rgba(0,0,0,.88);}
 .carousel-scroll .crd .crd-fav.is-fav{
   color:var(--hot);
-  background:rgba(255,42,109,.28);
-  box-shadow:0 0 8px rgba(255,42,109,.45);
+  background:rgba(255,42,109,.3);
+  border-color:rgba(255,42,109,.5);
+  box-shadow:0 0 8px rgba(255,42,109,.4);
 }
 
 /* viewers badge */
@@ -2883,6 +2886,7 @@ function cardHtml(x,mode='grid'){
   const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
   const isLive = (x.num_users||0)>0;
+  const favBtn = `<button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>`;
   return `<article class="crd${mode==='carousel'?' crd-sm':''}${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLive?1:0}">
   <div class="crd-media">
     ${imgSrcs.length?imgTag:phTag}
@@ -2894,9 +2898,10 @@ function cardHtml(x,mode='grid'){
       ${x.is_new&&!isLexy?'<span class="bdg bdg-new">NEW</span>':''}
     </div>
     ${isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':''}
-    <button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>
+    ${mode!=='carousel'?favBtn:''}
     ${x.num_users?`<div class="crd-vw"><span class="crd-vw-dot"></span>${fmt(x.num_users)}</div>`:''}
   </div>
+  ${mode==='carousel'?favBtn:''}
   <div class="crd-body">
     <div class="crd-name${isLexy?' crd-name-lexy':''}">${x.display_name||x.username}</div>
     <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
