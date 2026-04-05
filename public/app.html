@@ -1309,6 +1309,7 @@ header{
 }
 .dv-audio-btn:hover{background:rgba(232,48,90,.75);}
 .dv-audio-btn.active{background:rgba(232,48,90,.9);border-color:var(--hot);box-shadow:0 0 0 3px rgba(232,48,90,.3);}
+.dv-audio-btn.pending{background:rgba(255,165,0,.85);border-color:#ffa500;animation:dv-audio-pulse 0.6s ease-in-out infinite;}
 @keyframes dv-audio-pulse{0%,100%{box-shadow:0 0 0 3px rgba(232,48,90,.3)}50%{box-shadow:0 0 0 6px rgba(232,48,90,.08)}}
 .dv-audio-btn.active{animation:dv-audio-pulse 2s ease-in-out infinite;}
 
@@ -2197,8 +2198,8 @@ body.modal-open{overflow:hidden!important}
           <span>Conectando sala…</span>
         </div>
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
-          allow="autoplay; fullscreen; encrypted-media" allowFullscreen
-          referrerpolicy="no-referrer-when-downgrade"></iframe>
+          allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
+          allowFullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
         <!-- Intercepta clicks en el iframe — abre sala con params de afiliado -->
         <div class="embed-click-overlay" id="embed-click-overlay" onclick="openActiveRoomAffiliate()"></div>
       </div>
@@ -2365,7 +2366,7 @@ body.modal-open{overflow:hidden!important}
         <button class="dv-swap-btn" onclick="swapDualSlot('a')" title="Cambiar sala A">⇄ Cambiar</button>
         <div class="dv-embed-wrap">
           <iframe id="dv-frame-a" class="dv-frame" src="about:blank"
-            allow="autoplay; fullscreen; encrypted-media" allowFullscreen
+            allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
           <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a',event)" title="El stream carga en silencio. Toca para activar audio.">🔇 Audio</button>
@@ -2381,7 +2382,7 @@ body.modal-open{overflow:hidden!important}
         <button class="dv-swap-btn" onclick="swapDualSlot('b')" title="Cambiar sala B">⇄ Cambiar</button>
         <div class="dv-embed-wrap">
           <iframe id="dv-frame-b" class="dv-frame" src="about:blank"
-            allow="autoplay; fullscreen; encrypted-media" allowFullscreen
+            allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
           <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b',event)" title="El stream carga en silencio. Toca para activar audio.">🔇 Audio</button>
@@ -3121,7 +3122,7 @@ function openMod(u){
         _modalAudioActive = true;
         _audioOwner = 'modal'; // FIX D: actualizar mutex global
         const _ab=document.getElementById('modal-audio-btn');
-        if(_ab){ _ab.classList.add('active'); _ab.textContent='🔊 Audio ON'; }
+        if(_ab){ _ab.classList.add('active'); _ab.textContent='🔊 Audio activo'; }
       }
     }
   } else {
@@ -3584,8 +3585,11 @@ function openDualFromInput(){
 let dvSlotUser={a:'',b:''};
 
 /* ── Audio helpers: URL builder, localStorage prefs, fade reload ── */
+// AUDIO: Chaturbate embed siempre carga con disable_sound=0 (audio habilitado).
+// El browser puede mutear por política de autoplay hasta que el usuario interactúa.
+// El botón de audio hace que el usuario click directamente en el iframe (cross-origin safe).
 const _EMBED_BASE = (u, withAudio) =>
-  `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=${withAudio?0:1}&mobileRedirect=never`;
+  `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
 function _mkEmbedUrl(u, withAudio){ return _EMBED_BASE(u, withAudio); }
 
 function _getAudioPref(u){
@@ -3662,44 +3666,54 @@ function _muteSlot(slot){
     const wrap = frame.closest('.dv-embed-wrap');
     _reloadEmbedWithFade(frame, wrap, u, false);
   }
-  if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Audio'; }
+  if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Audio'; btn.classList.remove('active');}
 }
 
 function toggleDvAudio(slot, e){
   e.stopPropagation();
-  const frame = document.getElementById('dv-frame-' + slot);
-  const btn   = document.getElementById('dv-audio-' + slot);
-  const u     = dvSlotUser[slot];
+  const frame   = document.getElementById('dv-frame-' + slot);
+  const btn     = document.getElementById('dv-audio-' + slot);
+  const overlay = document.getElementById('dv-overlay-' + slot);
+  const u       = dvSlotUser[slot];
   if(!frame || !btn || !u) return;
 
-  const isActivating = !_dvAudioState[slot];
-
-  if(isActivating){
-    // FIX D3: silenciar modal si tenía audio activo
-    if(_modalAudioActive && active){
-      _modalAudioActive = false; _audioOwner = null;
-      const _mf=document.getElementById('live-embed-frame');
-      const _mw=document.getElementById('mhero-embed-wrap');
-      const _mb=document.getElementById('modal-audio-btn');
-      if(_mf&&_mf.parentNode) _reloadEmbedWithFade(_mf,_mw,active.username,false);
-      if(_mb){ _mb.classList.remove('active'); _mb.textContent='🔇 Audio'; }
-      _setAudioPref(active.username, false);
-    }
-    // Silenciar cualquier otro slot que tenga audio activo (mutex)
-    Object.keys(dvSlotUser).forEach(s => {
-      if(s !== slot && _dvAudioState[s]) _muteSlot(s);
-    });
-    _dvActiveAudioSlot = slot; _audioOwner = 'dv-' + slot;
-  } else {
+  // Silenciar el otro slot si tenía audio (mutex)
+  const otherSlot = slot === 'a' ? 'b' : 'a';
+  if(_dvAudioState[otherSlot]){
+    _dvAudioState[otherSlot] = false;
     _dvActiveAudioSlot = null;
+    const otherBtn = document.getElementById('dv-audio-' + otherSlot);
+    if(otherBtn){ otherBtn.classList.remove('active'); otherBtn.textContent = '🔇 Audio'; }
+  }
+  // Silenciar modal si tenía audio
+  if(_modalAudioActive && active){
+    _modalAudioActive = false; _audioOwner = null;
+    const _mb=document.getElementById('modal-audio-btn');
+    if(_mb){ _mb.classList.remove('active'); _mb.textContent='🔇 Audio'; }
+    _setAudioPref(active.username, false);
   }
 
-  _dvAudioState[slot] = isActivating;
-  const wrap = frame.closest('.dv-embed-wrap');
-  _setAudioPref(u, isActivating);
-  _reloadEmbedWithFade(frame, wrap, u, isActivating);
-  btn.classList.toggle('active', isActivating);
-  btn.textContent = isActivating ? '🔊 Audio ON' : '🔇 Sin audio';
+  // ESTRATEGIA click-through: quitar overlay del panel para que el usuario
+  // haga click directamente en el iframe y desbloquee el autoplay del browser
+  const dvOverlay = document.getElementById('dv-overlay-' + slot);
+  if(dvOverlay){
+    dvOverlay.style.pointerEvents = 'none';
+    btn.textContent = '👆 Click aquí en el video';
+    btn.classList.add('active');
+    setTimeout(()=>{
+      if(dvOverlay) dvOverlay.style.pointerEvents = '';
+      if(btn) btn.textContent = '🔊 Audio activo';
+    }, 5000);
+  } else {
+    // Sin overlay — solo indicar al usuario que haga click en el video
+    btn.textContent = '👆 Click en el video';
+    btn.classList.add('active');
+    setTimeout(()=>{ if(btn) btn.textContent = '🔊 Audio activo'; }, 5000);
+  }
+  _dvAudioState[slot] = true;
+  _dvActiveAudioSlot = slot;
+  _audioOwner = 'dv-' + slot;
+  _setAudioPref(u, true);
 }
 
 function _resetDvAudio(){
@@ -3707,7 +3721,7 @@ function _resetDvAudio(){
   Object.keys(dvSlotUser).forEach(slot => {
     _dvAudioState[slot] = false;
     const btn = document.getElementById('dv-audio-' + slot);
-    if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Audio'; }
+    if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Audio'; btn.classList.remove('active');}
   });
 }
 
@@ -3727,28 +3741,40 @@ function _positionAudioBtn(){
 function toggleModalAudio(e){
   e.stopPropagation();
   e.preventDefault();
-  if(!active) return;
-  const frame = document.getElementById('live-embed-frame');
-  const wrap  = document.getElementById('mhero-embed-wrap');
-  const btn   = document.getElementById('modal-audio-btn');
+  if(!active||!active.username) return;
+  const frame   = document.getElementById('live-embed-frame');
+  const overlay = document.getElementById('embed-click-overlay');
+  const btn     = document.getElementById('modal-audio-btn');
   if(!frame || !btn) return;
 
-  _modalAudioActive = !_modalAudioActive;
-  const u = active.username;
-  // FIX D2: si activamos audio, silenciar dual view
-  if(_modalAudioActive && _dvActiveAudioSlot){
-    _muteSlot(_dvActiveAudioSlot);
+  // ESTRATEGIA: quitar el overlay temporalmente para que el próximo
+  // click del usuario llegue DIRECTAMENTE al iframe de Chaturbate.
+  // Eso desbloquea el autoplay con audio porque el browser lo acepta
+  // como interacción directa del usuario en el contenido embebido.
+  if(overlay){
+    // Quitar overlay 5 segundos para que el click del usuario llegue al iframe
+    overlay.style.pointerEvents = 'none';
+    btn.textContent = '👆 Haz click en el video';
+    btn.classList.add('active');
+    btn.style.background = 'rgba(255,140,0,.9)';
+    btn.style.borderColor = '#ff8c00';
+    // Restaurar overlay después de 5 segundos
+    setTimeout(()=>{
+      if(overlay) overlay.style.pointerEvents = '';
+      if(btn){
+        btn.textContent = '🔊 Audio activo';
+        btn.style.background = '';
+        btn.style.borderColor = '';
+      }
+    }, 5000);
+  } else {
+    btn.textContent = '🔊 Audio activo';
+    btn.classList.add('active');
   }
-  _audioOwner = _modalAudioActive ? 'modal' : null;
-
-  // Guardar preferencia en localStorage
-  _setAudioPref(u, _modalAudioActive);
-
-  // Fade out → reload → fade in
-  _reloadEmbedWithFade(frame, wrap, u, _modalAudioActive);
-
-  btn.classList.toggle('active', _modalAudioActive);
-  btn.textContent = _modalAudioActive ? '🔊 Audio ON' : '🔇 Sin audio';
+  _modalAudioActive = true;
+  _audioOwner = 'modal';
+  const u = active.username;
+  _setAudioPref(u, true);
 }
 
 function _resetModalAudio(){
