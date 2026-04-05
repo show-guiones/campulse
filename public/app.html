@@ -3106,8 +3106,9 @@ function openMod(u){
       embedWrap.classList.add('active');
     }
     // Mostrar y posicionar botón de audio (position:fixed — necesita coords de viewport)
+    // setTimeout 320ms: espera que la animación del modal (.28s) termine antes de calcular coords
     const _audioBtn=document.getElementById('modal-audio-btn');
-    if(_audioBtn){ _positionAudioBtn(); _audioBtn.classList.add('visible'); }
+    if(_audioBtn){ _audioBtn.classList.add('visible'); setTimeout(_positionAudioBtn, 320); }
     if(frame){
       // Reconectar listener al frame actual — puede ser un elemento recreado por _reloadEmbedWithFade
       // El listener original (línea de inicio) apunta al elemento viejo si hubo destroy+recreate
@@ -3684,6 +3685,7 @@ function toggleDvAudio(slot, e){
   }
 
   _dvAudioState[slot] = isActivating;
+  if(isActivating){ _activeAudioContext = 'dv-' + slot; } else if(_activeAudioContext === 'dv-' + slot){ _activeAudioContext = null; }
   const wrap = frame.closest('.dv-embed-wrap');
   _setAudioPref(u, isActivating);
   _reloadEmbedWithFade(frame, wrap, u, isActivating);
@@ -3702,6 +3704,19 @@ function _resetDvAudio(){
 
 /* ── MODAL AUDIO — mismo patrón que Dual View ── */
 let _modalAudioActive = false;
+/* Mutex global: solo 1 contexto de audio activo a la vez ('modal' | 'dv-a' | 'dv-b' | null) */
+let _activeAudioContext = null;
+
+/* Destruye completamente el iframe del modal y limpia todo estado de audio.
+   Usar en closeMod() y en openDualView() — garantiza silencio total al salir. */
+function _killModalAudio(){
+  _modalAudioActive = false;
+  _activeAudioContext = null;
+  const frame = document.getElementById('live-embed-frame');
+  if(frame){ frame.onload = null; frame.src = 'about:blank'; }
+  const btn = document.getElementById('modal-audio-btn');
+  if(btn){ btn.classList.remove('active','visible'); btn.textContent = '🔇 Sin audio'; }
+}
 
 /* Posiciona el botón de audio justo encima del borde inferior del hero.
    position:fixed necesita coordenadas de viewport — getBoundingClientRect lo da. */
@@ -3725,6 +3740,12 @@ function toggleModalAudio(e){
   _modalAudioActive = !_modalAudioActive;
   const u = active.username;
 
+  // Mutex: si se activa audio en el modal, silenciar dual view si estaba activo
+  if(_modalAudioActive && _activeAudioContext && _activeAudioContext !== 'modal'){
+    _resetDvAudio();
+  }
+  _activeAudioContext = _modalAudioActive ? 'modal' : null;
+
   // Guardar preferencia en localStorage
   _setAudioPref(u, _modalAudioActive);
 
@@ -3737,6 +3758,7 @@ function toggleModalAudio(e){
 
 function _resetModalAudio(){
   _modalAudioActive = false;
+  _activeAudioContext = null;
   const btn = document.getElementById('modal-audio-btn');
   if(btn){ btn.classList.remove('active','visible'); btn.textContent = '🔇 Sin audio'; }
 }
@@ -3748,6 +3770,7 @@ function openDvSlot(slot){
 }
 function openDualView(uA,uB){
   _resetDvAudio();
+  _killModalAudio(); // garantiza que el modal no emita audio en background
   if(!uA||!uB)return;
   dvSlotUser.a=uA; dvSlotUser.b=uB;
   const bg=document.getElementById('dual-view-bg');
