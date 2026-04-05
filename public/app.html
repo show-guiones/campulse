@@ -483,7 +483,6 @@ header{
   position:relative;width:100%;padding-top:133%;
   background:var(--surf2);overflow:hidden
 }
-.carousel-scroll .crd{width:140px}
 .carousel-scroll .crd .crd-media{padding-top:0;height:186px;width:140px}
 .crd-img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
@@ -541,23 +540,24 @@ header{
 @keyframes favPop{0%{transform:scale(1)}40%{transform:scale(1.45)}70%{transform:scale(.92)}100%{transform:scale(1)}}
 .crd-fav.pop{animation:favPop .28s ease}
 
-/* Fav en carrusel — compacto, anclado al área de texto (crd-body), no sobre la imagen */
+/* Fav en carrusel — visible, esquina superior derecha de la imagen (igual que grid pero compacto) */
 .carousel-scroll .crd .crd-fav{
-  top:auto;
-  bottom:.32rem;
-  right:.32rem;
-  width:22px;height:22px;font-size:.6rem;
-  background:transparent;
-  backdrop-filter:none;
+  top:.3rem;
+  right:.3rem;
+  bottom:auto;
+  width:28px;height:28px;font-size:.78rem;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(4px);
+  color:rgba(255,255,255,.5);
   box-shadow:none;
-  color:rgba(255,255,255,.35);
-  z-index:2;
+  z-index:6;
 }
-.carousel-scroll .crd .crd-fav::after{inset:-6px}
+.carousel-scroll .crd .crd-fav::after{inset:-5px}
+.carousel-scroll .crd .crd-fav:hover{color:#fff;background:rgba(0,0,0,.82);}
 .carousel-scroll .crd .crd-fav.is-fav{
   color:var(--hot);
-  background:transparent;
-  box-shadow:none;
+  background:rgba(255,42,109,.28);
+  box-shadow:0 0 8px rgba(255,42,109,.45);
 }
 
 /* viewers badge */
@@ -576,9 +576,6 @@ header{
 .carousel-scroll .crd .crd-img{border-radius:var(--radius-sm) var(--radius-sm) 0 0}
 
 .crd-body{padding:.4rem .45rem .45rem;overflow:hidden;position:relative}
-/* En carrusel: el nombre tiene padding-right para no solapar con el fav */
-.carousel-scroll .crd .crd-body{padding-right:2rem}
-.carousel-scroll .crd .crd-name{overflow:hidden;text-overflow:ellipsis}
 .crd-name{
   font-size:.72rem;font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)
