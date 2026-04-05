@@ -2684,7 +2684,14 @@ function getFiltered(){
     if(sort==='viewers')return (b.num_users||0)-(a.num_users||0);
     if(sort==='followers')return (b.num_followers||0)-(a.num_followers||0);
     if(sort==='age_asc')return (a.age||99)-(b.age||99);
-    if(sort==='new')return (b.is_new?1:0)-(a.is_new?1:0);
+    if(sort==='new'){
+      const aNew=(a.num_followers||9999)<500?1:0;
+      const bNew=(b.num_followers||9999)<500?1:0;
+      const aLive=(a.num_users||0)>0?1:0;
+      const bLive=(b.num_users||0)>0?1:0;
+      if(bLive!==aLive)return bLive-aLive;
+      return bNew-aNew||(a.num_followers||9999)-(b.num_followers||9999);
+    }
     return 0;
   });
 }
@@ -2885,7 +2892,8 @@ function cardHtml(x,mode='grid'){
   ];
   const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
-  const isLive = (x.num_users||0)>0;
+  const isNew=(x.num_followers||9999)<500;
+  const isLive=(x.num_users||0)>0;
   const favBtn = `<button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>`;
   return `<article class="crd${mode==='carousel'?' crd-sm':''}${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLive?1:0}">
   <div class="crd-media">
@@ -2895,7 +2903,7 @@ function cardHtml(x,mode='grid'){
       ${isLexy||isTop3?'<span class="bdg bdg-top">TOP</span>':''}
       ${!isLexy&&isHot?'<span class="bdg bdg-fire">🔥</span>':''}
       ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
-      ${x.is_new&&!isLexy?'<span class="bdg bdg-new">NEW</span>':''}
+      ${isNew&&!isLexy?'<span class="bdg bdg-new">NEW</span>':''}
     </div>
     ${isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':''}
     ${mode!=='carousel'?favBtn:''}
@@ -3917,7 +3925,11 @@ document.getElementById('search').addEventListener('input',()=>{
   if(pd) pd.style.display=hide?'none':'';
   renderOnFilter();
 });
-document.getElementById('srt').addEventListener('change',e=>{sort=e.target.value;renderOnFilter();});
+document.getElementById('srt').addEventListener('change',e=>{
+  sort=e.target.value;
+  e.target.classList.toggle('active', sort!=='viewers');
+  renderOnFilter();
+});
 document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render();});
 document.getElementById('th-f').addEventListener('click',()=>{sort='followers';render();});
 document.getElementById('th-a').addEventListener('click',()=>{sort='age_asc';render();});
