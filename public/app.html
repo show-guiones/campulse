@@ -522,7 +522,6 @@ header{
   display:flex;align-items:center;justify-content:center;
   transition:transform .18s,color .15s,background .15s,box-shadow .15s;
   backdrop-filter:blur(6px);
-  /* Elimina delay 300ms en iOS/Android */
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
   cursor:pointer;
@@ -542,6 +541,25 @@ header{
 @keyframes favPop{0%{transform:scale(1)}40%{transform:scale(1.45)}70%{transform:scale(.92)}100%{transform:scale(1)}}
 .crd-fav.pop{animation:favPop .28s ease}
 
+/* Fav en carrusel — compacto, anclado al área de texto (crd-body), no sobre la imagen */
+.carousel-scroll .crd .crd-fav{
+  top:auto;
+  bottom:.32rem;
+  right:.32rem;
+  width:22px;height:22px;font-size:.6rem;
+  background:transparent;
+  backdrop-filter:none;
+  box-shadow:none;
+  color:rgba(255,255,255,.35);
+  z-index:2;
+}
+.carousel-scroll .crd .crd-fav::after{inset:-6px}
+.carousel-scroll .crd .crd-fav.is-fav{
+  color:var(--hot);
+  background:transparent;
+  box-shadow:none;
+}
+
 /* viewers badge */
 .crd-vw{
   position:absolute;left:.4rem;bottom:.4rem;
@@ -557,7 +575,10 @@ header{
 .carousel-scroll .crd .crd-media{overflow:hidden}
 .carousel-scroll .crd .crd-img{border-radius:var(--radius-sm) var(--radius-sm) 0 0}
 
-.crd-body{padding:.4rem .45rem .45rem;overflow:hidden}
+.crd-body{padding:.4rem .45rem .45rem;overflow:hidden;position:relative}
+/* En carrusel: el nombre tiene padding-right para no solapar con el fav */
+.carousel-scroll .crd .crd-body{padding-right:2rem}
+.carousel-scroll .crd .crd-name{overflow:hidden;text-overflow:ellipsis}
 .crd-name{
   font-size:.72rem;font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)
