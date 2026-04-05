@@ -2216,7 +2216,7 @@ body.modal-open{overflow:hidden!important}
     </div>
     <!-- Botón de audio: position:fixed, fuera del árbol hero — escapa de todos overflow:hidden -->
     <!-- JS lo posiciona via _positionAudioBtn() y lo muestra con clase .visible -->
-    <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Sin audio</button>
+    <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)" title="El stream carga en silencio (política del navegador). Toca para activar audio.">🔇 Toca para audio</button>
 
     <!-- BODY scrollable -->
     <div class="modal-body mbody-v2">
@@ -2368,7 +2368,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
-          <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a',event)">🔇 Sin audio</button>
+          <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a',event)" title="El stream carga en silencio. Toca para activar audio.">🔇 Audio</button>
           
         </div>
         <div class="dv-panel-actions">
@@ -2384,7 +2384,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay; fullscreen; encrypted-media" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
-          <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b',event)">🔇 Sin audio</button>
+          <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b',event)" title="El stream carga en silencio. Toca para activar audio.">🔇 Audio</button>
           
         </div>
         <div class="dv-panel-actions">
@@ -3106,22 +3106,20 @@ function openMod(u){
       embedWrap.classList.add('active');
     }
     // Mostrar y posicionar botón de audio (position:fixed — necesita coords de viewport)
-    // setTimeout 320ms: espera que la animación del modal (.28s) termine antes de calcular coords
     const _audioBtn=document.getElementById('modal-audio-btn');
-    if(_audioBtn){ _audioBtn.classList.add('visible'); setTimeout(_positionAudioBtn, 320); }
+    if(_audioBtn){ _positionAudioBtn(); _audioBtn.classList.add('visible'); }
     if(frame){
-      // Reconectar listener al frame actual — puede ser un elemento recreado por _reloadEmbedWithFade
-      // El listener original (línea de inicio) apunta al elemento viejo si hubo destroy+recreate
+      // FIX C: reconectar listener SIEMPRE al frame actual del DOM
+      // (puede haber sido recreado por _reloadEmbedWithFade en sesiones anteriores)
       frame.removeEventListener('load', onEmbedLoad);
       frame.addEventListener('load', onEmbedLoad);
       // Cargar con preferencia guardada de audio (evita reload innecesario)
       const _savedAudio = _getAudioPref(u);
-      const _initSound  = _savedAudio ? 0 : 1;
-      frame.src=_mkEmbedUrl(u, _initSound===0);
-      // Si la pref era audio ON, restaurar estado del botón sin hacer segundo reload
+      frame.src=_mkEmbedUrl(u, _savedAudio);
+      // FIX D: Si la pref era audio ON, sincronizar TODOS los estados de audio
       if(_savedAudio){
         _modalAudioActive = true;
-        _activeAudioContext = 'modal';
+        _audioOwner = 'modal'; // FIX D: actualizar mutex global
         const _ab=document.getElementById('modal-audio-btn');
         if(_ab){ _ab.classList.add('active'); _ab.textContent='🔊 Audio ON'; }
       }
@@ -3647,7 +3645,8 @@ function _reloadEmbedWithFade(frame, wrap, u, withAudio){
   }, 220);
 }
 
-/* ── Audio mutex — solo 1 sala con audio a la vez ── */
+/* ── Audio mutex global — solo 1 fuente con audio a la vez ── */
+let _audioOwner = null; // 'modal' | 'dv-a' | 'dv-b' | null
 const _dvAudioState = {a: false, b: false}; // false = muted
 let _dvActiveAudioSlot = null; // slot que tiene audio activo actualmente
 
@@ -3663,36 +3662,39 @@ function _muteSlot(slot){
     const wrap = frame.closest('.dv-embed-wrap');
     _reloadEmbedWithFade(frame, wrap, u, false);
   }
-  if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Sin audio'; }
+  if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Audio'; }
 }
 
 function toggleDvAudio(slot, e){
   e.stopPropagation();
-  e.preventDefault();
-  const frame   = document.getElementById('dv-frame-' + slot);
-  const btn     = document.getElementById('dv-audio-' + slot);
-  const overlay = document.getElementById('dv-overlay-' + slot);
-  const u       = dvSlotUser[slot];
+  const frame = document.getElementById('dv-frame-' + slot);
+  const btn   = document.getElementById('dv-audio-' + slot);
+  const u     = dvSlotUser[slot];
   if(!frame || !btn || !u) return;
 
   const isActivating = !_dvAudioState[slot];
 
   if(isActivating){
+    // FIX D3: silenciar modal si tenía audio activo
+    if(_modalAudioActive && active){
+      _modalAudioActive = false; _audioOwner = null;
+      const _mf=document.getElementById('live-embed-frame');
+      const _mw=document.getElementById('mhero-embed-wrap');
+      const _mb=document.getElementById('modal-audio-btn');
+      if(_mf&&_mf.parentNode) _reloadEmbedWithFade(_mf,_mw,active.username,false);
+      if(_mb){ _mb.classList.remove('active'); _mb.textContent='🔇 Audio'; }
+      _setAudioPref(active.username, false);
+    }
     // Silenciar cualquier otro slot que tenga audio activo (mutex)
     Object.keys(dvSlotUser).forEach(s => {
       if(s !== slot && _dvAudioState[s]) _muteSlot(s);
     });
-    _dvActiveAudioSlot = slot;
-    // Quitar overlay temporalmente — el click del usuario desbloquea autoplay del browser
-    if(overlay) overlay.style.pointerEvents = 'none';
-    frame.focus();
-    setTimeout(()=>{ if(overlay) overlay.style.pointerEvents = ''; }, 400);
+    _dvActiveAudioSlot = slot; _audioOwner = 'dv-' + slot;
   } else {
     _dvActiveAudioSlot = null;
   }
 
   _dvAudioState[slot] = isActivating;
-  if(isActivating){ _activeAudioContext = 'dv-' + slot; } else if(_activeAudioContext === 'dv-' + slot){ _activeAudioContext = null; }
   const wrap = frame.closest('.dv-embed-wrap');
   _setAudioPref(u, isActivating);
   _reloadEmbedWithFade(frame, wrap, u, isActivating);
@@ -3701,29 +3703,16 @@ function toggleDvAudio(slot, e){
 }
 
 function _resetDvAudio(){
-  _dvActiveAudioSlot = null;
+  _dvActiveAudioSlot = null; _audioOwner = null;
   Object.keys(dvSlotUser).forEach(slot => {
     _dvAudioState[slot] = false;
     const btn = document.getElementById('dv-audio-' + slot);
-    if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Sin audio'; }
+    if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Audio'; }
   });
 }
 
 /* ── MODAL AUDIO — mismo patrón que Dual View ── */
 let _modalAudioActive = false;
-/* Mutex global: solo 1 contexto de audio activo a la vez ('modal' | 'dv-a' | 'dv-b' | null) */
-let _activeAudioContext = null;
-
-/* Destruye completamente el iframe del modal y limpia todo estado de audio.
-   Usar en closeMod() y en openDualView() — garantiza silencio total al salir. */
-function _killModalAudio(){
-  _modalAudioActive = false;
-  _activeAudioContext = null;
-  const frame = document.getElementById('live-embed-frame');
-  if(frame) frame.src = 'about:blank';
-  const btn = document.getElementById('modal-audio-btn');
-  if(btn){ btn.classList.remove('active','visible'); btn.textContent = '🔇 Sin audio'; }
-}
 
 /* Posiciona el botón de audio justo encima del borde inferior del hero.
    position:fixed necesita coordenadas de viewport — getBoundingClientRect lo da. */
@@ -3739,44 +3728,33 @@ function toggleModalAudio(e){
   e.stopPropagation();
   e.preventDefault();
   if(!active) return;
-  const frame   = document.getElementById('live-embed-frame');
-  const wrap    = document.getElementById('mhero-embed-wrap');
-  const btn     = document.getElementById('modal-audio-btn');
-  const overlay = document.getElementById('embed-click-overlay');
+  const frame = document.getElementById('live-embed-frame');
+  const wrap  = document.getElementById('mhero-embed-wrap');
+  const btn   = document.getElementById('modal-audio-btn');
   if(!frame || !btn) return;
 
   _modalAudioActive = !_modalAudioActive;
   const u = active.username;
-
-  // Mutex: si se activa audio en el modal, silenciar dual view si estaba activo
-  if(_modalAudioActive && _activeAudioContext && _activeAudioContext !== 'modal'){
-    _resetDvAudio();
+  // FIX D2: si activamos audio, silenciar dual view
+  if(_modalAudioActive && _dvActiveAudioSlot){
+    _muteSlot(_dvActiveAudioSlot);
   }
-  _activeAudioContext = _modalAudioActive ? 'modal' : null;
+  _audioOwner = _modalAudioActive ? 'modal' : null;
+
+  // Guardar preferencia en localStorage
   _setAudioPref(u, _modalAudioActive);
 
-  if(_modalAudioActive){
-    // Activar audio: quitar overlay temporalmente para que el click llegue al iframe
-    // El browser solo permite audio si detecta interacción directa del usuario sobre el elemento
-    if(overlay) overlay.style.pointerEvents = 'none';
-    frame.focus();
-    setTimeout(()=>{ if(overlay) overlay.style.pointerEvents = ''; }, 400);
-    // Reload con disable_sound=0 — la interacción del usuario (este click) desbloquea autoplay
-    _reloadEmbedWithFade(frame, wrap, u, true);
-  } else {
-    // Silenciar: reload con disable_sound=1
-    _reloadEmbedWithFade(frame, wrap, u, false);
-  }
+  // Fade out → reload → fade in
+  _reloadEmbedWithFade(frame, wrap, u, _modalAudioActive);
 
   btn.classList.toggle('active', _modalAudioActive);
   btn.textContent = _modalAudioActive ? '🔊 Audio ON' : '🔇 Sin audio';
 }
 
 function _resetModalAudio(){
-  _modalAudioActive = false;
-  _activeAudioContext = null;
+  _modalAudioActive = false; if(_audioOwner==='modal') _audioOwner=null;
   const btn = document.getElementById('modal-audio-btn');
-  if(btn){ btn.classList.remove('active','visible'); btn.textContent = '🔇 Sin audio'; }
+  if(btn){ btn.classList.remove('active','visible'); btn.textContent = '🔇 Audio'; }
 }
 
 function openDvSlot(slot){
@@ -3786,8 +3764,11 @@ function openDvSlot(slot){
 }
 function openDualView(uA,uB){
   _resetDvAudio();
-  _killModalAudio(); // garantiza que el modal no emita audio en background
   if(!uA||!uB)return;
+  // FIX B: Destruir iframe del modal para evitar audio duplicado
+  const _mf=document.getElementById('live-embed-frame');
+  if(_mf){ _mf.src='about:blank'; }
+  _resetModalAudio();
   dvSlotUser.a=uA; dvSlotUser.b=uB;
   const bg=document.getElementById('dual-view-bg');
   const frameA=document.getElementById('dv-frame-a');
@@ -3804,20 +3785,6 @@ function openDualView(uA,uB){
   if(lblB) lblB.textContent=rB.display_name||uB;
   if(linkA){linkA.href=mkAffLink(uA);linkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
   if(linkB){linkB.href=mkAffLink(uB);linkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
-  // Sincronizar estado de audio con preferencias guardadas
-  const _prefA = _getAudioPref(uA);
-  const _prefB = _getAudioPref(uB);
-  // Mutex: si ambas tienen pref=true, solo activar A (no puede haber dos con audio)
-  const _activeA = _prefA;
-  const _activeB = !_prefA && _prefB;
-  _dvAudioState.a = _activeA;
-  _dvAudioState.b = _activeB;
-  if(_activeA){ _dvActiveAudioSlot='a'; _activeAudioContext='dv-a'; }
-  else if(_activeB){ _dvActiveAudioSlot='b'; _activeAudioContext='dv-b'; }
-  const _btnA=document.getElementById('dv-audio-a');
-  const _btnB=document.getElementById('dv-audio-b');
-  if(_btnA){ _btnA.classList.toggle('active',_activeA); _btnA.textContent=_activeA?'🔊 Audio ON':'🔇 Sin audio'; }
-  if(_btnB){ _btnB.classList.toggle('active',_activeB); _btnB.textContent=_activeB?'🔊 Audio ON':'🔇 Sin audio'; }
   // Reset cubiertas negras — evita flash blanco de Chaturbate
   const wrapA=document.getElementById('dv-panel-a')?.querySelector('.dv-embed-wrap');
   const wrapB=document.getElementById('dv-panel-b')?.querySelector('.dv-embed-wrap');
@@ -3826,12 +3793,26 @@ function openDualView(uA,uB){
   if(bg) bg.style.display='flex';
   setTimeout(()=>{
     if(frameA){
+      const _prefA = _getAudioPref(uA);
       frameA.src=mkUrl(uA);
       frameA.onload=()=>setTimeout(()=>wrapA&&wrapA.classList.add('stream-ready'),2500);
+      // FIX D4: sincronizar estado del botón con preferencia guardada
+      if(_prefA){
+        _dvAudioState.a = true; _dvActiveAudioSlot = 'a'; _audioOwner = 'dv-a';
+        const _bA=document.getElementById('dv-audio-a');
+        if(_bA){ _bA.classList.add('active'); _bA.textContent='🔊 Audio ON'; }
+      }
     }
     if(frameB){
+      const _prefB = _getAudioPref(uB);
       frameB.src=mkUrl(uB);
       frameB.onload=()=>setTimeout(()=>wrapB&&wrapB.classList.add('stream-ready'),2500);
+      // FIX D4: sincronizar estado del botón con preferencia guardada
+      if(_prefB && !_dvAudioState.a){ // solo si A no tiene audio (mutex)
+        _dvAudioState.b = true; _dvActiveAudioSlot = 'b'; _audioOwner = 'dv-b';
+        const _bB=document.getElementById('dv-audio-b');
+        if(_bB){ _bB.classList.add('active'); _bB.textContent='🔊 Audio ON'; }
+      }
     }
   },120);
   document.body.style.overflow='hidden';
@@ -3856,7 +3837,7 @@ function closeDualView(){
 function swapDualSlot(slot){
   // Si este slot tenía audio activo, limpiar mutex
   if(_dvAudioState[slot]){ _dvAudioState[slot]=false; if(_dvActiveAudioSlot===slot) _dvActiveAudioSlot=null; }
-  const _ab=document.getElementById('dv-audio-'+slot); if(_ab){_ab.classList.remove('active');_ab.textContent='🔇 Sin audio';}
+  const _ab=document.getElementById('dv-audio-'+slot); if(_ab){_ab.classList.remove('active');_ab.textContent='🔇 Audio';}
   const bg = document.getElementById('dual-picker-bg');
   if(!bg) return;
   _dpSlot = slot;
@@ -3892,19 +3873,20 @@ function swapDualConfirm(slot, newUsername){
   dvSlotUser[slot] = newUsername;
 }
 function closeMod(e){
-  if(!e||e.target===document.getElementById('modal-bg')){
-    document.getElementById('modal-bg').classList.remove('open');
-    document.body.classList.remove('modal-open');
-    clearInterval(prevCd);
-    const frame=document.getElementById('live-embed-frame');
-    const wrap=document.getElementById('mhero-embed-wrap');
-    if(frame) frame.src='about:blank';
-    if(wrap) wrap.classList.remove('active');
-    _resetModalAudio();
-    // Reset analytics panel
-    const analyticsPanel=document.getElementById('modal-analytics');
-    if(analyticsPanel) analyticsPanel.style.display='none';
-  }
+  // FIX B2: siempre destruir — no depender de e.target para matar el iframe
+  if(e && e.target && e.target!==document.getElementById('modal-bg') && !e.target.classList?.contains('modal-close')) return;
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.classList.remove('modal-open');
+  clearInterval(prevCd);
+  const frame=document.getElementById('live-embed-frame');
+  const wrap=document.getElementById('mhero-embed-wrap');
+  if(frame){ frame.src='about:blank'; }
+  if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); wrap.classList.remove('stream-ready'); }
+  _resetModalAudio();
+  const analyticsPanel=document.getElementById('modal-analytics');
+  if(analyticsPanel) analyticsPanel.style.display='none';
+  const heroEl=document.getElementById('modal-hero');
+  if(heroEl) heroEl.classList.remove('embed-active');
 }
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
