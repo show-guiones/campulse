@@ -3114,23 +3114,36 @@ function openMod(u){
     if(frame){
       // Siempre cargar silenciado primero — más confiable cross-browser
       const _savedAudio = _getAudioPref(u);
+      // FIX race condition: NO mezclar addEventListener+onload simultáneamente.
+      // Si hay auto-audio: gestionar manualmente con onload chain.
+      // Si no: usar onEmbedLoad normal para video-ready.
+      frame.onload = null;
       frame.removeEventListener('load', onEmbedLoad);
-      frame.addEventListener('load', onEmbedLoad);
       frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
       if(_savedAudio){
-        // Auto-activar audio después de que el stream cargue
+        // Ruta auto-audio: chain de dos cargas
         const _ab=document.getElementById('modal-audio-btn');
-        if(_ab){ _ab.textContent='⏳ Cargando…'; _ab.classList.add('active'); }
+        if(_ab){ _ab.textContent='⏳ Cargando…'; _ab.classList.add('active'); _ab.style.background='rgba(255,140,0,.9)'; }
         frame.onload = ()=>{
           frame.onload = null;
           setTimeout(()=>{
-            frame.removeEventListener('load', onEmbedLoad);
-            frame.addEventListener('load', onEmbedLoad);
+            // Segunda carga con audio habilitado
             frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never&t=${Date.now()}`;
             _modalAudioActive = true; _audioOwner = 'modal';
-            if(_ab){ _ab.textContent='🔊 Audio ON'; _ab.style.background=''; _ab.style.borderColor=''; }
+            frame.onload = ()=>{
+              frame.onload = null;
+              // Registrar onEmbedLoad DESPUÉS de que la carga con audio completó
+              frame.addEventListener('load', onEmbedLoad);
+              setTimeout(()=>{
+                if(embedWrap) embedWrap.classList.add('video-ready');
+                if(_ab){ _ab.textContent='🔊 Audio ON'; _ab.style.background=''; _ab.style.borderColor=''; }
+              }, 2000);
+            };
           }, 1500);
         };
+      } else {
+        // Ruta normal sin auto-audio: onEmbedLoad maneja video-ready
+        frame.addEventListener('load', onEmbedLoad);
       }
     }
   } else {
@@ -3176,21 +3189,31 @@ function activateEmbed(u){
   wrap.classList.add('active');
   if(loading) loading.classList.remove('hidden');
   // Siempre arrancar silenciado — más confiable cross-browser
+  frame.onload = null;
+  frame.removeEventListener('load', onEmbedLoad);
   frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
   const _pref2 = _getAudioPref(u);
   if(_pref2){
+    // Ruta auto-audio: chain de dos cargas (igual que openMod)
     const _ab2=document.getElementById('modal-audio-btn');
-    if(_ab2){ _ab2.textContent='⏳ Cargando…'; _ab2.classList.add('active'); }
+    if(_ab2){ _ab2.textContent='⏳ Cargando…'; _ab2.classList.add('active'); _ab2.style.background='rgba(255,140,0,.9)'; }
     frame.onload = ()=>{
       frame.onload=null;
       setTimeout(()=>{
-        frame.removeEventListener('load', onEmbedLoad);
-        frame.addEventListener('load', onEmbedLoad);
         frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never&t=${Date.now()}`;
         _modalAudioActive=true; _audioOwner='modal';
-        if(_ab2){ _ab2.textContent='🔊 Audio ON'; _ab2.style.background=''; _ab2.style.borderColor=''; }
+        frame.onload = ()=>{
+          frame.onload=null;
+          frame.addEventListener('load', onEmbedLoad);
+          setTimeout(()=>{
+            if(wrap) wrap.classList.add('video-ready');
+            if(_ab2){ _ab2.textContent='🔊 Audio ON'; _ab2.style.background=''; _ab2.style.borderColor=''; }
+          }, 2000);
+        };
       }, 1500);
     };
+  } else {
+    frame.addEventListener('load', onEmbedLoad);
   }
 }
 function onEmbedLoad(){
@@ -3603,11 +3626,10 @@ function openDualFromInput(){
 let dvSlotUser={a:'',b:''};
 
 /* ── Audio helpers: URL builder, localStorage prefs, fade reload ── */
-// AUDIO: Chaturbate embed siempre carga con disable_sound=0 (audio habilitado).
-// El browser puede mutear por política de autoplay hasta que el usuario interactúa.
-// El botón de audio hace que el usuario click directamente en el iframe (cross-origin safe).
+// AUDIO: disable_sound=1 → silenciado (default seguro), disable_sound=0 → con audio.
+// Siempre incluir cache-bust t= para forzar nueva sesión en Chaturbate.
 const _EMBED_BASE = (u, withAudio) =>
-  `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=0&mobileRedirect=never`;
+  `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=${withAudio?'0':'1'}&mobileRedirect=never&t=${Date.now()}`;
 function _mkEmbedUrl(u, withAudio){ return _EMBED_BASE(u, withAudio); }
 
 function _getAudioPref(u){
@@ -3677,14 +3699,17 @@ function _muteSlot(slot){
   const u = dvSlotUser[slot];
   const frame = document.getElementById('dv-frame-' + slot);
   const btn   = document.getElementById('dv-audio-' + slot);
+  const wrap  = frame ? frame.closest('.dv-embed-wrap') : null;
   if(!u || !frame) return;
   _dvAudioState[slot] = false;
+  if(_dvActiveAudioSlot === slot) _dvActiveAudioSlot = null;
+  if(_audioOwner === 'dv-' + slot) _audioOwner = null;
   // Solo recargar si estaba con audio activo — evitar reload innecesario
-  if(_dvActiveAudioSlot === slot){
-    const wrap = frame.closest('.dv-embed-wrap');
-    _reloadEmbedWithFade(frame, wrap, u, false);
-  }
-  if(btn){ btn.classList.remove('active'); btn.textContent = '🔇 Audio'; btn.classList.remove('active');}
+  if(btn){ btn.classList.remove('active','pending'); btn.textContent = '🔇 Audio'; }
+  if(wrap) wrap.classList.remove('stream-ready');
+  frame.onload = null;
+  frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
+  frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrap) wrap.classList.add('stream-ready'); }, 2000); };
 }
 
 function toggleDvAudio(slot, e){
@@ -3975,26 +4000,32 @@ function swapDualSlot(slot){
 function swapDualConfirm(slot, newUsername){
   if(!slot || !newUsername) return;
   closeDualPicker(); // cierra sin evento — sin guard
-  // Actualizar iframe + label + link del slot elegido
+
+  // Reset completo del estado de audio del slot anterior antes del swap
+  _dvAudioState[slot] = false;
+  if(_dvActiveAudioSlot === slot) _dvActiveAudioSlot = null;
+  if(_audioOwner === 'dv-' + slot) _audioOwner = null;
+  const _swapBtn = document.getElementById('dv-audio-' + slot);
+  if(_swapBtn){ _swapBtn.classList.remove('active','pending'); _swapBtn.textContent = '🔇 Audio'; }
+
+  // Actualizar username del slot ANTES de cargar el iframe
+  dvSlotUser[slot] = newUsername;
+
   const frame  = document.getElementById('dv-frame-'  + slot);
   const lblEl  = document.getElementById('dv-label-'  + slot);
   const linkEl = document.getElementById('dv-link-'   + slot);
   const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
-  const mkUrl = u => _mkEmbedUrl(u, _getAudioPref(u));
   const mkAffLink = u => `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
   if(frame){
-    const wrapEl=frame.closest('.dv-embed-wrap');
+    const wrapEl = frame.closest('.dv-embed-wrap');
     if(wrapEl) wrapEl.classList.remove('stream-ready');
-    frame.src='about:blank';
-    setTimeout(()=>{
-      frame.src=mkUrl(newUsername);
-      frame.onload=()=>setTimeout(()=>wrapEl&&wrapEl.classList.add('stream-ready'),2500);
-    },100);
+    frame.onload = null; // cancelar cualquier handler pendiente del slot anterior
+    // Nueva sala siempre silenciada — el usuario debe presionar el botón para audio
+    frame.src = `https://chaturbate.com/embed/${newUsername}/?tour=LQps&campaign=rI8z3&bgcolor=000000&embed_video_only=1&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
+    frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrapEl) wrapEl.classList.add('stream-ready'); }, 2500); };
   }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
   if(linkEl){ linkEl.href = mkAffLink(newUsername); linkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
-  // Actualizar username del slot para el overlay de click
-  dvSlotUser[slot] = newUsername;
 }
 function closeMod(e){
   // FIX B2: siempre destruir — no depender de e.target para matar el iframe
