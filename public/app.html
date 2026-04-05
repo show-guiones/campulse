@@ -3586,30 +3586,53 @@ function _setAudioPref(u, on){
   try{ if(on) localStorage.setItem('cb_audio_'+u,'1'); else localStorage.removeItem('cb_audio_'+u); }catch(e){}
 }
 
-/* Fade-out → swap src → fade-in.
-   Para el modal frame (live-embed-frame) onEmbedLoad ya está conectado
-   via addEventListener — usamos el flag _fadeReload para que haga el fade-in.
-   Para dual view frames usamos un listener one-shot. */
+/* Reload de audio: destruye y recrea el iframe para forzar nueva sesión.
+   Chaturbate cachea el estado de audio — cambiar .src no es suficiente. */
 function _reloadEmbedWithFade(frame, wrap, u, withAudio){
-  if(!frame) return;
-  frame.style.transition='opacity .25s';
-  frame.style.opacity='0';
+  if(!frame || !frame.parentNode) return;
+  const parent  = frame.parentNode;
+  const frameId = frame.id;
+  const cls     = frame.className;
+  const allow   = frame.getAttribute('allow') || 'autoplay; fullscreen; encrypted-media';
+  const refpol  = frame.getAttribute('referrerpolicy') || 'no-referrer-when-downgrade';
+  const isModal = frameId === 'live-embed-frame';
+
+  // Fade out
+  frame.style.transition = 'opacity .2s';
+  frame.style.opacity = '0';
   if(wrap) wrap.classList.remove('video-ready');
-  if(frame.id === 'live-embed-frame'){
-    frame._fadeReload = true;
-  } else {
-    // Limpiar cualquier .onload previo (openDualView/swapDualConfirm usan propiedad)
-    frame.onload = null;
-    const onLoad = ()=>{
-      frame.removeEventListener('load', onLoad);
-      setTimeout(()=>{
-        frame.style.opacity='1';
-        if(wrap) wrap.classList.add('stream-ready');
-      }, 2200);
-    };
-    frame.addEventListener('load', onLoad);
-  }
-  frame.src = _mkEmbedUrl(u, withAudio);
+  if(isModal && wrap) wrap.classList.remove('stream-ready');
+
+  setTimeout(()=>{
+    // Eliminar iframe viejo — libera sesión + audio context del browser
+    parent.removeChild(frame);
+
+    // Crear iframe nuevo con mismos atributos
+    const newFrame = document.createElement('iframe');
+    newFrame.id    = frameId;
+    newFrame.className = cls;
+    newFrame.setAttribute('allow', allow);
+    newFrame.setAttribute('referrerpolicy', refpol);
+    newFrame.allowFullscreen = true;
+    newFrame.style.opacity = '0';
+    newFrame.style.transition = 'opacity .25s';
+    parent.appendChild(newFrame);
+
+    if(isModal){
+      // Reconectar el listener de onEmbedLoad
+      newFrame.addEventListener('load', onEmbedLoad);
+      newFrame._fadeReload = true;
+    } else {
+      newFrame.onload = ()=>{
+        newFrame.onload = null;
+        setTimeout(()=>{
+          newFrame.style.opacity = '1';
+          if(wrap) wrap.classList.add('stream-ready');
+        }, 2200);
+      };
+    }
+    newFrame.src = _mkEmbedUrl(u, withAudio);
+  }, 220);
 }
 
 /* ── Audio mutex — solo 1 sala con audio a la vez ── */
