@@ -1288,8 +1288,9 @@ header{
   position:fixed;inset:0;z-index:700;
   background:#000;display:flex;flex-direction:column;
   overflow:hidden;overscroll-behavior:none;touch-action:none;
+  -webkit-overflow-scrolling:auto;
 }
-.dual-view{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;}
+.dual-view{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;touch-action:none;overscroll-behavior:none;}
 .dv-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:.5rem .75rem;background:rgba(12,13,16,.95);
@@ -1299,6 +1300,68 @@ header{
 .dv-close{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.75rem;font-weight:600;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .dv-panels{display:flex;flex:1;overflow:hidden;gap:2px;background:rgba(255,255,255,.06);overscroll-behavior:none;touch-action:none;}
 /* Mobile: vertical stack */
+/* ══════════════════════════════════════════════════════
+   DESKTOP WEB: área de video 100% — sin header ni actions bar
+   Los controles flotan sobre el video con fade automático
+   ══════════════════════════════════════════════════════ */
+@media(orientation:landscape),(min-width:640px){
+
+  /* Ocultar header interno del dual-view */
+  .dv-header{ display:none; }
+
+  /* Ocultar barra de acciones — el botón CTA flota sobre el video */
+  .dv-panel-actions{ display:none; }
+
+  /* Los panels ocupan el 100% del dual-view-bg sin nada que los recorte */
+  .dv-panels{ height:100%; }
+
+  /* Botón cerrar flotante — esquina superior derecha del dual-view-bg */
+  .dv-float-close{
+    display:flex;
+    position:fixed;top:.75rem;right:.75rem;z-index:900;
+    background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.22);
+    border-radius:20px;padding:5px 14px;
+    align-items:center;gap:.4rem;
+    cursor:pointer;color:#fff;font-size:.72rem;font-weight:700;
+    backdrop-filter:blur(8px);
+    transition:opacity .25s, background .15s;
+    opacity:0;
+    pointer-events:none;
+  }
+  .dual-view-bg:hover .dv-float-close,
+  .dual-view-bg:focus-within .dv-float-close{
+    opacity:1;pointer-events:auto;
+  }
+  .dv-float-close:hover{ background:rgba(232,48,90,.82); }
+
+  /* Links CTA flotantes por panel — aparecen en hover del panel */
+  .dv-float-cta{
+    display:flex;
+    position:absolute;bottom:.75rem;left:50%;
+    transform:translateX(-50%);
+    z-index:20;
+    background:rgba(232,48,90,.88);
+    border:none;border-radius:8px;
+    color:#fff;font-size:.7rem;font-weight:700;
+    padding:5px 16px;white-space:nowrap;
+    text-decoration:none;
+    opacity:0;
+    transition:opacity .2s;
+    pointer-events:none;
+    backdrop-filter:blur(6px);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .dv-panel:hover .dv-float-cta{
+    opacity:1;pointer-events:auto;
+  }
+}
+
+/* Móvil: los float controls no se muestran, el layout original se mantiene */
+@media(orientation:portrait) and (max-width:639px){
+  .dv-float-close{ display:none !important; }
+  .dv-float-cta{  display:none !important; }
+}
+
 .dv-swap-btn{
   position:absolute;top:.4rem;right:.5rem;z-index:15;
   background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.18);
@@ -1312,7 +1375,18 @@ header{
   .dv-panels{flex-direction:row}
 }
 @media(orientation:portrait) and (max-width:639px){
-  .dv-panels{flex-direction:column}
+  .dv-panels{
+    flex-direction:column;
+    height:100%;
+    overflow:hidden;
+  }
+  /* Cada panel ocupa exactamente la mitad — sin overflow, sin scroll */
+  .dv-panel{
+    flex:0 0 50%;
+    height:50%;
+    max-height:50%;
+    overflow:hidden;
+  }
 }
 .dv-panel-label{
   position:absolute;top:.4rem;left:.5rem;z-index:10;
@@ -1378,52 +1452,41 @@ header{
   overscroll-behavior:none;
   scrolling:no;
 }
-/* Móvil ≤480px: crop inferior 114px (+17mm sobre 50px base) */
+/* Móvil ≤480px: crop inferior 114px */
 @media(max-width:480px){
   .dv-frame{
     top:-36px;
     height:calc(100% + 36px + 114px);
   }
-  /* Panel B móvil: -2mm (8px) de área de video → se los lleva dv-panel-actions */
-  #dv-panel-b .dv-frame{
-    height:calc(100% + 36px + 114px - 8px);
-  }
 }
-/* Móvil pequeño (≤380px): top mínimo 36px (cubre CB top bar exacto), bot 106px */
+/* Móvil pequeño (≤380px): top mínimo 36px, bot 106px */
 @media(max-width:380px){
   .dv-frame{
     top:-36px;
     height:calc(100% + 36px + 106px);
   }
-  /* Panel B móvil pequeño: -2mm (8px) de área de video */
-  #dv-panel-b .dv-frame{
-    height:calc(100% + 36px + 106px - 8px);
-  }
 }
 /* Cuando el overlay está desactivado para audio */
 .dv-frame.audio-clickable{pointer-events:auto;}
 
-/* ── Barra de acciones del panel ── */
+/* ── Barra de acciones del panel — IDÉNTICA en panel A y B ── */
 .dv-panel-actions{
   flex-shrink:0;
-  padding:.69rem .5rem;  /* +3mm vs original .35rem */
+  padding:.69rem .5rem;
   background:rgba(12,13,16,.9);
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
+  width:100%;
+  box-sizing:border-box;
 }
-/* Móvil: reducir padding para ganar espacio de video */
 @media(max-width:480px){
   .dv-panel-actions{padding:.5rem .5rem;}
-  /* Panel B: +2mm (8px) que se restan del video de panel B */
-  #dv-panel-b .dv-panel-actions{padding:calc(.5rem + 4px) .5rem;}
 }
 @media(max-width:380px){
   .dv-panel-actions{padding:.35rem .5rem;}
-  /* Panel B pequeño: +2mm */
-  #dv-panel-b .dv-panel-actions{padding:calc(.35rem + 4px) .5rem;}
 }
 .dv-cta{
-  display:block;width:100%;
+  display:block;width:100%;box-sizing:border-box;min-width:0;
   background:var(--hot);color:#fff;border:none;border-radius:8px;
   font-size:.72rem;font-weight:700;padding:.4rem;text-align:center;
   text-decoration:none;-webkit-tap-highlight-color:transparent;
@@ -2451,6 +2514,8 @@ body.modal-open{overflow:hidden!important}
 
 <!-- ═══ DUAL VIEW — dos salas lado a lado ═══ -->
 <div class="dual-view-bg" id="dual-view-bg" style="display:none">
+  <!-- Botón cerrar flotante para desktop (se oculta en móvil) -->
+  <button class="dv-float-close" onclick="closeDualView()">✕ Cerrar</button>
   <div class="dual-view">
     <div class="dv-header">
       <span class="dv-title">⊞ Vista doble</span>
@@ -2467,11 +2532,12 @@ body.modal-open{overflow:hidden!important}
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
-          
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
         </div>
+        <!-- CTA flotante desktop -->
+        <a id="dv-float-link-a" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala A ↗</a>
       </div>
       <!-- Panel B -->
       <div class="dv-panel" id="dv-panel-b">
@@ -2483,11 +2549,12 @@ body.modal-open{overflow:hidden!important}
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
-          
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
         </div>
+        <!-- CTA flotante desktop -->
+        <a id="dv-float-link-b" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala B ↗</a>
       </div>
     </div>
   </div>
@@ -4006,6 +4073,11 @@ function openDualView(uA,uB){
   if(lblB) lblB.textContent=rB.display_name||uB;
   if(linkA){linkA.href=mkAffLink(uA);linkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
   if(linkB){linkB.href=mkAffLink(uB);linkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
+  // Sincronizar links flotantes desktop
+  const floatLinkA=document.getElementById('dv-float-link-a');
+  const floatLinkB=document.getElementById('dv-float-link-b');
+  if(floatLinkA){floatLinkA.href=mkAffLink(uA);floatLinkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
+  if(floatLinkB){floatLinkB.href=mkAffLink(uB);floatLinkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
   // Reset cubiertas negras — evita flash blanco de Chaturbate
   const wrapA=document.getElementById('dv-panel-a')?.querySelector('.dv-embed-wrap');
   const wrapB=document.getElementById('dv-panel-b')?.querySelector('.dv-embed-wrap');
@@ -4121,6 +4193,9 @@ function swapDualConfirm(slot, newUsername){
   }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
   if(linkEl){ linkEl.href = mkAffLink(newUsername); linkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
+  // Sincronizar link flotante desktop
+  const floatLinkEl = document.getElementById('dv-float-link-' + slot);
+  if(floatLinkEl){ floatLinkEl.href = mkAffLink(newUsername); floatLinkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
 }
 function closeMod(e){
   // FIX B2: siempre destruir — no depender de e.target para matar el iframe
