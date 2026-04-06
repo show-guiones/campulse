@@ -840,7 +840,10 @@ header{
 .embed-wrap.active{display:block}
 .embed-frame{
   width:100%;height:100%;border:none;display:block;pointer-events:auto;
+  overflow:hidden;overscroll-behavior:none;touch-action:none;
+  scrollbar-width:none;-ms-overflow-style:none;
 }
+.embed-frame::-webkit-scrollbar{display:none;width:0;height:0}
 /* embed-loading: capa negra ENCIMA del iframe — tapa el blanco de Chaturbate
    z-index:8 > iframe (no tiene z-index, auto) pero < embed-back-btn(z-index:10) */
 .embed-loading{
@@ -873,7 +876,51 @@ header{
   transition:background .15s
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
-/* embed-click-overlay + modal-audio-btn removed — user interacts natively with CB iframe (volume, etc) */
+/* ── OVERLAY AFILIADO: cubre el video pero LIBERA zona de volumen CB ──
+   El control de volumen de Chaturbate está en la esquina inferior izquierda.
+   clip-path excluye un rectángulo de 72×56px en bottom-left para acceso al volumen.
+   El overlay redirige al usuario con link afiliado al hacer clic en el resto del video. */
+.embed-affiliate-overlay{
+  position:absolute;
+  inset:0;
+  z-index:7; /* sobre iframe(auto) pero bajo embed-loading(8) */
+  cursor:pointer;
+  background:transparent;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  overscroll-behavior:none;
+  /* Libera esquina inferior izquierda (72px × 56px) para volumen nativo de CB */
+  clip-path:polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    72px 100%,
+    72px calc(100% - 56px),
+    0 calc(100% - 56px),
+    0 0
+  );
+}
+/* dv-iframe-overlay: misma lógica que el modal — overlay afiliado libera zona de volumen */
+.dv-affiliate-overlay{
+  position:absolute;
+  inset:0;
+  z-index:7;
+  cursor:pointer;
+  background:transparent;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  overscroll-behavior:none;
+  /* Libera esquina inferior izquierda (72px × 56px) para volumen nativo de CB */
+  clip-path:polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    72px 100%,
+    72px calc(100% - 56px),
+    0 calc(100% - 56px),
+    0 0
+  );
+}
 
 /* Name & meta over hero */
 .modal-hero-info{
@@ -972,6 +1019,7 @@ header{
   max-height:92dvh;
   height:auto;
   overflow:hidden;
+  overflow-x:hidden;
   display:flex;
   flex-direction:column;
   touch-action:pan-y;
@@ -1029,18 +1077,18 @@ header{
   overscroll-behavior:none;
   scrolling:no;
 }
-/* Móvil ≤480px: top 36px + bot 114px = oculta header y controles CB */
+/* Móvil ≤480px: crop variables aplicadas desde :root — usa --cb-crop-top/bot
+   +17mm en inferior ya incluido en --cb-crop-bot: 178px */
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px;
-    height:calc(100% + 36px + 114px);
+    top:calc(-1 * var(--cb-crop-top));
+    height:calc(100% + var(--cb-crop-top) + var(--cb-crop-bot));
   }
 }
-/* Móvil pequeño (≤380px): igual que 480, bot reducido 106px */
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px;
-    height:calc(100% + 36px + 106px);
+    top:calc(-1 * var(--cb-crop-top));
+    height:calc(100% + var(--cb-crop-top) + var(--cb-crop-bot));
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
@@ -1480,7 +1528,8 @@ header{
   top:-36px;
   left:0; right:0;
   width:100%;
-  height:calc(100% + 36px + 114px);
+  /* Móvil: -2mm (8px) menos de video → dárselos al área de botones */
+  height:calc(100% + 36px + 106px);
   border:none; display:block;
   overflow:hidden;
   pointer-events:auto;
@@ -1488,16 +1537,16 @@ header{
   overscroll-behavior:none;
 }
 @media(max-width:380px){
-  .dv-frame{ height:calc(100% + 36px + 106px); }
+  .dv-frame{ height:calc(100% + 36px + 98px); }
 }
 
-/* DESKTOP: iframe 160% ancho (corta chat+sidebar) + crop top 44px + crop bot 106px */
+/* DESKTOP: mismo crop que modal — solo top+bot, sin sidebar que cortar en el embed */
 @media(orientation:landscape),(min-width:640px){
   .dv-frame{
-    top:-44px;                              /* oculta logo/barra CB arriba */
-    left:-30%;                              /* centra el video (corta sidebar izq + chat der) */
-    width:160%;                             /* más ancho que el panel */
-    height:calc(100% + 44px + 106px);      /* panel + header_top + controles_bot */
+    top:-44px;
+    left:0;
+    width:100%;
+    height:calc(100% + 44px + 106px);
   }
 }
 .dv-frame.audio-clickable{pointer-events:auto;}
@@ -1505,18 +1554,20 @@ header{
 /* ── Barra de acciones del panel — IDÉNTICA en panel A y B ── */
 .dv-panel-actions{
   flex-shrink:0;
+  /* +2mm (8px) extra compensando el recorte del área de video móvil */
   padding:.69rem .5rem;
   background:rgba(12,13,16,.9);
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
   width:100%;
   box-sizing:border-box;
+  min-height:42px;
 }
 @media(max-width:480px){
-  .dv-panel-actions{padding:.5rem .5rem;}
+  .dv-panel-actions{padding:.55rem .5rem;min-height:40px;}
 }
 @media(max-width:380px){
-  .dv-panel-actions{padding:.35rem .5rem;}
+  .dv-panel-actions{padding:.4rem .5rem;min-height:36px;}
 }
 .dv-cta{
   display:block;width:100%;box-sizing:border-box;min-width:0;
@@ -2394,6 +2445,8 @@ body.modal-open{overflow:hidden!important}
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
           allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
           allowFullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <!-- Overlay afiliado: cubre video, libera zona volumen CB (bottom-left 72×56px) -->
+        <div class="embed-affiliate-overlay" id="modal-affiliate-overlay" onclick="openActiveRoomAffiliate()"></div>
       </div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
@@ -2561,6 +2614,8 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <!-- Overlay afiliado — libera zona volumen CB bottom-left 72×56px -->
+          <div class="dv-affiliate-overlay" id="dv-overlay-a" onclick="window.open(document.getElementById('dv-link-a').href,'_blank','noopener')"></div>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
@@ -2577,6 +2632,8 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <!-- Overlay afiliado — libera zona volumen CB bottom-left 72×56px -->
+          <div class="dv-affiliate-overlay" id="dv-overlay-b" onclick="window.open(document.getElementById('dv-link-b').href,'_blank','noopener')"></div>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
