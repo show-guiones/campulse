@@ -819,7 +819,7 @@ header{
   --cb-crop-top: 44px;    /* Oculta header CB: logo + barra título (~37px real + margen) */
   --cb-crop-bot: 200px;   /* Móvil: oculta UI inferior completa de CB */
 }
-/* Desktop: crop manejado por JS dvScaler() */
+/* Desktop: crop via geometría CSS pura */
 @media(orientation:landscape),(min-width:640px){
   :root{ --cb-crop-top:0px; --cb-crop-bot:0px; }
 }
@@ -1326,12 +1326,13 @@ header{
     overflow:hidden;
     background:#000;
   }
-  /* El wrap llena absolutamente todo el panel */
+  /* El wrap llena todo el panel y CORTA todo lo que salga (la UI de CB) */
   .dv-embed-wrap{
     position:absolute;
     inset:0;
     width:100%;
     height:100%;
+    overflow:hidden;  /* ← CRÍTICO: recorta el iframe expandido */
   }
 
   /* Botón cerrar flotante — esquina superior izquierda para no chocar con swap-btn */
@@ -1498,14 +1499,23 @@ header{
 }
 .dv-embed-wrap.stream-ready::before{opacity:0;pointer-events:none}
 
-/* ── dv-frame: base para MÓVIL ── */
+/* ══════════════════════════════════════════════════════════
+   dv-frame: crop puro por geometría
+   El iframe es más grande que el panel en todas direcciones.
+   El overflow:hidden del dv-embed-wrap recorta la UI de CB.
+
+   MÓVIL: CB muestra video arriba + chat abajo → crop top+bot
+   DESKTOP: CB muestra 3 columnas → crop top+bot + offset izq
+   ══════════════════════════════════════════════════════════ */
+
+/* BASE — móvil portrait */
 .dv-frame{
   position:absolute;
   top:-36px;
-  left:0;right:0;
+  left:0; right:0;
   width:100%;
   height:calc(100% + 36px + 160px);
-  border:none;display:block;
+  border:none; display:block;
   overflow:hidden;
   pointer-events:auto;
   touch-action:none;
@@ -1514,13 +1524,14 @@ header{
 @media(max-width:380px){
   .dv-frame{ height:calc(100% + 36px + 140px); }
 }
-/* Desktop: el JS de dvScaler() aplica transform dinámico — no usar crop CSS */
+
+/* DESKTOP: iframe 160% ancho (corta chat+sidebar) + crop top 44px + crop bot 110px */
 @media(orientation:landscape),(min-width:640px){
   .dv-frame{
-    top:0; left:0;
-    width:100%; height:100%;
-    transform-origin: top left;
-    /* transform se aplica via JS */
+    top:-44px;                              /* oculta logo CB arriba */
+    left:-30%;                             /* centra el video (corta sidebar izq + chat der) */
+    width:160%;                            /* más ancho que el panel */
+    height:calc(100% + 44px + 110px);     /* panel + logo_top + barra_bot */
   }
 }
 .dv-frame.audio-clickable{pointer-events:auto;}
@@ -4106,94 +4117,6 @@ function openDvSlot(slot){
   if(!u) return;
   window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');
 }
-/* ═══════════════════════════════════════════════════════════
-   dvScaler: escala cada iframe de dual-view para que el VIDEO
-   de Chaturbate llene exactamente el panel, sin chat ni UI.
-
-   CB desktop renderiza así dentro del iframe:
-     ┌─────────────────────────────────────────────────┐
-     │  header (logo + título)  ~44px                  │
-     │  ┌──────┬─────────────────────┬──────────────┐  │
-     │  │stats │     VIDEO 16:9      │  CHAT        │  │
-     │  │~8%W  │     ~62%W           │  ~30%W       │  │
-     │  └──────┴─────────────────────┴──────────────┘  │
-     │  footer (tokens / send tip)  ~52px               │
-     └─────────────────────────────────────────────────┘
-
-   Estrategia:
-   1. Medir el panel (panelW × panelH)
-   2. El video dentro del iframe ocupa el 62% del ancho y
-      está centrado verticalmente entre header(44px) y footer(52px)
-   3. Calcular el scale necesario para que ese 62% × (H-96px)
-      llene el panel completo
-   4. Calcular el translate para centrar exactamente el video
-   5. Aplicar transform: scale(s) translate(tx, ty) al iframe
-═══════════════════════════════════════════════════════════ */
-let _dvScalerRaf = null;
-function dvScaler(){
-  const isDesktop = window.matchMedia('(orientation:landscape),(min-width:640px)').matches;
-  if(!isDesktop) return;
-
-  ['a','b'].forEach(slot => {
-    const panel = document.getElementById('dv-panel-' + slot);
-    const frame = document.getElementById('dv-frame-' + slot);
-    if(!panel || !frame) return;
-
-    const panelW = panel.offsetWidth;
-    const panelH = panel.offsetHeight;
-    if(!panelW || !panelH) return;
-
-    // Dimensiones conocidas del layout interno de CB (en píxeles del iframe)
-    // El iframe se carga a 100% del panel (panelW × panelH antes del transform)
-    // CB renderiza internamente a un viewport mínimo de ~1280px
-    // Aproximaciones medidas:
-    const CB_HEADER   = 44;   // px — logo + barra título CB
-    const CB_FOOTER   = 52;   // px — barra tokens / send tip
-    const CB_VIDEO_W  = 0.62; // fracción del ancho total del iframe
-    const CB_SIDEBAR  = 0.08; // fracción — stats/sidebar izquierdo
-
-    // Tamaño del video real dentro del iframe (en coordenadas del iframe)
-    const videoH = panelH - CB_HEADER - CB_FOOTER;
-    const videoW = panelW * CB_VIDEO_W;
-
-    // Scale necesario para que el video llene el panel
-    const scaleX = panelW / videoW;
-    const scaleY = panelH / videoH;
-    const scale  = Math.max(scaleX, scaleY); // cover: usar el mayor
-
-    // Offset del video dentro del iframe (esquina top-left del video)
-    const videoTop  = CB_HEADER;
-    const videoLeft = panelW * CB_SIDEBAR;
-
-    // Después de scale, el iframe tiene: panelW*scale × panelH*scale
-    // Queremos que el punto (videoLeft, videoTop) quede en (0,0) del panel
-    // transform-origin: top left
-    // translateX = -videoLeft, translateY = -videoTop (en coord del iframe)
-    // Pero scale ya se aplica desde top-left, entonces:
-    const tx = -videoLeft;
-    const ty = -videoTop;
-
-    frame.style.transformOrigin = 'top left';
-    frame.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-    frame.style.width  = panelW + 'px';
-    frame.style.height = panelH + 'px';
-    frame.style.top    = '0';
-    frame.style.left   = '0';
-  });
-}
-
-function dvScalerStart(){
-  dvScaler();
-  // Re-escalar si cambia el tamaño de la ventana
-  if(!window._dvResizeAttached){
-    window.addEventListener('resize', () => {
-      cancelAnimationFrame(_dvScalerRaf);
-      _dvScalerRaf = requestAnimationFrame(dvScaler);
-    });
-    window._dvResizeAttached = true;
-  }
-}
-
 function openDualView(uA,uB){
   _resetDvAudio();
   if(!uA||!uB)return;
@@ -4228,9 +4151,6 @@ function openDualView(uA,uB){
   if(wrapA) wrapA.classList.remove('stream-ready');
   if(wrapB) wrapB.classList.remove('stream-ready');
   if(bg) bg.style.display='flex';
-
-  // Escalar iframes desktop para que el video llene el panel
-  requestAnimationFrame(()=>{ dvScalerStart(); });
 
   // Cargar iframes — siempre silenciados primero, luego auto-activar si hay pref
   setTimeout(()=>{
@@ -4336,11 +4256,7 @@ function swapDualConfirm(slot, newUsername){
     frame.onload = null; // cancelar cualquier handler pendiente del slot anterior
     // Nueva sala siempre silenciada — el usuario debe presionar el botón para audio
     frame.src = `https://chaturbate.com/embed/${newUsername}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
-    frame.onload = ()=>{
-      frame.onload=null;
-      setTimeout(()=>{ if(wrapEl) wrapEl.classList.add('stream-ready'); }, 2500);
-      requestAnimationFrame(dvScaler); // re-escalar después del swap
-    };
+    frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrapEl) wrapEl.classList.add('stream-ready'); }, 2500); };
   }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
   if(linkEl){ linkEl.href = mkAffLink(newUsername); linkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
