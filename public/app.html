@@ -809,10 +809,19 @@ header{
   background:#fff;animation:pulse 1.2s infinite
 }
 
+/* ══════════════════════════════════════════════════════
+   VARIABLES GLOBALES — ÁREAS DE VIDEO
+   CB_CROP_TOP: altura de la barra superior de Chaturbate
+   que se oculta en todos los players (medida con QA:
+   36px exactos en todos los viewports desktop + móvil)
+══════════════════════════════════════════════════════ */
+:root{
+  --cb-crop-top: 36px;   /* Oculta header Chaturbate — QA validated */
+}
+
 /* ── EMBED EN VIVO ── */
 .embed-wrap{
   display:none;position:absolute;inset:0;z-index:5;
-  /* Sin background: el thumbnail de z-index:2 es visible durante carga */
   background:transparent;
 }
 .embed-wrap.active{display:block}
@@ -1005,20 +1014,32 @@ header{
 }
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
-  overflow:hidden;pointer-events:auto;touch-action:none;
+  overflow:hidden;
+  pointer-events:auto;touch-action:none;
   overscroll-behavior:none;
   background:#000;
 }
+/* ── Sala en vivo: recorta el header de Chaturbate por arriba.
+   Los controles de volumen (barra inferior) quedan 100% visibles.
+   Idéntico en desktop, tablet y móvil — var(--cb-crop-top) = 36px. ── */
 .mhero-v2 .embed-wrap .embed-frame{
-  /* Oculta solo la barra superior de Chaturbate (36px) — controles de volumen quedan visibles */
   position:absolute;
-  top:-36px;left:0;right:0;
-  width:100%;height:calc(100% + 36px);
+  top:calc(-1 * var(--cb-crop-top));
+  left:0;right:0;
+  width:100%;
+  height:calc(100% + var(--cb-crop-top));
   border:none;display:block;
   overflow:hidden;
   pointer-events:auto;
   touch-action:none;
   overscroll-behavior:none;
+}
+/* Móvil pequeño (≤380px): reducir crop a 28px para ganar altura útil */
+@media(max-width:380px){
+  .mhero-v2 .embed-wrap .embed-frame{
+    top:-28px;
+    height:calc(100% + 28px);
+  }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -1288,10 +1309,13 @@ header{
   font-size:.65rem;font-weight:700;color:#fff;backdrop-filter:blur(4px);
   pointer-events:none;
 }
-.dv-embed-wrap{flex:1;position:relative;background:#000;overflow:hidden;touch-action:none;overscroll-behavior:none;}
+.dv-embed-wrap{
+  flex:1;position:relative;background:#000;
+  overflow:hidden;
+  touch-action:none;overscroll-behavior:none;
+}
 /* Overlay dual-view — intercepta click y redirige con afiliado.
-   top:40px protege el label superior; clip-path excluye esquina inferior-izquierda
-/* Overlay dual-view: zona central para afiliado, deja libre top y bottom */
+   top:0; bottom:80px deja libre la barra de controles de Chaturbate */
 .dv-iframe-overlay{
   position:absolute;
   top:0;left:0;right:0;bottom:80px;
@@ -1326,10 +1350,47 @@ header{
   pointer-events:none;
 }
 .dv-embed-wrap.stream-ready::before{opacity:0;pointer-events:none}
-.dv-frame{position:absolute;top:-36px;left:0;right:0;width:100%;height:calc(100% + 36px);border:none;display:block;overflow:hidden;pointer-events:auto;touch-action:none;overscroll-behavior:none;}
-/* Cuando el overlay está desactivado para audio, el frame necesita recibir clicks */
+
+/* ── Salas múltiples: idéntico al player de sala en vivo.
+   Recorta header Chaturbate (var(--cb-crop-top) = 36px) por arriba.
+   Sin extensión inferior → controles de volumen visibles.
+   Sin scroll horizontal ni vertical en ningún viewport. ── */
+.dv-frame{
+  position:absolute;
+  top:calc(-1 * var(--cb-crop-top));
+  left:0;right:0;
+  width:100%;
+  height:calc(100% + var(--cb-crop-top));
+  border:none;display:block;
+  overflow:hidden;
+  pointer-events:auto;
+  touch-action:none;
+  overscroll-behavior:none;
+}
+/* Móvil pequeño (≤380px): mismo ajuste que sala en vivo */
+@media(max-width:380px){
+  .dv-frame{
+    top:-28px;
+    height:calc(100% + 28px);
+  }
+}
+/* Cuando el overlay está desactivado para audio */
 .dv-frame.audio-clickable{pointer-events:auto;}
-.dv-panel-actions{flex-shrink:0;padding:.69rem .5rem;background:rgba(12,13,16,.9);display:flex;align-items:center;justify-content:center;}
+
+/* ── Barra de acciones del panel ── */
+.dv-panel-actions{
+  flex-shrink:0;
+  padding:.69rem .5rem;  /* +3mm vs original .35rem */
+  background:rgba(12,13,16,.9);
+  display:flex;align-items:center;justify-content:center;
+}
+/* Móvil: reducir padding para ganar espacio de video */
+@media(max-width:480px){
+  .dv-panel-actions{padding:.5rem .5rem;}
+}
+@media(max-width:380px){
+  .dv-panel-actions{padding:.35rem .5rem;}
+}
 .dv-cta{
   display:block;width:100%;
   background:var(--hot);color:#fff;border:none;border-radius:8px;
