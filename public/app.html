@@ -1004,16 +1004,18 @@ header{
 }
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
-  overflow:hidden;pointer-events:auto;touch-action:auto;
+  overflow:hidden;pointer-events:auto;touch-action:none;
+  overscroll-behavior:none;
   background:#000;
 }
 .mhero-v2 .embed-wrap .embed-frame{
-  /* Desplazamos el iframe -28px arriba para ocultar la banda de título de Chaturbate.
-     Compensamos con height +28px para que el video llene hacia abajo. */
+  /* Sala en vivo: sube 39px (28+11) para ocultar la banda superior de Chaturbate (+3mm).
+     Compensa con height +103px (39 base + 64px extra inferior = +17mm más de video abajo). */
   position:absolute;
-  top:-28px;left:0;right:0;
-  width:100%;height:calc(100% + 28px);
+  top:-39px;left:0;right:0;
+  width:100%;height:calc(100% + 103px);
   border:none;display:block;
+  overflow:hidden;
   pointer-events:auto;
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
@@ -1270,7 +1272,7 @@ header{
   backdrop-filter:blur(4px);transition:background .15s;
 }
 .dv-swap-btn:hover{background:var(--hot)}
-.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden}
+.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
 }
@@ -1283,7 +1285,7 @@ header{
   font-size:.65rem;font-weight:700;color:#fff;backdrop-filter:blur(4px);
   pointer-events:none;
 }
-.dv-embed-wrap{flex:1;position:relative;background:#000;overflow:hidden;touch-action:auto;}
+.dv-embed-wrap{flex:1;position:relative;background:#000;overflow:hidden;touch-action:none;overscroll-behavior:none;}
 /* Overlay dual-view — intercepta click y redirige con afiliado.
    top:40px protege el label superior; clip-path excluye esquina inferior-izquierda
 /* Overlay dual-view: zona central para afiliado, deja libre top y bottom */
@@ -1319,7 +1321,7 @@ header{
   pointer-events:none;
 }
 .dv-embed-wrap.stream-ready::before{opacity:0;pointer-events:none}
-.dv-frame{position:absolute;top:-28px;left:0;right:0;width:100%;height:calc(100% + 28px);border:none;display:block;overflow:hidden;pointer-events:auto;touch-action:auto;}
+.dv-frame{position:absolute;top:-39px;left:0;right:0;width:100%;height:calc(100% + 31px);border:none;display:block;overflow:hidden;pointer-events:auto;touch-action:auto;}
 /* Cuando el overlay está desactivado para audio, el frame necesita recibir clicks */
 .dv-frame.audio-clickable{pointer-events:auto;}
 .dv-panel-actions{flex-shrink:0;padding:.35rem .5rem;background:rgba(12,13,16,.9)}
