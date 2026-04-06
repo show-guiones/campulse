@@ -856,6 +856,7 @@ header{
   position:absolute;top:0;left:0;right:0;bottom:80px;z-index:9;
   cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;touch-action:none;
+  overscroll-behavior:none;
 }
 /* Botón de audio: position:fixed para escapar de TODOS los overflow:hidden del árbol.
    Se posiciona dinámicamente via JS (_positionAudioBtn) sobre el borde inferior del hero. */
@@ -1009,14 +1010,14 @@ header{
   background:#000;
 }
 .mhero-v2 .embed-wrap .embed-frame{
-  /* Sala en vivo: sube 39px (28+11) para ocultar la banda superior de Chaturbate (+3mm).
-     Compensa con height +103px (39 base + 64px extra inferior = +17mm más de video abajo). */
+  /* Igual que .dv-frame: top -39px oculta banda superior, height +20px igual que salas múltiples */
   position:absolute;
   top:-39px;left:0;right:0;
-  width:100%;height:calc(100% + 114px);
+  width:100%;height:calc(100% + 20px);
   border:none;display:block;
   overflow:hidden;
   pointer-events:auto;
+  touch-action:none;
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -1253,8 +1254,9 @@ header{
 .dual-view-bg{
   position:fixed;inset:0;z-index:700;
   background:#000;display:flex;flex-direction:column;
+  overflow:hidden;overscroll-behavior:none;touch-action:none;
 }
-.dual-view{width:100%;height:100%;display:flex;flex-direction:column}
+.dual-view{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;}
 .dv-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:.5rem .75rem;background:rgba(12,13,16,.95);
@@ -1262,7 +1264,7 @@ header{
 }
 .dv-title{font-size:.82rem;font-weight:700;color:var(--txt)}
 .dv-close{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.75rem;font-weight:600;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.dv-panels{display:flex;flex:1;overflow:hidden;gap:2px;background:rgba(255,255,255,.06)}
+.dv-panels{display:flex;flex:1;overflow:hidden;gap:2px;background:rgba(255,255,255,.06);overscroll-behavior:none;touch-action:none;}
 /* Mobile: vertical stack */
 .dv-swap-btn{
   position:absolute;top:.4rem;right:.5rem;z-index:15;
@@ -1294,6 +1296,8 @@ header{
   top:0;left:0;right:0;bottom:80px;
   z-index:5;cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;
+  touch-action:none;
+  overscroll-behavior:none;
 }
 /* Botón de audio por panel — grande y claro */
 .dv-audio-btn{
@@ -1321,7 +1325,7 @@ header{
   pointer-events:none;
 }
 .dv-embed-wrap.stream-ready::before{opacity:0;pointer-events:none}
-.dv-frame{position:absolute;top:-39px;left:0;right:0;width:100%;height:calc(100% + 20px);border:none;display:block;overflow:hidden;pointer-events:auto;touch-action:auto;}
+.dv-frame{position:absolute;top:-39px;left:0;right:0;width:100%;height:calc(100% + 20px);border:none;display:block;overflow:hidden;pointer-events:auto;touch-action:none;}
 /* Cuando el overlay está desactivado para audio, el frame necesita recibir clicks */
 .dv-frame.audio-clickable{pointer-events:auto;}
 .dv-panel-actions{flex-shrink:0;padding:.35rem .5rem;background:rgba(12,13,16,.9)}
@@ -2200,7 +2204,7 @@ body.modal-open{overflow:hidden!important}
         </div>
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
           allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
-          allowFullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+          allowFullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
         <!-- Intercepta clicks en el iframe — abre sala con params de afiliado -->
         <div class="embed-click-overlay" id="embed-click-overlay" onclick="openActiveRoomAffiliate()"></div>
       </div>
@@ -2367,6 +2371,7 @@ body.modal-open{overflow:hidden!important}
         <div class="dv-embed-wrap">
           <iframe id="dv-frame-a" class="dv-frame" src="about:blank"
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
+            scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
           
@@ -2382,6 +2387,7 @@ body.modal-open{overflow:hidden!important}
         <div class="dv-embed-wrap">
           <iframe id="dv-frame-b" class="dv-frame" src="about:blank"
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
+            scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
           
