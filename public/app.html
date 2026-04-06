@@ -830,11 +830,33 @@ header{
 @media(max-width:380px){
   :root{ --cb-crop-top:36px; --cb-crop-bot:170px; }
 }
-/* Desktop: header 44px + barra inferior 110px (medición exacta: 87px + buffer 23px) */
+/* Desktop: header 44px + barra inferior 110px (medición exacta F12: 04/06/2026) */
 @media(orientation:landscape),(min-width:640px){
   :root{
     --cb-crop-top: 44px;
     --cb-crop-bot: 110px;
+  }
+}
+/* ── PATCH F12 04/06/2026 ── Modal web: forzar crop correcto del iframe ── */
+@media(orientation:landscape),(min-width:640px){
+  .mhero-v2 .embed-wrap .embed-frame{
+    top:-44px!important;
+    left:0!important;width:100%!important;
+    height:calc(100% + 44px + 110px)!important;
+  }
+}
+/* ── PATCH F12 04/06/2026 ── Modal móvil: forzar crop correcto (top era +19px) ── */
+@media(max-width:639px) and (orientation:portrait){
+  .mhero-v2 .embed-wrap .embed-frame{
+    top:-36px!important;
+    left:0!important;width:100%!important;
+    height:calc(100% + 36px + 178px)!important;
+  }
+}
+@media(max-width:380px) and (orientation:portrait){
+  .mhero-v2 .embed-wrap .embed-frame{
+    top:-36px!important;
+    height:calc(100% + 36px + 170px)!important;
   }
 }
 
@@ -884,10 +906,12 @@ header{
 }
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
 /* ═══ OVERLAY AFILIADO MODAL — libera zona de volumen nativo ═══ */
+/* WEB: crop-bot=110px oculta el volumen CB → overlay cubre 100% del embed-wrap */
+/* MÓVIL: bottom:56px libera zona de volumen CB (medición real: 169px=225−56 ✅) */
 .embed-affiliate-overlay{
   position:absolute;
   top:0; left:0; right:0;
-  bottom:56px; /* deja libre zona de volumen CB (bottom 56px) */
+  bottom:56px; /* móvil: libera zona volumen CB */
   z-index:7;
   cursor:pointer;
   background:transparent;
@@ -895,6 +919,16 @@ header{
   touch-action:manipulation;
   overscroll-behavior:none;
   clip-path:polygon(72px 0,100% 0,100% 100%,72px 100%,72px 0);
+}
+/* Desktop: volumen CB ya oculto por crop-bot=110px → cubre 100% */
+@media(orientation:landscape),(min-width:640px){
+  .embed-affiliate-overlay{
+    bottom:0!important;
+    clip-path:none!important;
+  }
+  .embed-affiliate-overlay-left{
+    display:none!important;
+  }
 }
 .embed-affiliate-overlay-left{
   position:absolute;
@@ -1336,26 +1370,14 @@ header{
   /* Ocultar header interno del dual-view */
   .dv-header{ display:none; }
 
-  /* Ocultar barra de acciones — el botón CTA flota sobre el video */
-  .dv-panel-actions{ display:none; }
-
-  /* Los panels ocupan el 100% del dual-view-bg sin nada que los recorte */
+  /* FIX medición 04/06/26: panel-actions restaba 48px al embed-wrap */
+  .dv-panel-actions{ display:none!important; }
   .dv-panels{ height:100%; }
-
-  /* Cada panel: mitad exacta de pantalla, corta todo lo que salga */
-  .dv-panel{
-    flex:1;
-    position:relative;
-    overflow:hidden;
-    background:#000;
-  }
-  /* El wrap llena todo el panel y CORTA todo lo que salga (la UI de CB) */
+  .dv-panel{ flex:1;position:relative;overflow:hidden;background:#000; }
+  /* embed-wrap ocupa el panel completo (641px sin actions) */
   .dv-embed-wrap{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;  /* ← CRÍTICO: recorta el iframe expandido */
+    position:absolute!important;inset:0!important;
+    width:100%!important;height:100%!important;overflow:hidden!important;
   }
 
   /* Botón cerrar flotante — esquina superior izquierda para no chocar con swap-btn */
@@ -1548,14 +1570,15 @@ header{
    DESKTOP: CB embed 3 col → crop top 44px + bot 106px + offset lateral
    ══════════════════════════════════════════════════════════ */
 
-/* BASE — móvil portrait: top 36px (header CB) + bot 114px (controles CB) */
+/* BASE — móvil portrait: top −36px | embed-wrap=259px → frame=259+36+106=401px ✅
+   FIX6: position:absolute relativo a dv-embed-wrap (position:relative)
+   FIX5: top=−36px corrige el bug de top=−2px (frame-a) y top=+259px (frame-b) */
 .dv-frame{
   position:absolute;
   top:-36px;
   left:0; right:0;
   width:100%;
-  /* Móvil: top 36px + bot 106px (8px menos para dárselos al botón, equiv -2mm) */
-  height:calc(100% + 36px + 106px);
+  height:calc(100% + 36px + 106px); /* 259+36+106=401px medición real ✅ */
   border:none; display:block;
   overflow:hidden;
   pointer-events:auto;
@@ -1566,15 +1589,35 @@ header{
   .dv-frame{ height:calc(100% + 36px + 98px); }
 }
 
-/* DESKTOP: crop solo arriba (44px header) y abajo (110px tokens+tips bar)
-   El embed /embed/ NO tiene sidebar — width:100% es correcto */
+/* DESKTOP: embed-wrap=641px (sin actions) → frame=641+44+110=795px
+   FIX3+desktop: recalculado para el panel completo */
 @media(orientation:landscape),(min-width:640px){
   .dv-frame{
-    top:-44px;
-    left:0;
-    width:100%;
-    height:calc(100% + 44px + 110px);
+    top:-44px!important;
+    left:0!important;
+    width:100%!important;
+    height:calc(100% + 44px + 110px)!important;
   }
+}
+
+/* MÓVIL — forzar posición correcta (gana sobre cualquier cascada) */
+@media(max-width:639px) and (orientation:portrait){
+  .dv-frame{
+    position:absolute!important;
+    top:-36px!important;
+    left:0!important;right:0!important;width:100%!important;
+    height:calc(100% + 36px + 106px)!important;
+    border:none!important;display:block!important;
+    overflow:hidden!important;pointer-events:auto!important;
+  }
+}
+@media(max-width:380px) and (orientation:portrait){
+  .dv-frame{ height:calc(100% + 36px + 98px)!important; }
+}
+
+/* móvil: dv-embed-wrap DEBE ser position:relative para que el frame sea relativo a él */
+@media(max-width:639px) and (orientation:portrait){
+  .dv-embed-wrap{ position:relative!important; overflow:hidden!important; }
 }
 .dv-frame.audio-clickable{pointer-events:auto;}
 
