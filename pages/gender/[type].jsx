@@ -1,112 +1,62 @@
-// pages/gender/[type].jsx
-// SEO mejorado: título con viewers del top modelo, descripción menciona top 2
+// pages/gender/[type].jsx — Redesign con design system app.html
 
 import Head from "next/head";
+import { DS_CSS, Logo } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
-const SUPPORTED_GENDERS = ["female", "male", "couple", "trans"];
-const GENDER_DB_MAP = { female: "f", male: "m", couple: "c", trans: "t" };
+const SUPPORTED_GENDERS = ["female","male","couple","trans"];
+const GENDER_DB_MAP = { female:"f",male:"m",couple:"c",trans:"t" };
 
 const GENDER_INFO = {
-  female: { name: "Chicas",  nameEs: "Mujeres",  emoji: "♀", keywords: "chicas chaturbate, modelos femeninas chaturbate, webcam chicas" },
-  male:   { name: "Chicos",  nameEs: "Hombres",  emoji: "♂", keywords: "chicos chaturbate, modelos masculinos chaturbate, webcam hombres" },
-  couple: { name: "Parejas", nameEs: "Parejas",  emoji: "♥", keywords: "parejas chaturbate, couples chaturbate, webcam parejas" },
-  trans:  { name: "Trans",   nameEs: "Trans",    emoji: "⚧", keywords: "trans chaturbate, modelos trans chaturbate, webcam trans" },
+  female:{ name:"Chicas",nameEs:"Mujeres",emoji:"♀️",keywords:"chicas chaturbate, modelos femeninas chaturbate, webcam chicas",accent:"var(--female)" },
+  male:{   name:"Chicos",nameEs:"Hombres",emoji:"♂️",keywords:"chicos chaturbate, modelos masculinos chaturbate, webcam hombres",accent:"var(--male)" },
+  couple:{ name:"Parejas",nameEs:"Parejas",emoji:"👫",keywords:"parejas chaturbate, couples chaturbate, webcam parejas",accent:"var(--couple)" },
+  trans:{  name:"Trans",nameEs:"Trans",emoji:"⚧️",keywords:"trans chaturbate, modelos trans chaturbate, webcam trans",accent:"var(--trans)" },
 };
 
 const COUNTRY_NAMES = {
-  CO: "Colombia", MX: "México", AR: "Argentina", CL: "Chile",
-  PE: "Perú", VE: "Venezuela", EC: "Ecuador", US: "Estados Unidos",
-  ES: "España", BR: "Brasil", RO: "Rumania", RU: "Rusia",
-  DE: "Alemania", FR: "Francia", GB: "Reino Unido", IT: "Italia",
-  UA: "Ucrania", PH: "Filipinas", TH: "Tailandia", CA: "Canadá",
-  AU: "Australia", NL: "Países Bajos", TR: "Turquía", HU: "Hungría",
-  PL: "Polonia", CZ: "República Checa", SE: "Suecia",
+  CO:"Colombia",MX:"México",AR:"Argentina",CL:"Chile",PE:"Perú",VE:"Venezuela",EC:"Ecuador",
+  US:"Estados Unidos",ES:"España",BR:"Brasil",RO:"Rumania",RU:"Rusia",DE:"Alemania",FR:"Francia",
+  GB:"Reino Unido",IT:"Italia",UA:"Ucrania",PH:"Filipinas",TH:"Tailandia",CA:"Canadá",
+  AU:"Australia",NL:"Países Bajos",TR:"Turquía",HU:"Hungría",PL:"Polonia",CZ:"República Checa",SE:"Suecia",
 };
 
 export async function getServerSideProps({ params }) {
   const type = params.type.toLowerCase();
-  if (!SUPPORTED_GENDERS.includes(type)) return { notFound: true };
-
+  if (!SUPPORTED_GENDERS.includes(type)) return { notFound:true };
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  if (!SUPABASE_URL || !SUPABASE_KEY) return { notFound: true };
-
+  if (!SUPABASE_URL||!SUPABASE_KEY) return { notFound:true };
   try {
     const dbGender = GENDER_DB_MAP[type];
-    const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-
-    const url =
-      `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
-      `?captured_at=gte.${since}` +
-      `&gender=eq.${dbGender}` +
-      `&select=username,num_users,num_followers,display_name,country` +
-      `&order=captured_at.desc&limit=10000`;
-
-    const r = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
-    });
-
-    if (!r.ok) return { notFound: true };
+    const since = new Date(Date.now()-14*24*60*60*1000).toISOString();
+    const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&gender=eq.${dbGender}&select=username,num_users,num_followers,display_name,country&order=captured_at.desc&limit=10000`;
+    const r = await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
+    if (!r.ok) return { notFound:true };
     const rows = await r.json();
-    if (!Array.isArray(rows) || rows.length === 0) return { notFound: true };
-
+    if (!Array.isArray(rows)||rows.length===0) return { notFound:true };
     const map = {};
     for (const row of rows) {
-      const u = row.username;
-      if (!u) continue;
-      if (!map[u]) {
-        map[u] = {
-          username: u,
-          display_name: row.display_name || u,
-          country: row.country || "",
-          total_viewers: 0,
-          snapshots: 0,
-          max_followers: 0,
-        };
-      }
-      map[u].total_viewers += row.num_users ?? 0;
-      map[u].snapshots += 1;
-      if ((row.num_followers ?? 0) > map[u].max_followers) {
-        map[u].max_followers = row.num_followers ?? 0;
-      }
+      const u = row.username; if (!u) continue;
+      if (!map[u]) map[u]={username:u,display_name:row.display_name||u,country:row.country||"",total_viewers:0,snapshots:0,max_followers:0};
+      map[u].total_viewers+=row.num_users??0;
+      map[u].snapshots+=1;
+      if ((row.num_followers??0)>map[u].max_followers) map[u].max_followers=row.num_followers??0;
     }
-
-    const models = Object.values(map)
-      .filter((m) => m.snapshots >= 1)
-      .map((m) => ({
-        username: m.username,
-        display_name: m.display_name,
-        country: m.country,
-        avg_viewers: Math.round(m.total_viewers / m.snapshots),
-        max_followers: m.max_followers,
-      }))
-      .sort((a, b) => b.avg_viewers - a.avg_viewers)
-      .slice(0, 50);
-
-    if (models.length === 0) return { notFound: true };
-
-    const data = { gender: type, ...GENDER_INFO[type], models };
-    return { props: { data } };
-  } catch {
-    return { notFound: true };
-  }
+    const models = Object.values(map).filter(m=>m.snapshots>=1).map(m=>({username:m.username,display_name:m.display_name,country:m.country,avg_viewers:Math.round(m.total_viewers/m.snapshots),max_followers:m.max_followers})).sort((a,b)=>b.avg_viewers-a.avg_viewers).slice(0,50);
+    if (models.length===0) return { notFound:true };
+    return { props:{ data:{ gender:type,...GENDER_INFO[type],models } } };
+  } catch { return { notFound:true }; }
 }
 
 export default function GenderTypePage({ data }) {
-  const { gender, name, nameEs, emoji, keywords, models } = data;
+  const { gender,name,nameEs,emoji,keywords,accent,models } = data;
   const top = models[0];
   const second = models[1];
 
-  // Título: incluye emoji de género + viewers del top modelo
   const pageTitle = top
     ? `${emoji} ${name} en Chaturbate — ${top.display_name} con ${top.avg_viewers.toLocaleString("es")} viewers | Campulse`
     : `${name} en Chaturbate — Top ${models.length} | Campulse`;
-
-  // Descripción: menciona top 2 modelos
   const pageDescription =
     `Las ${models.length} mejores ${nameEs.toLowerCase()} de Chaturbate ordenadas por viewers. ` +
     (top ? `${top.display_name} lidera con ${top.avg_viewers.toLocaleString("es")} viewers promedio` : "") +
@@ -114,133 +64,106 @@ export default function GenderTypePage({ data }) {
     `Datos actualizados cada 2 horas en Campulse.`;
 
   const schema = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: pageTitle,
-    description: pageDescription,
-    url: `${SITE}/gender/${gender}`,
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Campulse", item: SITE },
-        { "@type": "ListItem", position: 2, name: "Géneros", item: `${SITE}/gender` },
-        { "@type": "ListItem", position: 3, name, item: `${SITE}/gender/${gender}` },
-      ],
-    },
-    hasPart: models.slice(0, 10).map((m) => ({
-      "@type": "WebPage",
-      name: `${m.display_name || m.username} Stats — Campulse`,
-      url: `${SITE}/model/${m.username}`,
-    })),
+    "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/gender/${gender}`,
+    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"Campulse",item:SITE},{"@type":"ListItem",position:2,name:"Géneros",item:`${SITE}/gender`},{"@type":"ListItem",position:3,name,item:`${SITE}/gender/${gender}`}]},
+    hasPart:models.slice(0,10).map(m=>({"@type":"WebPage",name:`${m.display_name||m.username} Stats — Campulse`,url:`${SITE}/model/${m.username}`})),
   };
 
   return (
     <>
       <Head>
         <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="keywords" content={keywords} />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href={`${SITE}/gender/${gender}`} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={`${SITE}/gender/${gender}`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Campulse" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+        <meta name="description" content={pageDescription}/>
+        <meta name="keywords" content={keywords}/>
+        <meta name="robots" content="index, follow"/>
+        <link rel="canonical" href={`${SITE}/gender/${gender}`}/>
+        <meta property="og:title" content={pageTitle}/>
+        <meta property="og:description" content={pageDescription}/>
+        <meta property="og:url" content={`${SITE}/gender/${gender}`}/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:site_name" content="Campulse"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}}/>
+        <style>{DS_CSS}</style>
       </Head>
 
-      <main style={styles.main}>
-        <nav style={styles.breadcrumbs}>
-          <a href="/" style={styles.link}>Campulse</a>
-          <span style={styles.sep}> › </span>
-          <a href="/gender" style={styles.link}>Géneros</a>
-          <span style={styles.sep}> › </span>
-          <span>{name}</span>
+      <div className="cmp-page">
+        <nav className="cmp-nav">
+          <Logo/>
+          <div className="cmp-nav-links">
+            <a href="/gender" className="cmp-nav-link">Géneros</a>
+            <a href="/country" className="cmp-nav-link">Países</a>
+            <a href="/search" className="cmp-nav-link">Buscar</a>
+          </div>
         </nav>
 
-        <h1 style={styles.h1}>{emoji} {name} en Chaturbate</h1>
-        <p style={styles.subtitle}>
-          Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio en los últimos 14 días.
-        </p>
+        <nav className="cmp-bc">
+          <a href="/">Campulse</a>
+          <span className="cmp-bc-sep">›</span>
+          <a href="/gender">Géneros</a>
+          <span className="cmp-bc-sep">›</span>
+          <span style={{color:"var(--txt2)"}}>{emoji} {name}</span>
+        </nav>
 
-        <div style={styles.list}>
-          {models.map((m, i) => (
-            <a key={m.username} href={`/model/${m.username}`} style={styles.row}>
-              <span style={styles.rank}>#{i + 1}</span>
-              <div style={styles.info}>
-                <div style={styles.username}>{m.display_name || m.username}</div>
-                <div style={styles.meta}>
-                  @{m.username}
-                  {m.country && (
-                    <>
-                      <span style={styles.dot}>·</span>
-                      <img
-                        src={`https://flagcdn.com/16x12/${m.country.toLowerCase()}.png`}
-                        alt={COUNTRY_NAMES[m.country] || m.country}
-                        width={16} height={12}
-                        style={{ borderRadius: 2, verticalAlign: "middle", marginRight: 4 }}
-                      />
-                      {COUNTRY_NAMES[m.country] || m.country}
-                    </>
-                  )}
-                </div>
-              </div>
-              <div style={styles.stats}>
-                <div style={styles.statMain}>
-                  {m.avg_viewers.toLocaleString("es")} <span style={styles.statLabel}>viewers</span>
-                </div>
-                {m.max_followers > 0 && (
-                  <div style={styles.statSub}>{m.max_followers.toLocaleString("es")} seguidores</div>
-                )}
-              </div>
-            </a>
-          ))}
+        <div className="cmp-page-header">
+          <h1 className="cmp-page-h1">{emoji} {name} en Chaturbate</h1>
+          <p className="cmp-page-sub">Top {models.length} {nameEs.toLowerCase()} ordenadas por viewers promedio · últimos 14 días</p>
         </div>
 
-        <section style={styles.seoText}>
-          <h2 style={styles.h2}>{name} en Chaturbate</h2>
-          <p>
-            Campulse rastrea en tiempo real las estadísticas de las {nameEs.toLowerCase()} de
-            Chaturbate. Los datos se actualizan cada 2 horas con el número de viewers,
-            seguidores y los mejores horarios para cada modelo.
+        {/* Affiliate CTA */}
+        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=lexy_fox2`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
+          🔴 Ver {name} en vivo ahora →
+        </a>
+
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {models.map((m,i)=>{
+            const medal = i===0?"cmp-rank-1":i===1?"cmp-rank-2":i===2?"cmp-rank-3":"";
+            return (
+              <a key={m.username} href={`/model/${m.username}`}
+                style={{display:"flex",alignItems:"center",gap:16,background:"var(--surf)",borderRadius:"var(--radius)",padding:"14px 18px",border:"1px solid var(--bdr)",transition:"border-color .2s,background .15s",textDecoration:"none"}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(56,182,212,.3)";e.currentTarget.style.background="rgba(56,182,212,.04)"}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor="var(--bdr)";e.currentTarget.style.background="var(--surf)"}}>
+                <span className={`cmp-rank ${medal}`}>#{i+1}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:700,fontSize:".9375rem",color:"var(--txt)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.display_name||m.username}</div>
+                  <div style={{fontSize:".75rem",color:"var(--txt3)",marginTop:2,display:"flex",alignItems:"center",gap:6}}>
+                    <span>@{m.username}</span>
+                    {m.country && (<>
+                      <span>·</span>
+                      <img src={`https://flagcdn.com/16x12/${m.country.toLowerCase()}.png`} alt={COUNTRY_NAMES[m.country]||m.country} width={16} height={12} style={{borderRadius:2,verticalAlign:"middle",display:"inline"}}/>
+                      <span>{COUNTRY_NAMES[m.country]||m.country}</span>
+                    </>)}
+                  </div>
+                </div>
+                <div style={{textAlign:"right",flexShrink:0}}>
+                  <div style={{fontWeight:700,color:"var(--neon)",fontSize:"1rem"}}>{m.avg_viewers.toLocaleString("es")} <span style={{fontSize:".7rem",color:"var(--txt3)",fontWeight:400}}>avg</span></div>
+                  {m.max_followers>0 && <div style={{fontSize:".75rem",color:"var(--txt3)",marginTop:2}}>{m.max_followers.toLocaleString("es")} seg.</div>}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+        <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
+          <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>{name} en Chaturbate</h2>
+          <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7,marginBottom:".75rem"}}>
+            Campulse rastrea en tiempo real las estadísticas de las {nameEs.toLowerCase()} de Chaturbate.
+            Los datos se actualizan cada 2 horas con el número de viewers, seguidores y los mejores horarios.
           </p>
           {top && (
-            <p>
-              Actualmente, <strong>{top.display_name || top.username}</strong> lidera con{" "}
-              <strong>{top.avg_viewers.toLocaleString("es")} viewers promedio</strong>
-              {top.max_followers > 0 ? ` y ${top.max_followers.toLocaleString("es")} seguidores.` : "."}
+            <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7}}>
+              Actualmente, <strong style={{color:"var(--txt)"}}>{top.display_name||top.username}</strong> lidera con <strong style={{color:"var(--neon)"}}>{top.avg_viewers.toLocaleString("es")} viewers promedio</strong>{top.max_followers>0?` y ${top.max_followers.toLocaleString("es")} seguidores.`:"."} 
             </p>
           )}
-          <p style={{ marginTop: 16 }}>
-            <a href="/gender" style={styles.link}>← Ver todos los géneros</a>
-            <span style={styles.sep}> · </span>
-            <a href="/country" style={styles.link}>Ver por país →</a>
-          </p>
         </section>
-      </main>
+
+        <div className="cmp-footer-links">
+          <a href="/gender" className="cmp-footer-link">← Ver todos los géneros</a>
+          <a href="/country" className="cmp-footer-link">Ver por país →</a>
+        </div>
+      </div>
     </>
   );
 }
-
-const styles = {
-  main: { fontFamily: "sans-serif", maxWidth: 800, margin: "0 auto", padding: "2rem 1rem", background: "#0d0d0d", minHeight: "100vh", color: "#f0f0f0" },
-  breadcrumbs: { fontSize: 13, color: "#888", marginBottom: 16 },
-  link: { color: "#a78bfa", textDecoration: "none" },
-  sep: { color: "#555", margin: "0 4px" },
-  h1: { fontSize: 28, marginTop: 8, marginBottom: 8 },
-  h2: { fontSize: 18, marginBottom: 12, color: "#ccc" },
-  subtitle: { color: "#888", fontSize: 14, marginBottom: 28 },
-  list: { display: "flex", flexDirection: "column", gap: 8 },
-  row: { display: "flex", alignItems: "center", gap: 16, background: "#1a1a2e", borderRadius: 10, padding: "14px 18px", textDecoration: "none", color: "#f0f0f0" },
-  rank: { fontSize: 13, color: "#555", width: 28, flexShrink: 0 },
-  info: { flex: 1 },
-  username: { fontWeight: 700, fontSize: 15 },
-  meta: { fontSize: 12, color: "#666", marginTop: 3, display: "flex", alignItems: "center", gap: 4 },
-  dot: { color: "#444" },
-  stats: { textAlign: "right" },
-  statMain: { fontWeight: 700, color: "#a78bfa", fontSize: 16 },
-  statLabel: { fontSize: 11, color: "#888", fontWeight: 400 },
-  statSub: { fontSize: 11, color: "#666", marginTop: 2 },
-  seoText: { marginTop: 48, padding: "24px", background: "#111", borderRadius: 12, color: "#aaa", fontSize: 14, lineHeight: 1.7 },
-};
