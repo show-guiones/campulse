@@ -1010,14 +1010,15 @@ header{
   background:#000;
 }
 .mhero-v2 .embed-wrap .embed-frame{
-  /* Igual que .dv-frame: top -39px oculta banda superior, height +20px igual que salas múltiples */
+  /* Oculta solo la barra superior de Chaturbate (36px) — controles de volumen quedan visibles */
   position:absolute;
-  top:-39px;left:0;right:0;
-  width:100%;height:calc(100% + 20px);
+  top:-36px;left:0;right:0;
+  width:100%;height:calc(100% + 36px);
   border:none;display:block;
   overflow:hidden;
   pointer-events:auto;
   touch-action:none;
+  overscroll-behavior:none;
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -1325,7 +1326,7 @@ header{
   pointer-events:none;
 }
 .dv-embed-wrap.stream-ready::before{opacity:0;pointer-events:none}
-.dv-frame{position:absolute;top:-39px;left:0;right:0;width:100%;height:calc(100% + 20px);border:none;display:block;overflow:hidden;pointer-events:auto;touch-action:none;}
+.dv-frame{position:absolute;top:-36px;left:0;right:0;width:100%;height:calc(100% + 36px);border:none;display:block;overflow:hidden;pointer-events:auto;touch-action:none;overscroll-behavior:none;}
 /* Cuando el overlay está desactivado para audio, el frame necesita recibir clicks */
 .dv-frame.audio-clickable{pointer-events:auto;}
 .dv-panel-actions{flex-shrink:0;padding:.35rem .5rem;background:rgba(12,13,16,.9)}
