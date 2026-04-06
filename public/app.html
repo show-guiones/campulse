@@ -816,8 +816,8 @@ header{
    36px exactos en todos los viewports desktop + móvil)
 ══════════════════════════════════════════════════════ */
 :root{
-  --cb-crop-top: 44px;    /* Oculta header Chaturbate (logo hasta 37px real + margen) */
-  --cb-crop-bot: 134px;   /* Oculta UI inferior: chat, tokens, Send Tip (+17mm = 64px extra) */
+  --cb-crop-top: 44px;    /* Oculta header Chaturbate (logo + barra de título ~37px real) */
+  --cb-crop-bot: 200px;   /* Oculta UI inferior completa: chat, tokens, Send Tip, controles */
 }
 
 /* ── EMBED EN VIVO ── */
@@ -1022,9 +1022,9 @@ header{
   background:#000;
 }
 /* ── Sala en vivo: recorta el header de Chaturbate por arriba (44px)
-   y oculta la UI inferior — chat, tokens, Send Tip (134px = 70px base + 17mm extra).
-   Móvil: +17mm adicionales en el crop inferior de la sala en vivo (primera sala).
-   Sin scroll horizontal ni vertical en ningún viewport. ── */
+   y oculta la barra de controles inferior (48px). Con aspect-ratio:16/9
+   el contenedor ya no incluye el chat ni tokens — solo el video puro.
+   Móvil sin aspect-ratio: crop bot mayor para ocultar UI completa de CB. ── */
 .mhero-v2 .embed-wrap .embed-frame{
   position:absolute;
   top:calc(-1 * var(--cb-crop-top));
@@ -1315,10 +1315,28 @@ header{
   /* Los panels ocupan el 100% del dual-view-bg sin nada que los recorte */
   .dv-panels{ height:100%; }
 
-  /* Botón cerrar flotante — esquina superior derecha del dual-view-bg */
+  /* Cada panel llena su mitad horizontal — el embed-wrap llena todo el panel */
+  .dv-panel{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    background:#000;
+  }
+  /* El embed-wrap llena ABSOLUTAMENTE todo el panel — sin aspect-ratio.
+     El crop se hace expandiendo el iframe hacia afuera (overflow:hidden del panel lo corta) */
+  .dv-embed-wrap{
+    position:absolute;
+    inset:0;
+    flex:none;
+    aspect-ratio:unset;
+    width:100%;
+    height:100%;
+  }
+
+  /* Botón cerrar flotante — esquina superior izquierda para no chocar con swap-btn */
   .dv-float-close{
     display:flex;
-    position:fixed;top:.75rem;right:.75rem;z-index:900;
+    position:fixed;top:.75rem;left:.75rem;z-index:900;
     background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.22);
     border-radius:20px;padding:5px 14px;
     align-items:center;gap:.4rem;
@@ -1356,10 +1374,62 @@ header{
   }
 }
 
-/* Móvil: los float controls no se muestran, el layout original se mantiene */
+/* ═══════════════════════════════════════════════════════════════
+   MÓVIL PORTRAIT: botones flotan sobre el video, sin barra de acciones
+   ═══════════════════════════════════════════════════════════════ */
 @media(orientation:portrait) and (max-width:639px){
+  /* Ocultar float-close desktop */
   .dv-float-close{ display:none !important; }
-  .dv-float-cta{  display:none !important; }
+
+  /* Ocultar la barra de acciones separada — el CTA flota sobre el video */
+  .dv-panel-actions{ display:none !important; }
+
+  /* El CTA flota sobre el video, siempre visible en móvil */
+  .dv-float-cta{
+    display:flex !important;
+    position:absolute;
+    bottom:.6rem;left:50%;
+    transform:translateX(-50%);
+    z-index:20;
+    background:rgba(232,48,90,.92);
+    border:none;border-radius:8px;
+    color:#fff;font-size:.72rem;font-weight:700;
+    padding:6px 20px;white-space:nowrap;
+    text-decoration:none;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    backdrop-filter:blur(6px);
+    -webkit-tap-highlight-color:transparent;
+    box-shadow:0 2px 12px rgba(232,48,90,.4);
+  }
+
+  /* Header ultra-compacto en móvil */
+  .dv-header{ padding:.3rem .6rem; }
+  .dv-title{ font-size:.75rem; }
+  .dv-close{ font-size:.7rem; padding:.25rem .55rem; }
+
+  /* Los panels llenan todo el espacio restante */
+  .dv-panels{
+    flex:1;
+    flex-direction:column;
+    height:calc(100% - 36px);
+    overflow:hidden;
+  }
+  /* Cada panel = exactamente la mitad */
+  .dv-panel{
+    flex:0 0 50%;
+    height:50%;
+    max-height:50%;
+    overflow:hidden;
+    position:relative;
+  }
+  /* El embed-wrap llena TODO el panel sin barra de acciones */
+  .dv-embed-wrap{
+    position:absolute;
+    inset:0;
+    flex:none;
+    aspect-ratio:unset;
+  }
 }
 
 .dv-swap-btn{
@@ -1369,24 +1439,14 @@ header{
   padding:3px 8px;border-radius:6px;cursor:pointer;
   backdrop-filter:blur(4px);transition:background .15s;
 }
+/* En desktop, el swap-btn baja para no solaparse con dv-float-close (que está top-left) */
+@media(orientation:landscape),(min-width:640px){
+  .dv-swap-btn{ top:3rem; right:.5rem; }
+}
 .dv-swap-btn:hover{background:var(--hot)}
 .dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-overflow-scrolling:auto;}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
-}
-@media(orientation:portrait) and (max-width:639px){
-  .dv-panels{
-    flex-direction:column;
-    height:100%;
-    overflow:hidden;
-  }
-  /* Cada panel ocupa exactamente la mitad — sin overflow, sin scroll */
-  .dv-panel{
-    flex:0 0 50%;
-    height:50%;
-    max-height:50%;
-    overflow:hidden;
-  }
 }
 .dv-panel-label{
   position:absolute;top:.4rem;left:.5rem;z-index:10;
@@ -1452,20 +1512,21 @@ header{
   overscroll-behavior:none;
   scrolling:no;
 }
-/* Móvil ≤480px: crop inferior 114px */
+/* Móvil ≤480px: crop bot 160px para ocultar chat completo de CB */
 @media(max-width:480px){
   .dv-frame{
     top:-36px;
-    height:calc(100% + 36px + 114px);
+    height:calc(100% + 36px + 160px);
   }
 }
-/* Móvil pequeño (≤380px): top mínimo 36px, bot 106px */
+/* Móvil pequeño (≤380px): proporcionalmente menor */
 @media(max-width:380px){
   .dv-frame{
     top:-36px;
-    height:calc(100% + 36px + 106px);
+    height:calc(100% + 36px + 140px);
   }
 }
+/* Desktop: usa --cb-crop-top (44px) y --cb-crop-bot (200px) via variables globales */
 /* Cuando el overlay está desactivado para audio */
 .dv-frame.audio-clickable{pointer-events:auto;}
 
