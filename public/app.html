@@ -45,7 +45,8 @@
   --radius-sm:8px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;overflow-x:hidden;-webkit-font-smoothing:antialiased;scrollbar-width:none;-ms-overflow-style:none;}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}
 a{text-decoration:none;color:inherit}
 button{font-family:inherit;cursor:pointer}
 img{display:block}
@@ -816,12 +817,19 @@ header{
    36px exactos en todos los viewports desktop + móvil)
 ══════════════════════════════════════════════════════ */
 :root{
-  --cb-crop-top: 44px;    /* Oculta header CB: logo + barra título (~37px real + margen) */
-  --cb-crop-bot: 200px;   /* Móvil: oculta UI inferior completa de CB */
+  /* ── Crop MODAL sala en vivo ──
+     top: oculta header CB (logo + barra) en móvil portrait
+     bot: oculta UI inferior CB (controles + chat + tokens) en móvil portrait */
+  --cb-crop-top: 36px;
+  --cb-crop-bot: 114px;
 }
-/* Desktop: crop via geometría CSS pura */
+/* Modal desktop: iframe 16:9 ya no incluye chat lateral,
+   solo necesita ocultar header (44px) y barra inferior de controles (106px) */
 @media(orientation:landscape),(min-width:640px){
-  :root{ --cb-crop-top:0px; --cb-crop-bot:0px; }
+  :root{
+    --cb-crop-top: 44px;
+    --cb-crop-bot: 106px;
+  }
 }
 
 /* ── EMBED EN VIVO ── */
@@ -1024,7 +1032,9 @@ header{
   overscroll-behavior:none;
   -webkit-overflow-scrolling:auto;
   background:#000;
+  scrollbar-width:none;-ms-overflow-style:none;
 }
+.mhero-v2 .embed-wrap::-webkit-scrollbar{display:none;width:0;height:0}
 /* ── Sala en vivo: recorta el header de Chaturbate por arriba (44px)
    y oculta la barra de controles inferior (48px). Con aspect-ratio:16/9
    el contenedor ya no incluye el chat ni tokens — solo el video puro.
@@ -1042,18 +1052,18 @@ header{
   overscroll-behavior:none;
   scrolling:no;
 }
-/* Móvil ≤480px: crop bot 114px + 17mm extra = 178px total para sala en vivo */
+/* Móvil ≤480px: top 36px + bot 114px = oculta header y controles CB */
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-36px;
-    height:calc(100% + 36px + 178px);
+    height:calc(100% + 36px + 114px);
   }
 }
-/* Móvil pequeño (≤380px): top mínimo 36px (igual a CB top bar), bot 170px */
+/* Móvil pequeño (≤380px): igual que 480, bot reducido 106px */
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-36px;
-    height:calc(100% + 36px + 170px);
+    height:calc(100% + 36px + 106px);
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
@@ -1446,7 +1456,7 @@ header{
   .dv-swap-btn{ top:3rem; right:.5rem; }
 }
 .dv-swap-btn:hover{background:var(--hot)}
-.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-overflow-scrolling:auto;}
+.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-overflow-scrolling:auto;scrollbar-width:none;-ms-overflow-style:none;}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
 }
@@ -1461,18 +1471,20 @@ header{
   overflow:hidden;
   touch-action:none;overscroll-behavior:none;
   -webkit-overflow-scrolling:auto;
+  scrollbar-width:none;-ms-overflow-style:none;
 }
+.dv-embed-wrap::-webkit-scrollbar{display:none;width:0;height:0}
 /* Overlay dual-view — intercepta click y redirige con afiliado.
-   top:0; bottom:80px deja libre la barra de controles de Chaturbate */
+   bottom:50px deja libre el botón de audio que flota encima */
 .dv-iframe-overlay{
   position:absolute;
-  top:0;left:0;right:0;bottom:80px;
+  top:0;left:0;right:0;bottom:50px;
   z-index:5;cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;
   touch-action:none;
   overscroll-behavior:none;
 }
-/* Botón de audio por panel — grande y claro */
+/* Botón de audio por panel — grande y claro, siempre encima del overlay */
 .dv-audio-btn{
   position:absolute;bottom:.5rem;left:50%;transform:translateX(-50%);
   z-index:10;
@@ -1482,6 +1494,7 @@ header{
   cursor:pointer;color:#fff;font-size:.7rem;font-weight:700;
   backdrop-filter:blur(6px);transition:background .15s;
   -webkit-tap-highlight-color:transparent;white-space:nowrap;
+  pointer-events:auto;
 }
 .dv-audio-btn:hover{background:rgba(232,48,90,.75);}
 .dv-audio-btn.active{background:rgba(232,48,90,.9);border-color:var(--hot);box-shadow:0 0 0 3px rgba(232,48,90,.3);}
@@ -1504,17 +1517,17 @@ header{
    El iframe es más grande que el panel en todas direcciones.
    El overflow:hidden del dv-embed-wrap recorta la UI de CB.
 
-   MÓVIL: CB muestra video arriba + chat abajo → crop top+bot
-   DESKTOP: CB muestra 3 columnas → crop top+bot + offset izq
+   MÓVIL: CB embed muestra video arriba + UI inferior → crop top 36px + bot 114px
+   DESKTOP: CB embed 3 col → crop top 44px + bot 106px + offset lateral
    ══════════════════════════════════════════════════════════ */
 
-/* BASE — móvil portrait */
+/* BASE — móvil portrait: top 36px (header CB) + bot 114px (controles CB) */
 .dv-frame{
   position:absolute;
   top:-36px;
   left:0; right:0;
   width:100%;
-  height:calc(100% + 36px + 160px);
+  height:calc(100% + 36px + 114px);
   border:none; display:block;
   overflow:hidden;
   pointer-events:auto;
@@ -1522,16 +1535,16 @@ header{
   overscroll-behavior:none;
 }
 @media(max-width:380px){
-  .dv-frame{ height:calc(100% + 36px + 140px); }
+  .dv-frame{ height:calc(100% + 36px + 106px); }
 }
 
-/* DESKTOP: iframe 160% ancho (corta chat+sidebar) + crop top 44px + crop bot 110px */
+/* DESKTOP: iframe 160% ancho (corta chat+sidebar) + crop top 44px + crop bot 106px */
 @media(orientation:landscape),(min-width:640px){
   .dv-frame{
-    top:-44px;                              /* oculta logo CB arriba */
-    left:-30%;                             /* centra el video (corta sidebar izq + chat der) */
-    width:160%;                            /* más ancho que el panel */
-    height:calc(100% + 44px + 110px);     /* panel + logo_top + barra_bot */
+    top:-44px;                              /* oculta logo/barra CB arriba */
+    left:-30%;                              /* centra el video (corta sidebar izq + chat der) */
+    width:160%;                             /* más ancho que el panel */
+    height:calc(100% + 44px + 106px);      /* panel + header_top + controles_bot */
   }
 }
 .dv-frame.audio-clickable{pointer-events:auto;}
@@ -2445,6 +2458,7 @@ body.modal-open{overflow:hidden!important}
     </div>
     <!-- Botón de audio: position:fixed, fuera del árbol hero — escapa de todos overflow:hidden -->
     <!-- JS lo posiciona via _positionAudioBtn() y lo muestra con clase .visible -->
+    <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Audio</button>
 
     <!-- BODY scrollable -->
     <div class="modal-body mbody-v2">
@@ -2599,6 +2613,7 @@ body.modal-open{overflow:hidden!important}
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
+          <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a',event)">🔇 Audio</button>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
@@ -2616,6 +2631,7 @@ body.modal-open{overflow:hidden!important}
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
+          <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b',event)">🔇 Audio</button>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
