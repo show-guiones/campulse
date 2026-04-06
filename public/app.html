@@ -45,7 +45,7 @@
   --radius-sm:8px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;overflow-x:hidden;overflow-y:hidden;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
 button{font-family:inherit;cursor:pointer}
 img{display:block}
@@ -184,7 +184,7 @@ header{
   flex-direction:column;
   overflow:hidden;
 }
-.page-explore{display:flex;flex:1;overflow:hidden;position:relative}
+.page-explore{display:flex;flex:1;overflow:hidden;position:relative;overscroll-behavior:none}
 .page-explore.hide{display:none}
 .model-view{
   flex:1;overflow-y:auto;
@@ -748,6 +748,8 @@ header{
 /* mhero-v2 usa aspect-ratio — no imponer height fija para evitar espacio en blanco */
 .modal-hero.mhero-v2{
   height:auto;
+  aspect-ratio:16/9;
+  max-height:56vw; /* limita en pantallas muy anchas */
 }
 .modal-hero img,.live-preview-img{
   width:100%;height:100%;object-fit:cover;
@@ -853,14 +855,23 @@ header{
 .embed-back-btn:hover{background:rgba(0,0,0,.9)}
 /* Overlay afiliado modal principal: cubre TODO — redirige con afiliado */
 .embed-click-overlay{
-  position:absolute;top:0;left:0;right:0;bottom:80px;z-index:9;
+  position:absolute;inset:0;z-index:9;
   cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;touch-action:none;
+  /* Excluir esquina inferior-izquierda (volumen nativo de Chaturbate ~120×56px) */
+  clip-path:polygon(
+    0% 0%,       /* top-left */
+    100% 0%,     /* top-right */
+    100% 100%,   /* bottom-right */
+    120px 100%,  /* bottom, justo a la derecha del volumen */
+    120px calc(100% - 56px), /* esquina de la zona de volumen */
+    0% calc(100% - 56px)     /* bottom-left, por encima del volumen */
+  );
 }
 /* Botón de audio: position:fixed para escapar de TODOS los overflow:hidden del árbol.
    Se posiciona dinámicamente via JS (_positionAudioBtn) sobre el borde inferior del hero. */
 .modal-audio-btn{
-  position:fixed;left:50%;transform:translateX(-50%);
+  position:fixed;right:1rem;
   z-index:810;
   background:rgba(0,0,0,.88);border:1px solid rgba(255,255,255,.3);
   border-radius:20px;padding:6px 16px;
@@ -1004,8 +1015,8 @@ header{
 }
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
-  overflow:hidden;pointer-events:auto;touch-action:auto;
-  background:#000;ntras escala el iframe — nunca blanco */
+  overflow:visible;pointer-events:auto;touch-action:auto;
+  background:#000;
 }
 .mhero-v2 .embed-wrap .embed-frame{
   /* Sin scale — CB sin embed_video_only llena correctamente el contenedor.
@@ -1251,6 +1262,7 @@ header{
 .dual-view-bg{
   position:fixed;inset:0;z-index:700;
   background:#000;display:flex;flex-direction:column;
+  overflow:hidden;overscroll-behavior:none;touch-action:none;
 }
 .dual-view{width:100%;height:100%;display:flex;flex-direction:column}
 .dv-header{
@@ -1260,7 +1272,7 @@ header{
 }
 .dv-title{font-size:.82rem;font-weight:700;color:var(--txt)}
 .dv-close{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.75rem;font-weight:600;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.dv-panels{display:flex;flex:1;overflow:hidden;gap:2px;background:rgba(255,255,255,.06)}
+.dv-panels{display:flex;flex:1;overflow:hidden;gap:2px;background:rgba(255,255,255,.06);touch-action:none;overscroll-behavior:none}
 /* Mobile: vertical stack */
 .dv-swap-btn{
   position:absolute;top:.4rem;right:.5rem;z-index:15;
@@ -1289,14 +1301,23 @@ header{
 /* Overlay dual-view: zona central para afiliado, deja libre top y bottom */
 .dv-iframe-overlay{
   position:absolute;
-  top:0;left:0;right:0;bottom:80px;
+  inset:0;
   z-index:5;cursor:pointer;background:transparent;
   -webkit-tap-highlight-color:transparent;
+  /* Excluir esquina inferior-izquierda: zona de volumen nativo de Chaturbate */
+  clip-path:polygon(
+    0% 0%,
+    100% 0%,
+    100% 100%,
+    120px 100%,
+    120px calc(100% - 56px),
+    0% calc(100% - 56px)
+  );
 }
 /* Botón de audio por panel — grande y claro */
 .dv-audio-btn{
-  position:absolute;bottom:.5rem;left:50%;transform:translateX(-50%);
-  z-index:10;
+  position:absolute;bottom:.5rem;right:.6rem;
+  z-index:12;
   background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
   border-radius:20px;padding:5px 14px;
   display:flex;align-items:center;gap:.35rem;
@@ -1689,7 +1710,7 @@ header{
   .modal{border-radius:20px;max-height:88dvh;max-width:500px;width:100%}
   .modal-hero{height:280px}
   /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
-  .modal-hero.mhero-v2{height:auto}
+  .modal-hero.mhero-v2{height:auto;aspect-ratio:16/9}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
@@ -1736,7 +1757,7 @@ header{
   .modal{border-radius:24px 24px 0 0;max-height:90dvh;width:100%}
   .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:90dvh}
   .modal-hero{height:250px}
-  .modal-hero.mhero-v2{height:auto}
+  .modal-hero.mhero-v2{height:auto;aspect-ratio:16/9}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar-top{padding:.35rem .7rem;top:40px}
@@ -1751,7 +1772,7 @@ header{
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
   /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
   .modal-hero{height:190px!important}
-  .modal-hero.mhero-v2{height:auto!important}
+  .modal-hero.mhero-v2{height:auto!important;aspect-ratio:16/9}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
 }
@@ -2214,8 +2235,8 @@ body.modal-open{overflow:hidden!important}
       <!-- Stats en hero — viewers destacados -->
       <div class="mhero-stats" id="mhero-stats"></div>
     </div>
-    <!-- Botón de audio: position:fixed, fuera del árbol hero — escapa de todos overflow:hidden -->
-    <!-- JS lo posiciona via _positionAudioBtn() y lo muestra con clase .visible -->
+    <!-- Botón de audio del modal — position:fixed, bottom-right para no tapar el volumen de CB -->
+    <button class="modal-audio-btn" id="modal-audio-btn" onclick="toggleModalAudio(event)">🔇 Audio</button>
 
     <!-- BODY scrollable -->
     <div class="modal-body mbody-v2">
@@ -2367,7 +2388,8 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-a" onclick="openDvSlot('a')"></div>
-          
+          <!-- Botón de audio — z-index por encima del overlay, fuera de su clip-path -->
+          <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a',event)">🔇 Audio</button>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
@@ -2382,7 +2404,8 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="dv-iframe-overlay" id="dv-overlay-b" onclick="openDvSlot('b')"></div>
-          
+          <!-- Botón de audio — z-index por encima del overlay, fuera de su clip-path -->
+          <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b',event)">🔇 Audio</button>
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
@@ -3799,11 +3822,15 @@ let _modalAudioActive = false;
 /* Posiciona el botón de audio justo encima del borde inferior del hero.
    position:fixed necesita coordenadas de viewport — getBoundingClientRect lo da. */
 function _positionAudioBtn(){
-  const hero = document.getElementById('modal-hero');
-  const btn  = document.getElementById('modal-audio-btn');
-  if(!hero || !btn) return;
-  const r = hero.getBoundingClientRect();
-  btn.style.top = Math.max(r.bottom - 40, r.top + 8) + 'px';
+  const hero=document.getElementById('modal-hero');
+  const btn=document.getElementById('modal-audio-btn');
+  if(!hero||!btn) return;
+  const r=hero.getBoundingClientRect();
+  // Posicionar en esquina inferior DERECHA del hero (lejos del volumen de CB que está a la izquierda)
+  btn.style.top=(r.bottom-44)+'px';
+  btn.style.right='1rem';
+  btn.style.left='auto';
+  btn.style.transform='none';
 }
 
 function toggleModalAudio(e){
