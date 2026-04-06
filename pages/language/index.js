@@ -1,126 +1,87 @@
-// pages/language/index.js
-// Índice de idiomas disponibles en Campulse
-// URL: /language
+// pages/language/index.js — Redesign con design system app.html
 
 import Head from "next/head";
+import { DS_CSS, Logo } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
 const LANGUAGES = [
-  { slug: "spanish",    name: "Español",    flag: "🇪🇸", desc: "Modelos hispanohablantes" },
-  { slug: "english",    name: "English",    flag: "🇬🇧", desc: "English-speaking models" },
-  { slug: "portuguese", name: "Português",  flag: "🇧🇷", desc: "Modelos que falam português" },
-  { slug: "romanian",   name: "Română",     flag: "🇷🇴", desc: "Modele vorbitoare de română" },
-  { slug: "russian",    name: "Русский",    flag: "🇷🇺", desc: "Русскоязычные модели" },
-  { slug: "german",     name: "Deutsch",    flag: "🇩🇪", desc: "Deutschsprachige Models" },
-  { slug: "french",     name: "Français",   flag: "🇫🇷", desc: "Modèles francophones" },
-  { slug: "italian",    name: "Italiano",   flag: "🇮🇹", desc: "Modelle italiane" },
+  { slug:"spanish",    name:"Español",    flag:"🇪🇸", desc:"Modelos hispanohablantes" },
+  { slug:"english",    name:"English",    flag:"🇬🇧", desc:"English-speaking models" },
+  { slug:"portuguese", name:"Português",  flag:"🇧🇷", desc:"Modelos que falam português" },
+  { slug:"romanian",   name:"Română",     flag:"🇷🇴", desc:"Modele vorbitoare de română" },
+  { slug:"russian",    name:"Русский",    flag:"🇷🇺", desc:"Русскоязычные модели" },
+  { slug:"german",     name:"Deutsch",    flag:"🇩🇪", desc:"Deutschsprachige Models" },
+  { slug:"french",     name:"Français",   flag:"🇫🇷", desc:"Modèles francophones" },
+  { slug:"italian",    name:"Italiano",   flag:"🇮🇹", desc:"Modelle italiane" },
 ];
 
 export default function LanguageIndex() {
   const pageTitle = "Modelos de Chaturbate por Idioma | Campulse";
-  const pageDescription =
-    "Encuentra modelos de Chaturbate por idioma: español, inglés, portugués, rumano y más. " +
-    "Estadísticas en tiempo real actualizadas cada 2 horas.";
-
+  const pageDescription = "Encuentra modelos de Chaturbate por idioma: español, inglés, portugués, rumano y más. Estadísticas en tiempo real actualizadas cada 2 horas.";
   const schema = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: pageTitle,
-    description: pageDescription,
-    url: `${SITE}/language`,
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Campulse", item: SITE },
-        { "@type": "ListItem", position: 2, name: "Idiomas",  item: `${SITE}/language` },
-      ],
-    },
+    "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/language`,
+    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"Campulse",item:SITE},{"@type":"ListItem",position:2,name:"Idiomas",item:`${SITE}/language`}]},
   };
 
   return (
     <>
       <Head>
         <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href={`${SITE}/language`} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={`${SITE}/language`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Campulse" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        <meta name="description" content={pageDescription}/>
+        <meta name="robots" content="index, follow"/>
+        <link rel="canonical" href={`${SITE}/language`}/>
+        <meta property="og:title" content={pageTitle}/>
+        <meta property="og:description" content={pageDescription}/>
+        <meta property="og:url" content={`${SITE}/language`}/>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}}/>
+        <style>{DS_CSS}</style>
       </Head>
 
-      <main style={styles.main}>
-        {/* Breadcrumb */}
-        <nav style={styles.breadcrumbs}>
-          <a href="/" style={styles.link}>Campulse</a>
-          <span style={styles.sep}> › </span>
-          <span>Idiomas</span>
+      <div className="cmp-page">
+        <nav className="cmp-nav">
+          <Logo/>
+          <div className="cmp-nav-links">
+            <a href="/country" className="cmp-nav-link">Países</a>
+            <a href="/gender" className="cmp-nav-link">Géneros</a>
+            <a href="/search" className="cmp-nav-link">Buscar</a>
+          </div>
         </nav>
 
-        <h1 style={styles.h1}>Modelos por Idioma</h1>
-        <p style={styles.subtitle}>
-          Explora modelos de Chaturbate filtradas por el idioma que hablan.
-        </p>
+        <nav className="cmp-bc">
+          <a href="/">Campulse</a>
+          <span className="cmp-bc-sep">›</span>
+          <span style={{color:"var(--txt2)"}}>Idiomas</span>
+        </nav>
 
-        <div style={styles.grid}>
-          {LANGUAGES.map((l) => (
-            <a key={l.slug} href={`/language/${l.slug}`} style={styles.card}>
-              <div style={styles.flag}>{l.flag}</div>
-              <div style={styles.name}>{l.name}</div>
-              <div style={styles.desc}>{l.desc}</div>
+        <div className="cmp-page-header">
+          <h1 className="cmp-page-h1">Modelos por Idioma</h1>
+          <p className="cmp-page-sub">Encuentra modelos de Chaturbate según el idioma que hablan.</p>
+        </div>
+
+        <div className="cmp-cat-grid">
+          {LANGUAGES.map(l=>(
+            <a key={l.slug} href={`/language/${l.slug}`}
+              style={{background:"var(--surf)",borderRadius:14,padding:"1.375rem",display:"flex",alignItems:"center",gap:"1rem",border:"1px solid var(--bdr)",transition:"border-color .2s,background .15s,transform .15s",textDecoration:"none"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(56,182,212,.3)";e.currentTarget.style.transform="translateY(-2px)"}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="var(--bdr)";e.currentTarget.style.transform=""}}>
+              <span style={{fontSize:"2rem",flexShrink:0,lineHeight:1}}>{l.flag}</span>
+              <div>
+                <div style={{fontWeight:700,fontSize:"1.0625rem",color:"var(--txt)",marginBottom:2}}>{l.name}</div>
+                <div style={{fontSize:".8rem",color:"var(--txt2)"}}>{l.desc}</div>
+              </div>
             </a>
           ))}
         </div>
 
-        <div style={styles.nav}>
-          <a href="/gender" style={styles.link}>⚥ Por género</a>
-          <span style={styles.sep}> · </span>
-          <a href="/country" style={styles.link}>🌍 Por país</a>
+        <div className="cmp-footer-links">
+          <a href="/country" className="cmp-footer-link">Ver por país →</a>
+          <a href="/gender" className="cmp-footer-link">Ver por género →</a>
         </div>
-      </main>
+      </div>
     </>
   );
 }
-
-const styles = {
-  main: {
-    fontFamily: "sans-serif",
-    maxWidth: 900,
-    margin: "0 auto",
-    padding: "2rem 1rem",
-    background: "#0d0d0d",
-    minHeight: "100vh",
-    color: "#f0f0f0",
-  },
-  breadcrumbs: { fontSize: 13, color: "#888", marginBottom: 16 },
-  link: { color: "#a78bfa", textDecoration: "none" },
-  sep: { color: "#555", margin: "0 4px" },
-  h1: { fontSize: 28, fontWeight: 800, margin: "0 0 8px" },
-  subtitle: { color: "#888", fontSize: 14, marginBottom: 32 },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-    gap: 16,
-    marginBottom: 32,
-  },
-  card: {
-    background: "#1a1a2e",
-    borderRadius: 14,
-    padding: "24px 20px",
-    textDecoration: "none",
-    color: "#f0f0f0",
-    display: "block",
-    textAlign: "center",
-  },
-  flag: { fontSize: 36, marginBottom: 10 },
-  name: { fontWeight: 700, fontSize: 17, marginBottom: 6 },
-  desc: { fontSize: 12, color: "#777" },
-  nav: { textAlign: "center", fontSize: 14, marginTop: 16 },
-};
