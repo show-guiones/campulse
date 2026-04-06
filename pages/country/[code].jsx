@@ -5,14 +5,8 @@ import { DS_CSS, Logo } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
-const SUPPORTED_COUNTRIES = [
-  "co","es","mx","ar","cl","pe","ve","ec",
-  "us","br","ro","ru","de","fr","gb","it",
-  "ph","th","cz","ua","hu","pl","ca","au",
-  "nl","se","tr","za","in","kz","rs","sk",
-  "mg","ke","pt","gr","be","at","ch","no",
-  "dk","fi","bg","md","lt","lv","ee","si",
-];
+// No whitelist — cualquier código de 2 letras válido se sirve dinámicamente desde Supabase.
+// Si no hay datos, se muestra estado vacío en vez de 404.
 
 const COUNTRY_NAMES = {
   CO:"Colombia",MX:"México",AR:"Argentina",CL:"Chile",PE:"Perú",VE:"Venezuela",EC:"Ecuador",BO:"Bolivia",
@@ -22,6 +16,13 @@ const COUNTRY_NAMES = {
   NO:"Noruega",DK:"Dinamarca",FI:"Finlandia",SK:"Eslovaquia",RS:"Serbia",BG:"Bulgaria",MD:"Moldavia",
   LT:"Lituania",LV:"Letonia",EE:"Estonia",SI:"Eslovenia",KZ:"Kazajistán",
   PH:"Filipinas",TH:"Tailandia",IN:"India",AU:"Australia",TR:"Turquía",ZA:"Sudáfrica",NG:"Nigeria",KE:"Kenia",MG:"Madagascar",
+  CN:"China",JP:"Japón",KR:"Corea del Sur",SV:"El Salvador",GT:"Guatemala",HN:"Honduras",NI:"Nicaragua",CR:"Costa Rica",PA:"Panamá",
+  DO:"República Dominicana",CU:"Cuba",PR:"Puerto Rico",PY:"Paraguay",UY:"Uruguay",GH:"Ghana",TN:"Túnez",MA:"Marruecos",EG:"Egipto",
+  IS:"Islandia",NZ:"Nueva Zelanda",SG:"Singapur",MY:"Malasia",ID:"Indonesia",VN:"Vietnam",TW:"Taiwán",HK:"Hong Kong",
+  IL:"Israel",SA:"Arabia Saudita",AE:"Emiratos Árabes",IR:"Irán",PK:"Pakistán",BD:"Bangladés",LK:"Sri Lanka",
+  HR:"Croacia",BA:"Bosnia",MK:"Macedonia",AL:"Albania",ME:"Montenegro",XK:"Kosovo",CY:"Chipre",MT:"Malta",LU:"Luxemburgo",
+  IE:"Irlanda",SC:"Seychelles",MU:"Mauricio",RE:"Reunión",CI:"Costa de Marfil",CM:"Camerún",SN:"Senegal",ET:"Etiopía",TZ:"Tanzania",
+  UZ:"Uzbekistán",TM:"Turkmenistán",AZ:"Azerbaiyán",GE:"Georgia",AM:"Armenia",BY:"Bielorrusia",
 };
 
 const COUNTRY_DEMONYM = {
@@ -44,7 +45,8 @@ function flag(code) {
 
 export async function getServerSideProps({ params }) {
   const code = (params.code||"").toLowerCase();
-  if (!SUPPORTED_COUNTRIES.includes(code)) return { notFound:true };
+  // Validar que sea exactamente 2 letras ISO — rechazar rutas malformadas
+  if (!/^[a-z]{2}$/.test(code)) return { notFound:true };
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
   if (!SUPABASE_URL||!SUPABASE_KEY) { const cu=(params.code||"").toUpperCase(); return { props:{ code:(params.code||"").toLowerCase(), codeUC:cu, name:COUNTRY_NAMES[cu]||cu, models:[], fetchError:"env_missing" } }; }
