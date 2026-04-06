@@ -16,8 +16,8 @@ const COUNTRY_NAMES = {
   PH:"Filipinas",TH:"Tailandia",IN:"India",AU:"Australia",TR:"Turquía",ZA:"Sudáfrica",NG:"Nigeria",KE:"Kenia",MG:"Madagascar",
 };
 
-const MIN_SNAPSHOTS = 5;
-const DAYS = 30;
+const MIN_SNAPSHOTS = 1;
+const DAYS = 7;
 
 export async function getServerSideProps() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -26,7 +26,7 @@ export async function getServerSideProps() {
   const since = new Date(Date.now()-DAYS*24*60*60*1000).toISOString();
   const sbHeaders = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` };
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username,country&limit=50000`,{headers:sbHeaders});
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username,country&limit=50000`,{headers:{...sbHeaders,'Range':'0-49999','Prefer':'count=none'}});
     const rows = r.ok ? await r.json() : [];
     const snapshotCount = {};
     const usernamesByCountry = {};
