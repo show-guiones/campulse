@@ -76,7 +76,7 @@ export default function TagPage({ tag, models }) {
 
       <main style={styles.main}>
         <nav style={styles.breadcrumb}>
-          <a href="/" style={styles.link}>Campulse</a>
+          <a href="/app.html" style={styles.link}>Campulse</a>
           <span style={styles.sep}> › </span>
           <span>#{tag}</span>
         </nav>
@@ -112,7 +112,7 @@ export default function TagPage({ tag, models }) {
         )}
 
         <div style={styles.back}>
-          <a href="/" style={styles.link}>← Volver al inicio</a>
+          <a href="/app.html" style={styles.link}>← Volver al inicio</a>
         </div>
       </main>
     </>

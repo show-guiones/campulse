@@ -100,7 +100,7 @@ export default function GenderTypePage({ data }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <a href="/gender">Géneros</a>
           <span className="cmp-bc-sep">›</span>

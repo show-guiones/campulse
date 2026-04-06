@@ -147,7 +147,7 @@ export default function Home({ totalModels, topModels }) {
 
       <div className="cp">
         <nav className="cp-nav">
-          <a href="/" className="cp-logo">Campulse</a>
+          <a href="/app.html" className="cp-logo">Campulse</a>
           <div className="cp-nav-links">
             <a href="/gender" className="cp-nav-link">Géneros</a>
             <a href="/country" className="cp-nav-link">Países</a>

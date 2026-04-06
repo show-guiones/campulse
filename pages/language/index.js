@@ -52,7 +52,7 @@ export default function LanguageIndex() {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Idiomas</span>
         </nav>

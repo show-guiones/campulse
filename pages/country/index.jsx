@@ -19,10 +19,10 @@ const COUNTRY_NAMES = {
 const MIN_SNAPSHOTS = 5;
 const DAYS = 30;
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ countries:[] }, revalidate:3600 };
+  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ countries:[], error:'config' } };
   const since = new Date(Date.now()-DAYS*24*60*60*1000).toISOString();
   const sbHeaders = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` };
   try {
@@ -45,11 +45,11 @@ export async function getStaticProps() {
     const countries = Object.entries(usernamesByCountry)
       .map(([code,modelCount])=>({ code, name:COUNTRY_NAMES[code]||code, models:modelCount, slug:`/country/${code.toLowerCase()}` }))
       .sort((a,b)=>b.models-a.models);
-    return { props:{ countries }, revalidate:3600 };
-  } catch { return { props:{ countries:[] }, revalidate:3600 }; }
+    return { props:{ countries, error:null } };
+  } catch { return { props:{ countries:[], error:'config' } }; }
 }
 
-export default function CountriesPage({ countries }) {
+export default function CountriesPage({ countries, error }) {
   const pageTitle = "Modelos de Chaturbate por País | Campulse";
   const pageDescription = `Explora modelos de Chaturbate organizadas por país. Encuentra las mejores salas en vivo de ${countries.slice(0,4).map(c=>c.name).join(", ")} y más.`;
   const schema = {
@@ -87,7 +87,7 @@ export default function CountriesPage({ countries }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Países</span>
         </nav>
@@ -114,7 +114,7 @@ export default function CountriesPage({ countries }) {
         </div>
 
         {countries.length===0 && (
-          <p style={{color:"var(--txt3)",textAlign:"center",marginTop:40}}>Cargando datos...</p>
+          <p style={{color:"var(--txt3)",textAlign:"center",marginTop:40}}>{error ? `Error al cargar (${error})` : "Sin datos disponibles."}</p>
         )}
 
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>

@@ -122,7 +122,7 @@ export default function LanguagePage({ data }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <a href="/language">Idiomas</a>
           <span className="cmp-bc-sep">›</span>

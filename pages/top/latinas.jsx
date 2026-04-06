@@ -86,7 +86,7 @@ export default function TopLatinasPage({ models, fetchedAt }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Top Latinas</span>
         </nav>

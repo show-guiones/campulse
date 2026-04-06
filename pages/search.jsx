@@ -67,7 +67,7 @@ export default function SearchPage() {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Buscar</span>
         </nav>
@@ -158,7 +158,7 @@ export default function SearchPage() {
         )}
 
         <div className="cmp-footer-links">
-          <a href="/" className="cmp-footer-link">← Volver al inicio</a>
+          <a href="/app.html" className="cmp-footer-link">← Volver al inicio</a>
         </div>
       </div>
     </>

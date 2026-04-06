@@ -146,7 +146,7 @@ button{font-family:inherit;cursor:pointer}
 // Logo JSX component — mirrors app.html .logo markup
 export function Logo() {
   return (
-    <a href="/" className="cmp-logo">
+    <a href="/app.html" className="cmp-logo">
       <span className="cmp-logo-icon">CP</span>
       <span className="cmp-logo-name">Campulse<em>Hub</em></span>
     </a>

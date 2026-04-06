@@ -174,7 +174,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
 
         {/* BREADCRUMB */}
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           {countryName && countryCode && (<><span className="cmp-bc-sep">›</span><a href={`/country/${countryCode.toLowerCase()}`}>{flag} {countryName}</a></>)}
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>{name}</span>
@@ -302,7 +302,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         <div className="cmp-footer-links">
           {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-footer-link">{flag} Ver más modelos de {countryName} →</a>}
           {langSlug && <a href={`/language/${langSlug}`} className="cmp-footer-link">🗣 Ver modelos en {langName} →</a>}
-          <a href="/" className="cmp-footer-link" style={{marginTop:4}}>← Volver al inicio</a>
+          <a href="/app.html" className="cmp-footer-link" style={{marginTop:4}}>← Volver al inicio</a>
         </div>
       </div>
     </>

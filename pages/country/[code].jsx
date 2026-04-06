@@ -47,15 +47,15 @@ export async function getServerSideProps({ params }) {
   if (!SUPPORTED_COUNTRIES.includes(code)) return { notFound:true };
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  if (!SUPABASE_URL||!SUPABASE_KEY) return { notFound:true };
+  if (!SUPABASE_URL||!SUPABASE_KEY) { const cu=(params.code||"").toUpperCase(); return { props:{ code:(params.code||"").toLowerCase(), codeUC:cu, name:COUNTRY_NAMES[cu]||cu, models:[], fetchError:"env_missing" } }; }
   const codeUC = code.toUpperCase();
   const since = new Date(Date.now()-DAYS*24*60*60*1000).toISOString();
   try {
     const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&country=eq.${codeUC}&select=username,num_users,num_followers,display_name,gender&limit=50000`;
     const r = await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
-    if (!r.ok) return { notFound:true };
+    if (!r.ok) { const codeUC3=(params.code||"").toUpperCase(); return { props:{ code:(params.code||"").toLowerCase(), codeUC:codeUC3, name:COUNTRY_NAMES[codeUC3]||codeUC3, models:[], fetchError:r.status } }; }
     const rows = await r.json();
-    if (!Array.isArray(rows)) return { notFound:true };
+    if (!Array.isArray(rows)) { const codeUC4=(params.code||"").toUpperCase(); return { props:{ code:(params.code||"").toLowerCase(), codeUC:codeUC4, name:COUNTRY_NAMES[codeUC4]||codeUC4, models:[], fetchError:"invalid_response" } }; }
     const map = {};
     for (const row of rows) {
       const u = row.username; if (!u) continue;
@@ -68,13 +68,13 @@ export async function getServerSideProps({ params }) {
       .filter(m=>m.snapshots>=MIN_SNAPSHOTS)
       .map(m=>({username:m.username,display_name:m.display_name,gender:m.gender,avg_viewers:Math.round(m.total_viewers/m.snapshots),max_followers:m.max_followers,snapshots:m.snapshots}))
       .sort((a,b)=>b.avg_viewers-a.avg_viewers).slice(0,LIMIT);
-    if (models.length===0) return { notFound:true };
+    // empty but valid — show empty state
     const name = COUNTRY_NAMES[codeUC]||codeUC;
     return { props:{ code,codeUC,name,models } };
-  } catch { return { notFound:true }; }
+  } catch(e) { const codeUC5=(params.code||"").toUpperCase(); return { props:{ code:(params.code||"").toLowerCase(), codeUC:codeUC5, name:COUNTRY_NAMES[codeUC5]||codeUC5, models:[], fetchError:"exception" } }; }
 }
 
-export default function CountryPage({ code, codeUC, name, models }) {
+export default function CountryPage({ code, codeUC, name, models, fetchError }) {
   const top = models[0];
   const second = models[1];
   const demonym = COUNTRY_DEMONYM[codeUC]||`de ${name}`;
@@ -126,7 +126,7 @@ export default function CountryPage({ code, codeUC, name, models }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <a href="/country">Países</a>
           <span className="cmp-bc-sep">›</span>
