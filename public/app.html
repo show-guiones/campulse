@@ -816,8 +816,8 @@ header{
    36px exactos en todos los viewports desktop + móvil)
 ══════════════════════════════════════════════════════ */
 :root{
-  --cb-crop-top: 44px;   /* Oculta header Chaturbate (logo hasta 37px real + margen) */
-  --cb-crop-bot: 70px;   /* Oculta UI inferior: chat, tokens, Send Tip */
+  --cb-crop-top: 44px;    /* Oculta header Chaturbate (logo hasta 37px real + margen) */
+  --cb-crop-bot: 134px;   /* Oculta UI inferior: chat, tokens, Send Tip (+17mm = 64px extra) */
 }
 
 /* ── EMBED EN VIVO ── */
@@ -1018,12 +1018,13 @@ header{
   overflow:hidden;
   pointer-events:auto;touch-action:none;
   overscroll-behavior:none;
+  -webkit-overflow-scrolling:auto;
   background:#000;
 }
 /* ── Sala en vivo: recorta el header de Chaturbate por arriba (44px)
-   y oculta la UI inferior — chat, tokens, Send Tip (70px).
-   Los controles de volumen quedan visibles dentro de los 70px del crop inferior.
-   Idéntico en desktop, tablet y móvil. ── */
+   y oculta la UI inferior — chat, tokens, Send Tip (134px = 70px base + 17mm extra).
+   Móvil: +17mm adicionales en el crop inferior de la sala en vivo (primera sala).
+   Sin scroll horizontal ni vertical en ningún viewport. ── */
 .mhero-v2 .embed-wrap .embed-frame{
   position:absolute;
   top:calc(-1 * var(--cb-crop-top));
@@ -1035,19 +1036,20 @@ header{
   pointer-events:auto;
   touch-action:none;
   overscroll-behavior:none;
+  scrolling:no;
 }
-/* Móvil ≤480px: reducir crop inferior a 50px */
+/* Móvil ≤480px: crop bot 114px + 17mm extra = 178px total para sala en vivo */
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-36px;
-    height:calc(100% + 36px + 50px);
+    height:calc(100% + 36px + 178px);
   }
 }
-/* Móvil pequeño (≤380px): reducir crop a 28px + 40px inferior */
+/* Móvil pequeño (≤380px): crop bot 104px + 17mm extra = 168px total */
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-28px;
-    height:calc(100% + 28px + 40px);
+    height:calc(100% + 28px + 168px);
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
@@ -1305,7 +1307,7 @@ header{
   backdrop-filter:blur(4px);transition:background .15s;
 }
 .dv-swap-btn:hover{background:var(--hot)}
-.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none}
+.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-overflow-scrolling:auto;}
 @media(orientation:landscape),(min-width:640px){
   .dv-panels{flex-direction:row}
 }
@@ -1322,6 +1324,7 @@ header{
   flex:1;position:relative;background:#000;
   overflow:hidden;
   touch-action:none;overscroll-behavior:none;
+  -webkit-overflow-scrolling:auto;
 }
 /* Overlay dual-view — intercepta click y redirige con afiliado.
    top:0; bottom:80px deja libre la barra de controles de Chaturbate */
@@ -1360,8 +1363,7 @@ header{
 }
 .dv-embed-wrap.stream-ready::before{opacity:0;pointer-events:none}
 
-/* ── Salas múltiples: idéntico al player de sala en vivo.
-   Top: 44px (oculta header CB). Bottom: 70px (oculta chat/tokens/SendTip).
+/* ── Salas múltiples: crop top 44px + bot 134px (+17mm vs anterior).
    Sin scroll horizontal ni vertical en ningún viewport. ── */
 .dv-frame{
   position:absolute;
@@ -1374,19 +1376,28 @@ header{
   pointer-events:auto;
   touch-action:none;
   overscroll-behavior:none;
+  scrolling:no;
 }
-/* Móvil ≤480px: crop inferior reducido */
+/* Móvil ≤480px: crop inferior 114px (+17mm sobre 50px base) */
 @media(max-width:480px){
   .dv-frame{
     top:-36px;
-    height:calc(100% + 36px + 50px);
+    height:calc(100% + 36px + 114px);
+  }
+  /* Panel B móvil: -2mm (8px) de área de video → se los lleva dv-panel-actions */
+  #dv-panel-b .dv-frame{
+    height:calc(100% + 36px + 114px - 8px);
   }
 }
-/* Móvil pequeño (≤380px): mismo ajuste que sala en vivo */
+/* Móvil pequeño (≤380px): crop inferior 104px (+17mm sobre 40px base) */
 @media(max-width:380px){
   .dv-frame{
     top:-28px;
-    height:calc(100% + 28px + 40px);
+    height:calc(100% + 28px + 104px);
+  }
+  /* Panel B móvil pequeño: -2mm (8px) de área de video */
+  #dv-panel-b .dv-frame{
+    height:calc(100% + 28px + 104px - 8px);
   }
 }
 /* Cuando el overlay está desactivado para audio */
@@ -1398,13 +1409,18 @@ header{
   padding:.69rem .5rem;  /* +3mm vs original .35rem */
   background:rgba(12,13,16,.9);
   display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
 }
 /* Móvil: reducir padding para ganar espacio de video */
 @media(max-width:480px){
   .dv-panel-actions{padding:.5rem .5rem;}
+  /* Panel B: +2mm (8px) que se restan del video de panel B */
+  #dv-panel-b .dv-panel-actions{padding:calc(.5rem + 4px) .5rem;}
 }
 @media(max-width:380px){
   .dv-panel-actions{padding:.35rem .5rem;}
+  /* Panel B pequeño: +2mm */
+  #dv-panel-b .dv-panel-actions{padding:calc(.35rem + 4px) .5rem;}
 }
 .dv-cta{
   display:block;width:100%;
