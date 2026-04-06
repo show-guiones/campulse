@@ -819,12 +819,12 @@ header{
   --cb-crop-top: 44px;    /* Oculta header CB: logo + barra título (~37px real + margen) */
   --cb-crop-bot: 200px;   /* Móvil: oculta UI inferior completa de CB */
 }
-/* Desktop: el crop oculta el header de CB (top) y la barra inferior (bot).
-   El chat lateral se oculta expandiendo el iframe en ancho (ver .dv-frame desktop). */
+/* Desktop: iframe es 160% ancho — el logo y barra inferior también se escalan.
+   crop-top y crop-bot ajustados para el iframe expandido. */
 @media(orientation:landscape),(min-width:640px){
   :root{
-    --cb-crop-top: 44px;   /* header CB */
-    --cb-crop-bot: 60px;   /* barra inferior CB en desktop (tokens/send tip ~50px) */
+    --cb-crop-top: 70px;    /* logo CB en iframe 160% ancho */
+    --cb-crop-bot: 160px;   /* barra inferior CB en iframe 160% ancho */
   }
 }
 
