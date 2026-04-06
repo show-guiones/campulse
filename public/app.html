@@ -819,11 +819,12 @@ header{
   --cb-crop-top: 44px;    /* Oculta header CB: logo + barra título (~37px real + margen) */
   --cb-crop-bot: 200px;   /* Móvil: oculta UI inferior completa de CB */
 }
-/* Desktop: con zoom:1.45 el contenido se agranda y el panel recorta automáticamente */
+/* Desktop: el crop oculta el header de CB (top) y la barra inferior (bot).
+   El chat lateral se oculta expandiendo el iframe en ancho (ver .dv-frame desktop). */
 @media(orientation:landscape),(min-width:640px){
   :root{
-    --cb-crop-top: 0px;
-    --cb-crop-bot: 0px;
+    --cb-crop-top: 44px;   /* header CB */
+    --cb-crop-bot: 60px;   /* barra inferior CB en desktop (tokens/send tip ~50px) */
   }
 }
 
@@ -1322,28 +1323,19 @@ header{
   /* Los panels ocupan el 100% del dual-view-bg sin nada que los recorte */
   .dv-panels{ height:100%; }
 
-  /* Cada panel llena su mitad horizontal */
+  /* Cada panel: mitad exacta de pantalla, corta todo lo que salga */
   .dv-panel{
     flex:1;
     position:relative;
     overflow:hidden;
     background:#000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
   }
-  /* dv-embed-wrap: aspect-ratio 16/9, pero min-width/min-height 100%
-     para que siempre CUBRA todo el panel (object-fit:cover para iframes).
-     Si el panel es más ancho → el wrap crece en ancho y se sale en alto (cortado).
-     Si el panel es más alto → el wrap crece en alto y se sale en ancho (cortado). */
+  /* El wrap llena absolutamente todo el panel */
   .dv-embed-wrap{
-    flex:none;
-    aspect-ratio:16/9;
-    min-width:100%;
-    min-height:100%;
-    width:auto;
-    height:auto;
-    position:relative;
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
   }
 
   /* Botón cerrar flotante — esquina superior izquierda para no chocar con swap-btn */
@@ -1524,20 +1516,18 @@ header{
   overscroll-behavior:none;
   scrolling:no;
 }
-/* Desktop: el iframe de CB usa layout 3 columnas (stats|video|chat).
-   Usamos zoom para agrandar el video y que llene todo el panel.
-   El zoom elimina la necesidad de crop top/bot excesivo. */
+/* ── DESKTOP: CB renderiza 3 columnas (sidebar-izq | VIDEO | chat-derecho).
+   Estrategia: iframe 200% ancho, desplazado -25% para que el video quede centrado.
+   overflow:hidden del dv-embed-wrap corta el chat y el sidebar.
+   Adicionalmente, zoom agranda el video para llenar toda la altura del panel. ── */
 @media(orientation:landscape),(min-width:640px){
   .dv-frame{
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    /* zoom:1.4 agranda el contenido un 40% — el panel overflow:hidden recorta los bordes */
-    zoom:1.45;
-    /* compensar el zoom: mover el iframe para centrar el video */
-    transform:translateY(-14%);
-    transform-origin:top center;
+    /* Hacer el iframe mucho más ancho para poder centrarlo en el video */
+    position:absolute;
+    top:calc(-1 * var(--cb-crop-top));
+    left:-30%;          /* Desplaza a la izquierda para centrar el video */
+    width:160%;         /* 160% del ancho del panel */
+    height:calc(100% + var(--cb-crop-top) + var(--cb-crop-bot));
   }
 }
 /* Móvil ≤480px: crop bot 160px para ocultar chat completo de CB */
