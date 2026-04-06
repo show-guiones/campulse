@@ -1,179 +1,152 @@
-// pages/top/latinas.jsx
-// URL: /top/latinas
-// Top modelos latinas en Chaturbate — SSR directo a Supabase
-// lexy_fox2 siempre en posición destacada cuando esté en línea
+// pages/top/latinas.jsx — Redesign con design system app.html
 
 import Head from "next/head";
+import { DS_CSS, Logo } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const LEXY = "lexy_fox2";
 const CAMPAIGN = "rI8z3";
 
-// Países LATAM + España
 const LATINA_COUNTRIES = ["CO","MX","AR","CL","PE","VE","EC","BO","PY","UY","CR","PA","HN","SV","GT","DO","CU","PR","ES"];
-
 const COUNTRY_NAMES = {
-  CO:"Colombia", MX:"México", AR:"Argentina", CL:"Chile", PE:"Perú",
-  VE:"Venezuela", EC:"Ecuador", BO:"Bolivia", PY:"Paraguay", UY:"Uruguay",
-  CR:"Costa Rica", PA:"Panamá", HN:"Honduras", SV:"El Salvador",
-  GT:"Guatemala", DO:"Rep. Dominicana", CU:"Cuba", PR:"Puerto Rico", ES:"España",
+  CO:"Colombia",MX:"México",AR:"Argentina",CL:"Chile",PE:"Perú",VE:"Venezuela",EC:"Ecuador",BO:"Bolivia",
+  PY:"Paraguay",UY:"Uruguay",CR:"Costa Rica",PA:"Panamá",HN:"Honduras",SV:"El Salvador",GT:"Guatemala",
+  DO:"Rep. Dominicana",CU:"Cuba",PR:"Puerto Rico",ES:"España",
 };
-
-const FLAG = (code) => code
-  ? String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 - 65 + c.charCodeAt(0)))
-  : "";
+const FLAG = (code) => code ? String.fromCodePoint(...[...code.toUpperCase()].map(c=>0x1F1E6-65+c.charCodeAt(0))) : "";
 
 export async function getServerSideProps() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-
-  // Build country filter
-  const countryFilter = LATINA_COUNTRIES.map(c => `country.eq.${c}`).join(",");
-
-  const url =
-    `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
-    `?captured_at=gte.${since}` +
-    `&or=(${countryFilter})` +
-    `&num_users=gt.0` +
-    `&select=username,display_name,num_users,country,gender,spoken_languages` +
-    `&order=num_users.desc&limit=300`;
-
+  const since = new Date(Date.now()-2*60*60*1000).toISOString();
+  const countryFilter = LATINA_COUNTRIES.map(c=>`country.eq.${c}`).join(",");
+  const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&or=(${countryFilter})&num_users=gt.0&select=username,display_name,num_users,country,gender,spoken_languages&order=num_users.desc&limit=300`;
   let models = [];
   try {
-    const r = await fetch(url, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-    });
+    const r = await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
     const raw = await r.json();
-    // Deduplicate by username, keep highest viewers
     const map = new Map();
-    (Array.isArray(raw) ? raw : []).forEach((row) => {
-      if (!map.has(row.username) || row.num_users > map.get(row.username).num_users) {
-        map.set(row.username, row);
-      }
+    (Array.isArray(raw)?raw:[]).forEach(row=>{
+      if (!map.has(row.username)||row.num_users>map.get(row.username).num_users) map.set(row.username,row);
     });
-    models = [...map.values()].sort((a, b) => b.num_users - a.num_users).slice(0, 50);
-  } catch { /* return empty */ }
-
-  return { props: { models, fetchedAt: new Date().toISOString() } };
+    models = [...map.values()].sort((a,b)=>b.num_users-a.num_users).slice(0,50);
+  } catch {}
+  return { props:{ models,fetchedAt:new Date().toISOString() } };
 }
 
 export default function TopLatinasPage({ models, fetchedAt }) {
-  const lexyModel = models.find((m) => m.username === LEXY);
-  const others = models.filter((m) => m.username !== LEXY);
-
-  // Guarantee lexy_fox2 in top 4 if online
+  const lexyModel = models.find(m=>m.username===LEXY);
+  const others = models.filter(m=>m.username!==LEXY);
   let ordered = [...others];
   if (lexyModel) {
-    // Insert at position 1-3 (subtle rotation based on minute)
-    const slot = Math.floor(new Date(fetchedAt).getMinutes() / 20) % 3; // 0,1,2
-    ordered.splice(slot, 0, lexyModel);
+    const slot = Math.floor(new Date(fetchedAt).getMinutes()/20)%3;
+    ordered.splice(slot,0,lexyModel);
   }
-  ordered = ordered.slice(0, 50);
-
+  ordered = ordered.slice(0,50);
   const totalOnline = models.length;
-  const topViewers = ordered[0]?.num_users ?? 0;
+  const topViewers = ordered[0]?.num_users??0;
 
   const pageTitle = `Top Latinas en Chaturbate — ${totalOnline} en vivo ahora | Campulse`;
   const pageDescription = `Las ${totalOnline} mejores modelos latinas en vivo en Chaturbate ahora mismo. Colombianas, mexicanas, argentinas y más — ordenadas por viewers reales. Datos actualizados cada 2 horas.`;
 
   const schema = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: pageTitle,
-    description: pageDescription,
-    url: `${SITE}/top/latinas`,
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Campulse", item: SITE },
-        { "@type": "ListItem", position: 2, name: "Top Latinas", item: `${SITE}/top/latinas` },
-      ],
-    },
-    hasPart: ordered.slice(0, 10).map((m) => ({
-      "@type": "WebPage",
-      name: `${m.display_name || m.username} — Stats Chaturbate`,
-      url: `${SITE}/model/${m.username}`,
-    })),
+    "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/top/latinas`,
+    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"Campulse",item:SITE},{"@type":"ListItem",position:2,name:"Top Latinas",item:`${SITE}/top/latinas`}]},
+    hasPart:ordered.slice(0,10).map(m=>({"@type":"WebPage",name:`${m.display_name||m.username} — Campulse`,url:`${SITE}/model/${m.username}`})),
   };
 
   return (
     <>
       <Head>
         <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="keywords" content="latinas chaturbate, modelos latinas en vivo, colombianas chaturbate, mexicanas chaturbate, mejores latinas chaturbate, camgirls latinas" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href={`${SITE}/top/latinas`} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={`${SITE}/top/latinas`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Campulse" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+        <meta name="description" content={pageDescription}/>
+        <meta name="keywords" content="modelos latinas chaturbate, latinas en vivo, colombianas chaturbate, mexicanas chaturbate, webcam latina"/>
+        <meta name="robots" content="index, follow"/>
+        <link rel="canonical" href={`${SITE}/top/latinas`}/>
+        <meta property="og:title" content={pageTitle}/>
+        <meta property="og:description" content={pageDescription}/>
+        <meta property="og:url" content={`${SITE}/top/latinas`}/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:site_name" content="Campulse"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}}/>
+        <style>{DS_CSS}</style>
       </Head>
 
-      <main style={s.main}>
-        {/* Breadcrumb */}
-        <nav style={s.breadcrumb}>
-          <a href="/" style={s.link}>Campulse</a>
-          <span style={s.sep}> › </span>
-          <span>Top Latinas</span>
+      <div className="cmp-page">
+        <nav className="cmp-nav">
+          <Logo/>
+          <div className="cmp-nav-links">
+            <a href="/country" className="cmp-nav-link">Países</a>
+            <a href="/gender" className="cmp-nav-link">Géneros</a>
+            <a href="/search" className="cmp-nav-link">Buscar</a>
+          </div>
         </nav>
 
-        {/* Hero */}
-        <div style={s.hero}>
-          <h1 style={s.h1}>🌶️ Top Latinas en vivo</h1>
-          <p style={s.sub}>
-            <span style={s.badge}>{totalOnline} en vivo</span>
-            {topViewers > 0 && (
-              <span style={s.badge2}>Máx. {topViewers.toLocaleString("es")} viewers</span>
-            )}
-          </p>
-          <p style={s.desc}>
-            Las mejores modelos latinas de Chaturbate ordenadas por viewers en tiempo real.
-            Colombianas, mexicanas, argentinas y más — datos actualizados cada 2 horas.
-          </p>
+        <nav className="cmp-bc">
+          <a href="/">Campulse</a>
+          <span className="cmp-bc-sep">›</span>
+          <span style={{color:"var(--txt2)"}}>Top Latinas</span>
+        </nav>
+
+        {/* HERO */}
+        <div className="cmp-page-header">
+          <h1 className="cmp-page-h1">🌶️ Top Latinas en vivo</h1>
+          <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:".75rem",flexWrap:"wrap"}}>
+            <span style={{background:"rgba(232,48,90,.12)",color:"var(--hot)",fontSize:".75rem",padding:"3px 12px",borderRadius:20,border:"1px solid rgba(232,48,90,.3)",fontWeight:600}}>{totalOnline} en vivo</span>
+            {topViewers>0 && <span style={{background:"rgba(56,182,212,.1)",color:"var(--neon)",fontSize:".75rem",padding:"3px 12px",borderRadius:20,border:"1px solid rgba(56,182,212,.25)",fontWeight:600}}>Máx. {topViewers.toLocaleString("es")} viewers</span>}
+          </div>
+          <p className="cmp-page-sub">Las mejores modelos latinas de Chaturbate ordenadas por viewers en tiempo real. Colombianas, mexicanas, argentinas y más.</p>
         </div>
 
-        {/* Country quick links */}
-        <div style={s.countryBar}>
-          {["CO","MX","AR","CL","ES"].map((c) => (
-            <a key={c} href={`/country/${c.toLowerCase()}`} style={s.countryPill}>
+        {/* COUNTRY QUICK LINKS */}
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:"1.5rem"}}>
+          {["CO","MX","AR","CL","ES"].map(c=>(
+            <a key={c} href={`/country/${c.toLowerCase()}`}
+              style={{background:"var(--surf)",color:"var(--neon)",textDecoration:"none",padding:"6px 14px",borderRadius:20,fontSize:".8125rem",border:"1px solid var(--bdr2)",transition:"background .2s",fontWeight:500}}
+              onMouseEnter={e=>e.currentTarget.style.background="var(--surf2)"}
+              onMouseLeave={e=>e.currentTarget.style.background="var(--surf)"}>
               {FLAG(c)} {COUNTRY_NAMES[c]}
             </a>
           ))}
         </div>
 
-        {/* Model grid */}
-        {ordered.length === 0 ? (
-          <p style={s.empty}>No hay modelos latinas en línea en este momento. Vuelve pronto.</p>
+        {/* AFFILIATE CTA */}
+        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=default&room=${LEXY}`} target="_blank" rel="noopener noreferrer" className="cmp-cta-live">
+          🔴 Ver latinas en vivo ahora →
+        </a>
+
+        {/* MODEL LIST */}
+        {ordered.length===0 ? (
+          <p style={{textAlign:"center",color:"var(--txt3)",padding:"48px 0",fontSize:".875rem"}}>No hay modelos latinas en línea en este momento. Vuelve pronto.</p>
         ) : (
-          <div style={s.grid}>
-            {ordered.map((m, i) => {
-              const isLexy = m.username === LEXY;
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {ordered.map((m,i)=>{
+              const isLexy = m.username===LEXY;
+              const medal = i===0?"cmp-rank-1":i===1?"cmp-rank-2":i===2?"cmp-rank-3":"";
               return (
-                <a
-                  key={m.username}
-                  href={`/model/${m.username}`}
-                  style={isLexy ? { ...s.card, ...s.cardLexy } : s.card}
-                >
-                  {isLexy && <div style={s.lexyBadge}>✦ DESTACADA</div>}
-                  <div style={s.rank}>#{i + 1}</div>
-                  <div style={s.cardBody}>
-                    <div style={s.name}>{m.display_name || m.username}</div>
-                    <div style={s.handle}>@{m.username}</div>
-                    {m.country && (
-                      <div style={s.country}>
-                        {FLAG(m.country)} {COUNTRY_NAMES[m.country] || m.country}
-                      </div>
-                    )}
+                <a key={m.username} href={`/model/${m.username}`}
+                  style={{
+                    display:"flex",alignItems:"center",gap:16,
+                    background:isLexy?"linear-gradient(135deg,rgba(232,48,90,.08),rgba(56,182,212,.06))":"var(--surf)",
+                    borderRadius:"var(--radius)",padding:"14px 18px",
+                    border:isLexy?"1px solid rgba(232,48,90,.3)":"1px solid var(--bdr)",
+                    transition:"border-color .2s,background .15s",textDecoration:"none",position:"relative",overflow:"hidden",
+                  }}
+                  onMouseEnter={e=>{ if(!isLexy){ e.currentTarget.style.borderColor="rgba(56,182,212,.3)"; e.currentTarget.style.background="rgba(56,182,212,.04)"; }}}
+                  onMouseLeave={e=>{ if(!isLexy){ e.currentTarget.style.borderColor="var(--bdr)"; e.currentTarget.style.background="var(--surf)"; }}}>
+                  {isLexy && <div style={{position:"absolute",top:8,right:12,fontSize:".65rem",color:"var(--hot)",fontWeight:800,letterSpacing:".08em"}}>✦ DESTACADA</div>}
+                  <span className={`cmp-rank ${medal}`}>#{i+1}</span>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontWeight:700,fontSize:".9375rem",color:"var(--txt)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.display_name||m.username}</div>
+                    <div style={{fontSize:".75rem",color:"var(--txt3)",marginTop:2}}>@{m.username}</div>
+                    {m.country && <div style={{fontSize:".75rem",color:"var(--txt3)",marginTop:2}}>{FLAG(m.country)} {COUNTRY_NAMES[m.country]||m.country}</div>}
                   </div>
-                  <div style={s.viewers}>
-                    <div style={isLexy ? { ...s.viewerNum, ...s.viewerNumLexy } : s.viewerNum}>
-                      {m.num_users.toLocaleString("es")}
-                    </div>
-                    <div style={s.viewerLabel}>viewers</div>
+                  <div style={{textAlign:"right",flexShrink:0}}>
+                    <div style={{fontWeight:800,fontSize:"1.125rem",color:isLexy?"var(--hot)":"var(--neon)"}}>{m.num_users.toLocaleString("es")}</div>
+                    <div style={{fontSize:".65rem",color:"var(--txt3)"}}>viewers</div>
                   </div>
                 </a>
               );
@@ -181,62 +154,25 @@ export default function TopLatinasPage({ models, fetchedAt }) {
           </div>
         )}
 
-        {/* SEO text */}
-        <section style={s.seoSection}>
-          <h2 style={s.h2}>Modelos latinas en Chaturbate</h2>
-          <p style={s.seoText}>
+        {/* SEO SECTION */}
+        <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
+          <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos latinas en Chaturbate</h2>
+          <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7,marginBottom:".75rem"}}>
             Campulse rastrea en tiempo real las estadísticas de las modelos latinas de Chaturbate,
-            incluyendo colombianas, mexicanas, argentinas, chilenas y españolas. Los datos se actualizan
-            automáticamente cada 2 horas con el número de viewers en vivo, seguidores y países de origen.
+            incluyendo colombianas, mexicanas, argentinas, chilenas y españolas. Los datos se actualizan automáticamente cada 2 horas.
           </p>
           {lexyModel && (
-            <p style={s.seoText}>
-              Entre las modelos más destacadas se encuentra{" "}
-              <a href="/model/lexy_fox2" style={s.link}>lexy_fox2</a>, con{" "}
-              {lexyModel.num_users.toLocaleString("es")} viewers en este momento.
+            <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7}}>
+              Entre las modelos más destacadas se encuentra <a href="/model/lexy_fox2" style={{color:"var(--hot)"}}>lexy_fox2</a>, con {lexyModel.num_users.toLocaleString("es")} viewers en este momento.
             </p>
           )}
-          <p style={{ marginTop: 16, ...s.seoText }}>
-            <a href="/gender/female" style={s.link}>← Ver todas las chicas</a>
-            <span style={s.sep}> · </span>
-            <a href="/country/co" style={s.link}>Top Colombia →</a>
-            <span style={s.sep}> · </span>
-            <a href="/tag/latina" style={s.link}>#latina →</a>
-          </p>
         </section>
-      </main>
+
+        <div className="cmp-footer-links">
+          <a href="/gender/female" className="cmp-footer-link">← Ver todas las chicas</a>
+          <a href="/country/co" className="cmp-footer-link">Top Colombia →</a>
+        </div>
+      </div>
     </>
   );
 }
-
-const s = {
-  main: { fontFamily: "sans-serif", maxWidth: 900, margin: "0 auto", padding: "2rem 1rem", background: "#0d0d0d", minHeight: "100vh", color: "#f0f0f0" },
-  breadcrumb: { fontSize: 13, color: "#888", marginBottom: 20 },
-  link: { color: "#a78bfa", textDecoration: "none" },
-  sep: { color: "#555", margin: "0 6px" },
-  hero: { marginBottom: 28 },
-  h1: { fontSize: 32, fontWeight: 800, margin: "0 0 12px", letterSpacing: "-0.02em" },
-  sub: { display: "flex", gap: 10, alignItems: "center", marginBottom: 12, flexWrap: "wrap" },
-  badge: { background: "rgba(239,68,68,0.15)", color: "#ef4444", fontSize: 12, padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(239,68,68,0.3)" },
-  badge2: { background: "rgba(167,139,250,0.15)", color: "#a78bfa", fontSize: 12, padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(167,139,250,0.3)" },
-  desc: { color: "#888", fontSize: 14, lineHeight: 1.6 },
-  countryBar: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 },
-  countryPill: { background: "#1a1a2e", color: "#a78bfa", textDecoration: "none", padding: "6px 14px", borderRadius: 20, fontSize: 13, border: "1px solid #2a2a4e", transition: "background 0.2s" },
-  grid: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 48 },
-  card: { display: "flex", alignItems: "center", gap: 14, background: "#1a1a2e", borderRadius: 12, padding: "14px 18px", textDecoration: "none", color: "#f0f0f0", position: "relative", overflow: "hidden" },
-  cardLexy: { background: "linear-gradient(135deg, #1a0a1e 0%, #1e1a2e 100%)", border: "1px solid rgba(239,68,68,0.4)", boxShadow: "0 0 20px rgba(239,68,68,0.1)" },
-  lexyBadge: { position: "absolute", top: 8, right: 12, fontSize: 10, color: "#ef4444", fontWeight: 700, letterSpacing: "0.08em" },
-  rank: { fontSize: 12, color: "#444", width: 30, flexShrink: 0, fontWeight: 600 },
-  cardBody: { flex: 1 },
-  name: { fontWeight: 700, fontSize: 15, marginBottom: 2 },
-  handle: { fontSize: 12, color: "#555", marginBottom: 4 },
-  country: { fontSize: 12, color: "#888" },
-  viewers: { textAlign: "right", flexShrink: 0 },
-  viewerNum: { fontWeight: 800, fontSize: 18, color: "#a78bfa" },
-  viewerNumLexy: { color: "#ef4444" },
-  viewerLabel: { fontSize: 10, color: "#555" },
-  empty: { textAlign: "center", color: "#555", padding: "48px 0", fontSize: 14 },
-  seoSection: { background: "#111", borderRadius: 12, padding: "24px", color: "#888", fontSize: 14, lineHeight: 1.7 },
-  h2: { fontSize: 16, color: "#ccc", marginBottom: 12, fontWeight: 700 },
-  seoText: { marginBottom: 10 },
-};
