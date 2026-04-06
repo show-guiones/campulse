@@ -34,8 +34,8 @@ const COUNTRY_DEMONYM = {
 const GENDER_LABELS = { f:"Mujer",m:"Hombre",c:"Pareja",t:"Trans" };
 const GENDER_COLORS = { f:"var(--female)",m:"var(--male)",c:"var(--couple)",t:"var(--trans)" };
 
-const DAYS = 30;
-const MIN_SNAPSHOTS = 3;
+const DAYS = 7;
+const MIN_SNAPSHOTS = 1;
 const LIMIT = 50;
 
 function flag(code) {
@@ -54,7 +54,7 @@ export async function getServerSideProps({ params }) {
   const since = new Date(Date.now()-DAYS*24*60*60*1000).toISOString();
   try {
     const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&country=eq.${codeUC}&select=username,num_users,num_followers,display_name,gender&limit=50000`;
-    const r = await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
+    const r = await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Range":"0-49999","Prefer":"count=none"}});
     if (!r.ok) { const codeUC3=(params.code||"").toUpperCase(); return { props:{ code:(params.code||"").toLowerCase(), codeUC:codeUC3, name:COUNTRY_NAMES[codeUC3]||codeUC3, models:[], fetchError:r.status } }; }
     const rows = await r.json();
     if (!Array.isArray(rows)) { const codeUC4=(params.code||"").toUpperCase(); return { props:{ code:(params.code||"").toLowerCase(), codeUC:codeUC4, name:COUNTRY_NAMES[codeUC4]||codeUC4, models:[], fetchError:"invalid_response" } }; }
