@@ -822,20 +822,20 @@ header{
      top: 44px  (header: logo CB + nombre modelo)
      bot: 160px = ~42px goal bar + ~42px tokens bar + 76px extra buffer */
   --cb-crop-top: 44px;
-  --cb-crop-bot: 180px;
+  --cb-crop-bot: 95px;
 }
 /* Móvil portrait */
 @media(max-width:639px) and (orientation:portrait){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:180px; }
+  :root{ --cb-crop-top:44px; --cb-crop-bot:95px; }
 }
 @media(max-width:380px){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:170px; }
+  :root{ --cb-crop-top:44px; --cb-crop-bot:85px; }
 }
 /* Desktop landscape */
 @media(orientation:landscape),(min-width:640px){
   :root{
     --cb-crop-top: 44px;
-    --cb-crop-bot: 180px;
+    --cb-crop-bot: 95px;
   }
 }
 /* ── PATCH DEFINITIVO: Desktop — iframe centrado 460px para ocultar chat lateral ── */
@@ -851,7 +851,7 @@ header{
     left:50%!important;
     transform:translateX(-50%)!important;
     width:460px!important;
-    height:calc(100% + 44px + 180px)!important;
+    height:calc(100% + 44px + 95px)!important;
   }
 }
 /* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
@@ -860,13 +860,13 @@ header{
     top:-44px!important;
     left:0!important;
     width:100%!important;
-    height:calc(100% + 44px + 180px)!important;
+    height:calc(100% + 44px + 95px)!important;
   }
 }
 @media(max-width:380px) and (orientation:portrait){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px!important;
-    height:calc(100% + 44px + 170px)!important;
+    height:calc(100% + 44px + 85px)!important;
   }
 }
 
@@ -1113,13 +1113,13 @@ header{
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px;
-    height:calc(100% + 44px + 180px);
+    height:calc(100% + 44px + 95px);
   }
 }
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px;
-    height:calc(100% + 44px + 170px);
+    height:calc(100% + 44px + 85px);
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
