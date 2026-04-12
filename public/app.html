@@ -969,11 +969,11 @@ header{
 .modal-sub{font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.15rem}
 
 /* ── BODY ── */
-.modal-body{padding:.7rem .9rem .85rem;background:var(--bg2);overflow-y:auto}
+.modal-body{padding:.5rem .9rem .7rem;background:var(--bg2);overflow-y:auto}
 
 /* Stats row */
 .modal-stats-row{
-  display:flex;gap:.4rem;margin-bottom:.65rem;
+  display:flex;gap:.4rem;margin-bottom:.4rem;
   font-size:.67rem;color:var(--txt2);align-items:center;flex-wrap:wrap
 }
 .modal-stat-item{display:flex;align-items:center;gap:.2rem}
@@ -1050,7 +1050,7 @@ header{
   flex-shrink:0;
   width:100%;
   /* aspect-ratio controla el alto proporcional — sin max-height que lo contradiga */
-  aspect-ratio:16/9;
+  aspect-ratio:4/5;
   overflow:hidden;
   background:#000;
   touch-action:auto;
@@ -2063,6 +2063,7 @@ header{
   .modal-hero{height:400px}
   /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
   .modal-hero.mhero-v2{height:auto}
+  .mhero-v2{aspect-ratio:16/9;max-height:400px}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
@@ -2106,8 +2107,8 @@ header{
   .rep-search{padding:1.5rem 1rem}
   .rep-search-title{font-size:1.6rem}
   .modal-bg{padding:0;align-items:flex-end}
-  .modal{border-radius:24px 24px 0 0;max-height:94dvh;width:100%}
-  .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:94dvh}
+  .modal{border-radius:24px 24px 0 0;max-height:96dvh;width:100%}
+  .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:96dvh}
   .modal-hero{height:320px}
   .modal-hero.mhero-v2{height:auto}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
@@ -2123,7 +2124,7 @@ header{
   .carousel-scroll .crd{width:95px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
   /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
-  .modal-hero{height:240px!important}
+  .modal-hero{height:260px!important}
   .modal-hero.mhero-v2{height:auto!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
