@@ -2634,40 +2634,66 @@ body.modal-open{overflow:hidden!important}
 <!-- ═══ DUAL PICKER — selector visual de segunda sala ═══ -->
 <div class="dual-picker-bg" id="dual-picker-bg" onclick="closeDualPicker(event)">
   <div class="dual-picker" onclick="event.stopPropagation()">
+    <!-- Header -->
     <div class="dp-header">
-      <span class="dp-title">⊞ Ver 2 salas en simultáneo</span>
-      <button class="dp-close" onclick="closeDualPicker()">✕</button>
+      <span class="dp-title" id="dp-title-txt">&#8862; Ver 2 salas en simult&#225;neo</span>
+      <button class="dp-close" onclick="closeDualPicker()">&#x2715;</button>
     </div>
-    <p class="dp-hint">Elige una segunda sala para ver junto a <strong id="dp-current-name">esta</strong></p>
-    <div class="dp-search-row">
-      <input class="dp-input" id="dp-input" type="text" placeholder="Buscar modelo…" oninput="renderDpGrid()" onkeydown="if(event.key==='Enter')openDualFromInput()">
-      <button class="dp-go" onclick="openDualFromInput()">Abrir →</button>
+    <!-- Género nav — idéntico al catálogo -->
+    <div class="gender-nav" id="dp-gnav" style="border-bottom:1px solid var(--bdr);margin:0 -.9rem .0rem;padding:0 .9rem">
+      <button class="gnav-btn active" data-dpg="" onclick="dpSetGender(this,'')"><span class="gnav-ico">&#127760;</span>Todas</button>
+      <div class="gnav-div"></div>
+      <button class="gnav-btn" data-dpg="f" onclick="dpSetGender(this,'f')"><span class="gnav-ico">&#128105;</span>Mujeres</button>
+      <button class="gnav-btn" data-dpg="m" onclick="dpSetGender(this,'m')"><span class="gnav-ico">&#128104;</span>Hombres</button>
+      <button class="gnav-btn" data-dpg="c" onclick="dpSetGender(this,'c')"><span class="gnav-ico">&#128107;</span>Parejas</button>
+      <button class="gnav-btn" data-dpg="t" onclick="dpSetGender(this,'t')"><span class="gnav-ico">&#9895;</span>Trans</button>
     </div>
-    <!-- DP Filters -->
-    <div class="dp-filters" id="dp-filters">
-      <div class="dp-filter-row">
-        <span class="dp-filter-lbl">Género</span>
-        <button class="dp-chip dp-gf active" data-dpg="" onclick="dpSetGender(this,'')">Todas</button>
-        <button class="dp-chip dp-gf" data-dpg="f" onclick="dpSetGender(this,'f')">♀ Mujeres</button>
-        <button class="dp-chip dp-gf" data-dpg="m" onclick="dpSetGender(this,'m')">♂ Hombres</button>
-        <button class="dp-chip dp-gf" data-dpg="c" onclick="dpSetGender(this,'c')">⚭ Parejas</button>
-        <button class="dp-chip dp-gf" data-dpg="t" onclick="dpSetGender(this,'t')">⚧ Trans</button>
+    <!-- Search + Sort sticky -->
+    <div style="display:flex;gap:.4rem;position:sticky;top:0;z-index:10;background:var(--bg2);padding:.5rem 0 .4rem;margin-bottom:0">
+      <div class="srch" style="flex:1">
+        <span class="srch-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/></svg></span>
+        <input id="dp-input" type="text" placeholder="Buscar modelo&#8230;" oninput="renderDpGrid()" onkeydown="if(event.key==='Enter')openDualFromInput()" style="background:transparent;border:none;outline:none;color:var(--txt);font-size:.8rem;flex:1;padding:0;font-family:inherit;width:100%">
       </div>
-      <div class="dp-filter-row">
-        <span class="dp-filter-lbl">Filtros</span>
-        <button class="dp-chip" id="dp-fav" onclick="dpToggle('dpFav',this)">♥ Favs</button>
-        <button class="dp-chip" id="dp-hd"  onclick="dpToggle('dpHD',this)">HD</button>
-        <button class="dp-chip" id="dp-co"  onclick="dpToggle('dpCo',this)">🇨🇴 Colombia</button>
-      </div>
-      <div class="dp-filter-row">
-        <span class="dp-filter-lbl">Edad</span>
-        <button class="dp-chip dp-chip-age" data-dpa="18-21" onclick="dpSetAge(this,'18-21')">18–21</button>
-        <button class="dp-chip dp-chip-age" data-dpa="22-25" onclick="dpSetAge(this,'22-25')">22–25</button>
-        <button class="dp-chip dp-chip-age" data-dpa="26-30" onclick="dpSetAge(this,'26-30')">26–30</button>
-        <button class="dp-chip dp-chip-age" data-dpa="31-40" onclick="dpSetAge(this,'31-40')">31–40</button>
-        <button class="dp-chip dp-chip-age" data-dpa="40+"   onclick="dpSetAge(this,'40+')">40+</button>
+      <select class="sort-sel" id="dp-sort" onchange="renderDpGrid()">
+        <option value="viewers">&#8595; Viewers</option>
+        <option value="followers">&#8595; Seguidores</option>
+        <option value="age_asc">M&#225;s j&#243;venes</option>
+        <option value="new">Nuevas</option>
+      </select>
+      <button class="dp-go" onclick="openDualFromInput()">Abrir &#8594;</button>
+    </div>
+    <!-- Filter chips — igual al catálogo -->
+    <div class="filter-bar" style="padding:.3rem 0 .4rem;margin-bottom:.3rem;border-bottom:1px solid var(--bdr)">
+      <button class="qchip" id="dp-fav" onclick="dpToggle('dpFav',this)">&#9829; Favs</button>
+      <button class="qchip" id="dp-hd"  onclick="dpToggle('dpHD',this)">HD</button>
+      <button class="qchip" id="dp-co"  onclick="dpToggle('dpCo',this)">&#127464;&#127476; Colombia</button>
+      <div class="fb-sep"></div>
+      <button class="qchip dp-chip-age" data-dpa="18-21" onclick="dpSetAge(this,'18-21')">18&#8211;21</button>
+      <button class="qchip dp-chip-age" data-dpa="22-25" onclick="dpSetAge(this,'22-25')">22&#8211;25</button>
+      <button class="qchip dp-chip-age" data-dpa="26-30" onclick="dpSetAge(this,'26-30')">26&#8211;30</button>
+      <button class="qchip dp-chip-age" data-dpa="31-40" onclick="dpSetAge(this,'31-40')">31&#8211;40</button>
+      <button class="qchip dp-chip-age" data-dpa="40+"   onclick="dpSetAge(this,'40+')">40+</button>
+      <div id="dp-active-filters" style="display:none;align-items:center;gap:.4rem">
+        <div class="fb-sep"></div>
+        <span id="dp-filter-summary" style="font-size:.65rem;color:var(--hot);font-weight:700;white-space:nowrap"></span>
+        <button onclick="_dpClearAllFilters()" style="background:none;border:none;color:var(--txt3);font-size:.7rem;cursor:pointer;padding:2px 4px;border-radius:4px" title="Limpiar filtros">&#x2715;</button>
       </div>
     </div>
+    <!-- Tag strip colapsable — igual al catálogo -->
+    <div style="display:flex;align-items:center;padding:.2rem 0 .0rem;border-bottom:1px solid var(--bdr);gap:.5rem;margin-bottom:.4rem">
+      <button class="tag-strip-toggle" id="dp-tag-btn" onclick="_dpToggleTagStrip()">
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 3h8M2.5 5.5h5M4 8h2"/></svg>
+        Tags
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5L5 6.5L8 3.5"/></svg>
+      </button>
+      <div id="dp-tag-preview" style="display:flex;gap:.3rem;overflow:hidden;flex:1"></div>
+    </div>
+    <div class="tag-strip" id="dp-tag-strip">
+      <div id="dp-tag-list" style="display:flex;flex-wrap:wrap;gap:.3rem"></div>
+    </div>
+    <!-- Contador resultados -->
+    <div style="font-size:.65rem;color:var(--txt3);margin-bottom:.4rem;padding-top:.1rem" id="dp-count"></div>
+    <!-- Grid de modelos -->
     <div class="dp-grid" id="dp-grid"></div>
   </div>
 </div>
@@ -2895,18 +2921,43 @@ async function load(){
       maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
       _rankCache=buildRankCache(rooms);
       loaded=true;
-      fetch('/api/model-live?username=lexy_fox2').then(r=>r.ok?r.json():null).then(data=>{
-        if(data&&data.online){
-          window._lexyLive=true;
-          window._lexyViewers=data.num_users||1;
-          if(!rooms.some(r=>r.username==='lexy_fox2')){
-            rooms.unshift({username:'lexy_fox2',display_name:'Lexy',num_users:data.num_users||1,country:'CO',gender:'f',tags:[],spoken_languages:'Spanish'});
-            maxV=Math.max(maxV,data.num_users||1);
-            _rankCache=buildRankCache(rooms);
+      // Verificar si lexy_fox2 está en vivo:
+      // 1) Primero busca en el catálogo ya cargado (tiempo real de CB)
+      // 2) Si no está, consulta /api/rooms?username=lexy_fox2 (proxy CB en tiempo real)
+      // 3) Fallback: /api/model-live (Supabase, puede tener hasta 3h de retraso)
+      (async()=>{
+        try{
+          // Paso 1: ya está en rooms (el catálogo CB la listó)
+          let lexyRoom=rooms.find(r=>r.username==='lexy_fox2');
+          if(!lexyRoom){
+            // Paso 2: consultar CB en tiempo real vía proxy
+            const cbRes=await fetch('/api/rooms?username=lexy_fox2&limit=1').catch(()=>null);
+            if(cbRes&&cbRes.ok){
+              const cbData=await cbRes.json().catch(()=>null);
+              const cbRoom=Array.isArray(cbData?.results)?cbData.results.find(r=>r.username==='lexy_fox2'):null;
+              if(cbRoom&&(cbRoom.num_users||0)>0){lexyRoom=cbRoom;}
+            }
           }
-          updateAll();
-        }
-      }).catch(()=>{});
+          if(!lexyRoom){
+            // Paso 3: fallback Supabase
+            const sbRes=await fetch('/api/model-live?username=lexy_fox2').catch(()=>null);
+            const sbData=sbRes&&sbRes.ok?await sbRes.json().catch(()=>null):null;
+            if(sbData&&sbData.online){
+              lexyRoom={username:'lexy_fox2',display_name:'Lexy',num_users:sbData.num_users||1,country:'CO',gender:'f',tags:[],spoken_languages:'Spanish'};
+            }
+          }
+          if(lexyRoom&&(lexyRoom.num_users||0)>0){
+            window._lexyLive=true;
+            window._lexyViewers=lexyRoom.num_users||1;
+            if(!rooms.some(r=>r.username==='lexy_fox2')){
+              rooms.unshift({username:'lexy_fox2',display_name:lexyRoom.display_name||'Lexy',num_users:lexyRoom.num_users||1,country:'CO',gender:'f',tags:lexyRoom.tags||[],spoken_languages:'Spanish'});
+              maxV=Math.max(maxV,lexyRoom.num_users||1);
+              _rankCache=buildRankCache(rooms);
+            }
+            updateAll();
+          }
+        }catch(e){}
+      })();
       updateAll();
       document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
       if(btn) btn.classList.remove('spin');
@@ -3806,11 +3857,12 @@ function drawMiniChart(canvas,vals){
 
 /* ── DUAL PICKER — local filter state (isolated from main catalog) ── */
 let _dpSlot=null; // 'a'|'b'|null — set by swapDualSlot
-let _dpGender='', _dpFav=false, _dpHD=false, _dpCo=false, _dpAge='';
+let _dpGender='', _dpFav=false, _dpHD=false, _dpCo=false, _dpAge='', _dpActiveTag='';
 
 function dpSetGender(btn,g){
   _dpGender=g;
-  document.querySelectorAll('.dp-gf').forEach(b=>b.classList.toggle('active',b.dataset.dpg===g));
+  document.querySelectorAll('#dp-gnav .gnav-btn[data-dpg]').forEach(b=>b.classList.toggle('active',b.dataset.dpg===g));
+  _dpRenderTagList();
   renderDpGrid();
 }
 function dpToggle(stateKey,btn){
@@ -3818,29 +3870,89 @@ function dpToggle(stateKey,btn){
   if(stateKey==='dpHD')   _dpHD=!_dpHD;
   if(stateKey==='dpCo')   _dpCo=!_dpCo;
   btn.classList.toggle('active');
+  _dpUpdateFilterSummary();
+  _dpRenderTagList();
   renderDpGrid();
 }
 function dpSetAge(btn,r){
   _dpAge=_dpAge===r?'':r;
   document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.toggle('active',b.dataset.dpa===_dpAge));
+  _dpUpdateFilterSummary();
   renderDpGrid();
 }
-function _dpResetFilters(){
-  _dpGender='';_dpFav=false;_dpHD=false;_dpCo=false;_dpAge='';
-  document.querySelectorAll('.dp-gf').forEach(b=>b.classList.toggle('active',b.dataset.dpg===''));
+function _dpSetTag(t){
+  _dpActiveTag=_dpActiveTag===t?'':t;
+  _dpRenderTagList();
+  _dpUpdateFilterSummary();
+  renderDpGrid();
+}
+function _dpUpdateFilterSummary(){
+  const parts=[];
+  if(_dpFav) parts.push('Favs');
+  if(_dpHD) parts.push('HD');
+  if(_dpCo) parts.push('\uD83C\uDDE8\uD83C\uDDF4');
+  if(_dpAge) parts.push(_dpAge);
+  if(_dpActiveTag) parts.push('#'+_dpActiveTag);
+  const wrap=document.getElementById('dp-active-filters');
+  const label=document.getElementById('dp-filter-summary');
+  if(wrap&&label){wrap.style.display=parts.length?'flex':'none';label.textContent=parts.join(' \u00b7 ');}
+}
+function _dpRenderTagList(){
+  // Compute tags from currently visible rooms (same gender filter applied)
+  const tagCount={};
+  rooms.filter(r=>r.num_users&&(!_dpGender||r.gender===_dpGender)).forEach(r=>(r.tags||[]).forEach(t=>{tagCount[t]=(tagCount[t]||0)+1;}));
+  const topTags=Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,24);
+  const tagHtml=topTags.map(([t,c])=>
+    `<span class="tag-chip${_dpActiveTag===t?' active':''}" onclick="_dpSetTag('${t}')" style="cursor:pointer">#${t}<span class="tag-count">${c}</span></span>`
+  ).join('');
+  const listEl=document.getElementById('dp-tag-list');
+  if(listEl) listEl.innerHTML=tagHtml||'<span style="font-size:.65rem;color:var(--txt3)">Sin tags disponibles</span>';
+  const preview=document.getElementById('dp-tag-preview');
+  if(preview) preview.innerHTML=topTags.slice(0,5).map(([t])=>
+    `<span class="tag-chip${_dpActiveTag===t?' active':''}" style="pointer-events:none;opacity:.65">#${t}</span>`
+  ).join('');
+}
+function _dpToggleTagStrip(){
+  const strip=document.getElementById('dp-tag-strip');
+  const btn=document.getElementById('dp-tag-btn');
+  if(!strip||!btn) return;
+  const isOpen=strip.classList.toggle('open');
+  btn.classList.toggle('open',isOpen);
+}
+function _dpClearAllFilters(){
+  _dpGender='';_dpFav=false;_dpHD=false;_dpCo=false;_dpAge='';_dpActiveTag='';
+  document.querySelectorAll('#dp-gnav .gnav-btn[data-dpg]').forEach(b=>b.classList.toggle('active',b.dataset.dpg===''));
   ['dp-fav','dp-hd','dp-co'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.remove('active'));
   const inp=document.getElementById('dp-input');if(inp)inp.value='';
+  const srt=document.getElementById('dp-sort');if(srt)srt.value='viewers';
+  _dpUpdateFilterSummary();
+  _dpRenderTagList();
+  renderDpGrid();
+}
+function _dpResetFilters(){
+  _dpGender='';_dpFav=false;_dpHD=false;_dpCo=false;_dpAge='';_dpActiveTag='';
+  document.querySelectorAll('#dp-gnav .gnav-btn[data-dpg]').forEach(b=>b.classList.toggle('active',b.dataset.dpg===''));
+  ['dp-fav','dp-hd','dp-co'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.remove('active'));
+  const inp=document.getElementById('dp-input');if(inp)inp.value='';
+  const srt=document.getElementById('dp-sort');if(srt)srt.value='viewers';
+  // Close tag strip
+  document.getElementById('dp-tag-strip')?.classList.remove('open');
+  document.getElementById('dp-tag-btn')?.classList.remove('open','active');
+  _dpUpdateFilterSummary();
 }
 
 function renderDpGrid(){
   const dpGrid=document.getElementById('dp-grid');
   if(!dpGrid) return;
-  // Determine excluded username based on context
+  // Excluded username: the other slot already loaded, or the active modal
   const excludeUser = _dpSlot
     ? (document.getElementById('dv-frame-'+(_dpSlot==='a'?'b':'a'))?.src||'').match(/embed\/([^/?]+)/)?.[1]||''
     : (active?.username||'');
   const q=(document.getElementById('dp-input')?.value||'').trim().toLowerCase();
+  const sortVal=(document.getElementById('dp-sort')?.value)||'viewers';
+
   let list=[...rooms].filter(r=>{
     if(!r.num_users) return false;
     if(r.username===excludeUser) return false;
@@ -3848,6 +3960,7 @@ function renderDpGrid(){
     if(_dpFav && !favs.includes(r.username)) return false;
     if(_dpHD && !r.is_hd) return false;
     if(_dpCo && r.country!=='CO') return false;
+    if(_dpActiveTag && !(r.tags||[]).includes(_dpActiveTag)) return false;
     if(_dpAge){
       const age=r.age; if(!age) return false;
       if(_dpAge==='18-21'&&(age<18||age>21)) return false;
@@ -3861,7 +3974,17 @@ function renderDpGrid(){
       if(!hay.includes(q)) return false;
     }
     return true;
-  }).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+  });
+
+  // Sort — same logic as main catalog
+  if(sortVal==='viewers') list.sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+  else if(sortVal==='followers') list.sort((a,b)=>(b.num_followers||0)-(a.num_followers||0));
+  else if(sortVal==='age_asc') list.sort((a,b)=>(a.age||99)-(b.age||99));
+  else if(sortVal==='new') list.sort((a,b)=>new Date(b.start_time||0)-new Date(a.start_time||0));
+
+  // Counter
+  const countEl=document.getElementById('dp-count');
+  if(countEl) countEl.textContent=list.length?`${list.length} sala${list.length!==1?'s':''} en vivo`:'';
 
   if(!list.length){
     dpGrid.innerHTML='<p style="grid-column:1/-1;font-size:.72rem;color:var(--txt3);padding:.5rem">Sin resultados</p>';
@@ -3874,7 +3997,7 @@ function renderDpGrid(){
     return `<div class="dp-card" onclick="${cb}">
       <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
         onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
-      <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
+      <div class="dp-card-vw">\uD83D\uDC40 ${fmt(r.num_users)}</div>
       <div class="dp-card-name">${r.display_name||r.username}</div>
     </div>`;
   }).join('');
@@ -3884,12 +4007,11 @@ function showDualPicker(){
   if(!active)return;
   _dpSlot=null;
   _dpResetFilters();
-  const bg=document.getElementById('dual-picker-bg');
-  const nameEl=document.getElementById('dp-current-name');
-  if(nameEl) nameEl.textContent=active.display_name||active.username;
-  const hint=bg?.querySelector('.dp-hint');
-  if(hint) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
+  const titleEl=document.getElementById('dp-title-txt');
+  if(titleEl) titleEl.textContent='⊞ Ver 2 salas — junto a '+(active.display_name||active.username);
+  _dpRenderTagList();
   renderDpGrid();
+  const bg=document.getElementById('dual-picker-bg');
   if(bg){bg.style.display='flex';requestAnimationFrame(()=>bg.classList.add('open'));}
 }
 
@@ -3900,8 +4022,6 @@ function closeDualPicker(e){
   _dpSlot=null;
   bg.classList.remove('open');
   bg.style.display='none';
-  const hint=bg.querySelector('.dp-hint');
-  if(hint&&active) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
 }
 
 function filterDpList(q){ renderDpGrid(); }
@@ -4110,8 +4230,9 @@ function swapDualSlot(slot){
   if(!bg) return;
   _dpSlot = slot;
   _dpResetFilters();
-  const hint = bg.querySelector('.dp-hint');
-  if(hint) hint.innerHTML = `Elige la sala para reemplazar el <strong>Panel ${slot.toUpperCase()}</strong>`;
+  const titleEl = document.getElementById('dp-title-txt');
+  if(titleEl) titleEl.textContent = '⇄ Cambiar Panel ' + slot.toUpperCase();
+  _dpRenderTagList();
   renderDpGrid();
   bg.style.display = 'flex';
   requestAnimationFrame(() => bg.classList.add('open'));
