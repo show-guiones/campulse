@@ -1029,21 +1029,33 @@ let lpAge = '';
 function login() {
   const v = document.getElementById('secret-input').value.trim();
   if (!v) { document.getElementById('login-error').textContent = 'Ingresa la clave.'; return; }
+  const btn = document.querySelector('#login-screen .btn-primary');
+  if (btn) { btn.textContent = 'Verificando…'; btn.disabled = true; }
   SECRET = v;
   fetchFeatured().then(() => {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-    document.getElementById('logout-btn').style.display = 'inline-flex';
-    document.getElementById('auth-tag').style.display = 'inline';
-    document.getElementById('hdr-search-wrap').style.display = 'block';
-    document.getElementById('mob-nav').classList.add('visible');
-    document.getElementById('sel-all-sh').style.display = '';
-    document.getElementById('login-error').textContent = '';
+    try {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-screen').style.display = 'block';
+      document.getElementById('logout-btn').style.display = 'inline-flex';
+      document.getElementById('auth-tag').style.display = 'inline';
+      document.getElementById('hdr-search-wrap').style.display = 'block';
+      document.getElementById('mob-nav').classList.add('visible');
+      const selAll = document.getElementById('sel-all-sh');
+      if (selAll) selAll.style.display = '';
+      document.getElementById('login-error').textContent = '';
+    } catch(domErr) {
+      console.error('Login DOM error:', domErr);
+    }
     loadRooms();
     startAutoRefresh();
-  }).catch(() => {
+  }).catch(e => {
     SECRET = '';
-    document.getElementById('login-error').textContent = 'Clave incorrecta o error de conexión.';
+    const msg = e.message === '401' ? 'Clave incorrecta.' :
+                e.message === 'inv' ? 'Respuesta inválida del servidor.' :
+                'Error de conexión. Intenta de nuevo.';
+    document.getElementById('login-error').textContent = msg;
+  }).finally(() => {
+    if (btn) { btn.textContent = 'Entrar al panel →'; btn.disabled = false; }
   });
 }
 
@@ -1177,10 +1189,12 @@ async function loadRooms(silent = false) {
 ══════════════════════════════════════════════════ */
 function sidebar() {
   const act = items.filter(i => i.active !== false).length;
-  document.getElementById('nb-feat').textContent = items.length;
-  document.getElementById('sf-feat').textContent = items.length;
-  document.getElementById('sf-act-count').textContent = act;
-  // Update mobile nav badges
+  const nbFeat = document.getElementById('nb-feat');
+  const sfFeat = document.getElementById('sf-feat');
+  const sfAct  = document.getElementById('sf-act-count');
+  if (nbFeat) nbFeat.textContent = items.length;
+  if (sfFeat) sfFeat.textContent = items.length;
+  if (sfAct)  sfAct.textContent  = act;
   _updateMobBadge('mnav-feat-bdg', items.length);
 }
 
@@ -1196,10 +1210,11 @@ function featStats() {
   const ls = new Set(rooms.map(r => r.username));
   const lv = act.filter(i => ls.has(i.username));
   const vw = lv.reduce((s, i) => s + (rooms.find(r => r.username === i.username)?.num_users || 0), 0);
-  document.getElementById('fs-tot').textContent = items.length;
-  document.getElementById('fs-act').textContent = act.length;
-  document.getElementById('fs-lv').textContent = lv.length;
-  document.getElementById('fs-vw').textContent = fmt(vw);
+  const els = { 'fs-tot': items.length, 'fs-act': act.length, 'fs-lv': lv.length, 'fs-vw': fmt(vw) };
+  Object.entries(els).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  });
 }
 
 function fmt(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n || 0); }
@@ -1232,8 +1247,10 @@ function renderFeatured() {
     list.sort((a, b) => a.position - b.position);
   }
 
-  document.getElementById('feat-cnt').textContent = list.length + (list.length !== 1 ? ' modelos' : ' modelo');
+  const cntEl = document.getElementById('feat-cnt');
+  if (cntEl) cntEl.textContent = list.length + (list.length !== 1 ? ' modelos' : ' modelo');
   const el = document.getElementById('feat-list');
+  if (!el) return;
 
   if (!list.length) {
     el.innerHTML = '<div class="empty"><div class="eico">🔍</div><p>Sin resultados para los filtros aplicados</p></div>';
@@ -1329,12 +1346,14 @@ function _swipeEnd(e, el) {
 }
 
 function _initSwipeItems() {
-  // Tap anywhere else to collapse open swipe
-  document.getElementById('feat-list').addEventListener('click', e => {
+  const list = document.getElementById('feat-list');
+  if (!list || list._swipeInit) return;
+  list._swipeInit = true;
+  list.addEventListener('click', e => {
     if (!e.target.closest('.item')) {
       document.querySelectorAll('.item').forEach(el => { el.style.transform = ''; });
     }
-  }, { once: false });
+  });
 }
 
 /* ══════════════════════════════════════════════════
