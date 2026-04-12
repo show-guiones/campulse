@@ -24,15 +24,31 @@ export default async function handler(req) {
     'Content-Type': 'application/json',
   };
 
-  // ─── GET — listar featured activas ordenadas por posición ───────
+  // ─── GET — listar featured (todas para admin ?all=1, solo activas para público) ──
   if (req.method === 'GET') {
+    const url = new URL(req.url);
+    const all = url.searchParams.get('all') === '1';
+
+    // Para admin: auth requerido para ver todas
+    let sbFilter = 'active=eq.true';
+    if (all) {
+      const authHeader = req.headers.get('Authorization') || '';
+      const token = authHeader.replace('Bearer ', '');
+      if (!ADMIN_SECRET || token !== ADMIN_SECRET) {
+        return new Response(JSON.stringify({ error: 'No autorizado' }), { status: 401, headers });
+      }
+      sbFilter = ''; // devolver todas (activas e inactivas)
+    }
+
+    const filterStr = sbFilter ? `${sbFilter}&` : '';
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/featured_models?active=eq.true&order=position.asc&select=username,position,label`,
+      `${SUPABASE_URL}/rest/v1/featured_models?${filterStr}order=position.asc&select=username,position,label,active`,
       { headers: sbHeaders }
     );
     const data = await res.json();
+    const cacheHeader = all ? 'no-store' : 's-maxage=60, stale-while-revalidate=30';
     return new Response(JSON.stringify(data), {
-      headers: { ...headers, 'Cache-Control': 's-maxage=60, stale-while-revalidate=30' }
+      headers: { ...headers, 'Cache-Control': cacheHeader }
     });
   }
 
@@ -71,7 +87,9 @@ export default async function handler(req) {
     const data = await res.json();
 
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: data }), { status: 500, headers });
+      // Extraer mensaje legible del error de Supabase
+      const errMsg = data?.message || data?.details || data?.hint || JSON.stringify(data);
+      return new Response(JSON.stringify({ error: errMsg }), { status: res.status, headers });
     }
     return new Response(JSON.stringify({ ok: true, data }), { headers });
   }

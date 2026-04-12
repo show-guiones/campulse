@@ -102,14 +102,15 @@ header{background:rgba(7,7,14,.92);backdrop-filter:blur(24px);-webkit-backdrop-f
 
 /* ═══ MOBILE NAV ═══ */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(13,13,26,.95);backdrop-filter:blur(20px);border-top:1px solid var(--bdr);padding:8px 12px;gap:4px}
-@media(max-width:768px){.mob-nav{display:flex}}
+.mob-nav.visible{display:flex}
+@media(max-width:768px){.mob-nav.visible{display:flex}}
 .mob-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:var(--rsm);border:none;background:none;color:var(--txt3);font-family:inherit;font-size:8px;font-weight:600;cursor:pointer;transition:all .12s;text-transform:uppercase;letter-spacing:.06em}
 .mob-btn.active{color:var(--hot);background:var(--hot2)}
 .mob-btn .mico{font-size:16px}
 
 /* ═══ CONTENT ═══ */
 .content{padding:20px;overflow-y:auto;height:calc(100vh - 53px)}
-@media(max-width:768px){.content{padding:14px;height:calc(100vh - 53px);padding-bottom:72px}}
+@media(max-width:768px){.content{padding:14px;height:calc(100vh - 53px);padding-bottom:90px;overflow-y:auto}}
 
 /* ═══ PAGE HEADER ═══ */
 .ph{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:20px;flex-wrap:wrap}
@@ -496,7 +497,7 @@ select.fpill{appearance:none;padding-right:24px;background-image:url("data:image
             <span class="srch-ico">🔍</span>
             <input placeholder="Buscar sala por username…" id="live-q" oninput="renderRooms()">
           </div>
-          <select class="fpill" id="live-g" onchange="renderRooms()">
+          <select class="fpill" id="live-g" onchange="_updateLPClear();renderRooms()">
             <option value="">Todos</option>
             <option value="f">♀ Mujeres</option>
             <option value="m">♂ Hombres</option>
@@ -508,9 +509,19 @@ select.fpill{appearance:none;padding-right:24px;background-image:url("data:image
           <button class="fpill" id="lp-nf" onclick="toggleLP('nf')">⭐ Sin destacar</button>
           <select class="fpill" id="live-s" onchange="renderRooms()">
             <option value="viewers">↓ Viewers</option>
+            <option value="followers">↓ Seguidores</option>
             <option value="name">A→Z</option>
             <option value="new">Más nuevas</option>
           </select>
+        </div>
+        <div class="toolbar" style="margin-top:-6px;padding-top:0">
+          <span style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;align-self:center">Edad</span>
+          <button class="fpill lp-age" data-lpa="18-21" onclick="toggleLPAge(this,'18-21')">18–21</button>
+          <button class="fpill lp-age" data-lpa="22-25" onclick="toggleLPAge(this,'22-25')">22–25</button>
+          <button class="fpill lp-age" data-lpa="26-30" onclick="toggleLPAge(this,'26-30')">26–30</button>
+          <button class="fpill lp-age" data-lpa="31-40" onclick="toggleLPAge(this,'31-40')">31–40</button>
+          <button class="fpill lp-age" data-lpa="40+" onclick="toggleLPAge(this,'40+')">40+</button>
+          <button class="fpill" id="lp-clr" onclick="clearLPFilters()" style="display:none;color:var(--hot)">✕ Limpiar</button>
         </div>
 
         <div class="sh">
@@ -768,6 +779,7 @@ let cfg = { autoref: true, notify: false, thumbs: true, viewers: true };
 
 const fpState = { act: false, lv: false, off: false };
 const lpState = { co: false, hd: false, nf: false };
+let lpAge = '';
 
 /* ══════════════════════════════════════════════════
    AUTH
@@ -782,7 +794,7 @@ function login() {
     document.getElementById('logout-btn').style.display = 'inline-flex';
     document.getElementById('auth-tag').style.display = 'inline';
     document.getElementById('hdr-search-wrap').style.display = 'block';
-    document.getElementById('mob-nav').style.display = 'flex';
+    document.getElementById('mob-nav').classList.add('visible');
     document.getElementById('sel-all-sh').style.display = '';
     document.getElementById('login-error').textContent = '';
     loadRooms();
@@ -801,7 +813,7 @@ function logout() {
   document.getElementById('logout-btn').style.display = 'none';
   document.getElementById('auth-tag').style.display = 'none';
   document.getElementById('hdr-search-wrap').style.display = 'none';
-  document.getElementById('mob-nav').style.display = 'none';
+  document.getElementById('mob-nav').classList.remove('visible');
   document.getElementById('secret-input').value = '';
 }
 
@@ -855,7 +867,14 @@ async function api(method, body) {
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch(API_BASE, opts);
   if (r.status === 401) throw new Error('401');
-  return r.json();
+  // Parsear JSON solo si hay contenido; lanzar error con mensaje si !ok
+  const ct = r.headers.get('content-type') || '';
+  const data = ct.includes('json') ? await r.json().catch(() => ({})) : {};
+  if (!r.ok) {
+    const msg = data?.error || data?.message || `HTTP ${r.status}`;
+    throw new Error(msg);
+  }
+  return data;
 }
 
 async function fetchFeatured(silent = false) {
@@ -1017,7 +1036,30 @@ function toggleFP(k) {
 function toggleLP(k) {
   lpState[k] = !lpState[k];
   document.getElementById('lp-' + k).classList.toggle('on', lpState[k]);
+  _updateLPClear();
   renderRooms();
+}
+
+function toggleLPAge(btn, r) {
+  lpAge = lpAge === r ? '' : r;
+  document.querySelectorAll('.lp-age').forEach(b => b.classList.toggle('on', b.dataset.lpa === lpAge));
+  _updateLPClear();
+  renderRooms();
+}
+
+function clearLPFilters() {
+  lpState.co = false; lpState.hd = false; lpState.nf = false; lpAge = '';
+  ['lp-co','lp-hd','lp-nf'].forEach(id => document.getElementById(id)?.classList.remove('on'));
+  document.querySelectorAll('.lp-age').forEach(b => b.classList.remove('on'));
+  document.getElementById('live-g').value = '';
+  _updateLPClear();
+  renderRooms();
+}
+
+function _updateLPClear() {
+  const hasFilter = lpState.co || lpState.hd || lpState.nf || !!lpAge || !!document.getElementById('live-g')?.value;
+  const clr = document.getElementById('lp-clr');
+  if (clr) clr.style.display = hasFilter ? '' : 'none';
 }
 
 /* ══════════════════════════════════════════════════
@@ -1105,10 +1147,19 @@ function renderRooms() {
     if (lpState.co && r.country !== 'CO') return false;
     if (lpState.hd && !r.is_hd) return false;
     if (lpState.nf && fs.has(r.username)) return false;
+    if (lpAge) {
+      const age = r.age; if (!age) return false;
+      if (lpAge === '18-21' && (age < 18 || age > 21)) return false;
+      if (lpAge === '22-25' && (age < 22 || age > 25)) return false;
+      if (lpAge === '26-30' && (age < 26 || age > 30)) return false;
+      if (lpAge === '31-40' && (age < 31 || age > 40)) return false;
+      if (lpAge === '40+' && age < 40) return false;
+    }
     if (q && !(r.username + ' ' + (r.display_name || '')).toLowerCase().includes(q)) return false;
     return true;
   }).sort((a, b) =>
     s === 'viewers' ? (b.num_users || 0) - (a.num_users || 0) :
+    s === 'followers' ? (b.num_followers || 0) - (a.num_followers || 0) :
     s === 'name' ? a.username.localeCompare(b.username) :
     (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0)
   );
@@ -1149,10 +1200,11 @@ function renderRooms() {
 ══════════════════════════════════════════════════ */
 async function quickAdd(username, btn) {
   if (new Set(items.map(i => i.username)).has(username)) {
-    toast(`${username} ya está destacada`, 'warn');
+    toast(`★ ${username} ya está en destacadas`, 'warn');
+    if (btn) { btn.textContent = '★ Ya destacada'; btn.className = 'radd radd-already'; }
     return;
   }
-  if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
+  if (btn) { btn.textContent = '⏳ Agregando…'; btn.disabled = true; }
   try {
     await api('POST', { username, label: null, position: null });
     await fetchFeatured(true);
@@ -1161,7 +1213,8 @@ async function quickAdd(username, btn) {
     sesStats.adds++;
     toast(`✓ ${username} agregada a destacadas`, 'ok');
   } catch (e) {
-    toast('Error al agregar', 'err');
+    const msg = e.message && e.message !== 'err' ? e.message : 'Error al agregar';
+    toast(`✗ ${msg}`, 'err');
     if (btn) { btn.textContent = '+ Destacar'; btn.disabled = false; }
   }
 }
@@ -1176,8 +1229,13 @@ async function addFeat() {
   const act = document.getElementById('add-act').value === 'true';
   const err = document.getElementById('add-err');
   err.textContent = '';
+  err.style.color = 'var(--hot)';
   if (!u) { err.textContent = 'Ingresa el username.'; return; }
-  if (items.find(i => i.username === u)) { err.textContent = `"${u}" ya está en las destacadas.`; return; }
+  if (items.find(i => i.username === u)) {
+    err.textContent = `★ "${u}" ya está en las destacadas — puedes editarla en la pestaña Destacadas.`;
+    err.style.color = 'var(--neon)';
+    return;
+  }
   try {
     await api('POST', { username: u, position: pos, label: lbl, active: act });
     logAction('add', `Agregada: <strong>${u}</strong>${lbl ? ' · ' + lbl : ''}${pos ? ' · pos ' + pos : ''}`);
@@ -1187,8 +1245,9 @@ async function addFeat() {
     toast(`✓ ${u} agregada a destacadas`, 'ok');
     showPage('featured');
   } catch (e) {
-    err.textContent = 'Error al agregar. ¿El username ya existe?';
-    toast('Error al agregar', 'err');
+    const msg = e.message && e.message !== 'err' ? e.message : 'Error al agregar';
+    err.textContent = `✗ ${msg}`;
+    toast(`✗ ${msg}`, 'err');
   }
 }
 
@@ -1218,12 +1277,25 @@ function prevThumb() {
   name.textContent = u;
 
   const liveRoom = rooms.find(r => r.username === u);
+  const alreadyFeat = items.find(i => i.username === u);
+
+  // Indicador de ya destacada
+  const errEl = document.getElementById('add-err');
+  if (alreadyFeat) {
+    errEl.textContent = `★ "${u}" ya está en las destacadas — puedes editarla desde la pestaña Destacadas.`;
+    errEl.style.color = 'var(--neon)';
+  } else {
+    errEl.textContent = '';
+  }
+
   if (liveRoom) {
-    status.textContent = 'Modelo encontrada en Chaturbate';
+    status.textContent = alreadyFeat ? '✅ Ya destacada · En vivo ahora' : 'Modelo encontrada en Chaturbate · En vivo';
+    status.style.color = alreadyFeat ? 'var(--neon)' : 'var(--grn)';
     liveEl.style.display = 'block';
     viewersEl.textContent = fmt(liveRoom.num_users || 0);
   } else {
-    status.textContent = 'Modelo no está en vivo en este momento';
+    status.textContent = alreadyFeat ? '✅ Ya está en destacadas (ahora offline)' : 'Modelo no está en vivo en este momento';
+    status.style.color = alreadyFeat ? 'var(--neon)' : 'var(--txt3)';
     liveEl.style.display = 'none';
   }
 }
