@@ -822,20 +822,20 @@ header{
      top: 44px  (header: logo CB + nombre modelo)
      bot: 160px = ~42px goal bar + ~42px tokens bar + 76px extra buffer */
   --cb-crop-top: 44px;
-  --cb-crop-bot: 160px;
+  --cb-crop-bot: 180px;
 }
 /* Móvil portrait */
 @media(max-width:639px) and (orientation:portrait){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:160px; }
+  :root{ --cb-crop-top:44px; --cb-crop-bot:180px; }
 }
 @media(max-width:380px){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:150px; }
+  :root{ --cb-crop-top:44px; --cb-crop-bot:170px; }
 }
 /* Desktop landscape */
 @media(orientation:landscape),(min-width:640px){
   :root{
     --cb-crop-top: 44px;
-    --cb-crop-bot: 160px;
+    --cb-crop-bot: 180px;
   }
 }
 /* ── PATCH DEFINITIVO: Desktop — iframe centrado 460px para ocultar chat lateral ── */
@@ -851,7 +851,7 @@ header{
     left:50%!important;
     transform:translateX(-50%)!important;
     width:460px!important;
-    height:calc(100% + 44px + 160px)!important;
+    height:calc(100% + 44px + 180px)!important;
   }
 }
 /* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
@@ -860,13 +860,13 @@ header{
     top:-44px!important;
     left:0!important;
     width:100%!important;
-    height:calc(100% + 44px + 160px)!important;
+    height:calc(100% + 44px + 180px)!important;
   }
 }
 @media(max-width:380px) and (orientation:portrait){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px!important;
-    height:calc(100% + 44px + 150px)!important;
+    height:calc(100% + 44px + 170px)!important;
   }
 }
 
@@ -1113,23 +1113,23 @@ header{
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px;
-    height:calc(100% + 44px + 160px);
+    height:calc(100% + 44px + 180px);
   }
 }
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px;
-    height:calc(100% + 44px + 150px);
+    height:calc(100% + 44px + 170px);
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .mhero-v2 .modal-hero-grad{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,.85));z-index:6;pointer-events:none}
-/* ── Máscaras negras sólidas que tapan el header y barras de CB ── */
+/* ── Máscaras edge: solo ocultan artefactos de borde CB (no el video) ── */
 .mhero-v2 .cb-mask-top{
   display:none;
   position:absolute;top:0;left:0;right:0;
-  height:50px;
+  height:8px;
   background:#000;
   z-index:9;
   pointer-events:none;
@@ -1137,7 +1137,7 @@ header{
 .mhero-v2 .cb-mask-bot{
   display:none;
   position:absolute;bottom:0;left:0;right:0;
-  height:140px;
+  height:8px;
   background:#000;
   z-index:9;
   pointer-events:none;
@@ -1150,10 +1150,12 @@ header{
 /* ── Info strip entre video y body ── */
 .mstrip-v2{
   display:flex;align-items:center;justify-content:space-between;
-  padding:.55rem .9rem .45rem;
+  padding:.5rem .9rem .45rem;
   background:var(--bg2);
+  border-top:1px solid rgba(255,255,255,.06);
   border-bottom:1px solid var(--bdr);
   flex-shrink:0;
+  min-height:44px;
 }
 .mstrip-name{
   font-size:.95rem;font-weight:700;color:var(--txt);
