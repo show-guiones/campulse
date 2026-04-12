@@ -71,37 +71,54 @@ export async function getServerSideProps({ params }) {
   const { username } = params;
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ username,history:[],bestHours:[],country:"",gender:"",displayName:"",languages:"",similarModels:[] } };
+  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ username,history:[],bestHours:[],country:"",gender:"",displayName:"",languages:"",similarModels:[],liveData:null } };
   const sbHeaders = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` };
   const since30d = new Date(Date.now()-30*24*60*60*1000).toISOString();
   const since2h  = new Date(Date.now()- 2*60*60*1000).toISOString();
   const enc = encodeURIComponent(username);
   try {
-    const [histRes,bestRes,snapRes,liveRes] = await Promise.all([
-      // DESC para no perder el snapshot más reciente con limit=1000, luego invertimos
+    // ESTRATEGIA: consultamos Chaturbate directamente en tiempo real para saber si está online AHORA
+    // Esto es 100% preciso sin importar cuándo corrió el scraper
+    const [histRes,bestRes,snapRes,cbLiveRes] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?username=eq.${enc}&captured_at=gte.${since30d}&select=captured_at,num_users,num_followers&order=captured_at.desc&limit=1000`,{headers:sbHeaders}),
       fetch(`${SUPABASE_URL}/rest/v1/best_hours?username=eq.${enc}&select=day_of_week,hour_est,avg_viewers,peak_viewers,sample_count&order=avg_viewers.desc&limit=168`,{headers:sbHeaders}),
       fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?username=eq.${enc}&select=country,gender,display_name,spoken_languages&order=captured_at.desc&limit=1`,{headers:sbHeaders}),
-      // Query dedicada: snapshot MÁS RECIENTE sin filtro de fecha — detecta si está online AHORA
-      fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?username=eq.${enc}&select=num_users,num_followers,captured_at&order=captured_at.desc&limit=1`,{headers:sbHeaders}),
+      // Consulta directa a Chaturbate API — estado en tiempo real, sin depender del scraper
+      fetch(`https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=rI8z3&client_ip=request_ip&format=json&limit=1&offset=0&username=${enc}`, { headers:{ "User-Agent":"Mozilla/5.0" }, signal: AbortSignal.timeout(5000) }).catch(()=>null),
     ]);
     const historyDesc = histRes.ok ? await histRes.json() : [];
-    // Invertir para que el historial quede cronológico (más viejo primero) para la sparkline
     const history  = Array.isArray(historyDesc) ? [...historyDesc].reverse() : [];
     const bestHours= bestRes.ok ? await bestRes.json() : [];
     const snapRows = snapRes.ok ? await snapRes.json() : [];
-    const liveRows = liveRes.ok ? await liveRes.json() : [];
     const snap     = Array.isArray(snapRows) ? snapRows[0]||{} : {};
-    // latestSnap: snapshot más reciente real, independiente del historial paginado
-    const latestSnap = Array.isArray(liveRows) && liveRows.length>0 ? liveRows[0] : null;
-    const countryCode = (snap.country||"").toUpperCase().trim();
-    const gender      = snap.gender||"";
+    // liveData: datos en tiempo real de Chaturbate — null si está offline o la API falló
+    let liveData = null;
+    try {
+      if (cbLiveRes && cbLiveRes.ok) {
+        const cbJson = await cbLiveRes.json();
+        const results = cbJson?.results || [];
+        // La API filtra por username, si devuelve resultados = está online ahora mismo
+        if (results.length > 0) {
+          const room = results[0];
+          liveData = {
+            num_users: room.num_users ?? 0,
+            num_followers: room.num_followers ?? 0,
+            display_name: room.display_name || "",
+            country: room.country || "",
+            gender: room.gender || "",
+            spoken_languages: room.spoken_languages || "",
+          };
+        }
+      }
+    } catch {}
+    const countryCode = ((liveData?.country || snap.country)||"").toUpperCase().trim();
+    const genderVal   = liveData?.gender || snap.gender || "";
     let similarModels = [];
     if (countryCode||gender) {
       try {
         let filter = `captured_at=gte.${since2h}&username=neq.${enc}&num_users=gt.0`;
         if (countryCode) filter+=`&country=eq.${countryCode}`;
-        else if (gender) filter+=`&gender=eq.${gender}`;
+        else if (genderVal) filter+=`&gender=eq.${genderVal}`;
         const simRes = await fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?${filter}&select=username,display_name,num_users,country&order=num_users.desc&limit=20`,{headers:sbHeaders});
         if (simRes.ok) {
           const rows = await simRes.json();
@@ -112,27 +129,30 @@ export async function getServerSideProps({ params }) {
         }
       } catch {}
     }
-    return { props:{ username, history:Array.isArray(history)?history:[], bestHours:Array.isArray(bestHours)?bestHours:[], country:snap.country||"", gender, displayName:snap.display_name||"", languages:snap.spoken_languages||"", similarModels, latestSnap:latestSnap??null } };
+    // Preferir datos en tiempo real de Chaturbate sobre los de Supabase
+    const country     = liveData?.country      || snap.country      || "";
+    const gender2     = liveData?.gender       || snap.gender       || "";
+    const displayName = liveData?.display_name || snap.display_name || "";
+    const languages   = liveData?.spoken_languages || snap.spoken_languages || "";
+    return { props:{ username, history:Array.isArray(history)?history:[], bestHours:Array.isArray(bestHours)?bestHours:[], country, gender:gender2, displayName, languages, similarModels, liveData:liveData??null } };
   } catch {
-    return { props:{ username,history:[],bestHours:[],country:"",gender:"",displayName:"",languages:"",similarModels:[],latestSnap:null } };
+    return { props:{ username,history:[],bestHours:[],country:"",gender:"",displayName:"",languages:"",similarModels:[],liveData:null } };
   }
 }
 
-export default function ModelPage({ username,history,bestHours,country,gender,displayName,languages,similarModels,latestSnap }) {
+export default function ModelPage({ username,history,bestHours,country,gender,displayName,languages,similarModels,liveData }) {
   const last        = history[history.length-1]||{};
   const days        = ["Dom","Lun","Mar","Mie","Jue","Vie","Sab"];
-  const viewers     = last.num_users??null;
+  const snapViewers = last.num_users??null;
   const followers   = last.num_followers??null;
   const snapCount   = history.length;
   const topHour     = bestHours[0];
   const peakViewers = history.length>0 ? Math.max(...history.map(r=>r.num_users??0)) : null;
-  // isLive: usa latestSnap dedicado (no el historial paginado).
-  // Considera "en vivo" si tiene viewers > 0 Y el snapshot fue hace menos de 3h (tolera retraso del scraper)
-  const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
-  const liveViewers  = latestSnap?.num_users ?? viewers;
-  const liveSnapAge  = latestSnap?.captured_at ? Date.now() - new Date(latestSnap.captured_at).getTime() : Infinity;
-  const isLive       = liveViewers != null && liveViewers > 0 && liveSnapAge < THREE_HOURS_MS;
-  const currentViewers = isLive ? liveViewers : null;
+  // isLive: 100% basado en la respuesta directa de Chaturbate API en tiempo real.
+  // liveData no es null SOLO si la API de Chaturbate confirmó que está online ahora mismo.
+  const isLive         = liveData !== null && liveData !== undefined;
+  const currentViewers = isLive ? (liveData?.num_users ?? snapViewers) : null;
+  const viewers        = currentViewers ?? snapViewers;
   const countryCode = (country||"").toUpperCase().trim();
   const countryName = COUNTRY_NAMES[countryCode]||countryCode||null;
   const flag        = countryCodeToFlag(countryCode);
