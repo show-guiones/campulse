@@ -1053,6 +1053,8 @@ function login() {
     let msg;
     if (e.message.startsWith('401:')) {
       msg = 'Clave incorrecta. (' + e.message.slice(4) + ')';
+    } else if (e.message.startsWith('cfg:')) {
+      msg = '⚠️ ' + e.message.slice(4) + ' — Ve a Vercel → Settings → Environment Variables y agrega ADMIN_SECRET';
     } else if (e.message.startsWith('err:')) {
       msg = 'Error del servidor: ' + e.message.slice(4);
     } else if (e.message === 'inv') {
@@ -1150,12 +1152,14 @@ async function fetchFeatured(silent = false) {
     if (el) el.innerHTML = '<div class="empty"><div class="eico skeleton" style="width:40px;height:40px;border-radius:50%;margin:0 auto"></div><p style="margin-top:10px">Cargando…</p></div>';
   }
   const r = await fetch(API_BASE + '?all=1&_t=' + Date.now(), { headers: { 'Authorization': `Bearer ${SECRET}` } });
+  const body = await r.json().catch(() => ({}));
   if (r.status === 401) {
-    const body = await r.json().catch(() => ({}));
     throw new Error('401:' + (body.error || 'No autorizado'));
   }
+  if (r.status === 503) {
+    throw new Error('cfg:' + (body.error || 'Panel no configurado'));
+  }
   if (!r.ok) {
-    const body = await r.json().catch(() => ({}));
     throw new Error('err:' + (body.error || `HTTP ${r.status}`));
   }
   const d = await r.json().catch(() => null);
