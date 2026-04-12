@@ -822,13 +822,13 @@ header{
      top: 36px (header CB: logo + nombre de modelo)
      bot: 178px = 114px (barra inferior tokens/tips) + 64px (+17mm extra según UX) */
   --cb-crop-top: 36px;
-  --cb-crop-bot: 178px;
+  --cb-crop-bot: 220px;
 }
 @media(max-width:480px){
-  :root{ --cb-crop-top:36px; --cb-crop-bot:178px; }
+  :root{ --cb-crop-top:36px; --cb-crop-bot:220px; }
 }
 @media(max-width:380px){
-  :root{ --cb-crop-top:36px; --cb-crop-bot:170px; }
+  :root{ --cb-crop-top:36px; --cb-crop-bot:210px; }
 }
 /* Desktop: header 44px + barra inferior 110px (medición exacta F12: 04/06/2026) */
 @media(orientation:landscape),(min-width:640px){
@@ -850,13 +850,13 @@ header{
   .mhero-v2 .embed-wrap .embed-frame{
     top:-36px!important;
     left:0!important;width:100%!important;
-    height:calc(100% + 36px + 178px)!important;
+    height:calc(100% + 36px + 220px)!important;
   }
 }
 @media(max-width:380px) and (orientation:portrait){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-36px!important;
-    height:calc(100% + 36px + 170px)!important;
+    height:calc(100% + 36px + 210px)!important;
   }
 }
 
@@ -1102,14 +1102,13 @@ header{
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-36px;
-    height:calc(100% + 36px + 114px);
+    height:calc(100% + 36px + 220px);
   }
 }
-/* Móvil pequeño (≤380px): igual que 480, bot reducido 106px */
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-36px;
-    height:calc(100% + 36px + 106px);
+    height:calc(100% + 36px + 210px);
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
@@ -2059,11 +2058,11 @@ header{
 ═══════════════════════════════════════════ */
 @media(min-width:601px){
   .modal-bg{align-items:center;padding:1.5rem}
-  .modal{border-radius:20px;max-height:92dvh;max-width:640px;width:100%}
+  .modal{border-radius:20px;max-height:92dvh;max-width:520px;width:100%}
   .modal-hero{height:400px}
   /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
   .modal-hero.mhero-v2{height:auto}
-  .mhero-v2{aspect-ratio:16/9;max-height:400px}
+  .mhero-v2{aspect-ratio:16/9;max-height:300px}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
@@ -2080,7 +2079,7 @@ header{
   .mbody-v2{
     flex:1;
     min-height:0;
-    max-height:calc(92dvh - 360px);
+    max-height:calc(92dvh - 300px);
     overflow-y:auto;
   }
 }
