@@ -756,22 +756,6 @@ header{
 }
 .modal-hero:hover .live-preview-img{transform:scale(1.03)}
 
-/* Gradiente sutil solo en la parte baja para el texto */
-.modal-hero-grad{
-  position:absolute;inset:0;
-  background:linear-gradient(
-    to top,
-    rgba(14,15,18,1) 0%,
-    rgba(14,15,18,.6) 30%,
-    rgba(14,15,18,.1) 55%,
-    transparent 75%
-  );
-  transition:opacity .25s;pointer-events:none
-}
-.mhero-v2.embed-active .modal-hero-grad{opacity:0}
-.mhero-v2.embed-active .mhi-v2{display:none}
-.mhero-v2.embed-active .mhero-stats{display:none}
-
 /* Play overlay — pequeño, elegante, no tapa la imagen */
 .live-preview-wrap{position:relative;height:100%}
 .live-play-btn{
@@ -1094,30 +1078,22 @@ header{
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+/* Gradiente: visible solo cuando NO hay embed (muestra thumbnail) */
 .mhero-v2 .modal-hero-grad{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,.85));z-index:6;pointer-events:none}
-/* ── Máscaras edge: solo ocultan artefactos de borde CB (no el video) ── */
-.mhero-v2 .cb-mask-top{
-  display:none;
-  position:absolute;top:0;left:0;right:0;
-  height:52px;
-  background:#000;
-  z-index:9;
-  pointer-events:none;
-}
-.mhero-v2 .cb-mask-bot{
-  display:none;
-  position:absolute;bottom:0;left:0;right:0;
-  height:8px;
-  background:#000;
-  z-index:9;
-  pointer-events:none;
-}
-.mhero-v2.embed-active .cb-mask-top,
-.mhero-v2.embed-active .cb-mask-bot{
-  display:block;
-}
+.mhero-v2.embed-active .modal-hero-grad{display:none}
+/* Máscaras CB: desactivadas — el crop geométrico ya oculta las barras */
+.mhero-v2 .cb-mask-top{ display:none !important; }
+.mhero-v2 .cb-mask-bot{ display:none !important; }
+/* Info overlay: oculto cuando hay embed activo — ya está en el mstrip debajo */
 .mhi-v2{position:absolute;bottom:.5rem;left:.75rem;z-index:7;pointer-events:none}
-/* ── Info strip entre video y body ── */
+.mhero-v2.embed-active .mhi-v2{ display:none; }
+/* Stats chips: ocultos cuando hay embed activo */
+.mhero-stats{
+  position:absolute;top:.55rem;right:.55rem;z-index:7;
+  display:flex;flex-direction:column;align-items:flex-end;gap:.25rem;
+  pointer-events:none;
+}
+.mhero-v2.embed-active .mhero-stats{ display:none; }
 .mstrip-v2{
   display:flex;align-items:center;justify-content:space-between;
   padding:.5rem .9rem .45rem;
@@ -1140,11 +1116,6 @@ header{
   display:none;
 }
 .mstrip-live.visible{display:block}
-.mhero-stats{
-  position:absolute;top:.55rem;right:.55rem;z-index:7;
-  display:flex;flex-direction:column;align-items:flex-end;gap:.25rem;
-  pointer-events:none;
-}
 .mhero-stat-chip{
   background:rgba(0,0,0,.7);border-radius:20px;
   padding:3px 9px;font-size:.65rem;font-weight:700;color:#fff;
