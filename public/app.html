@@ -1545,46 +1545,24 @@ header{
 }
 
 .dv-swap-btn{
-  /* FIX DEFINITIVO: position:fixed para salir del stacking context del iframe.
-     Los iframes con pointer-events:auto capturan todos los clicks en su área física
-     en Chrome, ignorando overflow:hidden y z-index de hermanos.
-     Con position:fixed el botón está en el root stacking context — siempre encima. */
   position:fixed;
-  z-index:750;  /* encima del dual-view-bg (700) */
-  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
-  color:#fff;font-size:.62rem;font-weight:700;
-  padding:4px 10px;border-radius:6px;cursor:pointer;
-  backdrop-filter:blur(6px);transition:background .15s, opacity .2s;
-  pointer-events:auto;
+  background:rgba(0,0,0,.75);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:8px;
+  color:#fff;
+  font-size:.72rem;font-weight:700;
+  padding:.32rem .65rem;
+  cursor:pointer;
+  z-index:750;
+  display:none;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
-  /* Oculto por defecto — JS lo posiciona al abrir el dual view */
-  display:none;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
 }
 .dv-swap-btn:hover{background:var(--hot)}
 
-/* Botón de audio para dual view — position:fixed via JS (mismo motivo que swap-btn) */
-.dv-audio-btn{
-  position:fixed;
-  z-index:750;
-  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
-  color:#fff;font-size:.75rem;font-weight:700;
-  padding:4px 8px;border-radius:6px;cursor:pointer;
-  backdrop-filter:blur(6px);transition:background .15s, opacity .2s;
-  pointer-events:auto;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-  display:none; /* JS lo posiciona y muestra */
-  line-height:1;
-}
-.dv-audio-btn:hover{background:rgba(232,48,90,.85);}
-.dv-audio-btn.active{background:rgba(232,48,90,.92);border-color:var(--hot);}
-/* Cuando dual view está abierto, JS pone display:flex */
-.dual-view-bg[style*="flex"] ~ * .dv-swap-btn{ display:flex; }
-.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-overflow-scrolling:auto;scrollbar-width:none;-ms-overflow-style:none;}
-@media(orientation:landscape),(min-width:640px){
-  .dv-panels{flex-direction:row}
-}
+
 .dv-panel-label{
   position:absolute;top:.4rem;left:.5rem;z-index:10;
   background:rgba(0,0,0,.7);border-radius:8px;padding:2px 8px;
@@ -2818,8 +2796,6 @@ body.modal-open{overflow:hidden!important}
         </div>
         <!-- CTA flotante desktop -->
         <a id="dv-float-link-a" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala A ↗</a>
-        <!-- Botón audio propio — position:fixed via JS para salir del stacking context del iframe -->
-        <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a')" title="Activar/silenciar audio panel A">🔇</button>
       </div>
       <!-- Panel B -->
       <div class="dv-panel" id="dv-panel-b">
@@ -2838,8 +2814,6 @@ body.modal-open{overflow:hidden!important}
         </div>
         <!-- CTA flotante desktop -->
         <a id="dv-float-link-b" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala B ↗</a>
-        <!-- Botón audio propio -->
-        <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b')" title="Activar/silenciar audio panel B">🔇</button>
       </div>
     </div>
   </div>
@@ -4156,66 +4130,14 @@ function _positionSwapBtns(){
     btnSwapB.style.width = SWAP_W + 'px';
   }
 
-  // Botones de audio — esquina inferior derecha de cada panel
-  const AUDIO_W = 36, AUDIO_PAD_BOT = 6, AUDIO_PAD_RIGHT = 6;
-  const btnAudioA = document.getElementById('dv-audio-a');
-  const btnAudioB = document.getElementById('dv-audio-b');
-  if(btnAudioA){
-    btnAudioA.style.display = 'block';
-    btnAudioA.style.top  = (rA.bottom - AUDIO_PAD_BOT - 30) + 'px';
-    btnAudioA.style.left = (rA.right  - AUDIO_PAD_RIGHT - AUDIO_W) + 'px';
-    btnAudioA.style.width = AUDIO_W + 'px';
-  }
-  if(btnAudioB){
-    btnAudioB.style.display = 'block';
-    btnAudioB.style.top  = (rB.bottom - AUDIO_PAD_BOT - 30) + 'px';
-    btnAudioB.style.left = (rB.right  - AUDIO_PAD_RIGHT - AUDIO_W) + 'px';
-    btnAudioB.style.width = AUDIO_W + 'px';
-  }
 }
 function _hideSwapBtns(){
   document.querySelectorAll('.dv-swap-btn').forEach(b => b.style.display = 'none');
-  document.querySelectorAll('.dv-audio-btn').forEach(b => b.style.display = 'none');
+
 }
 
 /* Estado de audio por slot */
-const _dvAudio = { a: false, b: false }; // false = muted, true = con audio
-
-function toggleDvAudio(slot){
-  _dvAudio[slot] = !_dvAudio[slot];
-  const btn = document.getElementById('dv-audio-' + slot);
-  const frame = document.getElementById('dv-frame-' + slot);
-  const user = dvSlotUser[slot];
-  if(!user || !frame) return;
-  
-  // Recargar el iframe con/sin audio — CB cachea el estado de audio
-  const wrap = frame.closest('.dv-embed-wrap');
-  if(wrap) wrap.classList.remove('stream-ready');
-  const sound = _dvAudio[slot] ? '1' : '0';
-  // Silenciar el otro slot si activamos audio en este
-  if(_dvAudio[slot]){
-    const other = slot === 'a' ? 'b' : 'a';
-    if(_dvAudio[other]){
-      _dvAudio[other] = false;
-      const otherBtn = document.getElementById('dv-audio-' + other);
-      const otherFrame = document.getElementById('dv-frame-' + other);
-      const otherUser = dvSlotUser[other];
-      if(otherBtn) { otherBtn.textContent = '🔇'; otherBtn.classList.remove('active'); }
-      if(otherFrame && otherUser){
-        const otherWrap = otherFrame.closest('.dv-embed-wrap');
-        if(otherWrap) otherWrap.classList.remove('stream-ready');
-        otherFrame.src = `https://chaturbate.com/embed/${otherUser}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=1&mobileRedirect=never&join_overlay=1&t=${Date.now()}`;
-        otherFrame.onload = ()=>{ otherFrame.onload=null; setTimeout(()=>{ if(otherWrap) otherWrap.classList.add('stream-ready'); }, 2500); };
-      }
-    }
-  }
-  frame.src = `https://chaturbate.com/embed/${user}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=${_dvAudio[slot]?'0':'1'}&mobileRedirect=never&join_overlay=1&t=${Date.now()}`;
-  frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrap) wrap.classList.add('stream-ready'); }, 2500); };
-  if(btn){ 
-    btn.textContent = _dvAudio[slot] ? '🔊' : '🔇'; 
-    btn.classList.toggle('active', _dvAudio[slot]);
-  }
-}
+// Audio manejado nativamente por CB
 // Reposicionar en resize y orientación
 window.addEventListener('resize', () => { _positionSwapBtns(); _updateDvScale(); });
 window.addEventListener('orientationchange', () => setTimeout(_positionSwapBtns, 300));
@@ -4226,12 +4148,7 @@ function openDualView(uA,uB){
   const _mf=document.getElementById('live-embed-frame');
   if(_mf){ _mf.src='about:blank'; }
   dvSlotUser.a=uA; dvSlotUser.b=uB;
-  // Resetear estado de audio
-  _dvAudio.a=false; _dvAudio.b=false;
-  ['a','b'].forEach(s=>{
-    const ab=document.getElementById('dv-audio-'+s);
-    if(ab){ab.textContent='🔇';ab.classList.remove('active');}
-  });
+  // Audio manejado nativamente por CB iframe
   const bg=document.getElementById('dual-view-bg');
   const frameA=document.getElementById('dv-frame-a');
   const frameB=document.getElementById('dv-frame-b');
@@ -4283,15 +4200,11 @@ function closeDualView(){
   document.querySelectorAll('.dv-embed-wrap').forEach(w=>w.classList.remove('stream-ready'));
   if(bg) bg.style.display='none';
   document.body.style.overflow='';
-  _dvAudio.a=false; _dvAudio.b=false;
   _hideSwapBtns(); // FIX: ocultar botones fixed al cerrar
 }
 
 /* ── SWAP SLOT: change one room without closing dual view ── */
 function swapDualSlot(slot){
-  // Si este slot tenía audio activo, limpiar mutex
-  if(_dvAudioState[slot]){ _dvAudioState[slot]=false; if(_dvActiveAudioSlot===slot) _dvActiveAudioSlot=null; }
-  const _ab=document.getElementById('dv-audio-'+slot); if(_ab){_ab.classList.remove('active');_ab.textContent='🔇 Audio';}
   const bg = document.getElementById('dual-picker-bg');
   if(!bg) return;
   _dpSlot = slot;
@@ -4306,17 +4219,6 @@ function swapDualConfirm(slot, newUsername){
   if(!slot || !newUsername) return;
   closeDualPicker(); // cierra sin evento — sin guard
 
-  // Reset completo del estado de audio del slot anterior antes del swap
-  _dvAudioState[slot] = false;
-  if(_dvActiveAudioSlot === slot) _dvActiveAudioSlot = null;
-  if(_audioOwner === 'dv-' + slot) _audioOwner = null;
-  const _swapBtn = document.getElementById('dv-audio-' + slot);
-  if(_swapBtn){ _swapBtn.classList.remove('active','pending'); _swapBtn.textContent = '🔇 Audio'; }
-
-  // Resetear audio del slot reemplazado
-  _dvAudio[slot] = false;
-  const _sab = document.getElementById('dv-audio-' + slot);
-  if(_sab){_sab.textContent='🔇';_sab.classList.remove('active');}
   // Actualizar username del slot ANTES de cargar el iframe
   dvSlotUser[slot] = newUsername;
 
