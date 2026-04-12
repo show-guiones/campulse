@@ -720,7 +720,7 @@ header{
 .modal{
   background:var(--bg2);
   border-radius:24px 24px 0 0;
-  width:100%;max-width:500px;
+  width:100%;max-width:640px;
   overflow:hidden;overflow-x:hidden;display:flex;flex-direction:column;
   animation:slidemodal .28s cubic-bezier(.22,1,.36,1);
   box-shadow:0 -8px 60px rgba(0,0,0,.6);
@@ -743,7 +743,7 @@ header{
 /* ── HERO — imagen real grande, play como toque fino ── */
 .modal-hero{
   position:relative;
-  height:260px;
+  height:340px;
   overflow:hidden;cursor:pointer;flex-shrink:0
 }
 /* mhero-v2 usa aspect-ratio — no imponer height fija para evitar espacio en blanco */
@@ -864,6 +864,7 @@ header{
 .embed-wrap{
   display:none;position:absolute;inset:0;z-index:5;
   background:transparent;
+  border-radius:inherit;
 }
 .embed-wrap.active{display:block}
 .embed-frame{
@@ -2058,15 +2059,15 @@ header{
 ═══════════════════════════════════════════ */
 @media(min-width:601px){
   .modal-bg{align-items:center;padding:1.5rem}
-  .modal{border-radius:20px;max-height:88dvh;max-width:500px;width:100%}
-  .modal-hero{height:280px}
+  .modal{border-radius:20px;max-height:92dvh;max-width:640px;width:100%}
+  .modal-hero{height:400px}
   /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
   .modal-hero.mhero-v2{height:auto}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
     height:auto;
-    max-height:88dvh;
+    max-height:92dvh;
     border-radius:20px;
     /* flex column: hero fijo arriba, body scrollea abajo */
     display:flex;
@@ -2078,7 +2079,7 @@ header{
   .mbody-v2{
     flex:1;
     min-height:0;
-    max-height:calc(88dvh - 281px);
+    max-height:calc(92dvh - 360px);
     overflow-y:auto;
   }
 }
@@ -2105,9 +2106,9 @@ header{
   .rep-search{padding:1.5rem 1rem}
   .rep-search-title{font-size:1.6rem}
   .modal-bg{padding:0;align-items:flex-end}
-  .modal{border-radius:24px 24px 0 0;max-height:90dvh;width:100%}
-  .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:90dvh}
-  .modal-hero{height:250px}
+  .modal{border-radius:24px 24px 0 0;max-height:94dvh;width:100%}
+  .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:94dvh}
+  .modal-hero{height:320px}
   .modal-hero.mhero-v2{height:auto}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
@@ -2122,7 +2123,7 @@ header{
   .carousel-scroll .crd{width:95px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
   /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
-  .modal-hero{height:190px!important}
+  .modal-hero{height:240px!important}
   .modal-hero.mhero-v2{height:auto!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
@@ -2846,7 +2847,7 @@ async function loadFeatured(){
 }
 // Returns FEATURED list with LEXY in top-4 (only if online), subtle rotation every 2 min
 function buildFeaturedOrder(){
-  const lexyOnline=rooms.some(r=>r.username===LEXY&&r.num_users>0)||window._lexyLive===true;
+  const lexyOnline=rooms.some(r=>r.username===LEXY&&r.num_users>0);
   const base=FEATURED.filter(u=>u!==LEXY);
   if(!lexyOnline) return base; // LEXY not online → exclude from featured
   const slot=Math.floor(Date.now()/120000)%4; // 0-3, rotates every 2 min
@@ -2951,20 +2952,6 @@ async function load(){
       maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
       _rankCache=buildRankCache(rooms);
       loaded=true;
-      // — Check lexy_fox2 via model-live (no depende de Chaturbate) —
-      fetch('/api/model-live?username=lexy_fox2').then(r=>r.ok?r.json():null).then(data=>{
-        if(data&&data.online){
-          window._lexyLive=true;
-          window._lexyViewers=data.num_users||1;
-          // Si no está en rooms, inyectar objeto sintético
-          if(!rooms.some(r=>r.username==='lexy_fox2')){
-            rooms.unshift({username:'lexy_fox2',display_name:'Lexy',num_users:data.num_users||1,country:'CO',gender:'f',tags:[],spoken_languages:'Spanish'});
-            maxV=Math.max(maxV,data.num_users||1);
-            _rankCache=buildRankCache(rooms);
-          }
-          updateAll();
-        }
-      }).catch(()=>{});
       updateAll();
       document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
       if(btn) btn.classList.remove('spin');
