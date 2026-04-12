@@ -376,6 +376,123 @@ select.fpill{appearance:none;padding-right:24px;background-image:url("data:image
   .rgrid{grid-template-columns:repeat(2,1fr)}
   .mob-btn span.mlbl{display:none}
 }
+
+/* ═══ MOB-BTN ADD HIGHLIGHT ═══ */
+.mob-btn-add .mico-wrap{background:linear-gradient(135deg,var(--hot),var(--neon));border:none!important}
+.mob-btn-add .mico{filter:brightness(10)}
+.mob-btn-add{color:var(--txt2)}
+.mob-btn-add.active .mico-wrap{background:linear-gradient(135deg,var(--hot),var(--neon))}
+
+/* ═══ CATALOG PAGE ═══ */
+.cat-searchbar{position:relative;margin-bottom:10px}
+.cat-search-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;z-index:1}
+.cat-searchbar input{width:100%;background:var(--bg2);border:1px solid var(--bdr2);border-radius:14px;padding:11px 40px 11px 38px;color:var(--txt);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+.cat-searchbar input:focus{border-color:rgba(232,48,90,.5);box-shadow:0 0 0 3px rgba(232,48,90,.08)}
+.cat-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--bg4);border:none;color:var(--txt3);width:26px;height:26px;border-radius:99px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .12s}
+.cat-search-clear:hover{background:var(--bg5);color:var(--txt)}
+.cat-chips{display:flex;gap:6px;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 0 10px;align-items:center;flex-shrink:0}
+.cat-chips::-webkit-scrollbar{display:none}
+.cat-chips-age{padding-top:0;margin-top:-4px}
+.cchip{display:inline-flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--bdr);border-radius:99px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;font-family:inherit;transition:all .13s;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.cchip:hover,.cchip:active{border-color:var(--bdr2);color:var(--txt);background:var(--bg3)}
+.cchip.active{background:var(--hot2);border-color:rgba(232,48,90,.45);color:var(--hot);font-weight:700}
+.cchip-sel{appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23555575'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-color:var(--bg2)}
+.cchip-sep{width:1px;height:18px;background:var(--bdr);flex-shrink:0;margin:0 2px}
+.cat-age-lbl{font-size:10px;font-weight:700;color:var(--txt4);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;flex-shrink:0;padding-right:2px}
+.cc-clr-btn{color:var(--hot)!important;border-color:rgba(232,48,90,.3)!important}
+.cat-bar{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 10px;border-bottom:1px solid var(--bdr);margin-bottom:12px}
+.cat-bar-count{font-size:11px;font-weight:700;color:var(--txt3)}
+.cat-bar-hint{font-size:10px;color:var(--txt4)}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:480px){.cat-grid{grid-template-columns:repeat(3,1fr);gap:6px}}
+@media(max-width:340px){.cat-grid{grid-template-columns:repeat(2,1fr);gap:5px}}
+.ccard{position:relative;border-radius:12px;overflow:hidden;background:var(--bg2);border:1px solid var(--bdr);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,border-color .13s,box-shadow .13s;user-select:none;aspect-ratio:2/3}
+.ccard:active{transform:scale(.95)}
+.ccard.is-feat{border-color:rgba(245,200,66,.55);box-shadow:0 0 0 1px rgba(245,200,66,.12)}
+.ccard-thumb{width:100%;height:100%;object-fit:cover;display:block;background:var(--bg4);position:absolute;inset:0}
+.ccard-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.15) 55%,transparent 100%);pointer-events:none;z-index:1}
+.ccard-live{position:absolute;top:6px;left:6px;background:var(--hot);color:#fff;font-size:8px;font-weight:900;padding:2px 6px;border-radius:99px;letter-spacing:.05em;z-index:3}
+.ccard-star{position:absolute;top:6px;right:7px;font-size:13px;z-index:3;filter:drop-shadow(0 0 4px rgba(245,200,66,.7))}
+.ccard-vw{position:absolute;bottom:32px;left:7px;font-size:9px;font-weight:700;color:rgba(255,255,255,.75);z-index:3;display:flex;align-items:center;gap:3px;line-height:1}
+.ccard-vwdot{width:5px;height:5px;border-radius:50%;background:var(--grn);flex-shrink:0;box-shadow:0 0 4px var(--grn)}
+.ccard-name{position:absolute;bottom:8px;left:7px;right:7px;font-size:10px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:3;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.ccard-tap{position:absolute;inset:0;z-index:4;border-radius:inherit}
+.ccard.adding{pointer-events:none}
+.ccard.adding .ccard-grad{background:rgba(0,0,0,.65)}
+.ccard.adding .ccard-adding-ico{display:flex}
+.ccard-adding-ico{display:none;position:absolute;inset:0;z-index:5;align-items:center;justify-content:center;font-size:24px}
+.ccard.just-added{border-color:rgba(0,209,102,.6);box-shadow:0 0 0 2px rgba(0,209,102,.2),0 0 16px rgba(0,209,102,.15)}
+.cat-empty{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--txt3);font-size:13px}
+.cat-empty .eico{font-size:36px;margin-bottom:10px;opacity:.4}
+
+/* ═══ SWIPE-TO-ACTION (MOBILE ITEMS) ═══ */
+.item-wrap{position:relative;overflow:hidden;margin-bottom:6px;border-radius:var(--r)}
+.item-actions-bg{position:absolute;inset:0;display:flex;align-items:stretch;justify-content:flex-end;border-radius:var(--r);overflow:hidden}
+.item-action-del{background:var(--hot);width:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;gap:3px;cursor:pointer;border:none;font-family:inherit;flex-shrink:0}
+.item-action-del:active{filter:brightness(.9)}
+.item-action-edit{background:var(--neon);width:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;gap:3px;cursor:pointer;border:none;font-family:inherit;flex-shrink:0}
+.item-action-edit:active{filter:brightness(.9)}
+.item{margin-bottom:0;border-radius:var(--r);transition:transform .2s cubic-bezier(.22,1,.36,1),border-color .14s,box-shadow .14s;will-change:transform;touch-action:pan-y}
+
+/* ═══ MOBILE ITEM CARD STYLE ═══ */
+@media(max-width:768px){
+  .item-wrap{border-radius:12px}
+  .item{border-radius:12px;padding:11px 12px;gap:10px}
+  /* Show position more prominently */
+  .ipos{width:28px;height:28px;border-radius:8px;font-size:11px}
+  /* Larger thumb */
+  .ithumb{width:38px;height:50px;border-radius:8px}
+  /* Name larger */
+  .iname{font-size:14px}
+  /* Actions row at bottom */
+  .iactions{width:100%;padding-top:8px;margin-top:4px;border-top:1px solid var(--bdr);justify-content:space-between;gap:6px}
+  .iactions .pos-wrap{margin-right:auto}
+  /* Bigger tap targets */
+  .parr{width:30px;height:30px;font-size:12px}
+  .pnum{height:30px;font-size:12px}
+  .abt{padding:7px 12px;font-size:11px;min-height:32px}
+  .btn-danger{min-width:32px;min-height:32px;display:inline-flex;align-items:center;justify-content:center}
+  /* Live badge on item */
+  .item.live::after{font-size:8px;padding:2px 7px;top:8px;right:10px}
+}
+
+
+/* ═══ LOGIN MOBILE IMPROVEMENTS ═══ */
+@media(max-width:480px){
+  #login-screen{min-height:100dvh;padding:16px;align-items:flex-end;padding-bottom:calc(32px + env(safe-area-inset-bottom))}
+  .login-box{border-radius:24px 24px 20px 20px;padding:28px 22px 24px;max-width:100%}
+  .login-brand-mark{width:52px;height:52px;border-radius:14px;font-size:19px}
+  .login-brand-txt{font-size:20px}
+  .login-box h2{font-size:22px}
+  .field input{font-size:16px!important;padding:13px 14px} /* 16px prevents iOS zoom */
+  .btn-primary{padding:14px!important;font-size:15px!important;border-radius:14px!important}
+}
+
+/* ═══ PH (PAGE HEADER) MOBILE ═══ */
+@media(max-width:600px){
+  .ph-sub{display:none} /* hide subtitle on small screens to save space */
+  .ph{margin-bottom:10px}
+  .ph-title{font-size:17px;font-weight:900}
+}
+
+/* ═══ SECTION HEADER MOBILE ═══ */
+@media(max-width:600px){
+  .sh{margin-bottom:8px}
+  .sh-title{font-size:9px}
+}
+
+/* ═══ EMPTY STATE MOBILE ═══ */
+@media(max-width:600px){
+  .empty{padding:36px 16px}
+  .empty .eico{font-size:28px}
+}
+
+/* ═══ SETTINGS MOBILE ═══ */
+@media(max-width:580px){
+  .settings-grid{grid-template-columns:1fr;gap:8px}
+  .setting-card{padding:12px}
+}
+
 </style>
 </head>
 <body>
@@ -435,10 +552,14 @@ select.fpill{appearance:none;padding-right:24px;background-image:url("data:image
         <span class="ico">📌</span>Destacadas
         <span class="bdg" id="nb-feat">—</span>
       </button>
-      <button class="nav-btn" id="nav-live" onclick="showPage('live')">
-        <span class="ico">🔴</span>En Vivo
-        <span class="bdg" id="nb-live">—</span>
+      <button class="nav-btn" id="nav-catalog" onclick="showPage('catalog')">
+        <span class="ico">🗂</span>Catálogo live
+        <span class="bdg" id="nb-catalog">—</span>
         <span class="pulse"></span>
+      </button>
+      <button class="nav-btn" id="nav-live" onclick="showPage('live')">
+        <span class="ico">🔴</span>En Vivo (lista)
+        <span class="bdg" id="nb-live">—</span>
       </button>
       <div class="nav-lbl">Agregar</div>
       <button class="nav-btn" id="nav-add" onclick="showPage('add')">
@@ -726,6 +847,57 @@ select.fpill{appearance:none;padding-right:24px;background-image:url("data:image
         </div>
       </div>
 
+      <!-- ───── PAGE: CATÁLOGO ───── -->
+      <div id="page-catalog" style="display:none">
+        <div class="ph">
+          <div>
+            <div class="ph-title">🗂 Catálogo Live</div>
+            <div class="ph-sub">Toca una modelo para destacarla · ★ = ya destacada</div>
+          </div>
+          <div class="ph-actions">
+            <span id="cat-count-tag" style="font-size:11px;color:var(--txt3)">— salas</span>
+            <button class="btn btn-ghost btn-sm" onclick="loadRooms();renderCatalog()">↺</button>
+          </div>
+        </div>
+        <div class="cat-searchbar">
+          <span class="cat-search-ico">🔍</span>
+          <input id="cat-q" placeholder="Buscar modelo…" oninput="renderCatalog()" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="cat-search-clear" id="cat-q-clear" onclick="document.getElementById('cat-q').value='';renderCatalog()" style="display:none">✕</button>
+        </div>
+        <div class="cat-chips" id="cat-chips">
+          <button class="cchip cchip-g active" data-g="" onclick="setCatGender(this,'')">Todos</button>
+          <button class="cchip cchip-g" data-g="f" onclick="setCatGender(this,'f')">♀ Mujeres</button>
+          <button class="cchip cchip-g" data-g="m" onclick="setCatGender(this,'m')">♂ Hombres</button>
+          <button class="cchip cchip-g" data-g="c" onclick="setCatGender(this,'c')">⚭ Parejas</button>
+          <button class="cchip cchip-g" data-g="t" onclick="setCatGender(this,'t')">⚧ Trans</button>
+          <div class="cchip-sep"></div>
+          <button class="cchip" id="cc-co" onclick="toggleCatChip('co')">🇨🇴 CO</button>
+          <button class="cchip" id="cc-hd" onclick="toggleCatChip('hd')">📺 HD</button>
+          <button class="cchip" id="cc-nf" onclick="toggleCatChip('nf')">⭐ Sin destacar</button>
+          <div class="cchip-sep"></div>
+          <select class="cchip cchip-sel" id="cat-sort" onchange="renderCatalog()">
+            <option value="viewers">↓ Viewers</option>
+            <option value="followers">↓ Seguidores</option>
+            <option value="name">A→Z</option>
+            <option value="new">Nuevas</option>
+          </select>
+        </div>
+        <div class="cat-chips cat-chips-age">
+          <span class="cat-age-lbl">Edad</span>
+          <button class="cchip cat-age" data-age="18-21" onclick="setCatAge(this,'18-21')">18–21</button>
+          <button class="cchip cat-age" data-age="22-25" onclick="setCatAge(this,'22-25')">22–25</button>
+          <button class="cchip cat-age" data-age="26-30" onclick="setCatAge(this,'26-30')">26–30</button>
+          <button class="cchip cat-age" data-age="31-40" onclick="setCatAge(this,'31-40')">31–40</button>
+          <button class="cchip cat-age" data-age="40+" onclick="setCatAge(this,'40+')">40+</button>
+          <button class="cchip cc-clr-btn" id="cc-clr" onclick="clearCatFilters()" style="display:none">✕ Limpiar</button>
+        </div>
+        <div class="cat-bar">
+          <span class="cat-bar-count" id="cat-cnt">—</span>
+          <span class="cat-bar-hint">Toca para destacar</span>
+        </div>
+        <div class="cat-grid" id="cat-grid"></div>
+      </div>
+
     </div><!-- /content -->
   </div><!-- /layout -->
 </div><!-- /main-screen -->
@@ -735,14 +907,14 @@ select.fpill{appearance:none;padding-right:24px;background-image:url("data:image
   <button class="mob-btn active" id="mnav-featured" onclick="showPage('featured')">
     <span class="mico-wrap"><span class="mico">📌</span></span>
     <span class="mbdg" id="mnav-feat-bdg"></span>
-    <span class="mlbl">Modelos</span>
+    <span class="mlbl">Destacadas</span>
   </button>
-  <button class="mob-btn" id="mnav-live" onclick="showPage('live')">
-    <span class="mico-wrap"><span class="mico">🔴</span></span>
-    <span class="mbdg" id="mnav-live-bdg"></span>
-    <span class="mlbl">En Vivo</span>
+  <button class="mob-btn" id="mnav-catalog" onclick="showPage('catalog')">
+    <span class="mico-wrap"><span class="mico">🗂</span></span>
+    <span class="mbdg" id="mnav-cat-bdg"></span>
+    <span class="mlbl">Catálogo</span>
   </button>
-  <button class="mob-btn" id="mnav-add" onclick="showPage('add')">
+  <button class="mob-btn mob-btn-add" id="mnav-add" onclick="showPage('add')">
     <span class="mico-wrap"><span class="mico">➕</span></span>
     <span class="mlbl">Agregar</span>
   </button>
@@ -909,7 +1081,7 @@ function applyCfg() {
 /* ══════════════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════════════ */
-const PAGES = ['featured', 'live', 'add', 'log', 'settings'];
+const PAGES = ['featured', 'live', 'add', 'log', 'settings', 'catalog'];
 
 function showPage(p) {
   PAGES.forEach(id => {
@@ -921,6 +1093,7 @@ function showPage(p) {
     if (mn) mn.classList.toggle('active', id === p);
   });
   if (p === 'settings') updateSessionStats();
+  if (p === 'catalog') renderCatalog();
   // Scroll content to top on mobile nav switch
   const content = document.querySelector('.content');
   if (content) content.scrollTop = 0;
@@ -977,8 +1150,10 @@ async function loadRooms(silent = false) {
     const totalViews = rooms.reduce((s, r) => s + (r.num_users || 0), 0);
     const coRooms = rooms.filter(r => r.country === 'CO').length;
     document.getElementById('nb-live').textContent = fmt(rooms.length);
+    document.getElementById('nb-catalog').textContent = fmt(rooms.length);
     document.getElementById('sf-live').textContent = fmt(rooms.length);
     _updateMobBadge('mnav-live-bdg', rooms.length);
+    _updateMobBadge('mnav-cat-bdg', rooms.length);
     document.getElementById('sf-views').textContent = fmt(totalViews);
     document.getElementById('sf-time').textContent = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
     document.getElementById('ls-total').textContent = fmt(rooms.length);
@@ -987,6 +1162,8 @@ async function loadRooms(silent = false) {
     document.getElementById('live-count-tag').textContent = fmt(rooms.length) + ' salas';
     featStats();
     renderRooms();
+    // Also refresh catalog if it's open
+    if (document.getElementById('page-catalog')?.style.display !== 'none') renderCatalog();
   } catch (e) {
     if (!silent) toast('Error cargando salas', 'err');
   } finally {
@@ -1071,38 +1248,93 @@ function renderFeatured() {
     const r = rooms.find(r => r.username === it.username);
     const pc = it.position === 1 ? 'p1' : it.position === 2 ? 'p2' : it.position === 3 ? 'p3' : '';
     const isSel = selectedItems.has(it.username);
-    return `<div class="item${it.active === false ? ' inactive' : ''}${lv ? ' live' : ''}"
-      draggable="${!multiSelect}" data-u="${it.username}" data-i="${i}"
-      ondragstart="dStart(event)" ondragover="dOver(event)" ondrop="dDrop(event)" ondragend="dEnd(event)">
-      ${multiSelect ? `<input type="checkbox" class="cbx" ${isSel ? 'checked' : ''} onchange="toggleItemSel('${it.username}',this.checked)" onclick="event.stopPropagation()">` : '<span class="dh">⠿</span>'}
-      <div class="ipos ${pc}">${it.position}</div>
-      ${showThumbs ? `<img class="ithumb" src="https://thumb.live.mmcdn.com/riw/${it.username}.jpg" onerror="this.src='https://thumb.live.mmcdn.com/ri/${it.username}.jpg'" loading="lazy">` : ''}
-      <div class="iinfo">
-        <div class="iname">${it.username}</div>
-        <div class="imeta">
-          ${showViewers && lv ? `<span style="color:var(--grn)">🔴 ${fmt(r?.num_users || 0)}</span>` : lv ? '<span style="color:var(--grn)">🔴 En vivo</span>' : '<span>Offline</span>'}
-          <span>${it.active === false ? '⏸ Inactiva' : '✅ Activa'}</span>
-          ${r?.country ? `<span>📍 ${r.country}</span>` : ''}
-          ${r?.is_hd ? '<span>📺 HD</span>' : ''}
-        </div>
-        ${it.label ? `<div class="ibadge ibadge-neon">${it.label}</div>` : ''}
+    return `<div class="item-wrap" id="wrap-${it.username}">
+      <div class="item-actions-bg" aria-hidden="true">
+        <button class="item-action-edit" onclick="openEdit('${it.username}')"><span style="font-size:16px">✏️</span>Editar</button>
+        <button class="item-action-del" onclick="delFeat('${it.username}')"><span style="font-size:16px">🗑</span>Borrar</button>
       </div>
-      <div class="iactions">
-        <button class="abt" onclick="openEdit('${it.username}')">✏️ Editar</button>
-        <div class="pos-wrap">
-          <button class="parr" onclick="shiftPos('${it.username}',-1)" title="Subir">▲</button>
-          <input class="pnum" type="number" value="${it.position}" min="1"
-            onchange="setPosInline('${it.username}',this.value)" onclick="event.stopPropagation()">
-          <button class="parr" onclick="shiftPos('${it.username}',1)" title="Bajar">▼</button>
+      <div class="item${it.active === false ? ' inactive' : ''}${lv ? ' live' : ''}"
+        draggable="${!multiSelect}" data-u="${it.username}" data-i="${i}"
+        ondragstart="dStart(event)" ondragover="dOver(event)" ondrop="dDrop(event)" ondragend="dEnd(event)"
+        ontouchstart="_swipeStart(event,this)" ontouchmove="_swipeMove(event,this)" ontouchend="_swipeEnd(event,this)">
+        ${multiSelect ? `<input type="checkbox" class="cbx" ${isSel ? 'checked' : ''} onchange="toggleItemSel('${it.username}',this.checked)" onclick="event.stopPropagation()">` : '<span class="dh">⠿</span>'}
+        <div class="ipos ${pc}">${it.position}</div>
+        ${showThumbs ? `<img class="ithumb" src="https://thumb.live.mmcdn.com/riw/${it.username}.jpg" onerror="this.src='https://thumb.live.mmcdn.com/ri/${it.username}.jpg'" loading="lazy">` : ''}
+        <div class="iinfo">
+          <div class="iname">${it.username}</div>
+          <div class="imeta">
+            ${showViewers && lv ? `<span style="color:var(--grn)">🔴 ${fmt(r?.num_users || 0)} viewers</span>` : lv ? '<span style="color:var(--grn)">🔴 En vivo</span>' : '<span style="color:var(--txt4)">Offline</span>'}
+            <span>${it.active === false ? '<span style="color:var(--txt3)">⏸ Inactiva</span>' : '<span style="color:var(--grn)">✅ Activa</span>'}</span>
+            ${r?.country ? `<span>📍 ${r.country}</span>` : ''}
+            ${r?.is_hd ? '<span style="color:var(--blue)">📺 HD</span>' : ''}
+          </div>
+          ${it.label ? `<div class="ibadge ibadge-neon" style="margin-top:5px">${it.label}</div>` : ''}
         </div>
-        <button class="abt abt-grn" onclick="toggleActive('${it.username}')" title="${it.active !== false ? 'Desactivar' : 'Activar'}">
-          ${it.active !== false ? '⏸' : '✅'}
-        </button>
-        <a href="${AFFILIATE_URL}${it.username}" target="_blank" rel="noopener" class="abt" title="Ver sala" style="text-decoration:none">↗</a>
-        <button class="btn-danger" onclick="delFeat('${it.username}')" title="Eliminar">🗑</button>
+        <div class="iactions">
+          <button class="abt" onclick="openEdit('${it.username}')">✏️ Editar</button>
+          <div class="pos-wrap">
+            <button class="parr" onclick="shiftPos('${it.username}',-1)" title="Subir">▲</button>
+            <input class="pnum" type="number" value="${it.position}" min="1"
+              onchange="setPosInline('${it.username}',this.value)" onclick="event.stopPropagation()">
+            <button class="parr" onclick="shiftPos('${it.username}',1)" title="Bajar">▼</button>
+          </div>
+          <button class="abt abt-grn" onclick="toggleActive('${it.username}')" title="${it.active !== false ? 'Desactivar' : 'Activar'}">
+            ${it.active !== false ? '⏸' : '✅'}
+          </button>
+          <a href="${AFFILIATE_URL}${it.username}" target="_blank" rel="noopener" class="abt" title="Ver sala" style="text-decoration:none">↗</a>
+          <button class="btn-danger" onclick="delFeat('${it.username}')" title="Eliminar">🗑</button>
+        </div>
       </div>
     </div>`;
   }).join('');
+
+  // Attach swipe after render
+  _initSwipeItems();
+}
+
+/* ── Swipe-to-reveal helpers ── */
+let _swTouchX = 0, _swActive = null, _swOffset = 0;
+const SW_THRESHOLD = 60, SW_MAX = 145;
+
+function _swipeStart(e, el) {
+  if (e.touches.length !== 1) return;
+  _swTouchX = e.touches[0].clientX;
+  _swActive = el;
+  _swOffset = 0;
+  el.style.transition = 'none';
+}
+
+function _swipeMove(e, el) {
+  if (!_swActive || _swActive !== el) return;
+  const dx = e.touches[0].clientX - _swTouchX;
+  if (dx > 0 && _swOffset >= 0) { _swActive = null; return; } // right swipe = cancel
+  _swOffset = Math.max(-SW_MAX, Math.min(0, dx));
+  el.style.transform = `translateX(${_swOffset}px)`;
+}
+
+function _swipeEnd(e, el) {
+  if (!_swActive || _swActive !== el) return;
+  _swActive = null;
+  el.style.transition = '';
+  if (_swOffset < -SW_THRESHOLD) {
+    el.style.transform = `translateX(-${SW_MAX}px)`;
+    // close others
+    document.querySelectorAll('.item').forEach(other => {
+      if (other !== el && other.style.transform) { other.style.transform = ''; }
+    });
+  } else {
+    el.style.transform = '';
+  }
+  _swOffset = 0;
+}
+
+function _initSwipeItems() {
+  // Tap anywhere else to collapse open swipe
+  document.getElementById('feat-list').addEventListener('click', e => {
+    if (!e.target.closest('.item')) {
+      document.querySelectorAll('.item').forEach(el => { el.style.transform = ''; });
+    }
+  }, { once: false });
 }
 
 /* ══════════════════════════════════════════════════
@@ -1800,6 +2032,140 @@ function runQA() {
   console.log('══════════════════════════════');
   toast(`QA: ${passed}/${total} pruebas OK${failed > 0 ? ` · ${failed} fallaron` : ' ✅'}`, failed > 0 ? 'err' : 'ok');
   return { total, passed, failed, results };
+}
+
+
+/* ══════════════════════════════════════════════════
+   CATALOG PAGE
+══════════════════════════════════════════════════ */
+const catState = { g: '', co: false, hd: false, nf: false, age: '', sort: 'viewers' };
+
+function renderCatalog() {
+  const q = (document.getElementById('cat-q')?.value || '').trim().toLowerCase();
+  const sort = document.getElementById('cat-sort')?.value || 'viewers';
+  const fs = new Set(items.map(i => i.username));
+  const clrBtn = document.getElementById('cat-q-clear');
+  if (clrBtn) clrBtn.style.display = q ? 'flex' : 'none';
+
+  let list = rooms.filter(r => {
+    if (catState.g && r.gender !== catState.g) return false;
+    if (catState.co && r.country !== 'CO') return false;
+    if (catState.hd && !r.is_hd) return false;
+    if (catState.nf && fs.has(r.username)) return false;
+    if (catState.age) {
+      const age = r.age; if (!age) return false;
+      if (catState.age === '18-21' && (age < 18 || age > 21)) return false;
+      if (catState.age === '22-25' && (age < 22 || age > 25)) return false;
+      if (catState.age === '26-30' && (age < 26 || age > 30)) return false;
+      if (catState.age === '31-40' && (age < 31 || age > 40)) return false;
+      if (catState.age === '40+' && age < 40) return false;
+    }
+    if (q && !(r.username + ' ' + (r.display_name || '')).toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) =>
+    sort === 'viewers'   ? (b.num_users     || 0) - (a.num_users     || 0) :
+    sort === 'followers' ? (b.num_followers || 0) - (a.num_followers || 0) :
+    sort === 'name'      ? a.username.localeCompare(b.username) :
+    (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0)
+  );
+
+  const cnt = document.getElementById('cat-cnt');
+  const tag = document.getElementById('cat-count-tag');
+  if (cnt) cnt.textContent = list.length + ' salas en vivo';
+  if (tag) tag.textContent = fmt(rooms.length) + ' salas';
+
+  const grid = document.getElementById('cat-grid');
+  if (!grid) return;
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="cat-empty"><div class="eico">🔍</div><p>Sin resultados con los filtros actuales</p></div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(r => {
+    const isFeat = fs.has(r.username);
+    const vw = fmt(r.num_users || 0);
+    return `<div class="ccard${isFeat ? ' is-feat' : ''}" id="ccard-${r.username}" onclick="catCardTap('${r.username}',this)">
+      <img class="ccard-thumb" src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg"
+        onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'" loading="lazy" alt="">
+      <div class="ccard-grad"></div>
+      <span class="ccard-live">LIVE</span>
+      ${isFeat ? '<span class="ccard-star">★</span>' : ''}
+      <div class="ccard-vw"><span class="ccard-vwdot"></span>${vw}</div>
+      <div class="ccard-name">${r.display_name || r.username}</div>
+      <div class="ccard-adding-ico">⏳</div>
+      <div class="ccard-tap"></div>
+    </div>`;
+  }).join('');
+}
+
+async function catCardTap(username, card) {
+  const fs = new Set(items.map(i => i.username));
+  if (fs.has(username)) {
+    toast(`★ ${username} ya está en destacadas`, 'warn');
+    // Visual pulse feedback
+    card.style.boxShadow = '0 0 0 3px rgba(124,58,237,.6)';
+    setTimeout(() => { card.style.boxShadow = ''; }, 500);
+    return;
+  }
+  card.classList.add('adding');
+  try {
+    await api('POST', { username, label: null, position: null });
+    await fetchFeatured(true);
+    renderCatalog();
+    logAction('add', \`Agregada desde Catálogo: <strong>\${username}</strong>\`);
+    sesStats.adds++;
+    toast(\`✓ \${username} agregada a destacadas\`, 'ok');
+    // Flash green success
+    const updated = document.getElementById('ccard-' + username);
+    if (updated) {
+      updated.classList.add('just-added');
+      setTimeout(() => updated.classList.remove('just-added'), 1200);
+    }
+    _updateMobBadge('mnav-feat-bdg', items.length);
+  } catch (e) {
+    const msg = e.message && e.message !== 'err' ? e.message : 'Error al agregar';
+    toast(\`✗ \${msg}\`, 'err');
+    card.classList.remove('adding');
+  }
+}
+
+function setCatGender(btn, g) {
+  catState.g = g;
+  document.querySelectorAll('.cchip-g').forEach(b => b.classList.toggle('active', b.dataset.g === g));
+  _updateCatClear();
+  renderCatalog();
+}
+
+function toggleCatChip(k) {
+  catState[k] = !catState[k];
+  document.getElementById('cc-' + k)?.classList.toggle('active', catState[k]);
+  _updateCatClear();
+  renderCatalog();
+}
+
+function setCatAge(btn, age) {
+  catState.age = catState.age === age ? '' : age;
+  document.querySelectorAll('.cat-age').forEach(b => b.classList.toggle('active', b.dataset.age === catState.age));
+  _updateCatClear();
+  renderCatalog();
+}
+
+function clearCatFilters() {
+  catState.g = ''; catState.co = false; catState.hd = false; catState.nf = false; catState.age = '';
+  document.querySelectorAll('.cchip-g').forEach(b => b.classList.toggle('active', b.dataset.g === ''));
+  ['cc-co','cc-hd','cc-nf'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  document.querySelectorAll('.cat-age').forEach(b => b.classList.remove('active'));
+  document.getElementById('cat-q').value = '';
+  document.getElementById('cat-q-clear').style.display = 'none';
+  _updateCatClear();
+  renderCatalog();
+}
+
+function _updateCatClear() {
+  const hasFilter = catState.g || catState.co || catState.hd || catState.nf || catState.age;
+  const btn = document.getElementById('cc-clr');
+  if (btn) btn.style.display = hasFilter ? '' : 'none';
 }
 
 /* ══════════════════════════════════════════════════
