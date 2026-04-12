@@ -122,21 +122,21 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
   const topHour     = bestHours[0];
   const peakViewers = history.length>0 ? Math.max(...history.map(r=>r.num_users??0)) : null;
 
-  // ── ESTADO EN VIVO: se detecta en el cliente via /api/rooms ──────────────
-  // El servidor no puede llamar a Chaturbate directamente (bloqueado).
-  // El navegador sí puede — llamamos /api/rooms que actúa de proxy.
-  const [liveViewers, setLiveViewers] = useState(null); // null = aún cargando / offline
+  // ── ESTADO EN VIVO: /api/live-check consulta chaturbate.com/api/chatvideocontext/ ──
+  // Endpoint oficial del embed de Chaturbate — responde el estado exacto de la sala.
+  const [liveViewers, setLiveViewers] = useState(null);
   const [liveChecked, setLiveChecked] = useState(false);
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/rooms?username=${encodeURIComponent(username)}&limit=1`)
+    fetch(`/api/live-check?username=${encodeURIComponent(username)}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (cancelled) return;
-        const results = data?.results || [];
-        // La API usa ?keywords= internamente — filtramos por username exacto
-        const match = results.find(r => r.username === username);
-        setLiveViewers(match ? (match.num_users ?? 0) : null);
+        if (data?.online) {
+          setLiveViewers(data.num_users ?? 1);
+        } else {
+          setLiveViewers(null);
+        }
         setLiveChecked(true);
       })
       .catch(() => { if (!cancelled) setLiveChecked(true); });
