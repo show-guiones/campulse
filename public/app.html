@@ -924,20 +924,35 @@ header{
 .embed-affiliate-overlay{
   position:absolute;
   top:0; left:0; right:0;
-  bottom:56px; /* móvil: libera zona volumen CB */
+  bottom:0;
   z-index:7;
   cursor:pointer;
   background:transparent;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
   overscroll-behavior:none;
-  clip-path:polygon(72px 0,100% 0,100% 100%,72px 100%,72px 0);
+  /* Zona de volumen CB: esquina inferior izquierda 80×60px — siempre libre */
+  clip-path:polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    80px 100%,
+    80px calc(100% - 60px),
+    0 calc(100% - 60px)
+  );
 }
-/* Desktop: volumen CB ya oculto por crop-bot=110px → cubre 100% */
+/* Desktop: misma zona de volumen libre */
 @media(orientation:landscape),(min-width:640px){
   .embed-affiliate-overlay{
-    bottom:0!important;
-    clip-path:none!important;
+    clip-path:polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      80px 100%,
+      80px calc(100% - 60px),
+      0 calc(100% - 60px)
+    ) !important;
+    bottom:0 !important;
   }
   .embed-affiliate-overlay-left{
     display:none!important;
@@ -946,8 +961,8 @@ header{
 .embed-affiliate-overlay-left{
   position:absolute;
   top:0; left:0;
-  width:72px;
-  bottom:56px;
+  width:80px;
+  bottom:60px; /* deja libre los 60px inferiores izquierdos = zona volumen */
   z-index:7;
   cursor:pointer;
   background:transparent;
@@ -1585,34 +1600,33 @@ header{
    Al hacer clic en el video → link afiliado. Volumen → interacción nativa CB. */
 .dv-affiliate-overlay{
   position:absolute;
-  /* Empieza en top:0, termina antes de la zona de volumen/tokens */
-  top:0; left:0; right:0;
-  /* No llega hasta el fondo — deja libre la zona inferior donde está el volumen */
-  bottom:56px;  /* 56px desde abajo = exactamente donde empieza el área del volumen */
+  top:0; left:0; right:0; bottom:0;
   z-index:7;
   cursor:pointer;
   background:transparent;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
   overscroll-behavior:none;
-  /* FIX botón "Cambiar": excluye esquina top-right (zona del swap-btn: ~90px × 42px)
-     y excluye columna izquierda 72px (zona volumen CB) */
+  /* Excluye:
+     - esquina top-right 90×42px → botón "Cambiar"
+     - esquina bottom-left 80×60px → control de volumen CB */
   clip-path:polygon(
-    72px 0,
-    calc(100% - 90px) 0,   /* deja libre el swap-btn (top-right 90px) */
-    calc(100% - 90px) 42px,/* altura del área del swap-btn */
+    0 0,
+    calc(100% - 90px) 0,
+    calc(100% - 90px) 42px,
     100% 42px,
     100% 100%,
-    72px 100%,
-    72px 0
+    80px 100%,
+    80px calc(100% - 60px),
+    0 calc(100% - 60px)
   );
 }
-/* Complemento del overlay: cubre la parte superior izquierda (encima del volumen) */
+/* Complemento: cubre top-left que el clip-path principal no cubre (encima de la zona volumen) */
 .dv-affiliate-overlay-left{
   position:absolute;
   top:0; left:0;
-  width:72px;
-  bottom:56px; /* no cubre donde está el volumen */
+  width:80px;
+  bottom:60px; /* deja libres los 60px inferiores = zona volumen CB */
   z-index:7;
   cursor:pointer;
   background:transparent;
