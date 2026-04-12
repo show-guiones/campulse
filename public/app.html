@@ -769,6 +769,8 @@ header{
   transition:opacity .25s;pointer-events:none
 }
 .mhero-v2.embed-active .modal-hero-grad{opacity:0}
+.mhero-v2.embed-active .mhi-v2{display:none}
+.mhero-v2.embed-active .mhero-stats{display:none}
 
 /* Play overlay — pequeño, elegante, no tapa la imagen */
 .live-preview-wrap{position:relative;height:100%}
@@ -822,20 +824,20 @@ header{
      top: 44px  (header: logo CB + nombre modelo)
      bot: 160px = ~42px goal bar + ~42px tokens bar + 76px extra buffer */
   --cb-crop-top: 44px;
-  --cb-crop-bot: 95px;
+  --cb-crop-bot: 110px;
 }
 /* Móvil portrait */
 @media(max-width:639px) and (orientation:portrait){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:95px; }
+  :root{ --cb-crop-top:44px; --cb-crop-bot:110px; }
 }
 @media(max-width:380px){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:85px; }
+  :root{ --cb-crop-top:44px; --cb-crop-bot:100px; }
 }
 /* Desktop landscape */
 @media(orientation:landscape),(min-width:640px){
   :root{
     --cb-crop-top: 44px;
-    --cb-crop-bot: 95px;
+    --cb-crop-bot: 110px;
   }
 }
 /* ── PATCH DEFINITIVO: Desktop — iframe centrado 460px para ocultar chat lateral ── */
@@ -851,7 +853,7 @@ header{
     left:50%!important;
     transform:translateX(-50%)!important;
     width:460px!important;
-    height:calc(100% + 44px + 95px)!important;
+    height:calc(100% + 44px + 110px)!important;
   }
 }
 /* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
@@ -860,13 +862,13 @@ header{
     top:-44px!important;
     left:0!important;
     width:100%!important;
-    height:calc(100% + 44px + 95px)!important;
+    height:calc(100% + 44px + 110px)!important;
   }
 }
 @media(max-width:380px) and (orientation:portrait){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px!important;
-    height:calc(100% + 44px + 85px)!important;
+    height:calc(100% + 44px + 100px)!important;
   }
 }
 
@@ -1062,7 +1064,7 @@ header{
   flex-shrink:0;
   width:100%;
   aspect-ratio:16/9;
-  max-height:48dvh;
+  max-height:54dvh;
   overflow:hidden;
   background:#000;
   touch-action:auto;
@@ -1113,13 +1115,13 @@ header{
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px;
-    height:calc(100% + 44px + 95px);
+    height:calc(100% + 44px + 110px);
   }
 }
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px;
-    height:calc(100% + 44px + 85px);
+    height:calc(100% + 44px + 100px);
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
@@ -2163,7 +2165,7 @@ header{
   .modal{border-radius:24px 24px 0 0;max-height:96dvh;width:100%}
   .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:96dvh}
   .modal-hero{height:200px}
-  .modal-hero.mhero-v2{height:auto;max-height:48dvh}
+  .modal-hero.mhero-v2{height:auto;max-height:54dvh}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar-top{padding:.35rem .7rem;top:40px}
