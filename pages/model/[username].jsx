@@ -122,8 +122,8 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
   const topHour     = bestHours[0];
   const peakViewers = history.length>0 ? Math.max(...history.map(r=>r.num_users??0)) : null;
 
-  // ── ESTADO EN VIVO: /api/live-check consulta chaturbate.com/api/chatvideocontext/ ──
-  // Endpoint oficial del embed de Chaturbate — responde el estado exacto de la sala.
+  // ── ESTADO EN VIVO: /api/live-check pagina Chaturbate buscando username exacto ─
+  // Pagina hasta 1500 salas (3 × 500) buscando match exacto por username.
   const [liveViewers, setLiveViewers] = useState(null);
   const [liveChecked, setLiveChecked] = useState(false);
   useEffect(() => {
@@ -132,11 +132,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (cancelled) return;
-        if (data?.online) {
-          setLiveViewers(data.num_users ?? 1);
-        } else {
-          setLiveViewers(null);
-        }
+        setLiveViewers(data?.online ? (data.num_users ?? 1) : null);
         setLiveChecked(true);
       })
       .catch(() => { if (!cancelled) setLiveChecked(true); });
