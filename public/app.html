@@ -1636,10 +1636,11 @@ header{
    El overflow:hidden del dv-embed-wrap recorta la UI de CB.
 
    MÓVIL: CB embed muestra video arriba + UI inferior → crop top 36px + bot 114px
-   DESKTOP: CB embed 3 col → crop top 44px + bot 106px + offset lateral
+   DESKTOP: CB embed 3 col → crop top 44px + bot 175px (cubre goal+tokens+promo+camtocam+enviar)
    ══════════════════════════════════════════════════════════ */
 
 /* BASE — móvil portrait: top −36px | embed-wrap=259px → frame=259+36+106=401px ✅
+   DESKTOP: iframe 500px wide → frame height 500px (281+44+175=500) — crop-bot 175px oculta 5 filas UI CB
    FIX6: position:absolute relativo a dv-embed-wrap (position:relative)
    FIX5: top=−36px corrige el bug de top=−2px (frame-a) y top=+259px (frame-b) */
 .dv-frame{
@@ -1684,8 +1685,9 @@ header{
     top:-44px !important;
     left:0 !important;
     width:500px !important;
-    /* height proporcional: 500*(9/16)+44+110 = 281+154 = 435px */
-    height:calc(281px + 44px + 110px) !important; /* 435px */
+    /* height: 500*(9/16)+44+175 = 281+219 = 500px
+       crop-bot 175px cubre: goal bar (~42px) + tokens bar (~42px) + Promocionar+CamToCam+Enviar (~91px) */
+    height:calc(281px + 44px + 175px) !important; /* 500px */
     /* Escalar para llenar el panel completo */
     transform-origin: top left !important;
     transform: scale(var(--dv-panel-scale, 1)) !important;
