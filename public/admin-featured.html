@@ -2151,9 +2151,9 @@ async function catCardTap(username, card) {
     await api('POST', { username, label: null, position: null });
     await fetchFeatured(true);
     renderCatalog();
-    logAction('add', \`Agregada desde Catálogo: <strong>\${username}</strong>\`);
+    logAction('add', `Agregada desde Catálogo: <strong>${username}</strong>`);
     sesStats.adds++;
-    toast(\`✓ \${username} agregada a destacadas\`, 'ok');
+    toast(`✓ ${username} agregada a destacadas`, 'ok');
     // Flash green success
     const updated = document.getElementById('ccard-' + username);
     if (updated) {
@@ -2163,7 +2163,7 @@ async function catCardTap(username, card) {
     _updateMobBadge('mnav-feat-bdg', items.length);
   } catch (e) {
     const msg = e.message && e.message !== 'err' ? e.message : 'Error al agregar';
-    toast(\`✗ \${msg}\`, 'err');
+    toast(`✗ ${msg}`, 'err');
     card.classList.remove('adding');
   }
 }
