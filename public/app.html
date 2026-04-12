@@ -837,7 +837,7 @@ header{
 @media(orientation:landscape),(min-width:640px){
   :root{
     --cb-crop-top: 44px;
-    --cb-crop-bot: 110px;
+    --cb-crop-bot: 150px;
   }
 }
 /* ── PATCH DEFINITIVO: Desktop — iframe centrado 460px para ocultar chat lateral ── */
@@ -853,7 +853,7 @@ header{
     left:50%!important;
     transform:translateX(-50%)!important;
     width:460px!important;
-    height:calc(100% + 44px + 110px)!important;
+    height:calc(100% + 44px + 150px)!important;
   }
 }
 /* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
@@ -862,7 +862,7 @@ header{
     top:-44px!important;
     left:0!important;
     width:100%!important;
-    height:calc(100% + 44px + 110px)!important;
+    height:calc(100% + 44px + 135px)!important;
   }
 }
 @media(max-width:380px) and (orientation:portrait){
@@ -1115,7 +1115,7 @@ header{
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
     top:-44px;
-    height:calc(100% + 44px + 110px);
+    height:calc(100% + 44px + 135px);
   }
 }
 @media(max-width:380px){
@@ -2096,7 +2096,7 @@ header{
   .modal-hero{height:400px}
   /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
   .modal-hero.mhero-v2{height:auto}
-  .mhero-v2{aspect-ratio:16/9;max-height:320px}
+  .mhero-v2{aspect-ratio:16/9;max-height:280px}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
