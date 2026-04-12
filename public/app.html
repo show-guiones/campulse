@@ -1598,41 +1598,7 @@ header{
    2. Excluye bottom-left 72×56px (control de volumen nativo de CB)
    3. Excluye los últimos 110px inferiores (barra tokens/tips — ya oculta por crop)
    Al hacer clic en el video → link afiliado. Volumen → interacción nativa CB. */
-.dv-affiliate-overlay{
-  position:absolute;
-  top:0; left:0; right:0; bottom:0;
-  z-index:7;
-  cursor:pointer;
-  background:transparent;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-  overscroll-behavior:none;
-  /* Excluye:
-     - esquina top-right 90×42px → botón "Cambiar"
-     - esquina bottom-left 80×60px → control de volumen CB */
-  clip-path:polygon(
-    0 0,
-    calc(100% - 90px) 0,
-    calc(100% - 90px) 42px,
-    100% 42px,
-    100% 100%,
-    80px 100%,
-    80px calc(100% - 60px),
-    0 calc(100% - 60px)
-  );
-}
-/* Complemento: cubre top-left que el clip-path principal no cubre (encima de la zona volumen) */
-.dv-affiliate-overlay-left{
-  position:absolute;
-  top:0; left:0;
-  width:80px;
-  bottom:60px; /* deja libres los 60px inferiores = zona volumen CB */
-  z-index:7;
-  cursor:pointer;
-  background:transparent;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
+
 
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
@@ -2804,8 +2770,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div class="dv-affiliate-overlay" onclick="window.open(document.getElementById('dv-link-a')?.href||'#','_blank','noopener')"></div>
-          <div class="dv-affiliate-overlay-left" onclick="window.open(document.getElementById('dv-link-a')?.href||'#','_blank','noopener')"></div>
+
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
@@ -2822,8 +2787,7 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div class="dv-affiliate-overlay" onclick="window.open(document.getElementById('dv-link-b')?.href||'#','_blank','noopener')"></div>
-          <div class="dv-affiliate-overlay-left" onclick="window.open(document.getElementById('dv-link-b')?.href||'#','_blank','noopener')"></div>
+
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
