@@ -818,26 +818,27 @@ header{
 ══════════════════════════════════════════════════════ */
 :root{
   /* ── Crop MODAL sala en vivo ──
-     Medidas exactas del embed de Chaturbate:
-     top: 36px (header CB: logo + nombre de modelo)
-     bot: 178px = 114px (barra inferior tokens/tips) + 64px (+17mm extra según UX) */
-  --cb-crop-top: 36px;
-  --cb-crop-bot: 60px;
+     CB embed layout (medido con F12 12/04/2026):
+     top: 44px  (header: logo CB + nombre modelo)
+     bot: 130px = ~42px goal bar + ~42px tokens bar + 46px extra buffer */
+  --cb-crop-top: 44px;
+  --cb-crop-bot: 130px;
 }
-@media(max-width:480px){
-  :root{ --cb-crop-top:36px; --cb-crop-bot:60px; }
+/* Móvil portrait: mismas barras pero ligeramente distintas en px reales */
+@media(max-width:639px) and (orientation:portrait){
+  :root{ --cb-crop-top:44px; --cb-crop-bot:130px; }
 }
 @media(max-width:380px){
-  :root{ --cb-crop-top:36px; --cb-crop-bot:50px; }
+  :root{ --cb-crop-top:44px; --cb-crop-bot:120px; }
 }
-/* Desktop: header 44px + barra inferior 110px (medición exacta F12: 04/06/2026) */
+/* Desktop landscape: igual, el embed usa el mismo layout */
 @media(orientation:landscape),(min-width:640px){
   :root{
     --cb-crop-top: 44px;
-    --cb-crop-bot: 110px;
+    --cb-crop-bot: 130px;
   }
 }
-/* ── PATCH video upgrade — Desktop: iframe 480px, chat CB oculto ── */
+/* ── PATCH DEFINITIVO: Desktop — iframe centrado 460px para ocultar chat lateral ── */
 @media(orientation:landscape),(min-width:520px){
   .mhero-v2 .embed-wrap{
     overflow:hidden!important;
@@ -849,22 +850,23 @@ header{
     top:-44px!important;
     left:50%!important;
     transform:translateX(-50%)!important;
-    width:480px!important;
-    height:calc(100% + 44px + 60px)!important;
+    width:460px!important;
+    height:calc(100% + 44px + 130px)!important;
   }
 }
-/* ── PATCH F12 04/06/2026 ── Modal móvil: forzar crop correcto (top era +19px) ── */
+/* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
 @media(max-width:639px) and (orientation:portrait){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px!important;
-    left:0!important;width:100%!important;
-    height:calc(100% + 36px + 60px)!important;
+    top:-44px!important;
+    left:0!important;
+    width:100%!important;
+    height:calc(100% + 44px + 130px)!important;
   }
 }
 @media(max-width:380px) and (orientation:portrait){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px!important;
-    height:calc(100% + 36px + 50px)!important;
+    top:-44px!important;
+    height:calc(100% + 44px + 120px)!important;
   }
 }
 
@@ -1106,17 +1108,17 @@ header{
   overscroll-behavior:none;
   scrolling:no;
 }
-/* Móvil ≤480px: top 36px + bot 114px = oculta header y controles CB */
+/* Móvil ≤480px: crop top 44px + bot 130px — oculta header + goal bar + tokens bar */
 @media(max-width:480px){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px;
-    height:calc(100% + 36px + 60px);
+    top:-44px;
+    height:calc(100% + 44px + 130px);
   }
 }
 @media(max-width:380px){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px;
-    height:calc(100% + 36px + 50px);
+    top:-44px;
+    height:calc(100% + 44px + 120px);
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
@@ -2070,7 +2072,7 @@ header{
   .modal-hero{height:400px}
   /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
   .modal-hero.mhero-v2{height:auto}
-  .mhero-v2{aspect-ratio:16/9;max-height:300px}
+  .mhero-v2{aspect-ratio:16/9;max-height:380px}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
