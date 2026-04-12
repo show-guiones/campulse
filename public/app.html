@@ -2846,7 +2846,7 @@ async function loadFeatured(){
 }
 // Returns FEATURED list with LEXY in top-4 (only if online), subtle rotation every 2 min
 function buildFeaturedOrder(){
-  const lexyOnline=rooms.some(r=>r.username===LEXY&&r.num_users>0);
+  const lexyOnline=rooms.some(r=>r.username===LEXY&&r.num_users>0)||window._lexyLive===true;
   const base=FEATURED.filter(u=>u!==LEXY);
   if(!lexyOnline) return base; // LEXY not online → exclude from featured
   const slot=Math.floor(Date.now()/120000)%4; // 0-3, rotates every 2 min
@@ -2951,6 +2951,20 @@ async function load(){
       maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
       _rankCache=buildRankCache(rooms);
       loaded=true;
+      // — Check lexy_fox2 via model-live (no depende de Chaturbate) —
+      fetch('/api/model-live?username=lexy_fox2').then(r=>r.ok?r.json():null).then(data=>{
+        if(data&&data.online){
+          window._lexyLive=true;
+          window._lexyViewers=data.num_users||1;
+          // Si no está en rooms, inyectar objeto sintético
+          if(!rooms.some(r=>r.username==='lexy_fox2')){
+            rooms.unshift({username:'lexy_fox2',display_name:'Lexy',num_users:data.num_users||1,country:'CO',gender:'f',tags:[],spoken_languages:'Spanish'});
+            maxV=Math.max(maxV,data.num_users||1);
+            _rankCache=buildRankCache(rooms);
+          }
+          updateAll();
+        }
+      }).catch(()=>{});
       updateAll();
       document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
       if(btn) btn.classList.remove('spin');
