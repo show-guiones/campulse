@@ -1,4 +1,4 @@
-﻿// pages/model/[username].jsx — Mobile-first redesign con UX optimizada para afiliado
+// pages/model/[username].jsx — Mobile-first redesign con UX optimizada para afiliado
 
 import Head from "next/head";
 import { useState, useEffect } from "react";
@@ -301,7 +301,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         <style>{mobileCSS}</style>
       </Head>
 
-      {/* MOBILE LAYOUT */}<div id="mob-layout">
+      {/* ── MOBILE LAYOUT ── */}<div id="mob-layout">
 
       {/* STICKY NAV — siempre visible al hacer scroll */}
       <div className="mob-sticky">
@@ -311,7 +311,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         <a href={AFFILIATE_URL} target="_blank" rel="noopener noreferrer"
           className={isLive?"mob-sticky-cta":"mob-sticky-cta-off"}>
           {isLive && <span className="cmp-live-dot"/>}
-          {isLive ? `${currentViewers?.toLocaleString("es")} viewers � Ver en vivo` : "Ver en Chaturbate"}
+          {isLive ? `${currentViewers?.toLocaleString("es")} viewers � Ver en vivo` : "Ver en Chaturbate"}
         </a>
       </div>
 
@@ -479,7 +479,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
       <div className="mob-seo">
         <h2 style={{fontSize:".9375rem",fontWeight:700,marginBottom:".5rem",color:"var(--txt)"}}>Estadísticas de {name} en Chaturbate</h2>
         <p style={{color:"var(--txt2)",fontSize:".8125rem",lineHeight:1.6}}>
-          CampulseHub rastrea en tiempo real las estadísticas de {name} en Chaturbate.{countryName?` Modelo de ${countryName}.`:""}{" "}{peakViewers!=null?`Pico de ${peakViewers.toLocaleString("es")} viewers en los �ltimos 30 d�as. `:""}Datos actualizados cada 2 horas.
+          CampulseHub rastrea en tiempo real las estadísticas de {name} en Chaturbate.{countryName?` Modelo de ${countryName}.`:""}{" "}{peakViewers!=null?`Pico de ${peakViewers.toLocaleString("es")} viewers en los �ltimos 30 d�as. `:""}Datos actualizados cada 2 horas.
         </p>
       </div>
 
@@ -490,7 +490,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         <a href="/app.html">← Volver al inicio</a>
       </div>
 
-</div></div>      {/* DESKTOP LAYOUT */}
+</div></div>      {/* ── DESKTOP LAYOUT ── */}
       <div className="cmp-page">
         <nav className="cmp-nav">
           <Logo/>
