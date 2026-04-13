@@ -1132,9 +1132,18 @@ function updateSessionStats() {
    API
 ══════════════════════════════════════════════════ */
 async function api(method, body) {
+  // For DELETE and PUT: username goes in the URL query param (Edge runtime drops body on DELETE)
+  // For POST: username goes in the body (as before)
+  let url = API_BASE;
+  let sendBody = body;
+  if ((method === 'DELETE' || method === 'PUT') && body && body.username) {
+    const { username, ...rest } = body;
+    url = API_BASE + '?username=' + encodeURIComponent(username);
+    sendBody = Object.keys(rest).length > 0 ? rest : null;
+  }
   const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SECRET}` } };
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(API_BASE, opts);
+  if (sendBody && Object.keys(sendBody).length > 0) opts.body = JSON.stringify(sendBody);
+  const r = await fetch(url, opts);
   if (r.status === 401) throw new Error('401');
   // Parsear JSON solo si hay contenido; lanzar error con mensaje si !ok
   const ct = r.headers.get('content-type') || '';
@@ -1482,7 +1491,7 @@ async function bulkDelete() {
       toast(`🗑 ${us.length} modelos eliminadas`, 'ok');
       clearSelection();
       await fetchFeatured(true);
-    } catch (e) { toast('Error al eliminar', 'err'); }
+    } catch (e) { console.error('[bulkDelete]', e); toast('✗ ' + (e.message || 'Error al eliminar'), 'err'); }
   });
 }
 
@@ -1778,7 +1787,7 @@ async function delFeat(username) {
       await fetchFeatured(true);
       renderRooms();
       toast(`🗑 ${username} eliminada`, 'ok');
-    } catch (e) { toast('Error al eliminar', 'err'); }
+    } catch (e) { console.error('[delFeat]', e); toast('✗ ' + (e.message || 'Error al eliminar'), 'err'); }
   });
 }
 

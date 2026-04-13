@@ -107,9 +107,13 @@ export default async function handler(req) {
     if (!username) return new Response(JSON.stringify({ error: 'username requerido' }), { status: 400, headers });
     const r = await fetch(`${SUPABASE_URL}/rest/v1/featured_models?username=eq.${encodeURIComponent(username)}`, {
       method: 'DELETE',
-      headers: sbHeaders,
+      headers: { ...sbHeaders, 'Prefer': 'return=minimal' },
     });
-    if (!r.ok) return new Response(JSON.stringify({ error: `Error ${r.status}` }), { status: r.status, headers });
+    if (!r.ok) {
+      const errBody = await r.json().catch(() => null);
+      const errMsg = errBody?.message || errBody?.error || errBody?.hint || `Supabase error ${r.status}`;
+      return new Response(JSON.stringify({ error: errMsg, status: r.status }), { status: r.status, headers });
+    }
     return new Response(JSON.stringify({ ok: true }), { headers });
   }
 
