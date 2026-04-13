@@ -86,13 +86,17 @@ export default async function handler(req) {
 
   if (req.method === 'PUT') {
     const url = new URL(req.url);
-    const username = url.searchParams.get('username');
+    // Read username from query param OR from body (frontend sends it in body)
+    let body = {};
+    try { body = await req.json(); } catch (_) {}
+    const username = url.searchParams.get('username') || body.username;
     if (!username) return new Response(JSON.stringify({ error: 'username requerido' }), { status: 400, headers });
-    const body = await req.json();
+    // Remove username from the patch payload (it's the key, not a field to update)
+    const { username: _u, ...patch } = body;
     const r = await fetch(`${SUPABASE_URL}/rest/v1/featured_models?username=eq.${encodeURIComponent(username)}`, {
       method: 'PATCH',
       headers: { ...sbHeaders, 'Prefer': 'return=representation' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(patch),
     });
     const d = await r.json().catch(() => null);
     if (!r.ok) return new Response(JSON.stringify({ error: d?.message || `Error ${r.status}` }), { status: r.status, headers });
@@ -101,7 +105,10 @@ export default async function handler(req) {
 
   if (req.method === 'DELETE') {
     const url = new URL(req.url);
-    const username = url.searchParams.get('username');
+    // Read username from query param OR from body (frontend sends it in body)
+    let body = {};
+    try { body = await req.json(); } catch (_) {}
+    const username = url.searchParams.get('username') || body.username;
     if (!username) return new Response(JSON.stringify({ error: 'username requerido' }), { status: 400, headers });
     const r = await fetch(`${SUPABASE_URL}/rest/v1/featured_models?username=eq.${encodeURIComponent(username)}`, {
       method: 'DELETE',
