@@ -1,20 +1,13 @@
 // pages/api/sitemap.js
 //
-// Sitemap completo — incluye:
-//   · Home y páginas estáticas de categoría (género, país, idioma)
-//   · Búsqueda + Tags populares de Chaturbate
-//   · Modelos individuales filtradas (MIN_SNAPSHOTS + MIN_VIEWERS)
+// Sitemap completo — usa la función SQL sitemap_qualified_models() en Supabase
+// para obtener los modelos calificados en UNA SOLA QUERY (sin paginación).
+// Esto evita el timeout de Vercel serverless (límite 10s en plan Hobby).
 //
-// Estrategia de paginación: keyset pagination por (username, captured_at)
-// Esto es más eficiente y confiable que offset con tablas grandes.
+// PREREQUISITO: ejecutar supabase_sitemap_function.sql en Supabase SQL Editor.
 
 const SITE = "https://www.campulsehub.com";
-const DAYS = 30;
-const MIN_SNAPSHOTS = 5;
-const MIN_VIEWERS = 1;
 const MIN_COUNTRY_MODELS = 5;
-const PAGE_SIZE = 1000;
-const MAX_ROWS = 600000; // límite de seguridad
 
 // ── Páginas estáticas ─────────────────────────────────────────────────────────
 const STATIC_PAGES = [
@@ -72,18 +65,6 @@ function buildUrl({ loc, changefreq, priority }) {
   );
 }
 
-// ── Fetch con timeout para no bloquear el response ────────────────────────────
-async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, { ...options, signal: controller.signal });
-    return res;
-  } finally {
-    clearTimeout(id);
-  }
-}
-
 export default async function handler(req, res) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
@@ -93,128 +74,65 @@ export default async function handler(req, res) {
     return;
   }
 
-  const since = new Date(Date.now() - DAYS * 24 * 60 * 60 * 1000).toISOString();
   const sbHeaders = {
     apikey: SUPABASE_KEY,
     Authorization: `Bearer ${SUPABASE_KEY}`,
-    // Decirle a PostgREST que devuelva el count para saber si hay más páginas
-    Prefer: "count=none",
+    "Content-Type": "application/json",
   };
 
-  const stats = {};          // { username -> { snapshots, maxViewers, country } }
-  const countryCounts = {};  // { countryCode -> Set<username> }
+  let qualifiedUsernames = [];
+  let qualifiedCountries = [];
 
   try {
-    // ── Keyset pagination: paginamos por offset numérico pero con un cursor
-    //    de username para evitar duplicados en inserciones concurrentes.
-    //    PostgREST soporta &offset=N en el query string — funciona con cualquier
-    //    versión de Supabase. Lo importante es que el límite máximo de respuesta
-    //    de Supabase por defecto es 1000 filas — si el proyecto tiene max_rows
-    //    configurado diferente, ajustar PAGE_SIZE.
-    //
-    //    Para evitar el problema de offset inconsistente con datos en tiempo real,
-    //    NO ordenamos por username (que cambia) sino por un campo estable:
-    //    captured_at + username como clave compuesta. Esto garantiza que cada
-    //    página sea siempre un slice distinto de la ventana de tiempo.
-
-    let totalFetched = 0;
-    let offset = 0;
-    let keepGoing = true;
-
-    while (keepGoing && totalFetched < MAX_ROWS) {
-      // Construir URL con parámetros correctos de PostgREST
-      const params = new URLSearchParams({
-        captured_at: `gte.${since}`,
-        select: "username,num_users,country",
-        order: "captured_at.asc,username.asc",
-        limit: String(PAGE_SIZE),
-        offset: String(offset),
-      });
-
-      let r;
-      try {
-        r = await fetchWithTimeout(
-          `${SUPABASE_URL}/rest/v1/rooms_snapshot?${params}`,
-          { headers: sbHeaders },
-          9000
-        );
-      } catch (fetchErr) {
-        console.error("[sitemap] fetch error en offset", offset, fetchErr.message);
-        break;
+    // ── Una sola llamada RPC — Supabase hace la agregación en SQL ─────────────
+    // La función sitemap_qualified_models() agrupa por username en la BD,
+    // devuelve solo los que cumplen min_snaps y min_viewers, en <1 segundo.
+    const rpcRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/sitemap_qualified_models`,
+      {
+        method: "POST",
+        headers: sbHeaders,
+        body: JSON.stringify({
+          since_days:  30,
+          min_snaps:    5,
+          min_viewers:  1,
+        }),
       }
+    );
 
-      // Supabase puede devolver 200 o 206 — ambos son válidos
-      if (!r.ok && r.status !== 206) {
-        console.error("[sitemap] HTTP", r.status, "en offset", offset);
-        break;
-      }
+    if (!rpcRes.ok) {
+      const errText = await rpcRes.text();
+      console.error("[sitemap] RPC error:", rpcRes.status, errText);
+      // Fallback graceful: devuelve solo páginas estáticas
+    } else {
+      const rows = await rpcRes.json();
+      console.log(`[sitemap] RPC devolvió ${rows.length} modelos calificados`);
 
-      let page;
-      try {
-        page = await r.json();
-      } catch (jsonErr) {
-        console.error("[sitemap] JSON parse error en offset", offset);
-        break;
-      }
-
-      if (!Array.isArray(page) || page.length === 0) {
-        keepGoing = false;
-        break;
-      }
-
-      // Procesar filas de esta página
-      for (const row of page) {
-        const u = row.username;
-        if (!u || typeof u !== "string") continue;
-
-        if (!stats[u]) stats[u] = { snapshots: 0, maxViewers: 0, country: null };
-        stats[u].snapshots += 1;
-        const viewers = row.num_users ?? 0;
-        if (viewers > stats[u].maxViewers) stats[u].maxViewers = viewers;
-        // Guardar el primer país no-vacío que encontremos
-        if (!stats[u].country && row.country && row.country.trim()) {
-          stats[u].country = row.country.trim().toLowerCase();
+      // Agrupar por país para las páginas /country/
+      const countryCounts = {};
+      for (const row of rows) {
+        if (row.username) qualifiedUsernames.push(row.username);
+        if (row.country && row.country.trim()) {
+          const c = row.country.trim().toLowerCase();
+          countryCounts[c] = (countryCounts[c] || 0) + 1;
         }
       }
 
-      totalFetched += page.length;
-      offset += page.length;
-
-      // Si recibimos menos filas que el límite, ya no hay más
-      if (page.length < PAGE_SIZE) keepGoing = false;
-    }
-
-    console.log(`[sitemap] Total rows fetched: ${totalFetched}, unique users: ${Object.keys(stats).length}`);
-
-    // ── Filtrar modelos calificados ──────────────────────────────────────────
-    for (const [u, s] of Object.entries(stats)) {
-      if (s.snapshots >= MIN_SNAPSHOTS && s.maxViewers >= MIN_VIEWERS && s.country) {
-        const c = s.country;
-        if (!countryCounts[c]) countryCounts[c] = new Set();
-        countryCounts[c].add(u);
-      }
+      // Países con suficientes modelos
+      const HIGH_PRIORITY = new Set(["co","es","mx","ar","br","ru","us","ro","gb","ph"]);
+      qualifiedCountries = Object.entries(countryCounts)
+        .filter(([, count]) => count >= MIN_COUNTRY_MODELS)
+        .sort((a, b) => b[1] - a[1])
+        .map(([code]) => ({
+          loc: `/country/${code}`,
+          changefreq: "daily",
+          priority: HIGH_PRIORITY.has(code) ? "0.8" : "0.6",
+        }));
     }
 
   } catch (e) {
-    console.error("[sitemap] Error inesperado:", e.message);
+    console.error("[sitemap] Error:", e.message);
   }
-
-  // ── Modelos calificados ────────────────────────────────────────────────────
-  const qualifiedUsernames = Object.entries(stats)
-    .filter(([, s]) => s.snapshots >= MIN_SNAPSHOTS && s.maxViewers >= MIN_VIEWERS)
-    .map(([username]) => username)
-    .sort();
-
-  // ── Países con suficientes modelos ────────────────────────────────────────
-  const HIGH_PRIORITY = new Set(["co", "es", "mx", "ar", "br", "ru", "us", "ro", "gb", "ph"]);
-  const qualifiedCountries = Object.entries(countryCounts)
-    .filter(([, set]) => set.size >= MIN_COUNTRY_MODELS)
-    .sort((a, b) => b[1].size - a[1].size)
-    .map(([code]) => ({
-      loc: `/country/${code}`,
-      changefreq: "daily",
-      priority: HIGH_PRIORITY.has(code) ? "0.8" : "0.6",
-    }));
 
   // ── Construir XML ──────────────────────────────────────────────────────────
   const staticSection  = STATIC_PAGES.map(buildUrl).join("\n");
