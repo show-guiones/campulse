@@ -6,8 +6,8 @@ export default function NotFound() {
   return (
     <>
       <Head>
-        <title>Página no encontrada | Campulse</title>
-        <meta name="description" content="Esta página no existe en Campulse." />
+        <title>Página no encontrada | CampulseHub</title>
+        <meta name="description" content="Esta página no existe en CampulseHub." />
         <meta name="robots" content="noindex" />
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>

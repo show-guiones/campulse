@@ -17,7 +17,7 @@ export default function Document() {
 
         {/* Branding */}
         <meta name="theme-color" content="#0d0d0d" />
-        <meta name="application-name" content="Campulse" />
+        <meta name="application-name" content="CampulseHub" />
 
         {/* Preconnect — acelera banderas de país */}
         <link rel="preconnect" href="https://flagcdn.com" />

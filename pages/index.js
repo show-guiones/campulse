@@ -55,13 +55,13 @@ export async function getServerSideProps() {
 export default function Home({ totalModels, topModels }) {
   const top = topModels[0];
   const pageTitle = totalModels > 0
-    ? `Campulse — ${totalModels.toLocaleString("es")} modelos en vivo en Chaturbate ahora`
-    : "Campulse — Estadísticas de Chaturbate en Tiempo Real";
+    ? `CampulseHub — ${totalModels.toLocaleString("es")} modelos en vivo en Chaturbate ahora`
+    : "CampulseHub — Estadísticas de Chaturbate en Tiempo Real";
   const pageDescription = top
     ? `${totalModels.toLocaleString("es")} modelos online en Chaturbate ahora. ${top.display_name} lidera con ${top.num_users.toLocaleString("es")} viewers. Filtra por país, género e idioma.`
-    : "Campulse rastrea las estadísticas de Chaturbate en tiempo real: viewers, seguidores y mejores horarios.";
+    : "CampulseHub rastrea las estadísticas de Chaturbate en tiempo real: viewers, seguidores y mejores horarios.";
   const schema = {
-    "@context": "https://schema.org", "@type": "WebSite", name: "Campulse",
+    "@context": "https://schema.org", "@type": "WebSite", name: "CampulseHub",
     description: pageDescription, url: SITE,
     potentialAction: { "@type": "SearchAction", target: `${SITE}/search?q={username}`, "query-input": "required name=username" },
   };
@@ -82,7 +82,7 @@ export default function Home({ totalModels, topModels }) {
         <meta property="og:description" content={pageDescription} />
         <meta property="og:url" content={SITE} />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Campulse" />
+        <meta property="og:site_name" content="CampulseHub" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet" />
@@ -147,7 +147,7 @@ export default function Home({ totalModels, topModels }) {
 
       <div className="cp">
         <nav className="cp-nav">
-          <a href="/app.html" className="cp-logo">Campulse</a>
+          <a href="/app.html" className="cp-logo">Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
           <div className="cp-nav-links">
             <a href="/gender" className="cp-nav-link">Géneros</a>
             <a href="/country" className="cp-nav-link">Países</a>
@@ -160,7 +160,7 @@ export default function Home({ totalModels, topModels }) {
             <span className="cp-live-dot" />
             En tiempo real
           </div>
-          <h1 className="cp-h1">Campulse</h1>
+          <h1 className="cp-h1">Campulse<span style={{color:"#c084fc",WebkitTextFillColor:"#c084fc"}}>Hub</span></h1>
           <p className="cp-tagline">Estadísticas de Chaturbate en tiempo real.<br />Viewers, seguidores y mejores horarios.</p>
           {totalModels > 0 && (
             <div className="cp-badge">
@@ -265,7 +265,7 @@ export default function Home({ totalModels, topModels }) {
 
         <div className="cp-seo">
           <h2>Estadísticas de Chaturbate en tiempo real</h2>
-          <p>Campulse rastrea viewers, seguidores y mejores horarios de miles de modelos, actualizado cada 2 horas desde Chaturbate.</p>
+          <p>CampulseHub rastrea viewers, seguidores y mejores horarios de miles de modelos, actualizado cada 2 horas desde Chaturbate.</p>
           <p>Encuentra las modelos más vistas de Colombia, España, México y 50 países más. Filtra por género, idioma o país para descubrir nuevas modelos en vivo.</p>
         </div>
       </div>

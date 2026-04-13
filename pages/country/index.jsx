@@ -50,7 +50,7 @@ export async function getServerSideProps() {
 }
 
 export default function CountriesPage({ countries, error }) {
-  const pageTitle = "Modelos de Chaturbate por País | Campulse";
+  const pageTitle = "Modelos de Chaturbate por País | CampulseHub";
   const pageDescription = `Explora modelos de Chaturbate organizadas por país. Encuentra las mejores salas en vivo de ${countries.slice(0,4).map(c=>c.name).join(", ")} y más.`;
   const schema = {
     "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/country`,
@@ -68,7 +68,7 @@ export default function CountriesPage({ countries, error }) {
         <meta property="og:description" content={pageDescription}/>
         <meta property="og:url" content={`${SITE}/country`}/>
         <meta property="og:type" content="website"/>
-        <meta property="og:site_name" content="Campulse"/>
+        <meta property="og:site_name" content="CampulseHub"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -87,7 +87,7 @@ export default function CountriesPage({ countries, error }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/app.html">Campulse</a>
+          <a href="/app.html" style={{display:"inline-flex",alignItems:"center",gap:"0",fontWeight:800,letterSpacing:"-.5px",textDecoration:"none",color:"#fff"}}>Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Países</span>
         </nav>
@@ -120,7 +120,7 @@ export default function CountriesPage({ countries, error }) {
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos de Chaturbate por País</h2>
           <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7,marginBottom:".75rem"}}>
-            Campulse rastrea en tiempo real las estadísticas de las modelos de Chaturbate de todo el mundo.
+            CampulseHub rastrea en tiempo real las estadísticas de las modelos de Chaturbate de todo el mundo.
             Filtra por país para encontrar las mejores salas en vivo de Colombia, España, México, Rumania y más.
           </p>
           <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7}}>

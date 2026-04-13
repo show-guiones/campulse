@@ -17,11 +17,11 @@ const LANGUAGES = [
 ];
 
 export default function LanguageIndex() {
-  const pageTitle = "Modelos de Chaturbate por Idioma | Campulse";
+  const pageTitle = "Modelos de Chaturbate por Idioma | CampulseHub";
   const pageDescription = "Encuentra modelos de Chaturbate por idioma: español, inglés, portugués, rumano y más. Estadísticas en tiempo real actualizadas cada 2 horas.";
   const schema = {
     "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/language`,
-    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"Campulse",item:SITE},{"@type":"ListItem",position:2,name:"Idiomas",item:`${SITE}/language`}]},
+    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"CampulseHub",item:SITE},{"@type":"ListItem",position:2,name:"Idiomas",item:`${SITE}/language`}]},
   };
 
   return (
@@ -52,7 +52,7 @@ export default function LanguageIndex() {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/app.html">Campulse</a>
+          <a href="/app.html" style={{display:"inline-flex",alignItems:"center",gap:"0",fontWeight:800,letterSpacing:"-.5px",textDecoration:"none",color:"#fff"}}>Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Idiomas</span>
         </nav>

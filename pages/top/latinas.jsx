@@ -46,13 +46,13 @@ export default function TopLatinasPage({ models, fetchedAt }) {
   const totalOnline = models.length;
   const topViewers = ordered[0]?.num_users??0;
 
-  const pageTitle = `Top Latinas en Chaturbate — ${totalOnline} en vivo ahora | Campulse`;
+  const pageTitle = `Top Latinas en Chaturbate — ${totalOnline} en vivo ahora | CampulseHub`;
   const pageDescription = `Las ${totalOnline} mejores modelos latinas en vivo en Chaturbate ahora mismo. Colombianas, mexicanas, argentinas y más — ordenadas por viewers reales. Datos actualizados cada 2 horas.`;
 
   const schema = {
     "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/top/latinas`,
-    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"Campulse",item:SITE},{"@type":"ListItem",position:2,name:"Top Latinas",item:`${SITE}/top/latinas`}]},
-    hasPart:ordered.slice(0,10).map(m=>({"@type":"WebPage",name:`${m.display_name||m.username} — Campulse`,url:`${SITE}/model/${m.username}`})),
+    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"CampulseHub",item:SITE},{"@type":"ListItem",position:2,name:"Top Latinas",item:`${SITE}/top/latinas`}]},
+    hasPart:ordered.slice(0,10).map(m=>({"@type":"WebPage",name:`${m.display_name||m.username} — CampulseHub`,url:`${SITE}/model/${m.username}`})),
   };
 
   return (
@@ -67,7 +67,7 @@ export default function TopLatinasPage({ models, fetchedAt }) {
         <meta property="og:description" content={pageDescription}/>
         <meta property="og:url" content={`${SITE}/top/latinas`}/>
         <meta property="og:type" content="website"/>
-        <meta property="og:site_name" content="Campulse"/>
+        <meta property="og:site_name" content="CampulseHub"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -86,7 +86,7 @@ export default function TopLatinasPage({ models, fetchedAt }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/app.html">Campulse</a>
+          <a href="/app.html" style={{display:"inline-flex",alignItems:"center",gap:"0",fontWeight:800,letterSpacing:"-.5px",textDecoration:"none",color:"#fff"}}>Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Top Latinas</span>
         </nav>
@@ -158,7 +158,7 @@ export default function TopLatinasPage({ models, fetchedAt }) {
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos latinas en Chaturbate</h2>
           <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7,marginBottom:".75rem"}}>
-            Campulse rastrea en tiempo real las estadísticas de las modelos latinas de Chaturbate,
+            CampulseHub rastrea en tiempo real las estadísticas de las modelos latinas de Chaturbate,
             incluyendo colombianas, mexicanas, argentinas, chilenas y españolas. Los datos se actualizan automáticamente cada 2 horas.
           </p>
           {lexyModel && (

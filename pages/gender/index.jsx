@@ -34,7 +34,7 @@ export async function getServerSideProps() {
 }
 
 export default function GenderPage({ genders }) {
-  const pageTitle = "Modelos de Chaturbate por Género | Campulse";
+  const pageTitle = "Modelos de Chaturbate por Género | CampulseHub";
   const pageDescription = "Explora modelos de Chaturbate por género: chicas, chicos, parejas y trans. Ranking en tiempo real ordenado por viewers. Estadísticas actualizadas cada 2 horas.";
   const schema = {
     "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/gender`,
@@ -52,7 +52,7 @@ export default function GenderPage({ genders }) {
         <meta property="og:description" content={pageDescription}/>
         <meta property="og:url" content={`${SITE}/gender`}/>
         <meta property="og:type" content="website"/>
-        <meta property="og:site_name" content="Campulse"/>
+        <meta property="og:site_name" content="CampulseHub"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -71,7 +71,7 @@ export default function GenderPage({ genders }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/app.html">Campulse</a>
+          <a href="/app.html" style={{display:"inline-flex",alignItems:"center",gap:"0",fontWeight:800,letterSpacing:"-.5px",textDecoration:"none",color:"#fff"}}>Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Géneros</span>
         </nav>

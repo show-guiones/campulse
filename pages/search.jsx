@@ -36,7 +36,7 @@ export default function SearchPage() {
     setLoading(false);
   }
 
-  const title = "Buscar modelos de Chaturbate | Campulse";
+  const title = "Buscar modelos de Chaturbate | CampulseHub";
   const description = "Busca modelos de Chaturbate por nombre de usuario. Estadísticas en tiempo real: viewers, seguidores y mejores horarios.";
 
   return (
@@ -49,7 +49,7 @@ export default function SearchPage() {
         <meta property="og:title" content={title}/>
         <meta property="og:description" content={description}/>
         <meta property="og:url" content={`${SITE}/search`}/>
-        <meta property="og:site_name" content="Campulse"/>
+        <meta property="og:site_name" content="CampulseHub"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -67,7 +67,7 @@ export default function SearchPage() {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/app.html">Campulse</a>
+          <a href="/app.html" style={{display:"inline-flex",alignItems:"center",gap:"0",fontWeight:800,letterSpacing:"-.5px",textDecoration:"none",color:"#fff"}}>Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Buscar</span>
         </nav>
