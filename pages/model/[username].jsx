@@ -263,9 +263,6 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
     @media(min-width:641px){
       #mob-layout{display:none!important}
     }
-    @media(max-width:640px){
-      .cmp-page{display:none!important}
-    }
   `;
 
   const gradients = [
@@ -501,11 +498,24 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         {/* SEO */}
         <div className="mob-seo">
           <h2 style={{fontSize:".9375rem",fontWeight:700,marginBottom:".5rem",color:"var(--txt)"}}>Estadísticas de {name} en Chaturbate</h2>
+          <p style={{color:"var(--txt2)",fontSize:".8125rem",lineHeight:1.6,marginBottom:".5rem"}}>
+            {"CampulseHub rastrea en tiempo real las estadísticas de "+name+" en Chaturbate."}
+            {countryName?" "+name+" es una modelo de "+countryName+".":""}
+            {followers!=null?" Cuenta con "+followers.toLocaleString("es")+" seguidores en Chaturbate.":""}
+            {peakViewers!=null?" Su pico de audiencia en los últimos 30 días fue de "+peakViewers.toLocaleString("es")+" viewers.":""}
+            {avgViewers!=null&&avgViewers>0?" Promedio de "+Math.round(avgViewers).toLocaleString("es")+" viewers por sesión.":""}
+          </p>
+          {topHour && (
+            <p style={{color:"var(--txt2)",fontSize:".8125rem",lineHeight:1.6,marginBottom:".5rem"}}>
+              {"Su mejor momento para transmitir es los "+["Domingos","Lunes","Martes","Miércoles","Jueves","Viernes","Sábados"][topHour.day_of_week]+" alrededor de las "+String(topHour.hour_est??0).padStart(2,"0")+":00 EST, con un promedio de "+Math.round(topHour.avg_viewers)+" viewers."}
+            </p>
+          )}
           <p style={{color:"var(--txt2)",fontSize:".8125rem",lineHeight:1.6}}>
-            CampulseHub rastrea en tiempo real las estadísticas de {name} en Chaturbate.{countryName?` Modelo de ${countryName}.`:""}{" "}
-            {peakViewers!=null?`Pico de ${peakViewers.toLocaleString("es")} viewers en los últimos 30 días. `:""}
-            {topHour?`Mejor horario: ${["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"][topHour.day_of_week]} a las ${String(topHour.hour_est??0).padStart(2,"00")}:00 EST. `:""}
-            Datos actualizados cada 2 horas.
+            {snapCount>0
+              ?"CampulseHub ha registrado "+snapCount+" snapshots de "+name+" en los últimos 30 días. Los datos se actualizan automáticamente cada 2 horas."
+              :"Los datos de "+name+" se actualizan automáticamente cada 2 horas. Vuelve pronto para ver su historial de viewers y estadísticas en tiempo real."
+            }
+            {langName?" Transmite principalmente en "+langName+".":""}
           </p>
         </div>
 
