@@ -108,26 +108,36 @@ export default async function handler(req, res) {
   let qualifiedCountries = [];
 
   try {
-    // Supabase devuelve máx 1000 filas por request — paginamos para obtener todas
+    // Supabase paginación con Range header (estándar PostgREST)
     let rows = [];
-    let offset = 0;
     const PAGE = 1000;
+    let start = 0;
     while (true) {
-      const countUrl =
+      const pageUrl =
         `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
         `?captured_at=gte.${since}` +
         `&select=username,num_users,country` +
-        `&order=username` +
-        `&limit=${PAGE}&offset=${offset}`;
-      const r = await fetch(countUrl, { headers: sbHeaders });
-      if (!r.ok) throw new Error(`Supabase error: ${r.status}`);
-      const page = await r.json();
+        `&order=username.asc`;
+      const pageRes = await fetch(pageUrl, {
+        headers: {
+          ...sbHeaders,
+          "Range": `${start}-${start + PAGE - 1}`,
+          "Range-Unit": "items",
+        },
+      });
+      // 206 = partial content, 200 = all content
+      if (!pageRes.ok && pageRes.status !== 206) {
+        console.error("[sitemap] Supabase page error:", pageRes.status);
+        break;
+      }
+      const page = await pageRes.json();
       if (!Array.isArray(page) || page.length === 0) break;
       rows = rows.concat(page);
       if (page.length < PAGE) break;
-      offset += PAGE;
-      if (offset > 200000) break; // safety cap
+      start += PAGE;
+      if (start > 300000) break; // safety cap
     }
+    console.log(`[sitemap] Total rows fetched: ${rows.length}`);
 
     const stats = {};
     const countryCounts = {};
@@ -144,8 +154,8 @@ export default async function handler(req, res) {
       }
 
       // Conteo por país — solo modelos con suficientes snapshots
-      if (row.country && row.country.trim() && stats[u].snapshots >= MIN_SNAPSHOTS) {
-        const c = row.country.trim().toLowerCase();
+      if (row.country && stats[u].snapshots >= MIN_SNAPSHOTS) {
+        const c = row.country.toLowerCase();
         if (!countryCounts[c]) countryCounts[c] = new Set();
         countryCounts[c].add(u);
       }
