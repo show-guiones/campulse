@@ -124,6 +124,9 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
         <meta name="keywords" content="modelos latinas chaturbate, latinas en vivo, colombianas chaturbate, mexicanas chaturbate, webcam latina"/>
         <meta name="robots" content="index, follow"/>
         <link rel="canonical" href={`${SITE}/top/latinas`}/>
+        <meta name="twitter:card" content="summary_large_image"/>
+        <meta name="twitter:title" content={pageTitle}/>
+        <meta name="twitter:description" content={pageDescription}/>
         <meta property="og:title" content={pageTitle}/>
         <meta property="og:description" content={pageDescription}/>
         <meta property="og:url" content={`${SITE}/top/latinas`}/>
