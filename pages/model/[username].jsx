@@ -167,8 +167,8 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
 
   const LEXY_USER = "lexy_fox2";
   let pageTitle = currentViewers!=null
-    ? `${name} en Chaturbate — ${currentViewers.toLocaleString("es")} viewers ahora | Campulse`
-    : `${name} Stats en Chaturbate | Campulse`;
+    ? `${name} en Chaturbate — ${currentViewers.toLocaleString("es")} viewers ahora | CampulseHub`
+    : `${name} Stats en Chaturbate | CampulseHub`;
   let pageDescription = `Estadísticas en tiempo real de ${name} en Chaturbate.`;
   if (countryName) pageDescription+=` Modelo de ${countryName}.`;
   if (followers!=null) pageDescription+=` ${followers.toLocaleString("es")} seguidores.`;
@@ -181,7 +181,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
   const schema = {
     "@context":"https://schema.org","@type":"ProfilePage",name:username===LEXY_USER?"lexy_fox2 — Modelo destacada en CampulseHub":`${name} — Stats en Chaturbate`,
     description:pageDescription,url:`${SITE}/model/${username}`,
-    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"Campulse",item:SITE},...(countryName&&countryCode?[{"@type":"ListItem",position:2,name:countryName,item:`${SITE}/country/${countryCode.toLowerCase()}`}]:[]),{"@type":"ListItem",position:countryName?3:2,name,item:`${SITE}/model/${username}`}]},
+    breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"CampulseHub",item:SITE},...(countryName&&countryCode?[{"@type":"ListItem",position:2,name:countryName,item:`${SITE}/country/${countryCode.toLowerCase()}`}]:[]),{"@type":"ListItem",position:countryName?3:2,name,item:`${SITE}/model/${username}`}]},
     mainEntity:{"@type":"Person",name,identifier:username,url:`https://chaturbate.com/${username}/`,...(countryName&&{nationality:countryName}),...(followers!=null&&{interactionStatistic:{"@type":"InteractionCounter",interactionType:"https://schema.org/FollowAction",userInteractionCount:followers}})},
     ...(snapCount>0&&{dateModified:last.captured_at??undefined}),
   };
@@ -283,7 +283,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         <meta name="description" content={pageDescription}/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         {username===LEXY_USER ? (<>
-          <meta name="keywords" content="lexy_fox2, lexy fox, modelo en vivo, chaturbate, campulse, webcam latina"/>
+          <meta name="keywords" content="lexy_fox2, lexy fox, modelo en vivo, chaturbate, campulsehub, webcam latina"/>
           <meta name="robots" content="index,follow,max-image-preview:large"/>
           <meta property="og:image" content="https://thumb.live.mmcdn.com/riw/lexy_fox2.jpg"/>
         </>) : (<meta name="robots" content={shouldIndex?"index, follow":"noindex, nofollow"}/>)}
@@ -292,7 +292,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         <meta property="og:description" content={pageDescription}/>
         <meta property="og:url" content={`${SITE}/model/${username}`}/>
         <meta property="og:type" content="profile"/>
-        <meta property="og:site_name" content="Campulse"/>
+        <meta property="og:site_name" content="CampulseHub"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -389,7 +389,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
               allowFullScreen frameBorder="0" scrolling="no" referrerPolicy="no-referrer-when-downgrade"
               title={`${name} en vivo en Chaturbate`}/>
           </div>
-          <p className="mob-embed-note">Al ver el stream en Campulse, apoyas a {name} directamente.</p>
+          <p className="mob-embed-note">Al ver el stream en CampulseHub, apoyas a {name} directamente.</p>
         </div>
       )}
 
@@ -479,7 +479,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
       <div className="mob-seo">
         <h2 style={{fontSize:".9375rem",fontWeight:700,marginBottom:".5rem",color:"var(--txt)"}}>Estadísticas de {name} en Chaturbate</h2>
         <p style={{color:"var(--txt2)",fontSize:".8125rem",lineHeight:1.6}}>
-          Campulse rastrea en tiempo real las estadísticas de {name} en Chaturbate.{countryName?` Modelo de ${countryName}.`:""}{" "}Datos actualizados cada 2 horas.
+          CampulseHub rastrea en tiempo real las estadísticas de {name} en Chaturbate.{countryName?` Modelo de ${countryName}.`:""}{" "}Datos actualizados cada 2 horas.
         </p>
       </div>
 
@@ -501,7 +501,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           </div>
         </nav>
         <nav className="cmp-bc">
-          <a href="/app.html">Campulse</a>
+          <a href="/app.html">CampulseHub</a>
           {countryName && countryCode && (<><span className="cmp-bc-sep">›</span><a href={`/country/${countryCode.toLowerCase()}`}>{flag} {countryName}</a></>)}
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>{name}</span>
@@ -557,7 +557,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
                 allowFullScreen frameBorder="0" scrolling="no" referrerPolicy="no-referrer-when-downgrade"
                 title={`${name} en vivo en Chaturbate`}/>
             </div>
-            <p className="cmp-embed-note">Al ver el stream en Campulse, apoyas a {name} directamente.</p>
+            <p className="cmp-embed-note">Al ver el stream en CampulseHub, apoyas a {name} directamente.</p>
           </div>
         )}
         {bestHours.length>0 && (<>
@@ -610,3 +610,5 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
     </>
   );
 }
+
+
