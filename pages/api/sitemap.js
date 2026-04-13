@@ -26,9 +26,6 @@ const STATIC_PAGES = [
 
   // Top categorías especiales
   { loc: "/top/latinas",    changefreq: "hourly",  priority: "0.9" },
-  { loc: "/top/colombia",   changefreq: "hourly",  priority: "0.9" },
-  { loc: "/top/mexico",     changefreq: "hourly",  priority: "0.9" },
-  { loc: "/top/espana",     changefreq: "hourly",  priority: "0.9" },
 
   // Búsqueda
   { loc: "/search",         changefreq: "daily",   priority: "0.8" },
@@ -111,17 +108,26 @@ export default async function handler(req, res) {
   let qualifiedCountries = [];
 
   try {
-    const countUrl =
-      `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
-      `?captured_at=gte.${since}` +
-      `&select=username,num_users,country` +
-      `&order=username` +
-      `&limit=50000`;
-
-    const r = await fetch(countUrl, { headers: sbHeaders });
-    if (!r.ok) throw new Error(`Supabase error: ${r.status}`);
-
-    const rows = await r.json();
+    // Supabase devuelve máx 1000 filas por request — paginamos para obtener todas
+    let rows = [];
+    let offset = 0;
+    const PAGE = 1000;
+    while (true) {
+      const countUrl =
+        `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
+        `?captured_at=gte.${since}` +
+        `&select=username,num_users,country` +
+        `&order=username` +
+        `&limit=${PAGE}&offset=${offset}`;
+      const r = await fetch(countUrl, { headers: sbHeaders });
+      if (!r.ok) throw new Error(`Supabase error: ${r.status}`);
+      const page = await r.json();
+      if (!Array.isArray(page) || page.length === 0) break;
+      rows = rows.concat(page);
+      if (page.length < PAGE) break;
+      offset += PAGE;
+      if (offset > 200000) break; // safety cap
+    }
 
     const stats = {};
     const countryCounts = {};
@@ -138,8 +144,8 @@ export default async function handler(req, res) {
       }
 
       // Conteo por país — solo modelos con suficientes snapshots
-      if (row.country && stats[u].snapshots >= MIN_SNAPSHOTS) {
-        const c = row.country.toLowerCase();
+      if (row.country && row.country.trim() && stats[u].snapshots >= MIN_SNAPSHOTS) {
+        const c = row.country.trim().toLowerCase();
         if (!countryCounts[c]) countryCounts[c] = new Set();
         countryCounts[c].add(u);
       }
