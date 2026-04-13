@@ -1,39 +1,43 @@
-// pages/index.js — Campulse Home — Premium UI Redesign
+// pages/index.js — CampulseHub Home
+// Estrategia SEO: página indexable por Google que presenta el dashboard
+// y lleva al usuario a /app.html con un clic, maximizando clicks desde SERP.
 
 import Head from "next/head";
 
 const SITE = "https://www.campulsehub.com";
 
 const COUNTRY_NAMES = {
-  CO: "Colombia", MX: "México", AR: "Argentina", CL: "Chile",
-  ES: "España", US: "Estados Unidos", BR: "Brasil", RO: "Rumania",
-  RU: "Rusia", DE: "Alemania", FR: "Francia", GB: "Reino Unido",
-  IT: "Italia", UA: "Ucrania", PH: "Filipinas", TH: "Tailandia",
-  CA: "Canadá", AU: "Australia", HU: "Hungría", PL: "Polonia",
-  PE: "Perú", VE: "Venezuela", EC: "Ecuador",
+  CO:"Colombia",MX:"México",AR:"Argentina",CL:"Chile",ES:"España",
+  US:"Estados Unidos",BR:"Brasil",RO:"Rumania",RU:"Rusia",DE:"Alemania",
+  FR:"Francia",GB:"Reino Unido",IT:"Italia",UA:"Ucrania",PH:"Filipinas",
+  CA:"Canadá",AU:"Australia",HU:"Hungría",PL:"Polonia",PE:"Perú",VE:"Venezuela",
 };
-
-const GENDER_LABELS = { f: "♀", m: "♂", c: "♥", t: "⚧" };
-const GENDER_COLORS = { f: "#f472b6", m: "#60a5fa", c: "#34d399", t: "#c084fc" };
+const GENDER_LABELS = { f:"♀",m:"♂",c:"♥",t:"⚧" };
+const GENDER_COLORS = { f:"#e8305a",m:"#3080e8",c:"#d48020",t:"#9248c8" };
 
 export async function getServerSideProps() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  let totalModels = 0;
-  let topModels = [];
+  let totalModels = 0, topModels = [], liveCount = 0;
   try {
     if (SUPABASE_URL && SUPABASE_KEY) {
       const since = new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString();
       const sbHeaders = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
-      const [countRes, topRes] = await Promise.all([
+      const [countRes, topRes, liveRes] = await Promise.all([
         fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username`,
           { headers: { ...sbHeaders, "Prefer": "count=exact", "Range": "0-0" } }),
         fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username,display_name,num_users,num_followers,country,gender&order=num_users.desc&limit=200`,
           { headers: sbHeaders }),
+        fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${new Date(Date.now()-2*60*60*1000).toISOString()}&num_users=gt.0&select=username`,
+          { headers: { ...sbHeaders, "Prefer": "count=exact", "Range": "0-0" } }),
       ]);
       if (countRes.ok) {
         const range = countRes.headers.get("content-range");
-        if (range) { const total = parseInt(range.split("/")[1], 10); if (!isNaN(total)) totalModels = total; }
+        if (range) { const t = parseInt(range.split("/")[1],10); if (!isNaN(t)) totalModels = t; }
+      }
+      if (liveRes.ok) {
+        const range = liveRes.headers.get("content-range");
+        if (range) { const t = parseInt(range.split("/")[1],10); if (!isNaN(t)) liveCount = t; }
       }
       if (topRes.ok) {
         const rows = await topRes.json();
@@ -42,231 +46,311 @@ export async function getServerSideProps() {
           for (const r of rows) {
             if (!r.username || seen.has(r.username)) continue;
             seen.add(r.username);
-            topModels.push({ username: r.username, display_name: r.display_name || r.username, num_users: r.num_users ?? 0, num_followers: r.num_followers ?? 0, country: r.country || "", gender: r.gender || "" });
-            if (topModels.length >= 10) break;
+            topModels.push({ username:r.username, display_name:r.display_name||r.username, num_users:r.num_users??0, country:r.country||"", gender:r.gender||"" });
+            if (topModels.length >= 12) break;
           }
         }
       }
     }
   } catch {}
-  return { props: { totalModels, topModels } };
+  return { props: { totalModels, topModels, liveCount } };
 }
 
-export default function Home({ totalModels, topModels }) {
+export default function Home({ totalModels, topModels, liveCount }) {
   const top = topModels[0];
   const pageTitle = totalModels > 0
-    ? `CampulseHub — ${totalModels.toLocaleString("es")} modelos en vivo en Chaturbate ahora`
-    : "CampulseHub — Estadísticas de Chaturbate en Tiempo Real";
+    ? `CampulseHub — ${totalModels.toLocaleString("es")} modelos Chaturbate en vivo ahora`
+    : "CampulseHub — Dashboard de Chaturbate en Tiempo Real";
   const pageDescription = top
-    ? `${totalModels.toLocaleString("es")} modelos online en Chaturbate ahora. ${top.display_name} lidera con ${top.num_users.toLocaleString("es")} viewers. Filtra por país, género e idioma.`
-    : "CampulseHub rastrea las estadísticas de Chaturbate en tiempo real: viewers, seguidores y mejores horarios.";
+    ? `${(liveCount||totalModels).toLocaleString("es")} modelos en vivo en Chaturbate ahora mismo. ${top.display_name} lidera con ${top.num_users.toLocaleString("es")} viewers. Filtra por país, género, idioma y tags. Stats actualizados en tiempo real.`
+    : "Dashboard de estadísticas de Chaturbate en tiempo real. Filtra modelos por país, género e idioma. Viewers, seguidores y mejores horarios actualizados cada hora.";
+
   const schema = {
-    "@context": "https://schema.org", "@type": "WebSite", name: "CampulseHub",
-    description: pageDescription, url: SITE,
-    potentialAction: { "@type": "SearchAction", target: `${SITE}/search?q={username}`, "query-input": "required name=username" },
+    "@context":"https://schema.org","@type":"WebSite",name:"CampulseHub",
+    description:pageDescription,url:SITE,
+    potentialAction:{"@type":"SearchAction",target:`${SITE}/search?q={search_term_string}`,"query-input":"required name=search_term_string"},
   };
-  const categories = [
-    { href: "/gender",      emoji: "⚥", title: "Por Género",   desc: "Chicas, chicos, parejas y trans", accent: "#c084fc" },
-    { href: "/country",     emoji: "🌍", title: "Por País",     desc: "Colombia, España, México y más",  accent: "#34d399" },
-    { href: "/language",    emoji: "🗣", title: "Por Idioma",   desc: "Español, inglés, portugués...",   accent: "#fbbf24" },
-    { href: "/top/latinas", emoji: "🌶️", title: "Top Latinas",  desc: "Las mejores latinas en vivo",    accent: "#f87171" },
+
+  const cats = [
+    { href:"/gender/female", emoji:"♀️", title:"Chicas",      desc:"Las más vistas ahora",       accent:"#e8305a" },
+    { href:"/gender/male",   emoji:"♂️", title:"Chicos",      desc:"Top hombres en vivo",         accent:"#3080e8" },
+    { href:"/gender/couple", emoji:"♥️", title:"Parejas",     desc:"Parejas en directo",          accent:"#d48020" },
+    { href:"/gender/trans",  emoji:"⚧️", title:"Trans",       desc:"Modelos trans en vivo",       accent:"#9248c8" },
+    { href:"/top/latinas",   emoji:"🌶️", title:"Top Latinas", desc:"Colombia, México, Argentina", accent:"#f0a830" },
+    { href:"/country/co",    emoji:"🇨🇴", title:"Colombia",    desc:`${topModels.filter(m=>m.country==="CO").length > 0 ? "429+ modelos" : "Modelos colombianas"}`, accent:"#22c77a" },
   ];
+
+  const countries = [
+    {href:"/country/co",l:"🇨🇴 Colombia"},{href:"/country/es",l:"🇪🇸 España"},
+    {href:"/country/mx",l:"🇲🇽 México"},{href:"/country/ar",l:"🇦🇷 Argentina"},
+    {href:"/country/ro",l:"🇷🇴 Rumania"},{href:"/country/us",l:"🇺🇸 EEUU"},
+    {href:"/country/br",l:"🇧🇷 Brasil"},{href:"/country/ru",l:"🇷🇺 Rusia"},
+    {href:"/country/ph",l:"🇵🇭 Filipinas"},{href:"/country/gb",l:"🇬🇧 UK"},
+  ];
+
+  const langs = [
+    {href:"/language/spanish",l:"🇪🇸 Español"},{href:"/language/english",l:"🇬🇧 English"},
+    {href:"/language/portuguese",l:"🇧🇷 Português"},{href:"/language/romanian",l:"🇷🇴 Română"},
+    {href:"/language/russian",l:"🇷🇺 Русский"},{href:"/language/german",l:"🇩🇪 Deutsch"},
+  ];
+
+  const tags = ["latina","bigboobs","ebony","teen","curvy","lovense","squirt","colombia","anal","lesbians"];
+
   return (
     <>
       <Head>
         <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href={SITE} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={SITE} />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="CampulseHub" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+        <meta name="description" content={pageDescription}/>
+        <meta name="robots" content="index, follow"/>
+        <link rel="canonical" href={SITE}/>
+        <meta property="og:title" content={pageTitle}/>
+        <meta property="og:description" content={pageDescription}/>
+        <meta property="og:url" content={SITE}/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:site_name" content="CampulseHub"/>
+        <meta property="og:image" content={`${SITE}/og-image.png`}/>
+        <meta name="twitter:card" content="summary_large_image"/>
+        <meta name="twitter:title" content={pageTitle}/>
+        <meta name="twitter:description" content={pageDescription}/>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}}/>
         <style>{`
-          *{box-sizing:border-box}
-          html{background:#080810}
-          body{margin:0;background:#080810}
-          .cp{font-family:'DM Sans',system-ui,sans-serif;max-width:960px;margin:0 auto;padding:0 1.25rem 5rem;background:#080810;min-height:100vh;color:#e2e8f0}
-          .cp-nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 0;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:0}
-          .cp-nav a{text-decoration:none}
-          .cp-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;letter-spacing:-.5px}
-          .cp-nav-links{display:flex;gap:1.5rem}
-          .cp-nav-link{font-size:.8125rem;color:#6b7280;font-weight:500;transition:color .2s}
-          .cp-nav-link:hover{color:#c084fc}
-          .cp-hero{text-align:center;padding:5rem 0 3rem}
-          .cp-eyebrow{display:inline-flex;align-items:center;gap:7px;background:rgba(192,132,252,.07);border:1px solid rgba(192,132,252,.18);border-radius:100px;padding:5px 14px;font-size:.7rem;color:#c084fc;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:1.5rem}
-          .cp-live-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;animation:pdot 2s infinite}
-          @keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-          .cp-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.8rem,9vw,5rem);line-height:1.03;margin:0 0 1rem;letter-spacing:-3px;background:linear-gradient(135deg,#fff 0%,#c084fc 55%,#818cf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-          .cp-tagline{font-size:1rem;color:#6b7280;margin:0 auto 2rem;max-width:380px;line-height:1.65}
-          .cp-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:100px;padding:9px 20px;font-size:.9375rem;color:#e2e8f0;font-weight:600}
-          .cp-badge-num{color:#c084fc}
-          .cp-search-wrap{margin:2rem 0 2.5rem}
-          .cp-search{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:1rem 1.25rem;color:#374151;font-size:.9375rem;text-decoration:none;font-weight:500;transition:border-color .2s,background .2s}
-          .cp-search:hover{border-color:rgba(192,132,252,.35);background:rgba(192,132,252,.04)}
-          .cp-search-kbd{margin-left:auto;background:rgba(255,255,255,.06);border-radius:6px;padding:3px 8px;font-size:.6875rem;color:#374151;font-family:monospace}
-          .cp-sec{margin-bottom:2.5rem}
-          .cp-label{font-size:.6875rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#374151;margin-bottom:.875rem;display:flex;align-items:center;gap:8px}
-          .cp-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05)}
-          .cp-list{display:flex;flex-direction:column;gap:4px}
-          .cp-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:13px 16px;text-decoration:none;color:#e2e8f0;transition:background .15s,border-color .15s,transform .15s}
-          .cp-row:hover{background:rgba(192,132,252,.05);border-color:rgba(192,132,252,.18);transform:translateX(3px)}
-          .cp-rank{font-size:.6875rem;color:#1f2937;width:22px;flex-shrink:0;font-weight:800;font-family:'Syne',sans-serif}
-          .r1{color:#fbbf24}.r2{color:#9ca3af}.r3{color:#b87c4a}
-          .cp-info{flex:1;min-width:0}
-          .cp-name{font-weight:600;font-size:.875rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-          .cp-meta{font-size:.75rem;color:#374151;display:flex;align-items:center;gap:4px;margin-top:2px}
-          .cp-vwrap{text-align:right;flex-shrink:0}
-          .cp-vnum{font-weight:800;color:#c084fc;font-size:.9375rem;font-family:'Syne',sans-serif}
-          .cp-vlbl{font-size:.6875rem;color:#1f2937}
-          .cp-more{display:block;text-align:center;margin-top:.875rem;color:#6b7280;font-size:.8125rem;text-decoration:none;transition:color .2s}
-          .cp-more:hover{color:#c084fc}
-          .cp-divider{height:1px;background:rgba(255,255,255,.05);margin:2rem 0}
-          .cp-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:12px}
-          .cp-cat{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.375rem 1.25rem;text-decoration:none;color:#e2e8f0;display:block;transition:transform .2s,border-color .2s,background .2s}
-          .cp-cat:hover{transform:translateY(-2px)}
-          .cp-cat-ico{font-size:1.5rem;margin-bottom:.75rem;display:block}
-          .cp-cat-name{font-weight:700;font-size:.9375rem;margin-bottom:3px}
-          .cp-cat-desc{font-size:.8125rem;color:#6b7280}
-          .cp-pills{display:flex;flex-wrap:wrap;gap:7px}
-          .cp-pill{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:100px;padding:6px 15px;text-decoration:none;color:#9ca3af;font-size:.8125rem;font-weight:500;transition:color .2s,border-color .2s,background .2s}
-          .cp-pill:hover{color:#c084fc;border-color:rgba(192,132,252,.28);background:rgba(192,132,252,.05)}
-          .cp-tag{color:#34d399}
-          .cp-tag:hover{color:#34d399;border-color:rgba(52,211,153,.28);background:rgba(52,211,153,.05)}
-          .cp-seo{margin-top:2.5rem;padding:1.375rem 1.5rem;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);border-radius:16px;color:#374151;font-size:.875rem;line-height:1.75}
-          .cp-seo h2{color:#4b5563;font-size:.9375rem;margin:0 0 .625rem;font-weight:600}
-          .cp-seo p{margin:0 0 .5rem}
-          @media(max-width:640px){.cp-nav-links{gap:1rem}.cp-h1{letter-spacing:-2px}.cp-cats{grid-template-columns:1fr 1fr}}
+          *{box-sizing:border-box;margin:0;padding:0}
+          html,body{background:#0f1014;color:#e8eaf0;font-family:'Outfit',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased}
+          a{text-decoration:none;color:inherit}
+          :root{
+            --bg:#0f1014;--bg2:#151720;--surf:#1e2130;--surf2:#252839;
+            --bdr:rgba(255,255,255,.07);--bdr2:rgba(255,255,255,.12);
+            --txt:#e8eaf0;--txt2:#8892a8;--txt3:#505870;
+            --hot:#e8305a;--neon:#38b6d4;--gold:#f0a830;--purple:#7c5cbf;
+            --radius:12px;
+          }
+          .pg{max-width:940px;margin:0 auto;padding:0 1.25rem 5rem}
+
+          /* NAV */
+          .nav{display:flex;align-items:center;justify-content:space-between;padding:1.125rem 0;border-bottom:1px solid var(--bdr);margin-bottom:0}
+          .logo{display:flex;align-items:center;gap:.45rem;font-weight:800;font-size:1.05rem;letter-spacing:-.03em}
+          .logo-icon{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--hot),var(--purple));display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:#fff}
+          .logo em{color:var(--neon);font-style:normal}
+          .nav-links{display:flex;gap:1.25rem}
+          .nav-link{font-size:.8125rem;color:var(--txt2);font-weight:500;transition:color .2s}
+          .nav-link:hover{color:var(--neon)}
+
+          /* HERO */
+          .hero{padding:3.5rem 0 2rem;text-align:center}
+          .live-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(232,48,90,.1);border:1px solid rgba(232,48,90,.25);border-radius:100px;padding:5px 14px;font-size:.7rem;font-weight:700;color:var(--hot);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1.25rem}
+          .live-dot{width:6px;height:6px;border-radius:50%;background:var(--hot);animation:pulse 1.8s ease-in-out infinite;flex-shrink:0}
+          @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
+          .h1{font-size:clamp(2.4rem,8vw,4.25rem);font-weight:900;line-height:1.04;letter-spacing:-2.5px;margin-bottom:.875rem}
+          .h1 em{color:var(--neon);font-style:normal}
+          .tagline{font-size:1rem;color:var(--txt2);margin-bottom:1.875rem;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.65}
+          .stats-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:2rem}
+          .stat-pill{background:var(--surf);border:1px solid var(--bdr2);border-radius:100px;padding:8px 18px;font-size:.875rem;font-weight:600;color:var(--txt);display:flex;align-items:center;gap:7px}
+          .stat-pill em{color:var(--neon);font-style:normal;font-weight:800}
+
+          /* CTA PRINCIPAL */
+          .cta-wrap{margin-bottom:2.5rem}
+          .cta-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--hot),var(--purple));color:#fff;font-weight:800;font-size:1rem;padding:1rem 2rem;border-radius:14px;letter-spacing:-.02em;transition:transform .18s,box-shadow .18s;box-shadow:0 4px 24px rgba(232,48,90,.3)}
+          .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(232,48,90,.45)}
+          .cta-btn svg{width:18px;height:18px;flex-shrink:0}
+          .cta-sub{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:.875rem;flex-wrap:wrap}
+          .cta-link{font-size:.8125rem;color:var(--txt2);display:flex;align-items:center;gap:5px;transition:color .2s}
+          .cta-link:hover{color:var(--neon)}
+
+          /* SECCIÓN */
+          .sec{margin-top:2.25rem}
+          .sec-label{font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:.875rem;display:flex;align-items:center;gap:10px}
+          .sec-label::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+          /* TOP MODELS */
+          .model-list{display:flex;flex-direction:column;gap:4px}
+          .model-row{display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--bdr);border-radius:var(--radius);padding:12px 16px;transition:border-color .15s,background .15s}
+          .model-row:hover{background:var(--surf2);border-color:var(--bdr2)}
+          .rank{font-size:.6875rem;font-weight:800;width:22px;flex-shrink:0;color:var(--txt3)}
+          .rank.r1{color:#f0a830}.rank.r2{color:#8892a8}.rank.r3{color:#b87c4a}
+          .model-info{flex:1;min-width:0}
+          .model-name{font-weight:600;font-size:.875rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+          .model-meta{font-size:.75rem;color:var(--txt2);display:flex;align-items:center;gap:5px;margin-top:2px}
+          .model-viewers{text-align:right;flex-shrink:0}
+          .viewers-num{font-weight:800;color:var(--neon);font-size:.9375rem}
+          .viewers-lbl{font-size:.6875rem;color:var(--txt3)}
+          .see-more{display:block;text-align:center;margin-top:.75rem;color:var(--txt2);font-size:.8125rem;padding:.5rem;border-radius:8px;transition:color .18s}
+          .see-more:hover{color:var(--neon)}
+
+          /* CATEGORÍAS */
+          .cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+          @media(max-width:580px){.cats-grid{grid-template-columns:repeat(2,1fr)}}
+          .cat-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:1.125rem 1rem;transition:border-color .2s,background .2s,transform .2s;display:block}
+          .cat-card:hover{transform:translateY(-2px)}
+          .cat-emoji{font-size:1.375rem;margin-bottom:.5rem;display:block}
+          .cat-name{font-weight:700;font-size:.875rem;margin-bottom:2px}
+          .cat-desc{font-size:.75rem;color:var(--txt2)}
+
+          /* PILLS */
+          .pills{display:flex;flex-wrap:wrap;gap:7px}
+          .pill{background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:100px;padding:6px 14px;font-size:.8125rem;color:var(--txt2);font-weight:500;transition:color .18s,border-color .18s,background .18s}
+          .pill:hover{color:var(--neon);border-color:rgba(56,182,212,.3);background:rgba(56,182,212,.07)}
+          .pill-tag{color:var(--grn,#22c77a)}
+          .pill-tag:hover{color:#22c77a;border-color:rgba(34,199,122,.3);background:rgba(34,199,122,.07)}
+
+          /* SEO BLOCK */
+          .seo-block{margin-top:2.5rem;padding:1.375rem 1.5rem;background:var(--surf);border:1px solid var(--bdr);border-radius:16px;color:var(--txt2);font-size:.875rem;line-height:1.75}
+          .seo-block h2{color:var(--txt);font-size:.9375rem;margin-bottom:.625rem;font-weight:700}
+          .seo-block p{margin-bottom:.5rem}
+          .seo-block p:last-child{margin-bottom:0}
+
+          .divider{height:1px;background:var(--bdr);margin:2rem 0}
+          @media(max-width:640px){.nav-links{gap:1rem}.h1{letter-spacing:-1.5px}}
         `}</style>
       </Head>
 
-      <div className="cp">
-        <nav className="cp-nav">
-          <a href="/app.html" className="cp-logo">Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
-          <div className="cp-nav-links">
-            <a href="/gender" className="cp-nav-link">Géneros</a>
-            <a href="/country" className="cp-nav-link">Países</a>
-            <a href="/top/latinas" className="cp-nav-link">Latinas</a>
+      <div className="pg">
+        {/* NAV */}
+        <nav className="nav">
+          <a href="/app.html" className="logo">
+            <span className="logo-icon">CH</span>
+            Campulse<em>Hub</em>
+          </a>
+          <div className="nav-links">
+            <a href="/gender" className="nav-link">Géneros</a>
+            <a href="/country" className="nav-link">Países</a>
+            <a href="/search" className="nav-link">Buscar</a>
           </div>
         </nav>
 
-        <section className="cp-hero">
-          <div className="cp-eyebrow">
-            <span className="cp-live-dot" />
-            En tiempo real
+        {/* HERO */}
+        <section className="hero">
+          <div className="live-pill">
+            <span className="live-dot"/>
+            En vivo ahora
           </div>
-          <h1 className="cp-h1">Campulse<span style={{color:"#c084fc",WebkitTextFillColor:"#c084fc"}}>Hub</span></h1>
-          <p className="cp-tagline">Estadísticas de Chaturbate en tiempo real.<br />Viewers, seguidores y mejores horarios.</p>
+          <h1 className="h1">Campulse<em>Hub</em></h1>
+          <p className="tagline">Dashboard de Chaturbate en tiempo real. Viewers, seguidores, filtros por país, género e idioma.</p>
+
+          {/* Stats */}
           {totalModels > 0 && (
-            <div className="cp-badge">
-              <span className="cp-live-dot" />
-              <span className="cp-badge-num">{totalModels.toLocaleString("es")}</span> modelos online ahora
+            <div className="stats-row">
+              <div className="stat-pill">
+                <span className="live-dot"/>
+                <em>{(liveCount||totalModels).toLocaleString("es")}</em> modelos online
+              </div>
+              {topModels[0] && (
+                <div className="stat-pill">
+                  🔥 Top: <em>{topModels[0].num_users.toLocaleString("es")}</em> viewers
+                </div>
+              )}
+              <div className="stat-pill">
+                📡 Actualizado <em>en tiempo real</em>
+              </div>
             </div>
           )}
+
+          {/* CTA PRINCIPAL — lleva al dashboard */}
+          <div className="cta-wrap">
+            <a href="/app.html" className="cta-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/>
+              </svg>
+              Abrir Dashboard en Vivo
+            </a>
+            <div className="cta-sub">
+              <a href="/search" className="cta-link">🔍 Buscar modelo</a>
+              <a href="/top/latinas" className="cta-link">🌶️ Top Latinas</a>
+              <a href="/country/co" className="cta-link">🇨🇴 Colombia</a>
+            </div>
+          </div>
         </section>
 
-        <div className="cp-search-wrap">
-          <a href="/search" className="cp-search">
-            🔍 Buscar modelo por username...
-            <span className="cp-search-kbd">buscar</span>
-          </a>
-        </div>
-
+        {/* TOP MODELOS */}
         {topModels.length > 0 && (
-          <section className="cp-sec">
-            <div className="cp-label">🔥 Top 10 en vivo ahora</div>
-            <div className="cp-list">
-              {topModels.map((m, i) => {
+          <section className="sec">
+            <div className="sec-label">🔥 Top 12 en vivo ahora</div>
+            <div className="model-list">
+              {topModels.map((m,i) => {
                 const cc = m.country?.toLowerCase();
-                const cn = COUNTRY_NAMES[m.country?.toUpperCase()] || m.country || null;
-                const gi = GENDER_LABELS[m.gender] || "";
-                const gc = GENDER_COLORS[m.gender] || "#4b5563";
-                const rc = i===0?"cp-rank r1":i===1?"cp-rank r2":i===2?"cp-rank r3":"cp-rank";
+                const cn = COUNTRY_NAMES[m.country?.toUpperCase()]||m.country||null;
+                const gi = GENDER_LABELS[m.gender]||"";
+                const gc = GENDER_COLORS[m.gender]||"var(--txt3)";
+                const rc = i===0?"rank r1":i===1?"rank r2":i===2?"rank r3":"rank";
                 return (
-                  <a key={m.username} href={`/model/${m.username}`} className="cp-row">
+                  <a key={m.username} href={`/model/${m.username}`} className="model-row">
                     <span className={rc}>#{i+1}</span>
-                    <div className="cp-info">
-                      <div className="cp-name">{m.display_name}</div>
-                      <div className="cp-meta">
+                    <div className="model-info">
+                      <div className="model-name">{m.display_name}</div>
+                      <div className="model-meta">
                         {gi && <span style={{color:gc}}>{gi}</span>}
-                        {cc && <img src={`https://flagcdn.com/16x12/${cc}.png`} alt={cn||m.country} width={16} height={12} style={{verticalAlign:"middle",borderRadius:2}} />}
+                        {cc && <img src={`https://flagcdn.com/16x12/${cc}.png`} alt={cn||m.country} width={16} height={12} style={{verticalAlign:"middle",borderRadius:2}}/>}
                         {cn}
                       </div>
                     </div>
-                    <div className="cp-vwrap">
-                      <div className="cp-vnum">{m.num_users.toLocaleString("es")}</div>
-                      <div className="cp-vlbl">viewers</div>
+                    <div className="model-viewers">
+                      <div className="viewers-num">{m.num_users.toLocaleString("es")}</div>
+                      <div className="viewers-lbl">viewers</div>
                     </div>
                   </a>
                 );
               })}
             </div>
-            <a href="/gender/female" className="cp-more">Ver más modelos →</a>
+            <a href="/app.html" className="see-more">Ver todas las modelos en vivo →</a>
           </section>
         )}
 
-        <div className="cp-divider" />
+        <div className="divider"/>
 
-        <section className="cp-sec">
-          <div className="cp-label">Explorar por categoría</div>
-          <div className="cp-cats">
-            {categories.map(cat => (
-              <a key={cat.href} href={cat.href} className="cp-cat"
-                onMouseEnter={e=>{e.currentTarget.style.borderColor=cat.accent+"44";e.currentTarget.style.background=cat.accent+"0a"}}
+        {/* CATEGORÍAS */}
+        <section className="sec">
+          <div className="sec-label">Explorar por género</div>
+          <div className="cats-grid">
+            {cats.map(c => (
+              <a key={c.href} href={c.href} className="cat-card"
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=c.accent+"44";e.currentTarget.style.background=c.accent+"0d"}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor="";e.currentTarget.style.background=""}}>
-                <span className="cp-cat-ico">{cat.emoji}</span>
-                <div className="cp-cat-name">{cat.title}</div>
-                <div className="cp-cat-desc">{cat.desc}</div>
+                <span className="cat-emoji">{c.emoji}</span>
+                <div className="cat-name">{c.title}</div>
+                <div className="cat-desc">{c.desc}</div>
               </a>
             ))}
           </div>
         </section>
 
-        <section className="cp-sec">
-          <div className="cp-label">Géneros populares</div>
-          <div className="cp-pills">
-            {[{href:"/gender/female",l:"♀ Chicas"},{href:"/gender/male",l:"♂ Chicos"},{href:"/gender/couple",l:"♥ Parejas"},{href:"/gender/trans",l:"⚧ Trans"},{href:"/top/latinas",l:"🌶️ Latinas"}].map(x=>(
-              <a key={x.href} href={x.href} className="cp-pill">{x.l}</a>
+        {/* PAÍSES */}
+        <section className="sec">
+          <div className="sec-label">Países más activos</div>
+          <div className="pills">
+            {countries.map(x=>(
+              <a key={x.href} href={x.href} className="pill">{x.l}</a>
             ))}
           </div>
         </section>
 
-        <section className="cp-sec">
-          <div className="cp-label">Países más activos</div>
-          <div className="cp-pills">
-            {[{href:"/country/co",l:"🇨🇴 Colombia"},{href:"/country/es",l:"🇪🇸 España"},{href:"/country/mx",l:"🇲🇽 México"},{href:"/country/ro",l:"🇷🇴 Rumania"},{href:"/country/us",l:"🇺🇸 EEUU"},{href:"/country/br",l:"🇧🇷 Brasil"}].map(x=>(
-              <a key={x.href} href={x.href} className="cp-pill">{x.l}</a>
+        {/* IDIOMAS */}
+        <section className="sec">
+          <div className="sec-label">Por idioma</div>
+          <div className="pills">
+            {langs.map(x=>(
+              <a key={x.href} href={x.href} className="pill">{x.l}</a>
             ))}
           </div>
         </section>
 
-        <section className="cp-sec">
-          <div className="cp-label">Idiomas</div>
-          <div className="cp-pills">
-            {[{href:"/language/spanish",l:"🇪🇸 Español"},{href:"/language/english",l:"🇬🇧 English"},{href:"/language/portuguese",l:"🇧🇷 Português"},{href:"/language/romanian",l:"🇷🇴 Română"},{href:"/language/russian",l:"🇷🇺 Русский"}].map(x=>(
-              <a key={x.href} href={x.href} className="cp-pill">{x.l}</a>
+        {/* TAGS */}
+        <section className="sec">
+          <div className="sec-label">Tags populares</div>
+          <div className="pills">
+            {tags.map(t=>(
+              <a key={t} href={`/tag/${t}`} className="pill pill-tag">#{t}</a>
             ))}
           </div>
         </section>
 
-        <section className="cp-sec">
-          <div className="cp-label">Tags populares</div>
-          <div className="cp-pills">
-            {["latina","bigboobs","ebony","teen","curvy","lovense","squirt","colombia"].map(t=>(
-              <a key={t} href={`/tag/${t}`} className="cp-pill cp-tag">#{t}</a>
-            ))}
-          </div>
-        </section>
-
-        <div className="cp-seo">
-          <h2>Estadísticas de Chaturbate en tiempo real</h2>
-          <p>CampulseHub rastrea viewers, seguidores y mejores horarios de miles de modelos, actualizado cada 2 horas desde Chaturbate.</p>
-          <p>Encuentra las modelos más vistas de Colombia, España, México y 50 países más. Filtra por género, idioma o país para descubrir nuevas modelos en vivo.</p>
+        {/* SEO BLOCK — texto indexable por Google */}
+        <div className="seo-block">
+          <h2>Dashboard de Chaturbate en tiempo real — CampulseHub</h2>
+          <p>CampulseHub rastrea en tiempo real las estadísticas de miles de modelos de Chaturbate: viewers activos, seguidores, mejores horarios y más. Los datos se actualizan automáticamente cada hora.</p>
+          <p>Filtra modelos por país (Colombia, España, México, Rumania, Brasil), por género (chicas, chicos, parejas, trans) o por idioma (español, inglés, portugués). Descubre qué modelos están en vivo ahora mismo y cuál es su audiencia real.</p>
+          <p>Cada perfil muestra el historial de viewers de los últimos 30 días, el mejor horario para conectarse y estadísticas comparativas con otras modelos del mismo país.</p>
         </div>
       </div>
     </>
