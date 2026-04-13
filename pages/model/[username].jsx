@@ -261,7 +261,10 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
       @keyframes cmpShimmer{0%{left:-100%}100%{left:200%}}
     }
     @media(min-width:641px){
-      @media(min-width:641px){#mob-layout{display:none!important}}
+      #mob-layout{display:none!important}
+    }
+    @media(max-width:640px){
+      .cmp-page{display:none!important}
     }
   `;
 
