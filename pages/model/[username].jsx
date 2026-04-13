@@ -195,7 +195,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
 
   const mobileCSS = `
     @media(max-width:640px){
-      .cmp-page{padding:0 0 5rem}
+      .cmp-page{display:none!important}.cmp-page{padding:0 0 5rem}
       .mob-sticky{position:sticky;top:0;z-index:100;background:rgba(15,16,20,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:.625rem 1rem;gap:12px}
       .mob-sticky-back{font-size:.75rem;color:var(--txt2);display:flex;align-items:center;gap:4px;text-decoration:none}
       .mob-sticky-cta{background:var(--hot);color:#fff;font-size:.75rem;font-weight:700;padding:.5rem 1rem;border-radius:100px;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;text-decoration:none}
@@ -651,3 +651,4 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
     </>
   );
 }
+
