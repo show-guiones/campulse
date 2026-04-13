@@ -121,6 +121,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
   const snapCount   = history.length;
   const topHour     = bestHours[0];
   const peakViewers = history.length>0 ? Math.max(...history.map(r=>r.num_users??0)) : null;
+  const avgViewers  = history.length>0 ? history.reduce((s,r)=>s+(r.num_users??0),0)/history.length : null;
 
   const [liveViewers, setLiveViewers] = useState(null);
   const [liveChecked, setLiveChecked] = useState(false);
