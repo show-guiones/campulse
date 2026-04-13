@@ -159,6 +159,6 @@ export default async function handler(req, res) {
     `\n</urlset>`;
 
   res.setHeader("Content-Type", "application/xml; charset=UTF-8");
-  res.setHeader("Cache-Control", "s-maxage=21600, stale-while-revalidate=3600");
+  res.setHeader("Cache-Control", "no-store, no-cache");
   res.status(200).send(xml);
 }
