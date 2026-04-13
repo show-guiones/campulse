@@ -2,7 +2,12 @@ name: Campulse Scraper
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    # Hora Colombia (UTC-5): 10:00 PM → 03:00 UTC
+    - cron: '0 3 * * *'
+    # Hora Colombia (UTC-5): 10:30 PM → 03:30 UTC
+    - cron: '30 3 * * *'
+    # Hora Colombia (UTC-5): 11:00 PM → 04:00 UTC
+    - cron: '0 4 * * *'
   workflow_dispatch:
 
 jobs:
