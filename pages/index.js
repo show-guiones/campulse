@@ -23,7 +23,7 @@ export async function getServerSideProps() {
   let topModels = [];
   try {
     if (SUPABASE_URL && SUPABASE_KEY) {
-      const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      const since = new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString();
       const sbHeaders = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
       const [countRes, topRes] = await Promise.all([
         fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username`,

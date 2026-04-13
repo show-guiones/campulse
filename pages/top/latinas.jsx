@@ -18,7 +18,7 @@ const FLAG = (code) => code ? String.fromCodePoint(...[...code.toUpperCase()].ma
 export async function getServerSideProps() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  const since = new Date(Date.now()-2*60*60*1000).toISOString();
+  const since = new Date(Date.now()-26*60*60*1000).toISOString();
   const countryFilter = LATINA_COUNTRIES.map(c=>`country.eq.${c}`).join(",");
   const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&or=(${countryFilter})&num_users=gt.0&select=username,display_name,num_users,country,gender,spoken_languages&order=num_users.desc&limit=300`;
   let models = [];
