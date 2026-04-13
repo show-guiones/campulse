@@ -77,6 +77,7 @@ export default function Home({ totalModels, topModels, liveCount }) {
     { href:"/gender/couple", emoji:"♥️", title:"Parejas",     desc:"Parejas en directo",          accent:"#d48020" },
     { href:"/gender/trans",  emoji:"⚧️", title:"Trans",       desc:"Modelos trans en vivo",       accent:"#9248c8" },
     { href:"/top/latinas",   emoji:"🌶️", title:"Top Latinas", desc:"Colombia, México, Argentina", accent:"#f0a830" },
+    { href:"/top/colombia",  emoji:"🇨🇴", title:"Top Colombia", desc:"Las más vistas de Colombia",   accent:"#22c77a" },
     { href:"/country/co",    emoji:"🇨🇴", title:"Colombia",    desc:`${topModels.filter(m=>m.country==="CO").length > 0 ? "429+ modelos" : "Modelos colombianas"}`, accent:"#22c77a" },
   ];
 
@@ -259,6 +260,7 @@ export default function Home({ totalModels, topModels, liveCount }) {
               <a href="/search" className="cta-link">🔍 Buscar modelo</a>
               <a href="/top/latinas" className="cta-link">🌶️ Top Latinas</a>
               <a href="/country/co" className="cta-link">🇨🇴 Colombia</a>
+              <a href="/top/colombia" className="cta-link">🇨🇴 Top colombianas</a>
             </div>
           </div>
         </section>

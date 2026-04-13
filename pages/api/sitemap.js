@@ -26,6 +26,9 @@ const STATIC_PAGES = [
 
   // Top categorías especiales
   { loc: "/top/latinas",    changefreq: "hourly",  priority: "0.9" },
+  { loc: "/top/colombia",   changefreq: "hourly",  priority: "0.9" },
+  { loc: "/top/mexico",     changefreq: "hourly",  priority: "0.9" },
+  { loc: "/top/espana",     changefreq: "hourly",  priority: "0.9" },
 
   // Búsqueda
   { loc: "/search",         changefreq: "daily",   priority: "0.8" },
