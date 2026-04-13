@@ -41,30 +41,7 @@ const STATIC_PAGES = [
   { loc: "/gender/couple",  changefreq: "hourly",  priority: "0.8" },
   { loc: "/gender/trans",   changefreq: "hourly",  priority: "0.8" },
 
-  // Países más activos
-  { loc: "/country/co",     changefreq: "daily",   priority: "0.8" },
-  { loc: "/country/es",     changefreq: "daily",   priority: "0.8" },
-  { loc: "/country/mx",     changefreq: "daily",   priority: "0.8" },
-  { loc: "/country/ar",     changefreq: "daily",   priority: "0.7" },
-  { loc: "/country/ro",     changefreq: "daily",   priority: "0.7" },
-  { loc: "/country/us",     changefreq: "daily",   priority: "0.7" },
-  { loc: "/country/br",     changefreq: "daily",   priority: "0.7" },
-  { loc: "/country/ru",     changefreq: "daily",   priority: "0.7" },
-  { loc: "/country/de",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/fr",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/gb",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/it",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/ph",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/ua",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/cl",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/pe",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/ve",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/ca",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/au",     changefreq: "daily",   priority: "0.6" },
-  { loc: "/country/hu",     changefreq: "daily",   priority: "0.5" },
-  { loc: "/country/pl",     changefreq: "daily",   priority: "0.5" },
-  { loc: "/country/cz",     changefreq: "daily",   priority: "0.5" },
-  { loc: "/country/tr",     changefreq: "daily",   priority: "0.5" },
+  // Países — generados dinámicamente desde Supabase (ver abajo)
 
   // Idiomas
   { loc: "/language/spanish",    changefreq: "daily",  priority: "0.8" },
@@ -99,6 +76,9 @@ const STATIC_PAGES = [
   { loc: "/tag/bigcock",     changefreq: "hourly", priority: "0.6" },
 ];
 
+// Mínimo de modelos por país para incluirlo en el sitemap
+const MIN_COUNTRY_MODELS = 5;
+
 function buildUrl({ loc, changefreq, priority }) {
   return (
     `  <url>\n` +
@@ -125,12 +105,13 @@ export default async function handler(req, res) {
   };
 
   let qualifiedUsernames = [];
+  let qualifiedCountries = [];
 
   try {
     const countUrl =
       `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
       `?captured_at=gte.${since}` +
-      `&select=username,num_users` +
+      `&select=username,num_users,country` +
       `&order=username` +
       `&limit=50000`;
 
@@ -140,13 +121,24 @@ export default async function handler(req, res) {
     const rows = await r.json();
 
     const stats = {};
+    const countryCounts = {};
+
     for (const row of rows) {
       const u = row.username;
       if (!u) continue;
+
+      // Stats por modelo
       if (!stats[u]) stats[u] = { snapshots: 0, maxViewers: 0 };
       stats[u].snapshots += 1;
       if ((row.num_users ?? 0) > stats[u].maxViewers) {
         stats[u].maxViewers = row.num_users ?? 0;
+      }
+
+      // Conteo por país — solo modelos con suficientes snapshots
+      if (row.country && stats[u].snapshots >= MIN_SNAPSHOTS) {
+        const c = row.country.toLowerCase();
+        if (!countryCounts[c]) countryCounts[c] = new Set();
+        countryCounts[c].add(u);
       }
     }
 
@@ -155,12 +147,24 @@ export default async function handler(req, res) {
       .map(([username]) => username)
       .sort();
 
+    // Países con suficientes modelos — prioridad según tamaño
+    const HIGH_PRIORITY = new Set(["co","es","mx","ar","br","ru","us","ro","gb","ph"]);
+    qualifiedCountries = Object.entries(countryCounts)
+      .filter(([, set]) => set.size >= MIN_COUNTRY_MODELS)
+      .sort((a, b) => b[1].size - a[1].size)
+      .map(([code]) => ({
+        loc: `/country/${code}`,
+        changefreq: "daily",
+        priority: HIGH_PRIORITY.has(code) ? "0.8" : "0.6",
+      }));
+
   } catch (e) {
     console.error("[sitemap] Error consultando Supabase:", e.message);
   }
 
   // ── Construir XML ──────────────────────────────────────────────────────────
   const staticSection = STATIC_PAGES.map(buildUrl).join("\n");
+  const countrySection = qualifiedCountries.map(buildUrl).join("\n");
 
   const modelSection = qualifiedUsernames
     .map(
@@ -177,6 +181,7 @@ export default async function handler(req, res) {
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     staticSection + "\n" +
+    countrySection + "\n" +
     modelSection +
     `\n</urlset>`;
 
