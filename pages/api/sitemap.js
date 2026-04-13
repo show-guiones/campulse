@@ -108,36 +108,27 @@ export default async function handler(req, res) {
   let qualifiedCountries = [];
 
   try {
-    // Supabase paginación con Range header (estándar PostgREST)
+    // Paginación con offset — Supabase limita a 1000 filas por request
     let rows = [];
     const PAGE = 1000;
-    let start = 0;
+    let offset = 0;
     while (true) {
       const pageUrl =
         `${SUPABASE_URL}/rest/v1/rooms_snapshot` +
         `?captured_at=gte.${since}` +
         `&select=username,num_users,country` +
-        `&order=username.asc`;
-      const pageRes = await fetch(pageUrl, {
-        headers: {
-          ...sbHeaders,
-          "Range": `${start}-${start + PAGE - 1}`,
-          "Range-Unit": "items",
-        },
-      });
-      // 206 = partial content, 200 = all content
-      if (!pageRes.ok && pageRes.status !== 206) {
-        console.error("[sitemap] Supabase page error:", pageRes.status);
-        break;
-      }
-      const page = await pageRes.json();
+        `&order=username.asc` +
+        `&limit=${PAGE}` +
+        `&offset=${offset}`;
+      const r = await fetch(pageUrl, { headers: sbHeaders });
+      if (!r.ok) break;
+      const page = await r.json();
       if (!Array.isArray(page) || page.length === 0) break;
       rows = rows.concat(page);
       if (page.length < PAGE) break;
-      start += PAGE;
-      if (start > 300000) break; // safety cap
+      offset += PAGE;
+      if (offset > 500000) break;
     }
-    console.log(`[sitemap] Total rows fetched: ${rows.length}`);
 
     const stats = {};
     const countryCounts = {};
@@ -154,8 +145,8 @@ export default async function handler(req, res) {
       }
 
       // Conteo por país — solo modelos con suficientes snapshots
-      if (row.country && stats[u].snapshots >= MIN_SNAPSHOTS) {
-        const c = row.country.toLowerCase();
+      if (row.country && row.country.trim() && stats[u].snapshots >= MIN_SNAPSHOTS) {
+        const c = row.country.trim().toLowerCase();
         if (!countryCounts[c]) countryCounts[c] = new Set();
         countryCounts[c].add(u);
       }
