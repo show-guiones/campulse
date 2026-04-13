@@ -1,16 +1,16 @@
-Ôªø// pages/model/[username].jsx ‚Äî Mobile-first redesign con UX optimizada para afiliado
+// pages/model/[username].jsx ó Mobile-first redesign con UX optimizada para afiliado
 
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import { DS_CSS, Logo } from "../../campulse-design-system";
 
 const LANG_VARIANTS = {
-  spanish:["spanish","espa√±ol","espanol","es"],english:["english","ingl√©s","ingles","en"],
-  portuguese:["portuguese","portugu√©s","portugues","pt"],romanian:["romanian","rumano","rom√¢nƒÉ","ro"],
-  russian:["russian","ruso","—Ä—É—Å—Å–∫–∏–π","ru"],german:["german","alem√°n","deutsch","de"],
-  french:["french","franc√©s","fran√ßais","fr"],italian:["italian","italiano","it"],
+  spanish:["spanish","espaÒol","espanol","es"],english:["english","inglÈs","ingles","en"],
+  portuguese:["portuguese","portuguÈs","portugues","pt"],romanian:["romanian","rumano","rom‚na","ro"],
+  russian:["russian","ruso","???????","ru"],german:["german","alem·n","deutsch","de"],
+  french:["french","francÈs","franÁais","fr"],italian:["italian","italiano","it"],
 };
-const LANG_NAMES = { spanish:"Espa√±ol",english:"English",portuguese:"Portugu√™s",romanian:"Rom√¢nƒÉ",russian:"–†—É—Å—Å–∫–∏–π",german:"Deutsch",french:"Fran√ßais",italian:"Italiano" };
+const LANG_NAMES = { spanish:"EspaÒol",english:"English",portuguese:"PortuguÍs",romanian:"Rom‚na",russian:"???????",german:"Deutsch",french:"FranÁais",italian:"Italiano" };
 function detectLangSlug(raw) {
   if (!raw) return null;
   const val = raw.toLowerCase().trim();
@@ -18,7 +18,7 @@ function detectLangSlug(raw) {
   return null;
 }
 const SITE = "https://www.campulsehub.com";
-const COUNTRY_NAMES = { CO:"Colombia",ES:"Espa√±a",MX:"M√©xico",AR:"Argentina",CL:"Chile",PE:"Per√∫",VE:"Venezuela",EC:"Ecuador",US:"Estados Unidos",BR:"Brasil",RO:"Rumania",RU:"Rusia",DE:"Alemania",FR:"Francia",GB:"Reino Unido",IT:"Italia",PH:"Filipinas",TH:"Tailandia",CZ:"Rep√∫blica Checa",UA:"Ucrania",HU:"Hungr√≠a",PL:"Polonia",CA:"Canad√°",AU:"Australia",NL:"Pa√≠ses Bajos",SE:"Suecia",TR:"Turqu√≠a" };
+const COUNTRY_NAMES = { CO:"Colombia",ES:"EspaÒa",MX:"MÈxico",AR:"Argentina",CL:"Chile",PE:"Per˙",VE:"Venezuela",EC:"Ecuador",US:"Estados Unidos",BR:"Brasil",RO:"Rumania",RU:"Rusia",DE:"Alemania",FR:"Francia",GB:"Reino Unido",IT:"Italia",PH:"Filipinas",TH:"Tailandia",CZ:"Rep˙blica Checa",UA:"Ucrania",HU:"HungrÌa",PL:"Polonia",CA:"Canad·",AU:"Australia",NL:"PaÌses Bajos",SE:"Suecia",TR:"TurquÌa" };
 const GENDER_LABELS = { f:"Mujer",m:"Hombre",c:"Pareja",t:"Trans" };
 const GENDER_COLORS = { f:"var(--female)",m:"var(--male)",c:"var(--couple)",t:"var(--trans)" };
 function countryCodeToFlag(code) {
@@ -122,8 +122,8 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
   const topHour     = bestHours[0];
   const peakViewers = history.length>0 ? Math.max(...history.map(r=>r.num_users??0)) : null;
 
-  // ‚îÄ‚îÄ ESTADO EN VIVO: /api/live-check pagina Chaturbate buscando username exacto ‚îÄ
-  // Pagina hasta 1500 salas (3 √ó 500) buscando match exacto por username.
+  // -- ESTADO EN VIVO: /api/live-check pagina Chaturbate buscando username exacto -
+  // Pagina hasta 1500 salas (3 ◊ 500) buscando match exacto por username.
   const [liveViewers, setLiveViewers] = useState(null);
   const [liveChecked, setLiveChecked] = useState(false);
   useEffect(() => {
@@ -167,19 +167,19 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
 
   const LEXY_USER = "lexy_fox2";
   let pageTitle = currentViewers!=null
-    ? `${name} en Chaturbate ‚Äî ${currentViewers.toLocaleString("es")} viewers ahora | CampulseHub`
+    ? `${name} en Chaturbate ó ${currentViewers.toLocaleString("es")} viewers ahora | CampulseHub`
     : `${name} Stats en Chaturbate | CampulseHub`;
-  let pageDescription = `Estad√≠sticas en tiempo real de ${name} en Chaturbate.`;
+  let pageDescription = `EstadÌsticas en tiempo real de ${name} en Chaturbate.`;
   if (countryName) pageDescription+=` Modelo de ${countryName}.`;
   if (followers!=null) pageDescription+=` ${followers.toLocaleString("es")} seguidores.`;
   if (topHour) pageDescription+=` Mejor horario: ${days[topHour.day_of_week]} a las ${String(topHour.hour_est??0).padStart(2,"0")}:00 EST con ${Math.round(topHour.avg_viewers)} viewers promedio.`;
-  if (snapCount>0) pageDescription+=` ${snapCount} snapshots en los √∫ltimos 30 d√≠as.`;
+  if (snapCount>0) pageDescription+=` ${snapCount} snapshots en los ˙ltimos 30 dÌas.`;
   if (username===LEXY_USER) {
-    pageTitle = isLive ? `lexy_fox2 en vivo ‚Äî ${currentViewers.toLocaleString("es")} viewers ahora | CampulseHub` : "lexy_fox2 en Chaturbate ‚Äî Perfil y estad√≠sticas | CampulseHub";
-    pageDescription = `lexy_fox2 es una de las modelos m√°s vistas en CampulseHub. ${isLive?`Ahora mismo con ${currentViewers.toLocaleString("es")} viewers en vivo. `:""}Sigue sus estad√≠sticas, historial y mejor horario en tiempo real.`;
+    pageTitle = isLive ? `lexy_fox2 en vivo ó ${currentViewers.toLocaleString("es")} viewers ahora | CampulseHub` : "lexy_fox2 en Chaturbate ó Perfil y estadÌsticas | CampulseHub";
+    pageDescription = `lexy_fox2 es una de las modelos m·s vistas en CampulseHub. ${isLive?`Ahora mismo con ${currentViewers.toLocaleString("es")} viewers en vivo. `:""}Sigue sus estadÌsticas, historial y mejor horario en tiempo real.`;
   }
   const schema = {
-    "@context":"https://schema.org","@type":"ProfilePage",name:username===LEXY_USER?"lexy_fox2 ‚Äî Modelo destacada en CampulseHub":`${name} ‚Äî Stats en Chaturbate`,
+    "@context":"https://schema.org","@type":"ProfilePage",name:username===LEXY_USER?"lexy_fox2 ó Modelo destacada en CampulseHub":`${name} ó Stats en Chaturbate`,
     description:pageDescription,url:`${SITE}/model/${username}`,
     breadcrumb:{"@type":"BreadcrumbList",itemListElement:[{"@type":"ListItem",position:1,name:"CampulseHub",item:SITE},...(countryName&&countryCode?[{"@type":"ListItem",position:2,name:countryName,item:`${SITE}/country/${countryCode.toLowerCase()}`}]:[]),{"@type":"ListItem",position:countryName?3:2,name,item:`${SITE}/model/${username}`}]},
     mainEntity:{"@type":"Person",name,identifier:username,url:`https://chaturbate.com/${username}/`,...(countryName&&{nationality:countryName}),...(followers!=null&&{interactionStatistic:{"@type":"InteractionCounter",interactionType:"https://schema.org/FollowAction",userInteractionCount:followers}})},
@@ -303,15 +303,15 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
 
       {/* MOBILE LAYOUT */}<div id="mob-layout">
 
-      {/* STICKY NAV ‚Äî siempre visible al hacer scroll */}
+      {/* STICKY NAV ó siempre visible al hacer scroll */}
       <div className="mob-sticky">
         {countryName && countryCode
-          ? <a href={`/country/${countryCode.toLowerCase()}`} className="mob-sticky-back">‚Üê {flag} {countryName}</a>
-          : <a href="/app.html" className="mob-sticky-back">‚Üê Inicio</a>}
+          ? <a href={`/country/${countryCode.toLowerCase()}`} className="mob-sticky-back">? {flag} {countryName}</a>
+          : <a href="/app.html" className="mob-sticky-back">? Inicio</a>}
         <a href={AFFILIATE_URL} target="_blank" rel="noopener noreferrer"
           className={isLive?"mob-sticky-cta":"mob-sticky-cta-off"}>
           {isLive && <span className="cmp-live-dot"/>}
-          {isLive ? `${currentViewers?.toLocaleString("es")} viewers ÔøΩ Ver en vivo` : "Ver en Chaturbate"}
+          {isLive ? `${currentViewers?.toLocaleString("es")} viewers ? Ver en vivo` : "Ver en Chaturbate"}
         </a>
       </div>
 
@@ -335,9 +335,9 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         {/* Viewer count card */}
         <div className="mob-viewer-card">
           <div>
-            <div className="mob-viewer-num">{currentViewers!=null ? currentViewers.toLocaleString("es") : "‚Äî"}</div>
+            <div className="mob-viewer-num">{currentViewers!=null ? currentViewers.toLocaleString("es") : "ó"}</div>
             <div className="mob-viewer-lbl">viewers ahora</div>
-            {trendPct!=null && <div className={`mob-viewer-trend ${trendPct>=0?"up":"down"}`}>{trendPct>=0?"‚ñ≤":"‚ñº"} {Math.abs(trendPct)}%</div>}
+            {trendPct!=null && <div className={`mob-viewer-trend ${trendPct>=0?"up":"down"}`}>{trendPct>=0?"?":"?"} {Math.abs(trendPct)}%</div>}
           </div>
           {sparkData.length>=2 && <div style={{flex:1,margin:"0 .75rem"}}><SparklineMini data={sparkData.slice(-10)} height={36}/></div>}
           {followers!=null && (
@@ -349,32 +349,32 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         </div>
       </div>
 
-      {/* CTA PRINCIPAL ‚Äî zona alta del pulgar */}
+      {/* CTA PRINCIPAL ó zona alta del pulgar */}
       <a href={AFFILIATE_URL} target="_blank" rel="noopener noreferrer"
         className={isLive?"mob-cta-main":"mob-cta-main-off"}>
         <div>
           <div className={isLive?"mob-cta-title":"mob-cta-title-off"}>
-            {isLive ? `${name} est√° EN VIVO` : `Ver sala de ${name}`}
+            {isLive ? `${name} est· EN VIVO` : `Ver sala de ${name}`}
           </div>
           <div className={isLive?"mob-cta-sub":"mob-cta-sub-off"}>
-            {isLive ? `${currentViewers?.toLocaleString("es")} espectadores ¬∑ chaturbate.com` : "Estad√≠sticas en tiempo real ¬∑ chaturbate.com"}
+            {isLive ? `${currentViewers?.toLocaleString("es")} espectadores ∑ chaturbate.com` : "EstadÌsticas en tiempo real ∑ chaturbate.com"}
           </div>
         </div>
-        <div className={isLive?"mob-cta-arrow":"mob-cta-arrow-off"}>‚Üí</div>
+        <div className={isLive?"mob-cta-arrow":"mob-cta-arrow-off"}>?</div>
       </a>
 
-      {/* M√âTRICAS 3 COL */}
+      {/* M…TRICAS 3 COL */}
       <div className="mob-metrics">
         <div className="mob-metric">
-          <div className="mob-mval">{currentViewers!=null?currentViewers.toLocaleString("es"):"‚Äî"}</div>
+          <div className="mob-mval">{currentViewers!=null?currentViewers.toLocaleString("es"):"ó"}</div>
           <div className="mob-mlbl">Viewers</div>
         </div>
         <div className="mob-metric">
-          <div className="mob-mval">{peakViewers!=null?peakViewers.toLocaleString("es"):"‚Äî"}</div>
+          <div className="mob-mval">{peakViewers!=null?peakViewers.toLocaleString("es"):"ó"}</div>
           <div className="mob-mlbl">Peak</div>
         </div>
         <div className="mob-metric">
-          <div className="mob-mval">{snapCount||"‚Äî"}</div>
+          <div className="mob-mval">{snapCount||"ó"}</div>
           <div className="mob-mlbl">Capturas</div>
         </div>
       </div>
@@ -382,7 +382,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
       {/* EMBED MOBILE */}
       {isLive && (
         <div className="mob-embed-section">
-          <div className="mob-embed-lbl"><span className="cmp-live-dot"/>En vivo ¬∑ {currentViewers?.toLocaleString("es")} viewers</div>
+          <div className="mob-embed-lbl"><span className="cmp-live-dot"/>En vivo ∑ {currentViewers?.toLocaleString("es")} viewers</div>
           <div className="cmp-embed-wrap">
             <iframe src={`https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=0f1014&disable_sound=0&mobileRedirect=never`}
               className="cmp-embed-frame" allow="autoplay; fullscreen; encrypted-media"
@@ -396,12 +396,12 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
       {/* SPARKLINE */}
       {sparkData.length>=2 && (
         <div className="mob-section">
-          <div className="mob-sec-title">Viewers √∫ltimos 30 d√≠as</div>
+          <div className="mob-sec-title">Viewers ˙ltimos 30 dÌas</div>
           <div className="mob-spark-wrap">
             <Sparkline data={sparkData}/>
             <div style={{display:"flex",justifyContent:"space-between",marginTop:".375rem"}}>
-              <span style={{fontSize:".625rem",color:"var(--txt3)"}}>hace 30 d√≠as</span>
-              {peakViewers!=null && <span style={{fontSize:".6875rem",color:"var(--neon)",fontWeight:700}}>M√°x: {peakViewers.toLocaleString("es")}</span>}
+              <span style={{fontSize:".625rem",color:"var(--txt3)"}}>hace 30 dÌas</span>
+              {peakViewers!=null && <span style={{fontSize:".6875rem",color:"var(--neon)",fontWeight:700}}>M·x: {peakViewers.toLocaleString("es")}</span>}
             </div>
           </div>
         </div>
@@ -424,13 +424,13 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         </div>
       )}
 
-      {/* CTA INLINE ‚Äî 2do punto de conversi√≥n */}
+      {/* CTA INLINE ó 2do punto de conversiÛn */}
       <a href={AFFILIATE_URL} target="_blank" rel="noopener noreferrer"
         className={isLive?"mob-cta-inline":"mob-cta-inline-off"}>
         <div className="mob-cta-il-title" style={{color:isLive?"var(--hot)":"var(--neon)"}}>
-          {isLive ? `${name} est√° en vivo ahora` : `Visita la sala de ${name}`}
+          {isLive ? `${name} est· en vivo ahora` : `Visita la sala de ${name}`}
         </div>
-        <div className="mob-cta-il-sub">chaturbate.com ¬∑ Gratis</div>
+        <div className="mob-cta-il-sub">chaturbate.com ∑ Gratis</div>
       </a>
 
       {/* HISTORIAL */}
@@ -450,10 +450,10 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         </div>
       )}
 
-      {/* MODELOS SIMILARES ‚Äî scroll horizontal */}
+      {/* MODELOS SIMILARES ó scroll horizontal */}
       {similarModels.length>0 && (
         <div className="mob-section">
-          <div className="mob-sec-title">{countryName?`M√°s de ${countryName} en vivo`:"Modelos similares"}</div>
+          <div className="mob-sec-title">{countryName?`M·s de ${countryName} en vivo`:"Modelos similares"}</div>
           <div className="mob-similar-scroll">
             {similarModels.map((m,i)=>(
               <a key={m.username} href={`/model/${m.username}`} className="mob-sim-card">
@@ -468,7 +468,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           {countryCode && (
             <div style={{textAlign:"center",marginTop:".875rem"}}>
               <a href={`/country/${countryCode.toLowerCase()}`} style={{color:"var(--neon)",fontSize:".8125rem",fontWeight:600,textDecoration:"none"}}>
-                Ver todas las modelos de {countryName} ‚Üí
+                Ver todas las modelos de {countryName} ?
               </a>
             </div>
           )}
@@ -477,33 +477,33 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
 
       {/* SEO */}
       <div className="mob-seo">
-        <h2 style={{fontSize:".9375rem",fontWeight:700,marginBottom:".5rem",color:"var(--txt)"}}>Estad√≠sticas de {name} en Chaturbate</h2>
+        <h2 style={{fontSize:".9375rem",fontWeight:700,marginBottom:".5rem",color:"var(--txt)"}}>EstadÌsticas de {name} en Chaturbate</h2>
         <p style={{color:"var(--txt2)",fontSize:".8125rem",lineHeight:1.6}}>
-          CampulseHub rastrea en tiempo real las estad√≠sticas de {name} en Chaturbate.{countryName?` Modelo de ${countryName}.`:""}{" "}{peakViewers!=null?`Pico de ${peakViewers.toLocaleString("es")} viewers en los ÔøΩltimos 30 dÔøΩas. `:""}Datos actualizados cada 2 horas.
+          CampulseHub rastrea en tiempo real las estadÌsticas de {name} en Chaturbate.{countryName?` Modelo de ${countryName}.`:""}{" "}{peakViewers!=null?`Pico de ${peakViewers.toLocaleString("es")} viewers en los ?ltimos 30 d?as. `:""}Datos actualizados cada 2 horas.
         </p>
       </div>
 
       {/* FOOTER MOBILE */}
       <div className="mob-footer">
-        {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`}>{flag} Ver m√°s modelos de {countryName} ‚Üí</a>}
-        {langSlug && <a href={`/language/${langSlug}`}>Ver modelos en {langName} ‚Üí</a>}
-        <a href="/app.html">‚Üê Volver al inicio</a>
+        {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`}>{flag} Ver m·s modelos de {countryName} ?</a>}
+        {langSlug && <a href={`/language/${langSlug}`}>Ver modelos en {langName} ?</a>}
+        <a href="/app.html">? Volver al inicio</a>
       </div>
 
-</div></div>      {/* DESKTOP LAYOUT */}
+</div>      {/* DESKTOP LAYOUT */}
       <div className="cmp-page">
         <nav className="cmp-nav">
           <Logo/>
           <div className="cmp-nav-links">
             {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-nav-link">{flag} {countryName}</a>}
-            <a href="/gender" className="cmp-nav-link">G√©neros</a>
+            <a href="/gender" className="cmp-nav-link">GÈneros</a>
             <a href="/search" className="cmp-nav-link">Buscar</a>
           </div>
         </nav>
         <nav className="cmp-bc">
           <a href="/app.html">CampulseHub</a>
-          {countryName && countryCode && (<><span className="cmp-bc-sep">‚Ä∫</span><a href={`/country/${countryCode.toLowerCase()}`}>{flag} {countryName}</a></>)}
-          <span className="cmp-bc-sep">‚Ä∫</span>
+          {countryName && countryCode && (<><span className="cmp-bc-sep">õ</span><a href={`/country/${countryCode.toLowerCase()}`}>{flag} {countryName}</a></>)}
+          <span className="cmp-bc-sep">õ</span>
           <span style={{color:"var(--txt2)"}}>{name}</span>
         </nav>
         <div className="cmp-page-header" style={{borderBottom:"1px solid var(--bdr)"}}>
@@ -520,7 +520,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
               <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:".5rem"}}>
                 {genderLabel && <span className="cmp-tag" style={{color:genderColor,borderColor:genderColor.replace("var(","rgba(").replace(")",", .35)"),background:genderColor.replace("var(","rgba(").replace(")",", .1)")}}>{genderLabel}</span>}
                 {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-tag-link">{flag} {countryName}</a>}
-                {langSlug ? <a href={`/language/${langSlug}`} className="cmp-tag-link">üó£ {langName}</a> : languages ? <span className="cmp-tag">üó£ {languages}</span> : null}
+                {langSlug ? <a href={`/language/${langSlug}`} className="cmp-tag-link">?? {langName}</a> : languages ? <span className="cmp-tag">?? {languages}</span> : null}
               </div>
             </div>
           </div>
@@ -528,7 +528,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         <div className="cmp-metrics">
           {[["Viewers ahora",currentViewers],["Seguidores",followers],["Peak viewers",peakViewers],["Snapshots",snapCount||null]].map(([label,val])=>(
             <div key={label} className="cmp-metric">
-              <div className="cmp-mval">{val!=null ? val.toLocaleString("es") : "‚Äî"}</div>
+              <div className="cmp-mval">{val!=null ? val.toLocaleString("es") : "ó"}</div>
               <div className="cmp-mlbl">{label}</div>
             </div>
           ))}
@@ -536,20 +536,20 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         {sparkData.length>=2 && (
           <div className="cmp-spark">
             <div className="cmp-spark-header">
-              <span className="cmp-spark-lbl">Viewers √∫ltimos 30 d√≠as</span>
-              {peakViewers!=null && <span className="cmp-spark-peak">M√°x: {peakViewers.toLocaleString("es")}</span>}
+              <span className="cmp-spark-lbl">Viewers ˙ltimos 30 dÌas</span>
+              {peakViewers!=null && <span className="cmp-spark-peak">M·x: {peakViewers.toLocaleString("es")}</span>}
             </div>
             <Sparkline data={sparkData}/>
           </div>
         )}
         <a href={AFFILIATE_URL} target="_blank" rel="noopener noreferrer" className={isLive?"cmp-cta-live":"cmp-cta"}>
-          {isLive ? "üî¥ Ver sala en vivo" : "Ver sala en Chaturbate ‚Üí"}
+          {isLive ? "?? Ver sala en vivo" : "Ver sala en Chaturbate ?"}
         </a>
         {isLive && (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:".75rem"}}>
               <span className="cmp-live-dot"/>
-              <span style={{fontSize:".8125rem",color:"var(--txt2)",fontWeight:600}}>En vivo ahora ¬∑ {currentViewers?.toLocaleString("es")} viewers</span>
+              <span style={{fontSize:".8125rem",color:"var(--txt2)",fontWeight:600}}>En vivo ahora ∑ {currentViewers?.toLocaleString("es")} viewers</span>
             </div>
             <div className="cmp-embed-wrap">
               <iframe src={`https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=0f1014&disable_sound=0&mobileRedirect=never`}
@@ -584,27 +584,27 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         </>)}
         {similarModels.length>0 && (<>
           <div className="cmp-divider"/>
-          <div className="cmp-sec">{countryName?`M√°s modelos de ${countryName} ahora`:"Modelos similares en vivo"}</div>
+          <div className="cmp-sec">{countryName?`M·s modelos de ${countryName} ahora`:"Modelos similares en vivo"}</div>
           <div className="cmp-grid">
             {similarModels.map(m=>(
               <a key={m.username} href={`/model/${m.username}`} className="cmp-card">
                 <div className="cmp-card-name">{m.display_name||m.username}</div>
                 <div className="cmp-card-handle">@{m.username}</div>
-                <div className="cmp-card-viewers">üëÅ {(m.num_users??0).toLocaleString("es")} viewers</div>
+                <div className="cmp-card-viewers">?? {(m.num_users??0).toLocaleString("es")} viewers</div>
                 {m.country && <div className="cmp-card-sub">{countryCodeToFlag(m.country)} {m.country.toUpperCase()}</div>}
               </a>
             ))}
           </div>
           {countryCode && (
             <p style={{textAlign:"center",marginTop:"1rem"}}>
-              <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-footer-link">Ver todas las modelos de {countryName} ‚Üí</a>
+              <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-footer-link">Ver todas las modelos de {countryName} ?</a>
             </p>
           )}
         </>)}
         <div className="cmp-footer-links">
-          {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-footer-link">{flag} Ver m√°s modelos de {countryName} ‚Üí</a>}
-          {langSlug && <a href={`/language/${langSlug}`} className="cmp-footer-link">üó£ Ver modelos en {langName} ‚Üí</a>}
-          <a href="/app.html" className="cmp-footer-link" style={{marginTop:4}}>‚Üê Volver al inicio</a>
+          {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-footer-link">{flag} Ver m·s modelos de {countryName} ?</a>}
+          {langSlug && <a href={`/language/${langSlug}`} className="cmp-footer-link">?? Ver modelos en {langName} ?</a>}
+          <a href="/app.html" className="cmp-footer-link" style={{marginTop:4}}>? Volver al inicio</a>
         </div>
       </div>
     </>
