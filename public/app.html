@@ -2277,10 +2277,10 @@ body.modal-open{overflow:hidden!important}
       </div>
       <div class="fb-sep"></div>
       <select class="sort-sel" id="srt">
-        <option value="viewers">↓ Viewers</option>
         <option value="followers">↓ Seguidores</option>
         <option value="age_asc">Más jóvenes</option>
         <option value="new">Nuevas</option>
+        <option value="viewers">↓ Viewers</option>
       </select>
       <div class="view-toggle">
         <button class="vtb active" id="vg"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
@@ -2855,7 +2855,7 @@ function buildFeaturedOrder(){
   return out;
 }
 let gender='',onlyFavs=false,onlyHD=false,onlyCol=false,activeTag='',activeCountry='',ageRange='';
-let sort='viewers',view='grid',maxV=1,active=null;
+let sort='followers',view='grid',maxV=1,active=null;
 let loaded=false;
 let _rankCache=null; // pre-computed rank map {username->rank}
 let _renderTimer=null; // debounce timer for filter renders // track first load to avoid blank flash
@@ -4476,6 +4476,7 @@ document.getElementById('search').addEventListener('input',()=>{
   if(pd) pd.style.display=hide?'none':'';
   renderOnFilter();
 });
+document.getElementById('srt').value='followers';
 document.getElementById('srt').addEventListener('change',e=>{
   sort=e.target.value;
   e.target.classList.toggle('active', sort!=='viewers');
