@@ -16,17 +16,17 @@ const COUNTRY_NAMES = {
   PH:"Filipinas",TH:"Tailandia",IN:"India",AU:"Australia",TR:"Turquía",ZA:"Sudáfrica",NG:"Nigeria",KE:"Kenia",MG:"Madagascar",
 };
 
-const MIN_SNAPSHOTS = 1;
-const DAYS = 7;
+const MIN_SNAPSHOTS = 5;
+const DAYS = 30;
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ countries:[], error:'config' } };
+  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ countries:[] }, revalidate:3600 };
   const since = new Date(Date.now()-DAYS*24*60*60*1000).toISOString();
   const sbHeaders = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` };
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username,country&limit=50000`,{headers:{...sbHeaders,'Range':'0-49999','Prefer':'count=none'}});
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username,country&limit=50000`,{headers:sbHeaders});
     const rows = r.ok ? await r.json() : [];
     const snapshotCount = {};
     const usernamesByCountry = {};
@@ -45,12 +45,12 @@ export async function getServerSideProps() {
     const countries = Object.entries(usernamesByCountry)
       .map(([code,modelCount])=>({ code, name:COUNTRY_NAMES[code]||code, models:modelCount, slug:`/country/${code.toLowerCase()}` }))
       .sort((a,b)=>b.models-a.models);
-    return { props:{ countries, error:null } };
-  } catch { return { props:{ countries:[], error:'config' } }; }
+    return { props:{ countries }, revalidate:3600 };
+  } catch { return { props:{ countries:[] }, revalidate:3600 }; }
 }
 
-export default function CountriesPage({ countries, error }) {
-  const pageTitle = "Modelos de Chaturbate por País | CampulseHub";
+export default function CountriesPage({ countries }) {
+  const pageTitle = "Modelos de Chaturbate por País | Campulse";
   const pageDescription = `Explora modelos de Chaturbate organizadas por país. Encuentra las mejores salas en vivo de ${countries.slice(0,4).map(c=>c.name).join(", ")} y más.`;
   const schema = {
     "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/country`,
@@ -64,14 +64,11 @@ export default function CountriesPage({ countries, error }) {
         <meta name="description" content={pageDescription}/>
         <meta name="robots" content="index, follow"/>
         <link rel="canonical" href={`${SITE}/country`}/>
-        <meta name="twitter:card" content="summary_large_image"/>
-        <meta name="twitter:title" content={pageTitle}/>
-        <meta name="twitter:description" content={pageDescription}/>
         <meta property="og:title" content={pageTitle}/>
         <meta property="og:description" content={pageDescription}/>
         <meta property="og:url" content={`${SITE}/country`}/>
         <meta property="og:type" content="website"/>
-        <meta property="og:site_name" content="CampulseHub"/>
+        <meta property="og:site_name" content="Campulse"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -90,7 +87,7 @@ export default function CountriesPage({ countries, error }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/app.html" style={{display:"inline-flex",alignItems:"center",gap:"0",fontWeight:800,letterSpacing:"-.5px",textDecoration:"none",color:"#fff"}}>Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
+          <a href="/">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Países</span>
         </nav>
@@ -117,13 +114,13 @@ export default function CountriesPage({ countries, error }) {
         </div>
 
         {countries.length===0 && (
-          <p style={{color:"var(--txt3)",textAlign:"center",marginTop:40}}>{error ? `Error al cargar (${error})` : "Sin datos disponibles."}</p>
+          <p style={{color:"var(--txt3)",textAlign:"center",marginTop:40}}>Cargando datos...</p>
         )}
 
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos de Chaturbate por País</h2>
           <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7,marginBottom:".75rem"}}>
-            CampulseHub rastrea en tiempo real las estadísticas de las modelos de Chaturbate de todo el mundo.
+            Campulse rastrea en tiempo real las estadísticas de las modelos de Chaturbate de todo el mundo.
             Filtra por país para encontrar las mejores salas en vivo de Colombia, España, México, Rumania y más.
           </p>
           <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7}}>

@@ -34,7 +34,7 @@ export async function getServerSideProps() {
 }
 
 export default function GenderPage({ genders }) {
-  const pageTitle = "Modelos de Chaturbate por Género | CampulseHub";
+  const pageTitle = "Modelos de Chaturbate por Género | Campulse";
   const pageDescription = "Explora modelos de Chaturbate por género: chicas, chicos, parejas y trans. Ranking en tiempo real ordenado por viewers. Estadísticas actualizadas cada 2 horas.";
   const schema = {
     "@context":"https://schema.org","@type":"CollectionPage",name:pageTitle,description:pageDescription,url:`${SITE}/gender`,
@@ -48,14 +48,11 @@ export default function GenderPage({ genders }) {
         <meta name="description" content={pageDescription}/>
         <meta name="robots" content="index, follow"/>
         <link rel="canonical" href={`${SITE}/gender`}/>
-        <meta name="twitter:card" content="summary_large_image"/>
-        <meta name="twitter:title" content={pageTitle}/>
-        <meta name="twitter:description" content={pageDescription}/>
         <meta property="og:title" content={pageTitle}/>
         <meta property="og:description" content={pageDescription}/>
         <meta property="og:url" content={`${SITE}/gender`}/>
         <meta property="og:type" content="website"/>
-        <meta property="og:site_name" content="CampulseHub"/>
+        <meta property="og:site_name" content="Campulse"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -74,7 +71,7 @@ export default function GenderPage({ genders }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/app.html" style={{display:"inline-flex",alignItems:"center",gap:"0",fontWeight:800,letterSpacing:"-.5px",textDecoration:"none",color:"#fff"}}>Campulse<span style={{color:"#c084fc"}}>Hub</span></a>
+          <a href="/">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <span style={{color:"var(--txt2)"}}>Géneros</span>
         </nav>
