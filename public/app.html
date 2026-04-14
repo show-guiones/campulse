@@ -3829,6 +3829,22 @@ function loadModalAnalytics(x){
       days.forEach(d=>{
         if(d.val>0){dowTotals[d.dow]+=d.val;dowCounts[d.dow]++;}
       });
+      // CRÍTICO: rooms_snapshot tiene límite 1000 rows — si la modelo tiene muchos
+      // snapshots, dowCounts puede ser 0 aunque best_hours sí tenga datos reales.
+      // Enriquecer dowCounts usando best_hours como fuente de verdad.
+      if(hourlyReal){
+        Object.keys(hourlyReal).forEach(jsDow=>{
+          const dw=parseInt(jsDow);
+          const hrs=hourlyReal[dw];
+          if(hrs&&Object.keys(hrs).length>0){
+            const maxV=Math.max(...Object.values(hrs),0);
+            if(maxV>0&&dowCounts[dw]===0){
+              dowCounts[dw]=1;
+              dowTotals[dw]=maxV;
+            }
+          }
+        });
+      }
       const dowAvg=dowTotals.map((t,i)=>dowCounts[i]>0?Math.round(t/dowCounts[i]):0);
       const bestDow=dowAvg.indexOf(Math.max(...dowAvg));
 

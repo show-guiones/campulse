@@ -23,7 +23,7 @@ export default async function handler(req) {
   }
 
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
-  const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=1000`;
+  const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?username=eq.${encodeURIComponent(username)}&captured_at=gte.${since}&select=captured_at,num_users,num_followers&order=captured_at.asc&limit=2000`;
 
   try {
     const res = await fetch(url, {
