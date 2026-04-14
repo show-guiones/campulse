@@ -854,7 +854,7 @@ header{
     --cb-crop-bot: 150px;
   }
 }
-/* ── PATCH DEFINITIVO: Desktop — iframe centrado 460px para ocultar chat lateral ── */
+/* ── PATCH DEFINITIVO: Desktop — iframe 500px fijo (CB no activa chat <560px) + scale ── */
 @media(orientation:landscape),(min-width:520px){
   .mhero-v2 .embed-wrap{
     overflow:hidden!important;
@@ -864,10 +864,13 @@ header{
   .mhero-v2 .embed-wrap .embed-frame{
     position:absolute!important;
     top:-44px!important;
-    left:50%!important;
-    transform:translateX(-50%)!important;
-    width:100%!important;
-    height:calc(100% + 44px + 150px)!important;
+    left:0!important;
+    /* Ancho fijo 500px → CB no activa panel de chat (umbral ~560px) */
+    width:500px!important;
+    height:calc(281px + 44px + 200px)!important;
+    /* Escalar para llenar el panel visualmente */
+    transform-origin:top left!important;
+    transform:scale(var(--modal-embed-scale,1))!important;
   }
 }
 /* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
@@ -3652,6 +3655,19 @@ function updateFavBtn(u){
 // startLivePreview kept as stub (no longer used for modal, kept for compatibility)
 function startLivePreview(x){}
 
+function _setModalEmbedScale(){
+  if(window.innerWidth<520) return; // móvil: no usar scale
+  const wrap=document.getElementById('mhero-embed-wrap');
+  if(!wrap) return;
+  const panelW=wrap.getBoundingClientRect().width;
+  if(!panelW) return;
+  const scale=(panelW/500).toFixed(4);
+  wrap.style.setProperty('--modal-embed-scale', scale);
+  const frame=document.getElementById('live-embed-frame');
+  if(frame) frame.style.setProperty('--modal-embed-scale', scale);
+}
+window.addEventListener('resize', _setModalEmbedScale);
+
 function activateEmbed(u){
   const wrap=document.getElementById('mhero-embed-wrap');
   const frame=document.getElementById('live-embed-frame');
@@ -3659,6 +3675,7 @@ function activateEmbed(u){
   if(!wrap||!frame)return;
   clearInterval(prevCd);
   wrap.classList.add('active');
+  _setModalEmbedScale(); // calcular escala ahora que wrap tiene dimensiones
   if(loading) loading.classList.remove('hidden');
   frame.onload=null;
   frame.removeEventListener('load', onEmbedLoad);
