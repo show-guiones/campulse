@@ -140,7 +140,7 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
-  .cmp-embed-wrap{padding-bottom:calc(56.25% + 10mm)}
+  .cmp-embed-wrap{padding-bottom:calc(56.25% + 20mm)}
 }
 
 /* ── BOTTOM NAV MÓVIL ── */

@@ -1,7 +1,7 @@
 // pages/top/latinas.jsx — En vivo tiempo real, 1 request, fallback Supabase
 
 import Head from "next/head";
-import { DS_CSS, Logo } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav} from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const LEXY = "lexy_fox2";
@@ -139,7 +139,7 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
         <style>{DS_CSS}</style>
       </Head>
 
-      <div className="cmp-page">
+      <div className="cmp-page cmp-page-body">
         <nav className="cmp-nav">
           <Logo/>
           <div className="cmp-nav-links">
@@ -231,6 +231,7 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           <a href="/country/co" className="cmp-footer-link">Top Colombia →</a>
         </div>
       </div>
+      <BottomNav active="/top/latinas" />
     </>
   );
 }

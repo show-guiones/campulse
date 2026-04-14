@@ -19,10 +19,10 @@ const COUNTRY_NAMES = {
 const MIN_SNAPSHOTS = 5;
 const DAYS = 30;
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
-  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ countries:[] }, revalidate:3600 };
+  if (!SUPABASE_URL||!SUPABASE_KEY) return { props:{ countries:[] } };
   const since = new Date(Date.now()-DAYS*24*60*60*1000).toISOString();
   const sbHeaders = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` };
   try {
@@ -45,8 +45,8 @@ export async function getStaticProps() {
     const countries = Object.entries(usernamesByCountry)
       .map(([code,modelCount])=>({ code, name:COUNTRY_NAMES[code]||code, models:modelCount, slug:`/country/${code.toLowerCase()}` }))
       .sort((a,b)=>b.models-a.models);
-    return { props:{ countries }, revalidate:3600 };
-  } catch { return { props:{ countries:[] }, revalidate:3600 }; }
+    return { props:{ countries } };
+  } catch { return { props:{ countries:[] } }; }
 }
 
 export default function CountriesPage({ countries }) {
