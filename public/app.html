@@ -3748,10 +3748,6 @@ function openMod(u){
       frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never&join_overlay=1&t=${Date.now()}`;
       frame.addEventListener('load', onEmbedLoad);
     }
-    // CHAT IFRAME — columna central en desktop
-    const chatLoading=document.getElementById('modal-chat-loading');
-      if(chatLoading) chatLoading.classList.remove('hidden');
-    }
   } else {
     // OFFLINE: mostrar imagen de perfil
     const _heroElOff=document.getElementById('modal-hero');
@@ -4573,10 +4569,6 @@ function closeMod(e){
   const wrap=document.getElementById('mhero-embed-wrap');
   if(frame){ frame.src='about:blank'; }
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); wrap.classList.remove('stream-ready'); }
-  // Limpiar chat iframe
-  const chatLoading=document.getElementById('modal-chat-loading');
-  if(chatLoading){ chatLoading.classList.remove('hidden'); }
-  // Resetear visibilidad de columna chat
   const analyticsPanel=document.getElementById('modal-analytics');
   if(analyticsPanel) analyticsPanel.style.display='none';
   const heroEl=document.getElementById('modal-hero');
