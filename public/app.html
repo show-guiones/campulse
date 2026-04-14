@@ -3908,55 +3908,50 @@ function loadModalAnalytics(x){
 
 // Build REAL hour ranges per day-of-week from best_hours data
 // hourly = {jsDow: {hour_est(EST): avg_viewers}} — datos reales de Supabase
-// dowCounts = [0..6] from JS getDay() — same convention as jsDow
+// Handles midnight-crossing sessions correctly via gap-rotation algorithm
 function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
   const ranges={};
   const fmt=h=>{
-    // Format hour (EST, 0-23) as 12h string
-    if(h===0) return '12am';
-    if(h<12)  return `${h}am`;
-    if(h===12) return '12pm';
-    return `${h-12}pm`;
+    if(h===0)return'12am';
+    if(h<12)return`${h}am`;
+    if(h===12)return'12pm';
+    return`${h-12}pm`;
   };
   for(let dow=0;dow<7;dow++){
     if(dowCounts[dow]===0){ranges[dow]=null;continue;}
     if(hourly&&hourly[dow]&&Object.keys(hourly[dow]).length>0){
-      // ── DATOS REALES desde best_hours ──
       const hrs=hourly[dow];
-      const vals=Object.values(hrs);
-      const maxH=Math.max(...vals,1);
-      // Umbral: horas con al menos 15% del pico (más permisivo que 20%)
-      const threshold=0.15;
+      const maxH=Math.max(...Object.values(hrs),1);
+      // Horas activas (≥15% del pico), ordenadas 0-23
       const active=[];
-      for(let h=0;h<24;h++){
-        if((hrs[h]||0)/maxH>=threshold) active.push(h);
+      for(let h=0;h<24;h++){if((hrs[h]||0)/maxH>=0.15)active.push(h);}
+      if(!active.length){
+        ranges[dow]={label:'Horario irregular',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:true,peakLabel:null};
+        continue;
       }
-      if(active.length>0){
-        // Encontrar bloque más largo de horas contiguas
-        let bestStart=active[0],bestLen=1,cur=active[0],curLen=1;
-        for(let i=1;i<active.length;i++){
-          if(active[i]===active[i-1]+1){curLen++;if(curLen>bestLen){bestLen=curLen;bestStart=cur;}}
-          else{cur=active[i];curLen=1;}
-        }
-        const startH=bestStart;
-        const endH=bestStart+bestLen-1;
-        // Peak hour
-        const peakH=parseInt(Object.entries(hrs).reduce((a,b)=>b[1]>a[1]?b:a)[0]);
-        // Dots: 8 slots starting from startH
-        const dots=[];
-        for(let h=startH;h<=Math.min(endH,startH+7);h++){
-          dots.push((hrs[h]||0)/maxH);
-        }
-        while(dots.length<8) dots.push(0);
-        // Label: rango real + pico
-        const label=`${fmt(startH)}–${fmt((endH+1)%24)}`;
-        ranges[dow]={label,peakLabel:`pico ${fmt(peakH)}`,dots,isReal:true};
-      } else {
-        ranges[dow]={label:'Horario irregular',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:true};
+      // Peak hour
+      const peakH=parseInt(Object.entries(hrs).reduce((a,b)=>+b[1]>+a[1]?b:a)[0]);
+      // Rotación por mayor hueco — maneja cruce de medianoche
+      if(active.length>1){
+        const gaps=active.map((h,i)=>((active[(i+1)%active.length]-h+24)%24));
+        const bigIdx=gaps.indexOf(Math.max(...gaps));
+        const rotStart=(bigIdx+1)%active.length;
+        const rotated=active.slice(rotStart).concat(active.slice(0,rotStart));
+        active.length=0;
+        rotated.forEach(h=>active.push(h));
       }
+      const startH=active[0];
+      const endH=active[active.length-1];
+      const spanEnd=(endH+1)%24;
+      // Dots: 8 slots from startH (wrapping)
+      const dots=[];
+      for(let i=0;i<8;i++){
+        const h=(startH+i)%24;
+        dots.push((hrs[h]||0)/maxH);
+      }
+      ranges[dow]={label:`${fmt(startH)}–${fmt(spanEnd)}`,peakLabel:`pico ${fmt(peakH)}`,dots,isReal:true};
     } else {
-      // ── SIN DATOS REALES — marcar claramente como estimado ──
-      ranges[dow]={label:'Sin datos suficientes',dots:[.2,.2,.2,.2,.2,.2,.2,.2],isReal:false};
+      ranges[dow]={label:'Sin datos suficientes',dots:[.15,.15,.15,.15,.15,.15,.15,.15],isReal:false,peakLabel:null};
     }
   }
   return ranges;
