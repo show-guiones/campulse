@@ -28,25 +28,19 @@ export async function getServerSideProps() {
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&select=username,country&limit=50000`,{headers:sbHeaders});
     const rows = r.ok ? await r.json() : [];
-    const snapshotCount = {};
-    const usernamesByCountry = {};
+    const map = {};
     for (const row of (Array.isArray(rows)?rows:[])) {
       const c = (row.country||"").toUpperCase().trim();
-      if (!c||c.length!==2) continue;
-      const key = `${c}:${row.username}`;
-      snapshotCount[key] = (snapshotCount[key]||0)+1;
+      if (!c||c.length!==2||!row.username) continue;
+      if (!map[c]) map[c] = new Set();
+      map[c].add(row.username);
     }
-    for (const [key,count] of Object.entries(snapshotCount)) {
-      if (count<MIN_SNAPSHOTS) continue;
-      const [c] = key.split(":");
-      if (!usernamesByCountry[c]) usernamesByCountry[c]=0;
-      usernamesByCountry[c]++;
-    }
-    const countries = Object.entries(usernamesByCountry)
-      .map(([code,modelCount])=>({ code, name:COUNTRY_NAMES[code]||code, models:modelCount, slug:`/country/${code.toLowerCase()}` }))
+    const countries = Object.entries(map)
+      .filter(([,set])=>set.size>=MIN_SNAPSHOTS)
+      .map(([code,set])=>({ code, name:COUNTRY_NAMES[code]||code, models:set.size, slug:`/country/${code.toLowerCase()}` }))
       .sort((a,b)=>b.models-a.models);
     return { props:{ countries } };
-  } catch { return { props:{ countries:[] } }; }
+  } catch(e) { return { props:{ countries:[] } }; }
 }
 
 export default function CountriesPage({ countries }) {
@@ -114,7 +108,10 @@ export default function CountriesPage({ countries }) {
         </div>
 
         {countries.length===0 && (
-          <p style={{color:"var(--txt3)",textAlign:"center",marginTop:40}}>Cargando datos...</p>
+          <div style={{textAlign:"center",marginTop:40,padding:"2rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
+            <p style={{color:"var(--txt2)",fontSize:"1rem",marginBottom:8}}>No hay datos disponibles en este momento</p>
+            <p style={{color:"var(--txt3)",fontSize:".8rem"}}>Los datos se actualizan cada 2 horas. Intenta de nuevo más tarde.</p>
+          </div>
         )}
 
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
