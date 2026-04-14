@@ -2007,6 +2007,17 @@ header{
 .compare-fill{height:100%;border-radius:3px;transition:width .8s ease}
 
 /* ═══ CHART CONTAINERS ═══ */
+.cmp-tooltip{
+  position:fixed;background:var(--surf2);border:1px solid var(--bdr2);
+  border-radius:8px;padding:.35rem .6rem;font-size:.68rem;color:var(--txt);
+  pointer-events:none;z-index:9999;display:none;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,.3)
+}
+.heat-grid{display:grid;grid-template-columns:28px repeat(24,1fr);gap:2px;margin-top:.5rem}
+.heat-label{font-size:.55rem;color:var(--txt3);display:flex;align-items:center;justify-content:flex-end;padding-right:3px}
+.heat-hour-label{font-size:.5rem;color:var(--txt3);text-align:center}
+.heat-cell{height:18px;border-radius:3px;cursor:pointer;transition:transform .1s}
+.heat-cell:hover{transform:scale(1.2);z-index:2;position:relative}
 .chart-wrap{
   width:100%;overflow:hidden;position:relative;
   height:120px;margin-top:.3rem
@@ -4748,6 +4759,7 @@ async function loadHistoricalData(username,room){
     renderTrendChart(data,dayAvgs,avg,peak,data.length);
     renderFollowersChart(data);
     renderScheduleSection(data);
+    loadBestHoursHeatmap(username);
   }catch(e){
     el('rp-avg','—');el('rp-peak','—');
     // Show friendly error in charts
@@ -4760,32 +4772,40 @@ function renderTrendChart(data,dayAvgs,avg,peak,snaps){
   const cont=document.getElementById('heatmap-container');
   if(!cont)return;
   if(!data.length){cont.innerHTML='<div class="chart-no-data">Aún no hay suficientes datos. ¡Empieza a transmitir!</div>';return;}
-  const w=cont.clientWidth||280,h=110;
+  const w=cont.clientWidth||280,h=130;
   const vals=dayAvgs.map(d=>d.avg);
+  const days=dayAvgs.map(d=>d.day);
   const mx=Math.max(...vals,1);
   const pts=vals.map((v,i)=>{
     const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
-    const y=h-12-(v/mx)*(h-24);
+    const y=h-20-(v/mx)*(h-36);
     return`${x},${y}`;
   }).join(' ');
+  // Puntos interactivos
+  const circles=vals.map((v,i)=>{
+    const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
+    const y=h-20-(v/mx)*(h-36);
+    const isPeak=v===peak&&vals.length>1;
+    return`<circle class="chart-dot" cx="${x}" cy="${y}" r="${isPeak?5:3.5}"
+      fill="${isPeak?'var(--gold)':'var(--hot)'}" stroke="var(--bg2)" stroke-width="1.5"
+      data-val="${v}" data-day="${days[i]||''}"
+      onmouseenter="showTT(event,'${days[i]||''}: ${fmt(v)} viewers')"
+      onmouseleave="hideTT()"/>`;
+  }).join('');
   cont.innerHTML=`<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="overflow:visible">
     <defs>
       <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="var(--hot)" stop-opacity=".35"/>
+        <stop offset="0%" stop-color="var(--hot)" stop-opacity=".3"/>
         <stop offset="100%" stop-color="var(--hot)" stop-opacity="0"/>
       </linearGradient>
     </defs>
     ${vals.length>1?`<polygon points="${pts} ${w-8},${h} 8,${h}" fill="url(#grad)"/>
     <polyline points="${pts}" fill="none" stroke="var(--hot)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`:''}
-    ${vals.map((v,i)=>{
-      const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
-      const y=h-12-(v/mx)*(h-24);
-      return v===peak&&vals.length>1?`<circle cx="${x}" cy="${y}" r="4" fill="var(--gold)" stroke="var(--bg2)" stroke-width="2"/>`:'';
-    }).join('')}
+    ${circles}
   </svg>
   <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--txt3);margin-top:.2rem;padding:0 2px">
     <span>${dayAvgs[0]?.day.substring(5)||''}</span>
-    <span style="color:var(--txt2)">Promedio: <strong style="color:var(--txt)">${fmt(avg)}</strong></span>
+    <span style="color:var(--txt2)">Promedio: <strong style="color:var(--txt)">${fmt(avg)}</strong> · Pico: <strong style="color:var(--gold)">${fmt(peak)}</strong></span>
     <span>${dayAvgs[dayAvgs.length-1]?.day.substring(5)||''}</span>
   </div>`;
 }
@@ -4795,17 +4815,28 @@ function renderFollowersChart(data){
   if(!cont)return;
   const fdata=data.filter(d=>d.num_followers>0);
   if(fdata.length<2){cont.innerHTML='<div class="chart-no-data">Pocos datos de seguidores aún</div>';return;}
-  const w=cont.clientWidth||280,h=110;
+  const w=cont.clientWidth||280,h=130;
   const vals=fdata.map(d=>d.num_followers);
+  const dates=fdata.map(d=>d.captured_at?.substring(0,10)||'');
   const mn=Math.min(...vals),mx=Math.max(...vals,mn+1);
   const pts=vals.map((v,i)=>{
     const x=i/(vals.length-1)*(w-16)+8;
-    const y=h-12-((v-mn)/(mx-mn))*(h-24);
+    const y=h-20-((v-mn)/(mx-mn))*(h-36);
     return`${x},${y}`;
   }).join(' ');
   const diff=vals[vals.length-1]-vals[0];
   const diffColor=diff>=0?'var(--grn)':'var(--hot)';
   const diffSign=diff>=0?'+':'';
+  // puntos interactivos (solo cada N para no saturar)
+  const step=Math.max(1,Math.floor(vals.length/20));
+  const circles=vals.map((v,i)=>{
+    if(i%step!==0&&i!==vals.length-1)return'';
+    const x=i/(vals.length-1)*(w-16)+8;
+    const y=h-20-((v-mn)/(mx-mn))*(h-36);
+    return`<circle cx="${x}" cy="${y}" r="3" fill="var(--grn)" stroke="var(--bg2)" stroke-width="1.5"
+      onmouseenter="showTT(event,'${dates[i]}: ${fmt(v)} seguidores')"
+      onmouseleave="hideTT()"/>`;
+  }).join('');
   cont.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem">
     <span style="font-size:1.2rem;font-weight:800;color:var(--txt)">${fmt(vals[vals.length-1])}</span>
     <span style="font-size:.72rem;font-weight:700;color:${diffColor}">${diffSign}${fmt(diff)} en 30d</span>
@@ -4819,6 +4850,7 @@ function renderFollowersChart(data){
     </defs>
     <polygon points="${pts} ${w-8},${h} 8,${h}" fill="url(#gradF)"/>
     <polyline points="${pts}" fill="none" stroke="var(--grn)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${circles}
   </svg>`;
 }
 
@@ -4856,6 +4888,64 @@ function renderScheduleSection(data){
     bestEl.style.display='inline-flex';
   }
   document.getElementById('schedule-hero-section').style.display='block';
+}
+
+function showTT(e,txt){
+  const t=document.getElementById('cmp-tt');
+  if(!t)return;
+  t.textContent=txt;t.style.display='block';
+  t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-28)+'px';
+}
+function hideTT(){const t=document.getElementById('cmp-tt');if(t)t.style.display='none';}
+
+async function loadBestHoursHeatmap(username){
+  const cont=document.getElementById('besttimes-container');
+  if(!cont)return;
+  try{
+    const res=await fetch(`/api/best-hours?username=${encodeURIComponent(username)}`);
+    const data=await res.json();
+    if(!Array.isArray(data)||!data.length){cont.style.display='none';return;}
+    const DAYS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+    // Build 7x24 grid
+    const grid={};
+    data.forEach(d=>{
+      const key=`${d.day_of_week}_${d.hour_est}`;
+      grid[key]={avg:d.avg_viewers||0,peak:d.peak_viewers||0,n:d.sample_count||0};
+    });
+    const maxAvg=Math.max(...data.map(d=>d.avg_viewers||0),1);
+    // Hour labels row
+    let html='<div class="heat-grid">';
+    html+='<div class="heat-label"></div>';
+    for(let h=0;h<24;h++)html+=`<div class="heat-hour-label">${h<10?'0'+h:h}</div>`;
+    // Day rows
+    for(let d=0;d<7;d++){
+      html+=`<div class="heat-label">${DAYS[d]}</div>`;
+      for(let h=0;h<24;h++){
+        const cell=grid[`${d}_${h}`]||{avg:0,peak:0,n:0};
+        const intensity=cell.avg/maxAvg;
+        const alpha=cell.avg>0?0.12+intensity*0.88:0.04;
+        const bg=cell.avg>0?`rgba(232,48,90,${alpha.toFixed(2)})`:'rgba(255,255,255,0.04)';
+        const tip=cell.avg>0?`${DAYS[d]} ${h<10?'0'+h:h}:00 — ${Math.round(cell.avg)} avg · ${Math.round(cell.peak)} pico (${cell.n} muestras)`:`${DAYS[d]} ${h<10?'0'+h:h}:00 — sin datos`;
+        html+=`<div class="heat-cell" style="background:${bg}"
+          onmouseenter="showTT(event,'${tip.replace(/'/g,'&#39;')}')"
+          onmouseleave="hideTT()"></div>`;
+      }
+    }
+    html+='</div>';
+    html+=`<div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-size:.6rem;color:var(--txt3)">
+      <div style="width:40px;height:10px;background:linear-gradient(to right,rgba(232,48,90,.12),rgba(232,48,90,1));border-radius:3px"></div>
+      <span>Menor → Mayor audiencia</span>
+    </div>`;
+    cont.innerHTML=`<div class="rep-section">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">🔥</span> ¿Cuándo transmitir? Heatmap real</div>
+        <div class="rep-section-badge">últimos 30 días</div>
+      </div>
+      <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.5rem;line-height:1.5">Cada celda es una hora del día. Más rojo = más viewers históricos. Pasa el cursor para ver el detalle.</p>
+      ${html}
+    </div>`;
+    cont.style.display='block';
+  }catch(e){cont.style.display='none';}
 }
 
 async function loadStatbateIncome(username){
@@ -4989,5 +5079,6 @@ setInterval(load, 5*60*1000); // auto-refresh each 5 min
 load();
 // Reposicionar botón de audio si cambia el tamaño de ventana/orientación
 </script>
+<div class="cmp-tooltip" id="cmp-tt"></div>
 </body>
 </html>
