@@ -4011,10 +4011,16 @@ function loadModalAnalytics(x){
           // If not, use common streaming patterns based on day activity
           const hourly=data.hourly||null; // {dow: {hour: viewers}}
           const HOUR_RANGES=buildHourRanges(hourly,dowCounts,dowAvg,bestDow);
+          // Un día es "activo" si dowCounts lo tiene O si hourlyReal tiene datos para ese día
+          const isDayActive=(i)=>{
+            if(dowCounts[i]>0) return true;
+            if(hourlyReal&&hourlyReal[i]&&Object.values(hourlyReal[i]).some(v=>v>0)) return true;
+            return false;
+          };
           schedEl.innerHTML=DOW_NAMES.map((name,i)=>{
-            if(dowCounts[i]===0) return '';
-            const isBest=i===bestDow&&dowAvg[i]>0;
-            const isActive=dowAvg[i]>0;
+            if(!isDayActive(i)) return '';
+            const isBest=i===bestDow&&(dowAvg[i]>0||(hourlyReal&&hourlyReal[i]));
+            const isActive=true;
             const range=HOUR_RANGES[i]||{label:'Sin datos',dots:[.2,.2,.2,.2,.2,.2,.2,.2],isReal:false};
             const dotHtml=range.dots.map(v=>`<div class="man-sched-dot ${v>0.6?'on':v>0.2?'mid':''}"></div>`).join('');
             const subLabel=range.isReal
