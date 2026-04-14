@@ -833,29 +833,14 @@ header{
    36px exactos en todos los viewports desktop + móvil)
 ══════════════════════════════════════════════════════ */
 :root{
-  /* ── Crop MODAL sala en vivo ──
-     CB embed layout (medido con F12 12/04/2026):
-     top: 44px  (header: logo CB + nombre modelo)
-     bot: 160px = ~42px goal bar + ~42px tokens bar + 76px extra buffer */
-  --cb-crop-top: 44px;
-  --cb-crop-bot: 110px;
+  /* ── Embed CB: sin crop — mostramos la experiencia completa ──
+     El usuario ve: video + controles de volumen + goal bar + chat (desktop) */
+  --cb-crop-top: 0px;
+  --cb-crop-bot: 0px;
 }
-/* Móvil portrait */
-@media(max-width:639px) and (orientation:portrait){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:110px; }
-}
-@media(max-width:380px){
-  :root{ --cb-crop-top:44px; --cb-crop-bot:100px; }
-}
-/* Desktop landscape */
-@media(orientation:landscape),(min-width:640px){
-  :root{
-    --cb-crop-top: 44px;
-    --cb-crop-bot: 150px;
-  }
-}
-/* ── PATCH DEFINITIVO: Desktop — iframe 500px fijo (CB no activa chat <560px) + scale ── */
-@media(orientation:landscape),(min-width:520px){
+/* ── EMBED COMPLETO: iframe 100% del contenedor, sin crop, experiencia CB nativa ── */
+/* Desktop: columna izquierda del modal grid — iframe full */
+@media(min-width:640px){
   .mhero-v2 .embed-wrap{
     overflow:hidden!important;
     position:absolute!important;
@@ -863,29 +848,27 @@ header{
   }
   .mhero-v2 .embed-wrap .embed-frame{
     position:absolute!important;
-    top:-44px!important;
-    left:0!important;
-    /* width/height controlados por JS _setModalEmbedScale() — sin !important aquí */
-    width:500px;
-    height:calc(281px + 44px + 220px);
-    transform-origin:top left!important;
-    /* transform también controlado por JS — fallback CSS variable para compatibilidad */
-    transform:scale(var(--modal-embed-scale,1));
-  }
-}
-/* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
-@media(max-width:639px) and (orientation:portrait){
-  .mhero-v2 .embed-wrap .embed-frame{
-    top:-44px!important;
+    top:0!important;
     left:0!important;
     width:100%!important;
-    height:calc(100% + 44px + 154px)!important;
+    height:100%!important;
+    transform:none!important;
   }
 }
-@media(max-width:380px) and (orientation:portrait){
+/* Móvil: iframe también al 100% del hero */
+@media(max-width:639px){
+  .mhero-v2 .embed-wrap{
+    overflow:hidden;
+    position:absolute;
+    inset:0;
+  }
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-44px!important;
-    height:calc(100% + 44px + 119px)!important;
+    position:absolute!important;
+    top:0!important;
+    left:0!important;
+    width:100%!important;
+    height:100%!important;
+    transform:none!important;
   }
 }
 
@@ -1048,8 +1031,10 @@ header{
   position:relative;
   flex-shrink:0;
   width:100%;
-  aspect-ratio:16/9;
-  max-height:52dvh;
+  /* Móvil: sin aspect-ratio fijo — altura según contenido CB (incluye controles) */
+  height:56dvh;
+  min-height:280px;
+  max-height:62dvh;
   overflow:hidden;
   background:#000;
   touch-action:auto;
@@ -1085,29 +1070,15 @@ header{
    Móvil sin aspect-ratio: crop bot mayor para ocultar UI completa de CB. ── */
 .mhero-v2 .embed-wrap .embed-frame{
   position:absolute;
-  top:calc(-1 * var(--cb-crop-top));
-  left:0;right:0;
+  top:0;left:0;right:0;bottom:0;
   width:100%;
-  height:calc(100% + var(--cb-crop-top) + var(--cb-crop-bot));
+  height:100%;
   border:none;display:block;
   overflow:hidden;
   pointer-events:auto;
   touch-action:none;
   overscroll-behavior:none;
   scrolling:no;
-}
-/* Móvil ≤480px: crop top 44px + bot 160px — oculta header + goal bar + tokens bar */
-@media(max-width:480px){
-  .mhero-v2 .embed-wrap .embed-frame{
-    top:-44px;
-    height:calc(100% + 44px + 135px);
-  }
-}
-@media(max-width:380px){
-  .mhero-v2 .embed-wrap .embed-frame{
-    top:-44px;
-    height:calc(100% + 44px + 100px);
-  }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
@@ -2120,16 +2091,18 @@ header{
     backdrop-filter:blur(8px);
   }
 
-  /* VIDEO: columna izquierda — ocupa toda la altura */
+  /* VIDEO: columna izquierda — ocupa toda la altura del modal */
   .modal-hero.mhero-v2{
     grid-column:1;
     grid-row:1;
     width:100%;
     height:100%;
-    aspect-ratio:unset;
+    min-height:0;
     max-height:none;
+    aspect-ratio:unset;
     border-radius:20px 0 0 20px;
     overflow:hidden;
+    background:#000;
   }
 
   /* INFO: columna derecha — stack vertical con scroll */
@@ -2146,12 +2119,16 @@ header{
     display:flex;
     flex-direction:column;
     height:100%;
+    min-height:0;
     max-height:none;
     overflow-y:auto;
+    overflow-x:hidden;
     padding:.9rem 1rem 1.5rem;
     background:var(--bg2);
     border-left:1px solid var(--bdr);
     border-radius:0 20px 20px 0;
+    scrollbar-width:thin;
+    scrollbar-color:var(--bdr) transparent;
   }
 
   /* Nombre+badge arriba en panel derecho — se lee con el contenido del mbody */
@@ -2181,9 +2158,9 @@ header{
   .rep-search-title{font-size:1.6rem}
   .modal-bg{padding:0;align-items:flex-end}
   .modal{border-radius:24px 24px 0 0;max-height:96dvh;width:100%}
-  .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:96dvh}
+  .modal-v2{border-radius:24px 24px 0 0;height:96dvh;max-height:96dvh;display:flex;flex-direction:column}
   .modal-hero{height:200px}
-  .modal-hero.mhero-v2{height:auto;max-height:52dvh}
+  .modal-hero.mhero-v2{height:56dvh;min-height:260px;max-height:62dvh;flex-shrink:0}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar-top{padding:.35rem .7rem;top:40px}
@@ -3765,37 +3742,16 @@ function updateFavBtn(u){
 function startLivePreview(x){}
 
 function _setModalEmbedScale(){
-  const wrap = document.getElementById('mhero-embed-wrap');
+  // Embed ahora es 100% del contenedor — sin scale artificial
+  // Esta función se mantiene para compatibilidad con llamadas existentes
   const frame = document.getElementById('live-embed-frame');
-  if(!wrap||!frame) return;
-  const col = wrap.parentElement; // .mhero-v2
-  const W = col ? col.offsetWidth : wrap.offsetWidth;
-  if(!W) return;
-  const isMobile = window.innerWidth < 640;
-  if(isMobile){
-    // Móvil: no aplicar JS scale — CSS portrait media-query se encarga
+  const wrap = document.getElementById('mhero-embed-wrap');
+  if(frame){
     frame.style.width = '';
     frame.style.height = '';
     frame.style.transform = '';
-    wrap.style.height = '';
-    return;
   }
-  const IFRAME_W = 500; // fixed width — CB no activa chat sidebar con < 560px
-  const CROP_TOP = 44;  // px — oculta header de CB
-  const CROP_BOT = 220; // px — oculta goal bar + token ticker
-  const scale = W / IFRAME_W;
-  const CONTENT_H = Math.round(IFRAME_W * 9/16); // altura pura 16:9
-  const FULL_H = CONTENT_H + CROP_TOP + CROP_BOT; // iframe real con crop
-  // Aplicar al frame
-  frame.style.width  = IFRAME_W + 'px';
-  frame.style.height = FULL_H + 'px';
-  frame.style.transform = `scale(${scale})`;
-  frame.style.transformOrigin = 'top left';
-  // Actualizar CSS variable como backup
-  wrap.closest('[style]')?.style?.setProperty?.('--modal-embed-scale', scale);
-  // El wrap debe tener la altura del contenido visible (sin crop top)
-  const visibleH = Math.round(CONTENT_H * scale);
-  wrap.style.height = visibleH + 'px';
+  if(wrap) wrap.style.height = '';
 }
 window.addEventListener('resize', _setModalEmbedScale);
 
@@ -3806,8 +3762,8 @@ function activateEmbed(u){
   if(!wrap||!frame)return;
   clearInterval(prevCd);
   wrap.classList.add('active');
-  // Llamar scale con doble RAF para asegurar que el grid desktop esté renderizado
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{ _setModalEmbedScale(); }));
+  // Scale noop — iframe es 100% CSS, no requiere cálculo JS
+  _setModalEmbedScale();
   if(loading) loading.classList.remove('hidden');
   frame.onload=null;
   frame.removeEventListener('load', onEmbedLoad);
