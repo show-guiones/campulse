@@ -1,7 +1,7 @@
 // pages/gender/index.jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const DB_TO_SLUG = { f:"female",m:"male",c:"couple",t:"trans" };
@@ -60,7 +60,7 @@ export default function GenderPage({ genders }) {
         <style>{DS_CSS}</style>
       </Head>
 
-      <div className="cmp-page">
+      <div className="cmp-page cmp-page-body">
         <nav className="cmp-nav">
           <Logo/>
           <div className="cmp-nav-links">
@@ -101,6 +101,7 @@ export default function GenderPage({ genders }) {
           <a href="/country" className="cmp-footer-link">Ver por país →</a>
           <a href="/top/latinas" className="cmp-footer-link">🔥 Top Latinas ahora</a>
         </div>
+        <BottomNav active="/gender" />
       </div>
     </>
   );

@@ -140,8 +140,65 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
+  .cmp-embed-wrap{padding-bottom:calc(56.25% + 10mm)}
+}
+
+/* ── BOTTOM NAV MÓVIL ── */
+.cmp-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(15,16,20,.97);
+  border-top:1px solid var(--bdr);
+  z-index:1000;
+  padding:6px 0 env(safe-area-inset-bottom,6px);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.cmp-bottom-nav-inner{
+  display:flex;align-items:flex-start;justify-content:space-around;
+  max-width:540px;margin:0 auto;padding:0 4px;
+}
+.cmp-bottom-nav-item{
+  display:flex;flex-direction:column;align-items:center;
+  gap:2px;flex:1;
+  color:var(--txt3);font-size:.6rem;font-weight:500;
+  text-decoration:none;padding:4px 2px;
+  transition:color .18s;
+  letter-spacing:.01em;line-height:1.2;
+  min-width:0;
+}
+.cmp-bottom-nav-item:hover,.cmp-bottom-nav-item.active{color:var(--neon)}
+.cmp-bottom-nav-icon{font-size:1.2rem;line-height:1}
+.cmp-page-body{padding-bottom:72px}
+@media(max-width:540px){
+  .cmp-bottom-nav{display:block}
 }
 `;
+
+// BottomNav — barra de navegación fija inferior, solo móvil
+export function BottomNav({ active }) {
+  const items = [
+    { href:"/top/latinas", icon:"🔥", label:"Latinas" },
+    { href:"/country/co",  icon:"🇨🇴", label:"Colombia" },
+    { href:"/country/mx",  icon:"🇲🇽", label:"México" },
+    { href:"/country",     icon:"🌍", label:"Países" },
+    { href:"/gender",      icon:"⚧", label:"Género" },
+    { href:"/language",    icon:"💬", label:"Idioma" },
+    { href:"/search",      icon:"🔍", label:"Buscar" },
+  ];
+  return (
+    <nav className="cmp-bottom-nav">
+      <div className="cmp-bottom-nav-inner">
+        {items.map(it=>(
+          <a key={it.href} href={it.href} className={`cmp-bottom-nav-item${active===it.href?" active":""}`}>
+            <span className="cmp-bottom-nav-icon">{it.icon}</span>
+            <span>{it.label}</span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  );
+}
 
 // Logo JSX component — mirrors app.html .logo markup
 export function Logo() {

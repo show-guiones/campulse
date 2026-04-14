@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import { useState } from "react";
-import { DS_CSS, Logo } from "../campulse-design-system";
+import { DS_CSS, Logo, BottomNav } from "../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -56,7 +56,7 @@ export default function SearchPage() {
         <style>{DS_CSS}</style>
       </Head>
 
-      <div className="cmp-page">
+      <div className="cmp-page cmp-page-body">
         <nav className="cmp-nav">
           <Logo/>
           <div className="cmp-nav-links">
@@ -160,6 +160,7 @@ export default function SearchPage() {
         <div className="cmp-footer-links">
           <a href="/" className="cmp-footer-link">← Volver al inicio</a>
         </div>
+        <BottomNav active="/search" />
       </div>
     </>
   );
