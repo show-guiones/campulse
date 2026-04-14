@@ -1141,6 +1141,31 @@ header{
 /* No phantom spacer below modal */
 .modal-v2::after{display:none}
 
+/* ── CHAT COLUMN — columna central del modal desktop ── */
+.modal-chat-header{
+  display:flex;align-items:center;justify-content:center;
+  padding:.45rem .75rem;
+  background:rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
+}
+.modal-chat-title{
+  font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.modal-chat-body{
+  flex:1;min-height:0;position:relative;
+  display:flex;flex-direction:column;
+}
+.modal-chat-loading{
+  position:absolute;inset:0;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.5rem;
+  background:#0d0d0d;color:rgba(255,255,255,.4);font-size:.72rem;
+  pointer-events:none;transition:opacity .5s ease;
+}
+.modal-chat-loading.hidden{opacity:0;pointer-events:none}
+
 /* ── ANALYTICS PANEL — redesigned ── */
 .modal-analytics{margin-top:.6rem}
 
@@ -2068,7 +2093,7 @@ header{
   .modal-bg{align-items:center;padding:1.5rem}
   .modal::before{display:none}
 
-  /* ── MODAL DESKTOP: 2 columnas video|info ── */
+  /* ── MODAL DESKTOP: 3 columnas video|chat|info ── */
   .modal.modal-v2{
     border-radius:20px;
     max-height:88dvh;
@@ -2076,7 +2101,7 @@ header{
     max-width:960px;
     height:90dvh;
     display:grid;
-    grid-template-columns:1fr 360px;
+    grid-template-columns:1fr 340px;
     grid-template-rows:1fr;
     overflow:hidden;
     position:relative;
@@ -2107,11 +2132,16 @@ header{
 
   /* INFO: columna derecha — stack vertical con scroll */
   .mstrip-v2,.mbody-v2{
-    grid-column:2;
+    grid-column:3;
   }
   /* Ocultar strip separado — la info va directo en el panel derecho */
   .mstrip-v2{
     display:none;
+  }
+  /* Chat column: columna central — visible en desktop cuando live */
+  /* Default: sin chat → mbody ocupa cols 2-3 */
+  .mbody-v2{
+    grid-column:2/3;
   }
   /* Panel derecho: header sticky + scroll */
   .mbody-v2{
@@ -2703,6 +2733,16 @@ body.modal-open .mob-explore-nav{display:none!important}
       <!-- Stats en hero — viewers destacados -->
       <div class="mhero-stats" id="mhero-stats"></div>
     </div>
+    <!-- Chat column — solo visible en desktop cuando está en vivo --><div class="modal-chat-body">
+        <div class="modal-chat-loading" id="modal-chat-loading">
+          <div class="embed-loading-spinner"></div>
+          <span>Cargando chat…</span>
+        </div>
+          allow="autoplay *; encrypted-media *"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+
     <!-- Botón de audio: position:fixed, fuera del árbol hero — escapa de todos overflow:hidden -->
 
     <!-- Strip info: nombre + badge debajo del video, fuera del hero -->
@@ -3694,6 +3734,7 @@ function openMod(u){
     if(imgWrap) imgWrap.innerHTML='';
     const _heroEl=document.getElementById('modal-hero');
     if(_heroEl) _heroEl.classList.add('embed-active');
+    // Mostrar chat column en desktop
     if(embedWrap){
       const loading=document.getElementById('embed-loading');
       if(loading) loading.classList.remove('hidden');
@@ -3707,11 +3748,16 @@ function openMod(u){
       frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never&join_overlay=1&t=${Date.now()}`;
       frame.addEventListener('load', onEmbedLoad);
     }
+    // CHAT IFRAME — columna central en desktop
+    const chatLoading=document.getElementById('modal-chat-loading');
+      if(chatLoading) chatLoading.classList.remove('hidden');
+    }
   } else {
     // OFFLINE: mostrar imagen de perfil
     const _heroElOff=document.getElementById('modal-hero');
     if(_heroElOff) _heroElOff.classList.remove('embed-active');
     if(embedWrap) embedWrap.classList.remove('active');
+    // Ocultar chat column cuando está offline
     if(imgWrap) imgWrap.innerHTML=`
       <div class="mhp-wrap">
         <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
@@ -4527,6 +4573,10 @@ function closeMod(e){
   const wrap=document.getElementById('mhero-embed-wrap');
   if(frame){ frame.src='about:blank'; }
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); wrap.classList.remove('stream-ready'); }
+  // Limpiar chat iframe
+  const chatLoading=document.getElementById('modal-chat-loading');
+  if(chatLoading){ chatLoading.classList.remove('hidden'); }
+  // Resetear visibilidad de columna chat
   const analyticsPanel=document.getElementById('modal-analytics');
   if(analyticsPanel) analyticsPanel.style.display='none';
   const heroEl=document.getElementById('modal-hero');
