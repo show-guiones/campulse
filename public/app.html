@@ -1149,29 +1149,7 @@ header{
 .modal-v2::after{display:none}
 
 /* ── CHAT COLUMN — columna central del modal desktop ── */
-.modal-chat-header{
-  display:flex;align-items:center;justify-content:center;
-  padding:.45rem .75rem;
-  background:rgba(255,255,255,.04);
-  border-bottom:1px solid rgba(255,255,255,.07);
-  flex-shrink:0;
-}
-.modal-chat-title{
-  font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);
-  letter-spacing:.06em;text-transform:uppercase;
-}
-.modal-chat-body{
-  flex:1;min-height:0;position:relative;
-  display:flex;flex-direction:column;
-}
-.modal-chat-loading{
-  position:absolute;inset:0;z-index:5;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:.5rem;
-  background:#0d0d0d;color:rgba(255,255,255,.4);font-size:.72rem;
-  pointer-events:none;transition:opacity .5s ease;
-}
-.modal-chat-loading.hidden{opacity:0;pointer-events:none}
+
 
 /* ── ANALYTICS PANEL — redesigned ── */
 .modal-analytics{margin-top:.6rem}
@@ -2139,16 +2117,15 @@ header{
 
   /* INFO: columna derecha — stack vertical con scroll */
   .mstrip-v2,.mbody-v2{
-    grid-column:3;
+    grid-column:2;
   }
   /* Ocultar strip separado — la info va directo en el panel derecho */
   .mstrip-v2{
     display:none;
   }
-  /* Chat column: columna central — visible en desktop cuando live */
-  /* Default: sin chat → mbody ocupa cols 2-3 */
+  /* Sin chat — mbody ocupa col 2 */
   .mbody-v2{
-    grid-column:2/3;
+    grid-column:2;
   }
   /* Panel derecho: header sticky + scroll */
   .mbody-v2{
@@ -2740,15 +2717,7 @@ body.modal-open .mob-explore-nav{display:none!important}
       <!-- Stats en hero — viewers destacados -->
       <div class="mhero-stats" id="mhero-stats"></div>
     </div>
-    <!-- Chat column — solo visible en desktop cuando está en vivo --><div class="modal-chat-body">
-        <div class="modal-chat-loading" id="modal-chat-loading">
-          <div class="embed-loading-spinner"></div>
-          <span>Cargando chat…</span>
-        </div>
-          allow="autoplay *; encrypted-media *"
-          referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
-    </div>
+
 
     <!-- Botón de audio: position:fixed, fuera del árbol hero — escapa de todos overflow:hidden -->
 
