@@ -2307,10 +2307,10 @@ body.modal-open{overflow:hidden!important}
       </div>
       <div class="fb-sep"></div>
       <select class="sort-sel" id="srt">
-        <option value="viewers">↓ Viewers</option>
-        <option value="followers" selected>↓ Seguidores</option>
+        <option value="followers">↓ Seguidores</option>
         <option value="age_asc">Más jóvenes</option>
         <option value="new">Nuevas</option>
+        <option value="viewers">↓ Viewers</option>
       </select>
       <div class="view-toggle">
         <button class="vtb active" id="vg"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
@@ -4433,11 +4433,10 @@ document.getElementById('search').addEventListener('input',()=>{
   renderOnFilter();
 });
 const _srtEl=document.getElementById('srt');
-_srtEl.value=sort;
-_srtEl.classList.toggle('active',sort!=='viewers');
+_srtEl.value='followers';
 _srtEl.addEventListener('change',e=>{
   sort=e.target.value;
-  e.target.classList.toggle('active', sort!=='viewers');
+  e.target.classList.toggle('active', sort!=='followers');
   renderOnFilter();
 });
 document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render();});
