@@ -3719,20 +3719,20 @@ function loadModalAnalytics(x){
       const schedEl=document.getElementById('man-schedule');
       if(schedSec&&schedEl){
         // Determine active days (at least 1 appearance in 30d)
-        const hasActivity=dowCounts.some(c=>c>0);
+        const hasActivity=dowCounts.some(c=>c>0)||(hourly&&Object.keys(hourly).length>0);
         if(hasActivity){
           schedSec.style.display='';
           // Estimate broadcast hour ranges from data.hourly if available
           // If not, use common streaming patterns based on day activity
           const hourly=data.hourly||null; // {dow: {hour: viewers}}
           const HOUR_RANGES=buildHourRanges(hourly,dowCounts,dowAvg,bestDow);
+          const isDayActiveP=(i)=>dowCounts[i]>0||(hourly&&hourly[i]&&Object.values(hourly[i]).some(v=>v>0));
           schedEl.innerHTML=DOW_NAMES.map((name,i)=>{
-            if(dowCounts[i]===0) return '';
-            const isBest=i===bestDow&&dowAvg[i]>0;
-            const isActive=dowAvg[i]>0;
-            const range=HOUR_RANGES[i]||{label:'Horario variable',dots:[1,1,1,0,0,0,0,0]};
+            if(!isDayActiveP(i)) return '';
+            const isBest=i===bestDow&&(dowAvg[i]>0||(hourly&&hourly[i]));
+            const range=HOUR_RANGES[i]||{label:'Horario variable',dots:[1,1,1,0,0,0,0,0],isReal:false};
             const dotHtml=range.dots.map(v=>`<div class="man-sched-dot ${v>0.6?'on':v>0.2?'mid':''}"></div>`).join('');
-            return `<div class="man-sched-row ${isBest?'best':isActive?'active':''}">
+            return `<div class="man-sched-row ${isBest?'best':'active'}">
               <div class="man-sched-day">${name}</div>
               <div class="man-sched-hours">${range.label}<small>aprox.</small></div>
               <div class="man-sched-bar">${dotHtml}</div>
