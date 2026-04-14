@@ -865,12 +865,12 @@ header{
     position:absolute!important;
     top:-44px!important;
     left:0!important;
-    /* 500px → CB no activa chat. Scale llena la columna izquierda visualmente */
-    width:500px!important;
-    /* Altura: 500*(9/16) + crop-top + crop-bot */
-    height:calc(281px + 44px + 220px)!important;
+    /* width/height controlados por JS _setModalEmbedScale() — sin !important aquí */
+    width:500px;
+    height:calc(281px + 44px + 220px);
     transform-origin:top left!important;
-    transform:scale(var(--modal-embed-scale,1))!important;
+    /* transform también controlado por JS — fallback CSS variable para compatibilidad */
+    transform:scale(var(--modal-embed-scale,1));
   }
 }
 /* ── Móvil portrait: crop agresivo cubre goal bar + tokens bar ── */
@@ -3768,17 +3768,34 @@ function _setModalEmbedScale(){
   const wrap = document.getElementById('mhero-embed-wrap');
   const frame = document.getElementById('live-embed-frame');
   if(!wrap||!frame) return;
-  const col = wrap.parentElement; // .mhero-v2 or modal-hero column
+  const col = wrap.parentElement; // .mhero-v2
   const W = col ? col.offsetWidth : wrap.offsetWidth;
   if(!W) return;
-  const IFRAME_W = 500; // fixed iframe width to prevent CB chat sidebar
+  const isMobile = window.innerWidth < 640;
+  if(isMobile){
+    // Móvil: no aplicar JS scale — CSS portrait media-query se encarga
+    frame.style.width = '';
+    frame.style.height = '';
+    frame.style.transform = '';
+    wrap.style.height = '';
+    return;
+  }
+  const IFRAME_W = 500; // fixed width — CB no activa chat sidebar con < 560px
+  const CROP_TOP = 44;  // px — oculta header de CB
+  const CROP_BOT = 220; // px — oculta goal bar + token ticker
   const scale = W / IFRAME_W;
-  const H = Math.round(IFRAME_W * 9/16); // 16:9 aspect for the iframe
+  const CONTENT_H = Math.round(IFRAME_W * 9/16); // altura pura 16:9
+  const FULL_H = CONTENT_H + CROP_TOP + CROP_BOT; // iframe real con crop
+  // Aplicar al frame
   frame.style.width  = IFRAME_W + 'px';
-  frame.style.height = H + 'px';
+  frame.style.height = FULL_H + 'px';
   frame.style.transform = `scale(${scale})`;
   frame.style.transformOrigin = 'top left';
-  wrap.style.height = Math.round(H * scale) + 'px';
+  // Actualizar CSS variable como backup
+  wrap.closest('[style]')?.style?.setProperty?.('--modal-embed-scale', scale);
+  // El wrap debe tener la altura del contenido visible (sin crop top)
+  const visibleH = Math.round(CONTENT_H * scale);
+  wrap.style.height = visibleH + 'px';
 }
 window.addEventListener('resize', _setModalEmbedScale);
 
@@ -3789,7 +3806,8 @@ function activateEmbed(u){
   if(!wrap||!frame)return;
   clearInterval(prevCd);
   wrap.classList.add('active');
-  requestAnimationFrame(()=>{ _setModalEmbedScale(); }); // escala tras render
+  // Llamar scale con doble RAF para asegurar que el grid desktop esté renderizado
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ _setModalEmbedScale(); }));
   if(loading) loading.classList.remove('hidden');
   frame.onload=null;
   frame.removeEventListener('load', onEmbedLoad);
