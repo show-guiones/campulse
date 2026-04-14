@@ -2147,6 +2147,56 @@ header{
   color:var(--hot);font-weight:700;
 }
 body.modal-open{overflow:hidden!important}
+
+/* ── Sidebar Explorar nav ── */
+.explore-nav{display:flex;flex-direction:column;gap:2px;margin-top:.3rem}
+.explore-link{
+  display:flex;align-items:center;gap:.45rem;
+  padding:.38rem .5rem;border-radius:6px;
+  font-size:.72rem;color:var(--txt2);text-decoration:none;
+  transition:background .15s,color .15s;
+}
+.explore-link:hover{background:var(--surf2);color:var(--txt)}
+
+/* ── Mobile bottom Explorar nav ── */
+.mob-explore-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--surf);border-top:1px solid var(--bdr);
+  z-index:400;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding:0 .25rem env(safe-area-inset-bottom);
+}
+.mob-explore-nav::-webkit-scrollbar{display:none}
+.mob-explore-nav{
+  display:none;
+  flex-direction:row;
+  align-items:stretch;
+}
+.mob-enav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;flex-shrink:0;
+  padding:.45rem .6rem;
+  text-decoration:none;color:var(--txt2);
+  font-size:.58rem;line-height:1;
+  transition:color .15s;
+  min-width:52px;
+}
+.mob-enav-item:hover,.mob-enav-item:active{color:var(--txt)}
+.mob-enav-ico{font-size:1.15rem;line-height:1}
+.mob-enav-lbl{white-space:nowrap}
+
+/* Show mobile nav only on mobile/tablet, hide on desktop where sidebar is visible */
+@media(max-width:900px){
+  .mob-explore-nav{display:flex}
+  /* Push content up so bottom nav doesn't cover cards */
+  .page{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+}
+/* Hide mobile nav when modal is open to avoid overlap */
+body.modal-open .mob-explore-nav{display:none!important}
+
 </style>
 <!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js" defer></script>
@@ -2253,6 +2303,20 @@ body.modal-open{overflow:hidden!important}
     <div class="drawer-sec">
       <div class="drawer-lbl">Tags populares</div>
       <div id="sd-tag-list" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.3rem"></div>
+    </div>
+    <div class="drawer-div"></div>
+    <div class="drawer-sec">
+      <div class="drawer-lbl">Explorar</div>
+      <nav class="explore-nav">
+        <a class="explore-link" href="https://www.campulsehub.com/top/latinas" target="_blank">🔥 Top Latinas</a>
+        <a class="explore-link" href="https://www.campulsehub.com/top/colombia" target="_blank">🇨🇴 Top Colombia</a>
+        <a class="explore-link" href="https://www.campulsehub.com/top/mexico" target="_blank">🇲🇽 Top México</a>
+        <a class="explore-link" href="https://www.campulsehub.com/top/espana" target="_blank">🇪🇸 Top España</a>
+        <a class="explore-link" href="https://www.campulsehub.com/country" target="_blank">🌍 Por país</a>
+        <a class="explore-link" href="https://www.campulsehub.com/gender" target="_blank">⚧ Por género</a>
+        <a class="explore-link" href="https://www.campulsehub.com/language" target="_blank">💬 Por idioma</a>
+        <a class="explore-link" href="https://www.campulsehub.com/search" target="_blank">🔍 Buscar modelos</a>
+      </nav>
     </div>
   </aside>
 
@@ -2604,6 +2668,10 @@ body.modal-open{overflow:hidden!important}
         <button class="btn-sec" onclick="openModelReportFromModal()" title="Ver mi reporte completo">
           👤 <span>Reporte</span>
         </button>
+
+        <a id="m-profile-link" class="btn-sec" href="#" target="_blank" rel="noopener" title="Ver página completa de la modelo en CampulseHub" style="text-decoration:none;display:inline-flex;align-items:center;gap:.3rem">
+          📄 <span>Ver página</span>
+        </a>
       </div>
 
       <!-- ANALYTICS PANEL — días conexión + views destacados -->
@@ -3510,6 +3578,8 @@ function openMod(u){
     mstripLive.classList.toggle('visible',x.num_users>0);
   }
   document.getElementById('m-link').href=`https://es.chaturbate.com/${x.username}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${x.username}&tour=LQps&track=default`;
+  const profileLink=document.getElementById('m-profile-link');
+  if(profileLink) profileLink.href=`https://www.campulsehub.com/model/${x.username}`;
   const ctaTxt=document.getElementById('m-cta-txt');
   const ctaIco=document.getElementById('m-cta-ico');
   if(ctaTxt) ctaTxt.textContent=x.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';
@@ -5080,5 +5150,38 @@ load();
 // Reposicionar botón de audio si cambia el tamaño de ventana/orientación
 </script>
 <div class="cmp-tooltip" id="cmp-tt"></div>
+
+<!-- ═══ MOBILE BOTTOM EXPLORE NAV ═══ -->
+<nav class="mob-explore-nav" id="mob-explore-nav">
+  <a class="mob-enav-item" href="https://www.campulsehub.com/top/latinas" target="_blank">
+    <span class="mob-enav-ico">🔥</span>
+    <span class="mob-enav-lbl">Latinas</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/top/colombia" target="_blank">
+    <span class="mob-enav-ico">🇨🇴</span>
+    <span class="mob-enav-lbl">Colombia</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/top/mexico" target="_blank">
+    <span class="mob-enav-ico">🇲🇽</span>
+    <span class="mob-enav-lbl">México</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/country" target="_blank">
+    <span class="mob-enav-ico">🌍</span>
+    <span class="mob-enav-lbl">Países</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/gender" target="_blank">
+    <span class="mob-enav-ico">⚧</span>
+    <span class="mob-enav-lbl">Género</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/language" target="_blank">
+    <span class="mob-enav-ico">💬</span>
+    <span class="mob-enav-lbl">Idioma</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/search" target="_blank">
+    <span class="mob-enav-ico">🔍</span>
+    <span class="mob-enav-lbl">Buscar</span>
+  </a>
+</nav>
+
 </body>
 </html>
