@@ -1048,7 +1048,7 @@ header{
   position:relative;
   flex-shrink:0;
   width:100%;
-  aspect-ratio:1/1;
+  aspect-ratio:16/9;
   max-height:52dvh;
   overflow:hidden;
   background:#000;
@@ -2101,11 +2101,11 @@ header{
   .modal.modal-v2{
     border-radius:20px;
     max-height:88dvh;
-    width:min(900px,96vw);
-    max-width:900px;
-    height:88dvh;
+    width:min(960px,96vw);
+    max-width:960px;
+    height:90dvh;
     display:grid;
-    grid-template-columns:1fr 340px;
+    grid-template-columns:1fr 360px;
     grid-template-rows:1fr;
     overflow:hidden;
     position:relative;
@@ -3765,16 +3765,20 @@ function updateFavBtn(u){
 function startLivePreview(x){}
 
 function _setModalEmbedScale(){
-  if(window.innerWidth<520) return; // móvil: no usar scale
-  const hero=document.getElementById('modal-hero');
-  if(!hero) return;
-  const panelW=hero.getBoundingClientRect().width;
-  if(!panelW) return;
-  const scale=(panelW/500).toFixed(4);
-  const wrap=document.getElementById('mhero-embed-wrap');
-  if(wrap) wrap.style.setProperty('--modal-embed-scale', scale);
-  const frame=document.getElementById('live-embed-frame');
-  if(frame) frame.style.setProperty('--modal-embed-scale', scale);
+  const wrap = document.getElementById('mhero-embed-wrap');
+  const frame = document.getElementById('live-embed-frame');
+  if(!wrap||!frame) return;
+  const col = wrap.parentElement; // .mhero-v2 or modal-hero column
+  const W = col ? col.offsetWidth : wrap.offsetWidth;
+  if(!W) return;
+  const IFRAME_W = 500; // fixed iframe width to prevent CB chat sidebar
+  const scale = W / IFRAME_W;
+  const H = Math.round(IFRAME_W * 9/16); // 16:9 aspect for the iframe
+  frame.style.width  = IFRAME_W + 'px';
+  frame.style.height = H + 'px';
+  frame.style.transform = `scale(${scale})`;
+  frame.style.transformOrigin = 'top left';
+  wrap.style.height = Math.round(H * scale) + 'px';
 }
 window.addEventListener('resize', _setModalEmbedScale);
 
@@ -3785,7 +3789,7 @@ function activateEmbed(u){
   if(!wrap||!frame)return;
   clearInterval(prevCd);
   wrap.classList.add('active');
-  _setModalEmbedScale(); // calcular escala ahora que wrap tiene dimensiones
+  requestAnimationFrame(()=>{ _setModalEmbedScale(); }); // escala tras render
   if(loading) loading.classList.remove('hidden');
   frame.onload=null;
   frame.removeEventListener('load', onEmbedLoad);
@@ -4061,13 +4065,18 @@ function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
     return`${h-12}pm`;
   };
   for(let dow=0;dow<7;dow++){
-    if(dowCounts[dow]===0){ranges[dow]=null;continue;}
+    // Use hourlyReal as fallback if dowCounts is 0 but best_hours has data
+    if(dowCounts[dow]===0){
+      // Check if hourlyReal has data for this day (JS dow mapping)
+      const hasRealData = hourly && hourly[dow] && Object.values(hourly[dow]).some(v=>v>0);
+      if(!hasRealData){ranges[dow]=null;continue;}
+    }
     if(hourly&&hourly[dow]&&Object.keys(hourly[dow]).length>0){
       const hrs=hourly[dow];
       const maxH=Math.max(...Object.values(hrs),1);
       // Horas activas (≥15% del pico), ordenadas 0-23
       const active=[];
-      for(let h=0;h<24;h++){if((hrs[h]||0)/maxH>=0.15)active.push(h);}
+      for(let h=0;h<24;h++){if((hrs[h]||0)/maxH>=0.05)active.push(h);}
       if(!active.length){
         ranges[dow]={label:'Horario irregular',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:true,peakLabel:null};
         continue;
