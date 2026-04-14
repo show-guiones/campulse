@@ -25,7 +25,9 @@ jobs:
 
   best_hours:
     runs-on: ubuntu-latest
-    needs: scrape          # corre justo después del scraper
+    needs: scrape
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
