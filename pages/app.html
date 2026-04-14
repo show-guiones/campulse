@@ -4432,7 +4432,10 @@ document.getElementById('search').addEventListener('input',()=>{
   if(pd) pd.style.display=hide?'none':'';
   renderOnFilter();
 });
-document.getElementById('srt').addEventListener('change',e=>{
+const _srtEl=document.getElementById('srt');
+_srtEl.value=sort;
+_srtEl.classList.toggle('active', sort!=='viewers');
+_srtEl.addEventListener('change',e=>{
   sort=e.target.value;
   e.target.classList.toggle('active', sort!=='viewers');
   renderOnFilter();
