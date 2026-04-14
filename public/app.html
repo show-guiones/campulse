@@ -3763,10 +3763,24 @@ function loadModalAnalytics(x){
   if(daysEl) daysEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Cargando…</span>';
   const chartCanvas=document.getElementById('man-chart');
 
-  fetch(`/api/history?username=${encodeURIComponent(u)}`)
-    .then(r=>r.ok?r.json():null)
-    .then(raw=>{
+  // Fetch history + best_hours en paralelo para tener horarios reales
+  Promise.all([
+    fetch(`/api/history?username=${encodeURIComponent(u)}`).then(r=>r.ok?r.json():null),
+    fetch(`/api/best-hours?username=${encodeURIComponent(u)}`).then(r=>r.ok?r.json():null)
+  ]).then(([raw, bestHoursRaw])=>{
       if(!raw||!daysEl)return;
+
+      // Construir hourly real desde best_hours: {dow: {hour: avg_viewers}}
+      let hourlyReal = null;
+      if(Array.isArray(bestHoursRaw) && bestHoursRaw.length>0){
+        hourlyReal = {};
+        bestHoursRaw.forEach(d=>{
+          const dow = d.day_of_week;
+          const h   = d.hour_est;
+          if(!hourlyReal[dow]) hourlyReal[dow]={};
+          hourlyReal[dow][h] = d.avg_viewers||0;
+        });
+      }
 
       // La API devuelve un array de snapshots: [{captured_at, num_users, ...}]
       // Convertir a data.daily = {"YYYY-MM-DD": maxViewers del día}
@@ -3779,7 +3793,7 @@ function loadModalAnalytics(x){
           const v=snap.num_users||0;
           if(!dailyMap[key]||v>dailyMap[key]) dailyMap[key]=v;
         });
-        data={daily:dailyMap};
+        data={daily:dailyMap, hourly:hourlyReal};
       }
 
       // Build last-30-days array
