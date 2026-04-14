@@ -65,16 +65,21 @@ export default function LanguageIndex() {
           <p className="cmp-page-sub">Encuentra modelos de Chaturbate según el idioma que hablan.</p>
         </div>
 
-        <div className="cmp-cat-grid">
+        <div style={{
+          display:"grid",
+          gridTemplateColumns:"repeat(auto-fill,minmax(min(100%,220px),1fr))",
+          gap:12,
+          marginTop:"1.5rem"
+        }}>
           {LANGUAGES.map(l=>(
             <a key={l.slug} href={`/language/${l.slug}`}
-              style={{background:"var(--surf)",borderRadius:14,padding:"1.375rem",display:"flex",alignItems:"center",gap:"1rem",border:"1px solid var(--bdr)",transition:"border-color .2s,background .15s,transform .15s",textDecoration:"none"}}
+              style={{background:"var(--surf)",borderRadius:14,padding:"1.125rem 1rem",display:"flex",alignItems:"center",gap:".75rem",border:"1px solid var(--bdr)",transition:"border-color .2s,background .15s,transform .15s",textDecoration:"none",minWidth:0}}
               onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(56,182,212,.3)";e.currentTarget.style.transform="translateY(-2px)"}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor="var(--bdr)";e.currentTarget.style.transform=""}}>
-              <span style={{fontSize:"2rem",flexShrink:0,lineHeight:1}}>{l.flag}</span>
-              <div>
-                <div style={{fontWeight:700,fontSize:"1.0625rem",color:"var(--txt)",marginBottom:2}}>{l.name}</div>
-                <div style={{fontSize:".8rem",color:"var(--txt2)"}}>{l.desc}</div>
+              <span style={{fontSize:"1.75rem",flexShrink:0,lineHeight:1}}>{l.flag}</span>
+              <div style={{minWidth:0,overflow:"hidden"}}>
+                <div style={{fontWeight:700,fontSize:"1rem",color:"var(--txt)",marginBottom:2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{l.name}</div>
+                <div style={{fontSize:".775rem",color:"var(--txt2)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{l.desc}</div>
               </div>
             </a>
           ))}
@@ -84,8 +89,8 @@ export default function LanguageIndex() {
           <a href="/country" className="cmp-footer-link">Ver por país →</a>
           <a href="/gender" className="cmp-footer-link">Ver por género →</a>
         </div>
+        <BottomNav active="/language" />
       </div>
-      <BottomNav active="/language" />
     </>
   );
 }
