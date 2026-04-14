@@ -865,10 +865,10 @@ header{
     position:absolute!important;
     top:-44px!important;
     left:0!important;
-    /* Ancho fijo 500px → CB no activa panel de chat (umbral ~560px) */
+    /* 500px → CB no activa chat. Scale llena la columna izquierda visualmente */
     width:500px!important;
-    height:calc(281px + 44px + 200px)!important;
-    /* Escalar para llenar el panel visualmente */
+    /* Altura: 500*(9/16) + crop-top + crop-bot */
+    height:calc(281px + 44px + 220px)!important;
     transform-origin:top left!important;
     transform:scale(var(--modal-embed-scale,1))!important;
   }
@@ -2037,32 +2037,125 @@ header{
   padding:3px 10px;font-size:.65rem;color:var(--txt2)
 }
 
+
+/* ── DESKTOP MODAL: panel derecho ── */
+@media(min-width:601px){
+  /* Header dentro del panel derecho: nombre + badge */
+  .mdesktop-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:.5rem;
+    margin-bottom:.8rem;
+    padding-bottom:.75rem;
+    border-bottom:1px solid var(--bdr);
+    flex-shrink:0;
+  }
+  .mdesktop-header .mstrip-name{font-size:1.05rem;font-weight:800;color:var(--txt)}
+  .mdesktop-header .mstrip-sub{font-size:.68rem;color:var(--txt2);margin-top:.15rem}
+  .mdesktop-header .mstrip-live{display:block!important}
+  /* En móvil ocultar el header extra */
+}
+@media(max-width:600px){
+  .mdesktop-header{display:none}
+}
+
+
+@media(min-width:601px){
+  /* CTA + actions in right panel */
+  .modal.modal-v2 .modal-acts{
+    margin-bottom:.6rem;
+    margin-top:0;
+  }
+  .modal.modal-v2 .btn-go{
+    font-size:.9rem;
+    padding:.65rem 1rem;
+    border-radius:12px;
+  }
+  .modal.modal-v2 .modal-secondary.msec-v2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:.4rem;
+    margin-bottom:.7rem;
+  }
+  .modal.modal-v2 .btn-sec{
+    border-radius:10px;
+    font-size:.72rem;
+    padding:.5rem .6rem;
+    justify-content:center;
+  }
+  /* Analytics fills remaining space */
+  .modal.modal-v2 .modal-analytics{
+    margin-top:.2rem;
+  }
+}
+
 /* ═══════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════ */
 @media(min-width:601px){
   .modal-bg{align-items:center;padding:1.5rem}
-  .modal{border-radius:20px;max-height:92dvh;max-width:780px;width:100%}
-  .modal-hero{height:420px}
-  /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
-  .modal-hero.mhero-v2{height:auto}
-  .mhero-v2{aspect-ratio:16/9;max-height:none}
   .modal::before{display:none}
-  /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
-  .modal-v2{
-    height:auto;
-    max-height:92dvh;
+
+  /* ── MODAL DESKTOP: 2 columnas video|info ── */
+  .modal.modal-v2{
     border-radius:20px;
+    max-height:88dvh;
+    width:min(900px,96vw);
+    max-width:900px;
+    height:88dvh;
+    display:grid;
+    grid-template-columns:1fr 340px;
+    grid-template-rows:1fr;
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* Cerrar — esquina superior derecha del modal */
+  .modal.modal-v2 .modal-close{
+    position:absolute;top:.6rem;right:.6rem;
+    z-index:50;
+    background:rgba(0,0,0,.7);
+    border:1px solid rgba(255,255,255,.15);
+    backdrop-filter:blur(8px);
+  }
+
+  /* VIDEO: columna izquierda — ocupa toda la altura */
+  .modal-hero.mhero-v2{
+    grid-column:1;
+    grid-row:1;
+    width:100%;
+    height:100%;
+    aspect-ratio:unset;
+    max-height:none;
+    border-radius:20px 0 0 20px;
+    overflow:hidden;
+  }
+
+  /* INFO: columna derecha — stack vertical con scroll */
+  .mstrip-v2,.mbody-v2{
+    grid-column:2;
+  }
+  /* Ocultar strip separado — la info va directo en el panel derecho */
+  .mstrip-v2{
+    display:none;
+  }
+  /* Panel derecho: header sticky + scroll */
+  .mbody-v2{
+    grid-row:1;
     display:flex;
     flex-direction:column;
-  }
-  /* Body ocupa el espacio restante hasta el límite del modal */
-  .mbody-v2{
-    flex:1;
-    min-height:0;
-    max-height:calc(92dvh - 440px);
+    height:100%;
+    max-height:none;
     overflow-y:auto;
+    padding:.9rem 1rem 1.5rem;
+    background:var(--bg2);
+    border-left:1px solid var(--bdr);
+    border-radius:0 20px 20px 0;
   }
+
+  /* Nombre+badge arriba en panel derecho — se lee con el contenido del mbody */
+  .modal-v2 .modal-acts{margin-top:auto;padding-top:.5rem}
 }
 @media(max-width:900px){
   .drawer{display:none}
@@ -2646,6 +2739,15 @@ body.modal-open .mob-explore-nav{display:none!important}
 
     <!-- BODY scrollable -->
     <div class="modal-body mbody-v2">
+
+      <!-- DESKTOP: header info arriba del panel derecho -->
+      <div class="mdesktop-header">
+        <div>
+          <div class="mstrip-name" id="mstrip-name-d"></div>
+          <div class="mstrip-sub" id="mstrip-sub-d"></div>
+        </div>
+        <div class="mstrip-live" id="mstrip-live-d"></div>
+      </div>
 
       <!-- CTA PRINCIPAL -->
       <div class="modal-acts">
@@ -3577,6 +3679,13 @@ function openMod(u){
     mstripLive.textContent=x.num_users>0?'● EN VIVO':'';
     mstripLive.classList.toggle('visible',x.num_users>0);
   }
+  // Sync desktop right-panel header
+  const dName=document.getElementById('mstrip-name-d');
+  const dSub=document.getElementById('mstrip-sub-d');
+  const dLive=document.getElementById('mstrip-live-d');
+  if(dName) dName.textContent=x.display_name||x.username;
+  if(dSub) dSub.textContent=x.username!==x.display_name?'@'+x.username:'';
+  if(dLive){dLive.textContent=x.num_users>0?'● EN VIVO':'';dLive.classList.toggle('visible',x.num_users>0);}
   document.getElementById('m-link').href=`https://es.chaturbate.com/${x.username}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${x.username}&tour=LQps&track=default`;
   const profileLink=document.getElementById('m-profile-link');
   if(profileLink) profileLink.href=`https://www.campulsehub.com/model/${x.username}`;
@@ -3657,12 +3766,13 @@ function startLivePreview(x){}
 
 function _setModalEmbedScale(){
   if(window.innerWidth<520) return; // móvil: no usar scale
-  const wrap=document.getElementById('mhero-embed-wrap');
-  if(!wrap) return;
-  const panelW=wrap.getBoundingClientRect().width;
+  const hero=document.getElementById('modal-hero');
+  if(!hero) return;
+  const panelW=hero.getBoundingClientRect().width;
   if(!panelW) return;
   const scale=(panelW/500).toFixed(4);
-  wrap.style.setProperty('--modal-embed-scale', scale);
+  const wrap=document.getElementById('mhero-embed-wrap');
+  if(wrap) wrap.style.setProperty('--modal-embed-scale', scale);
   const frame=document.getElementById('live-embed-frame');
   if(frame) frame.style.setProperty('--modal-embed-scale', scale);
 }
