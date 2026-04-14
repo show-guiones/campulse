@@ -29,7 +29,7 @@ export default async function handler(req) {
   // Estrategia: paginar la API de afiliados en bloques de 500 buscando el username exacto.
   // Máximo 3 páginas (1500 salas) para no exceder el timeout de Edge (10s).
   // La mayoría de modelos activas aparecen en las primeras 1500 salas ordenadas por viewers.
-  const maxPages = 3;
+  const maxPages = 20;  // cubre hasta 10.000 salas
 
   try {
     for (let page = 0; page < maxPages; page++) {
