@@ -3771,14 +3771,19 @@ function loadModalAnalytics(x){
       if(!raw||!daysEl)return;
 
       // Construir hourly real desde best_hours: {dow: {hour: avg_viewers}}
+      // Construir hourly real desde best_hours
+      // IMPORTANTE: best_hours usa Python weekday() 0=Lun, JS usa getDay() 0=Dom
+      // Conversión: jsDow = (pythonDow + 1) % 7
       let hourlyReal = null;
       if(Array.isArray(bestHoursRaw) && bestHoursRaw.length>0){
         hourlyReal = {};
         bestHoursRaw.forEach(d=>{
-          const dow = d.day_of_week;
-          const h   = d.hour_est;
-          if(!hourlyReal[dow]) hourlyReal[dow]={};
-          hourlyReal[dow][h] = d.avg_viewers||0;
+          const jsDow = (d.day_of_week + 1) % 7; // Python Mon=0 → JS Mon=1, Python Sun=6 → JS Sun=0
+          const h     = d.hour_est;
+          if(!hourlyReal[jsDow]) hourlyReal[jsDow]={};
+          // Acumular avg_viewers (puede haber varios registros por dow/hour tras múltiples upserts)
+          if(!hourlyReal[jsDow][h] || d.avg_viewers > hourlyReal[jsDow][h])
+            hourlyReal[jsDow][h] = d.avg_viewers||0;
         });
       }
 
@@ -3871,14 +3876,17 @@ function loadModalAnalytics(x){
             if(dowCounts[i]===0) return '';
             const isBest=i===bestDow&&dowAvg[i]>0;
             const isActive=dowAvg[i]>0;
-            const range=HOUR_RANGES[i]||{label:'Horario variable',dots:[1,1,1,0,0,0,0,0]};
+            const range=HOUR_RANGES[i]||{label:'Sin datos',dots:[.2,.2,.2,.2,.2,.2,.2,.2],isReal:false};
             const dotHtml=range.dots.map(v=>`<div class="man-sched-dot ${v>0.6?'on':v>0.2?'mid':''}"></div>`).join('');
+            const subLabel=range.isReal
+              ? (range.peakLabel?`<small style="color:var(--neon)">${range.peakLabel}</small>`:`<small>hora EST</small>`)
+              : `<small style="color:var(--txt3)">sin datos</small>`;
             return `<div class="man-sched-row ${isBest?'best':isActive?'active':''}">
               <div class="man-sched-day">${name}</div>
-              <div class="man-sched-hours">${range.label}<small>aprox.</small></div>
+              <div class="man-sched-hours">${range.label}${subLabel}</div>
               <div class="man-sched-bar">${dotHtml}</div>
             </div>`;
-          }).filter(Boolean).join('');
+          }).filter(Boolean).join('')+'<div style="font-size:.58rem;color:var(--txt3);margin-top:.4rem">⏰ Horario EST = Colombia/Perú. Basado en transmisiones reales de los últimos 30 días.</div>';
         } else {
           schedSec.style.display='none';
         }
@@ -3898,57 +3906,57 @@ function loadModalAnalytics(x){
     });
 }
 
-// Build estimated hour ranges per day-of-week
-// Uses hourly data if available, otherwise derives from day activity levels
+// Build REAL hour ranges per day-of-week from best_hours data
+// hourly = {jsDow: {hour_est(EST): avg_viewers}} — datos reales de Supabase
+// dowCounts = [0..6] from JS getDay() — same convention as jsDow
 function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
   const ranges={};
-  // Standard streaming hour blocks: morning(6-10), afternoon(12-16), evening(17-21), night(22-02)
-  const BLOCKS=[
-    {label:'Mañana',start:6,end:10},
-    {label:'Tarde',start:14,end:18},
-    {label:'Noche',start:19,end:23},
-    {label:'Madrugada',start:23,end:2}
-  ];
+  const fmt=h=>{
+    // Format hour (EST, 0-23) as 12h string
+    if(h===0) return '12am';
+    if(h<12)  return `${h}am`;
+    if(h===12) return '12pm';
+    return `${h-12}pm`;
+  };
   for(let dow=0;dow<7;dow++){
     if(dowCounts[dow]===0){ranges[dow]=null;continue;}
-    if(hourly&&hourly[dow]){
-      // We have real hourly data
+    if(hourly&&hourly[dow]&&Object.keys(hourly[dow]).length>0){
+      // ── DATOS REALES desde best_hours ──
       const hrs=hourly[dow];
-      const maxH=Math.max(...Object.values(hrs),1);
-      // Find the contiguous peak block
+      const vals=Object.values(hrs);
+      const maxH=Math.max(...vals,1);
+      // Umbral: horas con al menos 15% del pico (más permisivo que 20%)
+      const threshold=0.15;
       const active=[];
       for(let h=0;h<24;h++){
-        const v=(hrs[h]||0)/maxH;
-        if(v>0.2) active.push(h);
+        if((hrs[h]||0)/maxH>=threshold) active.push(h);
       }
       if(active.length>0){
-        const startH=active[0];
-        const endH=active[active.length-1];
-        const fmt12=h=>h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
+        // Encontrar bloque más largo de horas contiguas
+        let bestStart=active[0],bestLen=1,cur=active[0],curLen=1;
+        for(let i=1;i<active.length;i++){
+          if(active[i]===active[i-1]+1){curLen++;if(curLen>bestLen){bestLen=curLen;bestStart=cur;}}
+          else{cur=active[i];curLen=1;}
+        }
+        const startH=bestStart;
+        const endH=bestStart+bestLen-1;
+        // Peak hour
+        const peakH=parseInt(Object.entries(hrs).reduce((a,b)=>b[1]>a[1]?b:a)[0]);
+        // Dots: 8 slots starting from startH
         const dots=[];
         for(let h=startH;h<=Math.min(endH,startH+7);h++){
           dots.push((hrs[h]||0)/maxH);
         }
         while(dots.length<8) dots.push(0);
-        ranges[dow]={label:`${fmt12(startH)}–${fmt12((endH+1)%24)}`,dots};
+        // Label: rango real + pico
+        const label=`${fmt(startH)}–${fmt((endH+1)%24)}`;
+        ranges[dow]={label,peakLabel:`pico ${fmt(peakH)}`,dots,isReal:true};
       } else {
-        ranges[dow]={label:'Horario variable',dots:[.5,.5,.5,0,0,0,0,0]};
+        ranges[dow]={label:'Horario irregular',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:true};
       }
     } else {
-      // No hourly data — assign plausible window based on activity level
-      // Higher activity days get prime-time evening slots
-      const pct=dowAvg[dow]/Math.max(...dowAvg,1);
-      let label,dots;
-      if(dow===bestDow){
-        label='7pm–11pm'; dots=[.3,.7,1,1,.9,.6,.3,.1];
-      } else if(pct>0.6){
-        label='8pm–12am'; dots=[.1,.4,.9,1,1,.7,.4,.2];
-      } else if(pct>0.3){
-        label='9pm–1am'; dots=[0,.2,.6,1,1,.8,.5,.2];
-      } else {
-        label='Horario variable'; dots=[.2,.4,.5,.4,.3,.2,.1,0];
-      }
-      ranges[dow]={label,dots};
+      // ── SIN DATOS REALES — marcar claramente como estimado ──
+      ranges[dow]={label:'Sin datos suficientes',dots:[.2,.2,.2,.2,.2,.2,.2,.2],isReal:false};
     }
   }
   return ranges;
