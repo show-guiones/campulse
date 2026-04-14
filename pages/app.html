@@ -4434,7 +4434,7 @@ document.getElementById('search').addEventListener('input',()=>{
 });
 const _srtEl=document.getElementById('srt');
 _srtEl.value=sort;
-_srtEl.classList.toggle('active', sort!=='viewers');
+_srtEl.classList.toggle('active',sort!=='viewers');
 _srtEl.addEventListener('change',e=>{
   sort=e.target.value;
   e.target.classList.toggle('active', sort!=='viewers');
