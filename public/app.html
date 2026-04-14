@@ -3898,12 +3898,15 @@ function loadModalAnalytics(x){
       if(Array.isArray(bestHoursRaw) && bestHoursRaw.length>0){
         hourlyReal = {};
         bestHoursRaw.forEach(d=>{
-          const jsDow = (d.day_of_week + 1) % 7; // Python Mon=0 → JS Mon=1, Python Sun=6 → JS Sun=0
-          const h     = d.hour_est;
+          // CRÍTICO: forzar enteros para evitar bugs de string vs number en lookup
+          const jsDow = ((parseInt(d.day_of_week,10) + 1) % 7); // Python Mon=0 → JS Mon=1, Sun=0
+          const h     = parseInt(d.hour_est,10);                  // forzar número
+          if(isNaN(jsDow)||isNaN(h)) return;
           if(!hourlyReal[jsDow]) hourlyReal[jsDow]={};
           // Acumular avg_viewers (puede haber varios registros por dow/hour tras múltiples upserts)
-          if(!hourlyReal[jsDow][h] || d.avg_viewers > hourlyReal[jsDow][h])
-            hourlyReal[jsDow][h] = d.avg_viewers||0;
+          const viewers = parseFloat(d.avg_viewers)||0;
+          if(!hourlyReal[jsDow][h] || viewers > hourlyReal[jsDow][h])
+            hourlyReal[jsDow][h] = viewers;
         });
       }
 
@@ -4062,17 +4065,32 @@ function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
     if(h===12)return'12pm';
     return`${h-12}pm`;
   };
+  // CRITICO: normalizar keys a enteros — Supabase puede devolver hour_est como string
+  // causando que hrs[9] sea undefined aunque hrs["9"] tenga el valor correcto.
+  function normalizeHrs(rawHrs){
+    if(!rawHrs) return null;
+    const n={};
+    Object.entries(rawHrs).forEach(([k,v])=>{
+      const key=parseInt(k,10);
+      if(!isNaN(key)) n[key]=parseFloat(v)||0;
+    });
+    return n;
+  }
   for(let dow=0;dow<7;dow++){
-    // Use hourlyReal as fallback if dowCounts is 0 but best_hours has data
-    if(dowCounts[dow]===0){
-      // Check if hourlyReal has data for this day (JS dow mapping)
-      const hasRealData = hourly && hourly[dow] && Object.values(hourly[dow]).some(v=>v>0);
-      if(!hasRealData){ranges[dow]=null;continue;}
+    // Buscar datos del día, aceptando tanto clave numérica como string
+    const rawDay = hourly && (hourly[dow]!==undefined ? hourly[dow] : hourly[String(dow)]);
+    const hrs = rawDay ? normalizeHrs(rawDay) : null;
+    const hasData = hrs && Object.keys(hrs).length>0 && Object.values(hrs).some(v=>v>0);
+
+    // Si no hay datos reales Y dowCounts también es 0: día inactivo, skip
+    if(!hasData && dowCounts[dow]===0){
+      ranges[dow]=null;
+      continue;
     }
-    if(hourly&&hourly[dow]&&Object.keys(hourly[dow]).length>0){
-      const hrs=hourly[dow];
+
+    if(hasData){
       const maxH=Math.max(...Object.values(hrs),1);
-      // Horas activas (≥15% del pico), ordenadas 0-23
+      // Horas activas (>=5% del pico), ordenadas 0-23
       const active=[];
       for(let h=0;h<24;h++){if((hrs[h]||0)/maxH>=0.05)active.push(h);}
       if(!active.length){
@@ -4081,7 +4099,7 @@ function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
       }
       // Peak hour
       const peakH=parseInt(Object.entries(hrs).reduce((a,b)=>+b[1]>+a[1]?b:a)[0]);
-      // Rotación por mayor hueco — maneja cruce de medianoche
+      // Rotacion por mayor hueco — maneja cruce de medianoche
       if(active.length>1){
         const gaps=active.map((h,i)=>((active[(i+1)%active.length]-h+24)%24));
         const bigIdx=gaps.indexOf(Math.max(...gaps));
@@ -4101,7 +4119,8 @@ function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
       }
       ranges[dow]={label:`${fmt(startH)}–${fmt(spanEnd)}`,peakLabel:`pico ${fmt(peakH)}`,dots,isReal:true};
     } else {
-      ranges[dow]={label:'Sin datos suficientes',dots:[.15,.15,.15,.15,.15,.15,.15,.15],isReal:false,peakLabel:null};
+      // dowCounts[dow]>0 pero sin datos de hora exacta
+      ranges[dow]={label:'Activo este dia',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:false,peakLabel:null};
     }
   }
   return ranges;
