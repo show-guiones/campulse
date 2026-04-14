@@ -4432,11 +4432,10 @@ document.getElementById('search').addEventListener('input',()=>{
   if(pd) pd.style.display=hide?'none':'';
   renderOnFilter();
 });
-const _srtEl=document.getElementById('srt');
-_srtEl.value='followers';
-_srtEl.addEventListener('change',e=>{
+document.getElementById('srt').value='followers';
+document.getElementById('srt').addEventListener('change',e=>{
   sort=e.target.value;
-  e.target.classList.toggle('active', sort!=='followers');
+  e.target.classList.toggle('active', sort!=='viewers');
   renderOnFilter();
 });
 document.getElementById('th-v').addEventListener('click',()=>{sort='viewers';render();});
