@@ -866,7 +866,7 @@ header{
     top:-44px!important;
     left:50%!important;
     transform:translateX(-50%)!important;
-    width:460px!important;
+    width:100%!important;
     height:calc(100% + 44px + 150px)!important;
   }
 }
@@ -2039,28 +2039,25 @@ header{
 ═══════════════════════════════════════════ */
 @media(min-width:601px){
   .modal-bg{align-items:center;padding:1.5rem}
-  .modal{border-radius:20px;max-height:92dvh;max-width:560px;width:100%}
-  .modal-hero{height:400px}
+  .modal{border-radius:20px;max-height:92dvh;max-width:780px;width:100%}
+  .modal-hero{height:420px}
   /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
   .modal-hero.mhero-v2{height:auto}
-  .mhero-v2{aspect-ratio:1/1;max-height:260px}
+  .mhero-v2{aspect-ratio:16/9;max-height:none}
   .modal::before{display:none}
   /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
   .modal-v2{
     height:auto;
     max-height:92dvh;
     border-radius:20px;
-    /* flex column: hero fijo arriba, body scrollea abajo */
     display:flex;
     flex-direction:column;
   }
-  /* Hero 16:9: en desktop el modal es 500px → aspect-ratio da 281px exactos
-     No sobreescribir con max-height — dejar que aspect-ratio lo controle */
   /* Body ocupa el espacio restante hasta el límite del modal */
   .mbody-v2{
     flex:1;
     min-height:0;
-    max-height:calc(92dvh - 330px);
+    max-height:calc(92dvh - 440px);
     overflow-y:auto;
   }
 }
@@ -3768,7 +3765,7 @@ function loadModalAnalytics(x){
     fetch(`/api/history?username=${encodeURIComponent(u)}`).then(r=>r.ok?r.json():null),
     fetch(`/api/best-hours?username=${encodeURIComponent(u)}`).then(r=>r.ok?r.json():null)
   ]).then(([raw, bestHoursRaw])=>{
-      if(!raw||!daysEl)return;
+      if((!raw&&!bestHoursRaw)||!daysEl)return; // solo salir si AMBAS APIs fallan
 
       // Construir hourly real desde best_hours: {dow: {hour: avg_viewers}}
       // Construir hourly real desde best_hours
@@ -3799,6 +3796,9 @@ function loadModalAnalytics(x){
           if(!dailyMap[key]||v>dailyMap[key]) dailyMap[key]=v;
         });
         data={daily:dailyMap, hourly:hourlyReal};
+      } else {
+        // history falló pero best_hours puede tener datos — usar objeto vacío
+        data={daily:{}, hourly:hourlyReal};
       }
 
       // Build last-30-days array
@@ -3881,7 +3881,7 @@ function loadModalAnalytics(x){
       const schedEl=document.getElementById('man-schedule');
       if(schedSec&&schedEl){
         // Determine active days (at least 1 appearance in 30d)
-        const hasActivity=dowCounts.some(c=>c>0);
+        const hasActivity=dowCounts.some(c=>c>0)||(hourlyReal&&Object.keys(hourlyReal).length>0);
         if(hasActivity){
           schedSec.style.display='';
           // Estimate broadcast hour ranges from data.hourly if available
