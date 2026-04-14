@@ -3904,7 +3904,8 @@ function loadModalAnalytics(x){
           if(isNaN(jsDow)||isNaN(h)) return;
           if(!hourlyReal[jsDow]) hourlyReal[jsDow]={};
           // Acumular avg_viewers (puede haber varios registros por dow/hour tras múltiples upserts)
-          const viewers = parseFloat(d.avg_viewers)||0;
+          // CRÍTICO: si avg_viewers es 0 o null, usar 1 como centinela — el registro existe = hay actividad real
+          const viewers = Math.max(parseFloat(d.avg_viewers)||0, 1);
           if(!hourlyReal[jsDow][h] || viewers > hourlyReal[jsDow][h])
             hourlyReal[jsDow][h] = viewers;
         });
@@ -4024,11 +4025,11 @@ function loadModalAnalytics(x){
             if(!isDayActive(i)) return '';
             const isBest=i===bestDow&&(dowAvg[i]>0||(hourlyReal&&hourlyReal[i]));
             const isActive=true;
-            const range=HOUR_RANGES[i]||{label:'Sin datos',dots:[.2,.2,.2,.2,.2,.2,.2,.2],isReal:false};
+            const range=HOUR_RANGES[i]||{label:'Horario variable',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:false,peakLabel:null};
             const dotHtml=range.dots.map(v=>`<div class="man-sched-dot ${v>0.6?'on':v>0.2?'mid':''}"></div>`).join('');
             const subLabel=range.isReal
               ? (range.peakLabel?`<small style="color:var(--neon)">${range.peakLabel}</small>`:`<small>hora EST</small>`)
-              : `<small style="color:var(--txt3)">sin datos</small>`;
+              : `<small style="color:var(--txt3)">hora EST</small>`;
             return `<div class="man-sched-row ${isBest?'best':isActive?'active':''}">
               <div class="man-sched-day">${name}</div>
               <div class="man-sched-hours">${range.label}${subLabel}</div>
@@ -4080,7 +4081,7 @@ function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
     // Buscar datos del día, aceptando tanto clave numérica como string
     const rawDay = hourly && (hourly[dow]!==undefined ? hourly[dow] : hourly[String(dow)]);
     const hrs = rawDay ? normalizeHrs(rawDay) : null;
-    const hasData = hrs && Object.keys(hrs).length>0 && Object.values(hrs).some(v=>v>0);
+    const hasData = hrs && Object.keys(hrs).length>0;
 
     // Si no hay datos reales Y dowCounts también es 0: día inactivo, skip
     if(!hasData && dowCounts[dow]===0){
