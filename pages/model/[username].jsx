@@ -151,7 +151,7 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
   const langName    = langSlug ? LANG_NAMES[langSlug] : null;
   const sparkData   = history.slice(-30);
   const histMax     = peakViewers||1;
-  const shouldIndex = snapCount>=3;
+  const shouldIndex = snapCount>=1;
   const maxHourViewers = bestHours.length>0 ? Math.max(...bestHours.slice(0,5).map(h=>Math.round(h.avg_viewers))) : 1;
 
   const trendPct = (() => {
