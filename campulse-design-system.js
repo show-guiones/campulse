@@ -200,12 +200,30 @@ export function BottomNav({ active }) {
   );
 }
 
-// Logo JSX component — mirrors app.html .logo markup
+// Logo JSX component — Campulse brand mark
 export function Logo() {
   return (
-    <a href="/" className="cmp-logo">
-      <span className="cmp-logo-icon">CP</span>
-      <span className="cmp-logo-name">Campulse<em>Hub</em></span>
+    <a href="/app.html" className="cmp-logo" style={{ gap: ".55rem" }}>
+      <span className="cmp-logo-icon" style={{
+        background: "linear-gradient(135deg,#e8305a 0%,#7c5cbf 100%)",
+        boxShadow: "0 2px 10px rgba(232,48,90,.25)",
+        borderRadius: "10px",
+        width: "32px",
+        height: "32px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: ".6rem",
+        fontWeight: 900,
+        color: "#fff",
+        letterSpacing: "-.03em",
+        flexShrink: 0,
+      }}>
+        CP
+      </span>
+      <span className="cmp-logo-name" style={{ fontSize: "1.075rem", fontWeight: 800, letterSpacing: "-.03em" }}>
+        Campulse<em style={{ color: "var(--neon)", fontStyle: "normal" }}>Hub</em>
+      </span>
     </a>
   );
 }
