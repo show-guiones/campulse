@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         headers: sbHeaders,
         body: JSON.stringify({
           since_days:  30,
-          min_snaps:    5,
+          min_snaps:    1,
           min_viewers:  1,
         }),
       }
