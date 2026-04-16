@@ -309,6 +309,26 @@ export default function TagPage({ tag, models }) {
           <EmptyState tag={tag} />
         )}
 
+        {/* EMBED — Top Female en vivo */}
+        <section style={{marginTop:32,marginBottom:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+            <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
+            <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>En vivo ahora en Chaturbate</span>
+          </div>
+          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",paddingTop:"56.25%"}}>
+            <iframe
+              src={`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=tag_${tag}&disable_sound=1&mobileRedirect=auto&embed_video_only=1`}
+              style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
+              allow="autoplay; fullscreen; encrypted-media"
+              scrolling="no"
+            />
+          </div>
+          <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
+            Stream en vivo desde Chaturbate ·{" "}
+            <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=tag_${tag}`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+          </p>
+        </section>
+
         {/* SEO */}
         <section className="tg-seo">
           <h2>Modelos con #{tag} en Chaturbate en vivo</h2>
