@@ -37,7 +37,7 @@ export async function getServerSideProps({ params }) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
   if (!SUPABASE_URL || !SUPABASE_KEY) return { props: { tag, models: [] } };
-  const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const sbHeaders = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
   try {
     const url = `${SUPABASE_URL}/rest/v1/rooms_snapshot?captured_at=gte.${since}&tags=cs.{"${tag}"}&select=username,display_name,num_users,country,gender&order=num_users.desc&limit=100`;
@@ -95,12 +95,28 @@ function ModelCard({ model, index }) {
 }
 
 function EmptyState({ tag }) {
+  const relatedTags = RELATED_TAGS[tag] || [];
   return (
     <div className="tg-empty">
       <span className="tg-empty-emoji">{TAG_EMOJI[tag] || "📡"}</span>
-      <h2 className="tg-empty-h">Sin modelos en vivo ahora</h2>
-      <p className="tg-empty-p">No hay nadie con <strong style={{color:"var(--neon)"}}>#{tag}</strong> en este momento. Los datos se actualizan cada 2 horas.</p>
-      <span className="tg-timer"><span className="tg-timer-dot"/>Próxima actualización en menos de 2h</span>
+      <h2 className="tg-empty-h">Sin modelos en vivo en este momento</h2>
+      <p className="tg-empty-p">
+        Las modelos con el tag <strong style={{color:"var(--neon)"}}>#{tag}</strong> en Chaturbate
+        no están activas ahora mismo. Los datos se actualizan automáticamente — vuelve en unos minutos.
+      </p>
+      <span className="tg-timer"><span className="tg-timer-dot"/>Actualización automática cada hora</span>
+      {relatedTags.length > 0 && (
+        <div style={{marginTop:"2rem"}}>
+          <p style={{color:"var(--txt3)",fontSize:".75rem",fontWeight:700,letterSpacing:".08em",textTransform:"uppercase",marginBottom:".75rem"}}>
+            Mientras tanto, explora tags similares
+          </p>
+          <div style={{display:"flex",flexWrap:"wrap",gap:"8px",justifyContent:"center"}}>
+            {relatedTags.map((t) => (
+              <a key={t} href={`/tag/${t}`} className="tg-rel-tag">#{t}</a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
