@@ -214,6 +214,26 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           </div>
         )}
 
+        {/* EMBED — Top Female en vivo */}
+        <section style={{marginTop:40,marginBottom:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+            <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
+            <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>Latina más popular en vivo ahora</span>
+          </div>
+          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",paddingTop:"56.25%"}}>
+            <iframe
+              src="https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=top_latinas&disable_sound=1&mobileRedirect=auto&embed_video_only=1"
+              style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
+              allow="autoplay; fullscreen; encrypted-media"
+              scrolling="no"
+            />
+          </div>
+          <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
+            Stream en vivo desde Chaturbate ·{" "}
+            <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=top_latinas" target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+          </p>
+        </section>
+
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos latinas en Chaturbate</h2>
           <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7}}>
