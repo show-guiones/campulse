@@ -5,10 +5,14 @@
     "headers": [
         {
             "source": "/:path*",
-            "has": [
+            "missing": [
                 {
                     "type": "host",
-                    "value": "campulse-sooty.vercel.app"
+                    "value": "www.campulsehub.com"
+                },
+                {
+                    "type": "host",
+                    "value": "campulsehub.com"
                 }
             ],
             "headers": [
