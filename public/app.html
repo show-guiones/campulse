@@ -3999,15 +3999,14 @@ async function loadStatbateEarnings(username){
   const body = document.getElementById('stb-body');
   if(!sec || !body) return;
 
-  sec.style.display = '';
-  body.innerHTML = '<div class="stb-loading">Buscando ID del modelo…</div>';
-
+  // Verificar primero si statbate.com está disponible antes de mostrar la sección
   const id = await getStatbateId(username);
   if(!id){
-    body.innerHTML = '<div class="stb-err">Sin datos de Statbate para este modelo.</div>';
+    sec.style.display = 'none';
     return;
   }
 
+  sec.style.display = '';
   body.innerHTML = '<div class="stb-loading">Cargando ingresos…</div>';
   try{
     const res = await fetch('https://statbate.com/public/info.php', {
@@ -4081,7 +4080,7 @@ async function loadStatbateEarnings(username){
     body.innerHTML = kpisHtml + chartHtml + topHtml;
 
   }catch(e){
-    body.innerHTML = '<div class="stb-err">No se pudo cargar Statbate en este momento.</div>';
+    sec.style.display = 'none';
   }
 }
 
