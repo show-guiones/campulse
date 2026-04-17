@@ -140,7 +140,7 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
-  .cmp-embed-wrap{width:100%;padding-bottom:56.25%;height:0;border-radius:10px}
+  .cmp-embed-wrap{width:100%;padding-bottom:calc(56.25% + 26mm);height:0;border-radius:10px}
   .cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;display:block}
 }
 `;
