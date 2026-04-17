@@ -2179,8 +2179,8 @@ header{
   /* mhero-v2 CON embed activo: mismo approach que pagina de modelo —
      padding-bottom:56.25% calcula la altura sobre el ANCHO REAL del contenedor (no del viewport),
      asi el ratio 16:9 es perfecto sin recortes sin importar padding/margenes del modal.
-     +30mm de altura extra solicitada para la zona de video en movil. */
-  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:calc(56.25% + 30mm)!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
+     +26mm de altura extra para la zona de video en movil. */
+  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:calc(56.25% + 26mm)!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
   /* embed-wrap: absolute sobre el padre que ya tiene altura por padding-bottom */
   .modal-hero.mhero-v2 .embed-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}
   /* iframe: 100% del wrap — sin transform ni crop en movil */
@@ -2200,7 +2200,7 @@ header{
   /* Modal hero en moviles muy pequeños — mismo approach padding-bottom que pagina de modelo */
   .modal-hero{height:220px!important}
   .modal-hero.mhero-v2{height:52dvh!important;min-height:220px!important}
-  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:calc(56.25% + 30mm)!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
+  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:calc(56.25% + 26mm)!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
 }
