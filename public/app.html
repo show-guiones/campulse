@@ -2174,13 +2174,16 @@ header{
   .modal{border-radius:24px 24px 0 0;max-height:96dvh;width:100%}
   .modal-v2{border-radius:24px 24px 0 0;height:96dvh;max-height:96dvh;display:flex;flex-direction:column}
   .modal-hero{height:200px}
-  .modal-hero.mhero-v2{height:56dvh;min-height:280px;max-height:65dvh;flex-shrink:0}
-  /* Cuando hay embed activo en móvil: asegura que el contenedor tenga altura suficiente */
-  .modal-hero.mhero-v2.embed-active{height:58dvh;min-height:300px}
-  /* embed-wrap debe llenar el mhero-v2 en móvil */
-  .modal-hero.mhero-v2 .embed-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
-  /* iframe rellena completamente el embed-wrap sin recortes */
-  .modal-hero.mhero-v2 .embed-wrap .embed-frame{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;left:0!important;top:0!important;transform:none!important}
+  /* mhero-v2 SIN embed: thumbnail/info normal */
+  .modal-hero.mhero-v2{position:relative;height:56dvh;min-height:280px;max-height:65dvh;flex-shrink:0;overflow:hidden}
+  /* mhero-v2 CON embed activo: expande para que el video 16:9 quepa sin recorte.
+     56dvh ≈ altura base — el aspect-ratio 16:9 garantiza que el ancho 100vw
+     rellene correctamente sin desbordarse ni cortarse en ningún móvil. */
+  .modal-hero.mhero-v2.embed-active{height:56.25vw;min-height:200px;max-height:65dvh}
+  /* embed-wrap: llena el padre que ahora tiene posición y dimensiones reales */
+  .modal-hero.mhero-v2 .embed-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}
+  /* iframe: 100% del wrap — sin transform ni crop en móvil */
+  .modal-hero.mhero-v2 .embed-wrap .embed-frame{position:absolute!important;inset:0!important;top:0!important;left:0!important;width:100%!important;height:100%!important;transform:none!important}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar-top{padding:.35rem .7rem;top:40px}
@@ -2193,10 +2196,10 @@ header{
   .grid{grid-template-columns:repeat(3,1fr);gap:.22rem}
   .carousel-scroll .crd{width:95px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
-  /* Modal hero en móviles muy pequeños — altura fija para que embed no se corte */
+  /* Modal hero en móviles muy pequeños — usa el mismo approach 16:9 */
   .modal-hero{height:220px!important}
-  .modal-hero.mhero-v2{height:52dvh!important;min-height:240px!important}
-  .modal-hero.mhero-v2.embed-active{height:55dvh!important;min-height:260px!important}
+  .modal-hero.mhero-v2{height:52dvh!important;min-height:220px!important}
+  .modal-hero.mhero-v2.embed-active{height:56.25vw!important;min-height:180px!important;max-height:60dvh!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
 }
@@ -3641,12 +3644,14 @@ function renderList(r){
    - width/height se controlan por CSS, no por atributos del iframe
 ═══════════════════════════════════════════ */
 function buildEmbedSrc(username){
-  /* tour=dTm0 + room= → sala ESPECÍFICA de la modelo seleccionada
-     embed_video_only=1 → solo video, sin UI extra de CB
-     mobileRedirect=never → el iframe se renderiza en móvil sin redirigir a la app nativa
-     t= → cache-bust para forzar nueva sesión al cambiar de sala */
+  /* chaturbate.com/embed/USERNAME/ → carga SIEMPRE la sala exacta de la modelo seleccionada.
+     tour=LQps → tour de sala en vivo directa (no catálogo — respeta el username en la URL).
+     mobileRedirect=never → el iframe se renderiza en móvil sin redirigir a la app nativa.
+     t= → cache-bust para forzar nueva sesión al cambiar de sala.
+     IMPORTANTE: cbxyz.com/in/?tour=dTm0 es un tour de catálogo "Top Female" que IGNORA
+     el parámetro room= y muestra sala aleatoria — por eso se cambió a embed directo. */
   const ts = Date.now();
-  return `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=never&embed_video_only=1&room=${username}&t=${ts}`;
+  return `https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=0f1014&disable_sound=1&mobileRedirect=never&t=${ts}`;
 }
 
 /* ═══════════════════════════════════════════
