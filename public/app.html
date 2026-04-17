@@ -546,6 +546,10 @@ header{
 .bdg-fire{background:rgba(0,0,0,.5);color:var(--hot)}
 .bdg-hd{background:rgba(0,229,255,.2);border:1px solid rgba(0,229,255,.4);color:var(--neon)}
 .bdg-new{background:rgba(0,232,148,.2);border:1px solid rgba(0,232,148,.4);color:var(--grn)}
+.bdg-away{background:rgba(255,193,7,.18);border:1px solid rgba(255,193,7,.4);color:#ffc107}
+.bdg-priv{background:rgba(232,48,90,.18);border:1px solid rgba(232,48,90,.4);color:var(--hot)}
+.bdg-away{background:rgba(255,193,7,.18);border:1px solid rgba(255,193,7,.4);color:#ffc107}
+.bdg-priv{background:rgba(232,48,90,.18);border:1px solid rgba(232,48,90,.4);color:var(--hot)}
 
 /* fav btn */
 .crd-fav{
@@ -1175,6 +1179,8 @@ header{
 }
 .man-kpi:hover{border-color:var(--bdr2)}
 .man-kpi-val{display:block;font-size:1.05rem;font-weight:800;color:var(--txt);line-height:1.1}
+.man-kpi-priv{color:var(--hot)!important}
+.man-kpi-away{color:#ffc107!important}
 .man-kpi-lbl{display:block;font-size:.55rem;color:var(--txt3);margin-top:2px;line-height:1.3}
 
 /* ── SCHEDULE SECTION ── */
@@ -2738,6 +2744,7 @@ body.modal-open .mob-explore-nav{display:none!important}
       <div class="mstrip-info">
         <div class="mstrip-name" id="mstrip-name"></div>
         <div class="mstrip-sub" id="mstrip-sub"></div>
+        <div class="mstrip-subject" id="mstrip-subject" style="display:none;font-size:.6rem;color:var(--txt3);margin-top:.15rem;line-height:1.3;font-style:italic"></div>
       </div>
       <div class="mstrip-live" id="mstrip-live"></div>
     </div>
@@ -2750,6 +2757,7 @@ body.modal-open .mob-explore-nav{display:none!important}
         <div>
           <div class="mstrip-name" id="mstrip-name-d"></div>
           <div class="mstrip-sub" id="mstrip-sub-d"></div>
+          <div class="mstrip-subject" id="mstrip-subject-d" style="display:none;font-size:.6rem;color:var(--txt3);margin-top:.15rem;line-height:1.3;font-style:italic"></div>
         </div>
         <div class="mstrip-live" id="mstrip-live-d"></div>
       </div>
@@ -2787,10 +2795,14 @@ body.modal-open .mob-explore-nav{display:none!important}
         <!-- KPIs ahora mismo -->
         <div class="man-section">
           <div class="man-title">📊 Ahora mismo</div>
-          <div class="man-kpis" id="man-kpis">
+          <div class="man-kpis" id="man-kpis" style="grid-template-columns:repeat(3,1fr)">
             <div class="man-kpi"><span class="man-kpi-val" id="man-viewers">—</span><span class="man-kpi-lbl">viewers ahora</span></div>
             <div class="man-kpi"><span class="man-kpi-val" id="man-followers">—</span><span class="man-kpi-lbl">seguidores</span></div>
             <div class="man-kpi"><span class="man-kpi-val" id="man-rank">—</span><span class="man-kpi-lbl">puesto live</span></div>
+          </div>
+          <div class="man-kpis" id="man-kpis-extra" style="grid-template-columns:repeat(2,1fr);margin-top:.35rem">
+            <div class="man-kpi"><span class="man-kpi-val" id="man-lang" style="font-size:.72rem">—</span><span class="man-kpi-lbl">idioma</span></div>
+            <div class="man-kpi"><span class="man-kpi-val" id="man-show-status" style="font-size:.72rem">—</span><span class="man-kpi-lbl">tipo de show</span></div>
           </div>
         </div>
 
@@ -3396,7 +3408,7 @@ function pinnedCardHtml(x,badge){
   </div>
   <div class="crd-body">
     <div class="crd-name">${x.display_name||x.username}</div>
-    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+    <div class="crd-sub" title="${subjectRaw}">${crdSubContent}</div>
   </div>
 </article>`;
 }
@@ -3468,8 +3480,17 @@ function cardHtml(x,mode='grid'){
   ];
   const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
-  const isNew=(x.num_followers||9999)<500;
+  // is_new: usar campo real de CB; fallback heurístico si no viene
+  const isNew=x.is_new!=null?x.is_new:(x.num_followers||9999)<500;
   const isLive=(x.num_users||0)>0;
+  const showStatus=x.current_show||'public';
+  const isAway=showStatus==='away';
+  const isPriv=showStatus==='private'||showStatus==='group';
+  // room_subject truncado (max 38 chars) para crd-sub
+  const subjectRaw=(x.room_subject||'').trim();
+  const subjectShort=subjectRaw.length>38?subjectRaw.slice(0,36)+'…':subjectRaw;
+  const metaLine=[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ');
+  const crdSubContent=subjectShort||metaLine||'&nbsp;';
   const favBtn = `<button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>`;
   return `<article class="crd${mode==='carousel'?' crd-sm':''}${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLive?1:0}">
   <div class="crd-media">
@@ -3480,6 +3501,8 @@ function cardHtml(x,mode='grid'){
       ${!isLexy&&isHot?'<span class="bdg bdg-fire">🔥</span>':''}
       ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
       ${isNew&&!isLexy?'<span class="bdg bdg-new">NEW</span>':''}
+      ${isAway?'<span class="bdg bdg-away">AWAY</span>':''}
+      ${isPriv?'<span class="bdg bdg-priv">'+(showStatus==='group'?'GRUPO':'PRIVADO')+'</span>':''}
     </div>
     ${isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':''}
     ${mode!=='carousel'?favBtn:''}
@@ -3697,6 +3720,13 @@ function openMod(u){
   const mstripLive=document.getElementById('mstrip-live');
   if(mstripName) mstripName.textContent=x.display_name||x.username;
   if(mstripSub) mstripSub.textContent=x.username!==x.display_name?'@'+x.username:'';
+  // room_subject debajo del nombre (solo si está en vivo y tiene tema)
+  const mstripSubject=document.getElementById('mstrip-subject');
+  if(mstripSubject){
+    const subj=(x.room_subject||'').trim();
+    mstripSubject.textContent=subj.length>60?subj.slice(0,58)+'…':subj;
+    mstripSubject.style.display=subj?'block':'none';
+  }
   if(mstripLive){
     mstripLive.textContent=x.num_users>0?'● EN VIVO':'';
     mstripLive.classList.toggle('visible',x.num_users>0);
@@ -3708,6 +3738,13 @@ function openMod(u){
   if(dName) dName.textContent=x.display_name||x.username;
   if(dSub) dSub.textContent=x.username!==x.display_name?'@'+x.username:'';
   if(dLive){dLive.textContent=x.num_users>0?'● EN VIVO':'';dLive.classList.toggle('visible',x.num_users>0);}
+  // room_subject en desktop header
+  const dSubject=document.getElementById('mstrip-subject-d');
+  if(dSubject){
+    const subj=(x.room_subject||'').trim();
+    dSubject.textContent=subj.length>70?subj.slice(0,68)+'…':subj;
+    dSubject.style.display=subj?'block':'none';
+  }
   document.getElementById('m-link').href=`https://es.chaturbate.com/${x.username}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${x.username}&tour=LQps&track=default`;
   const profileLink=document.getElementById('m-profile-link');
   if(profileLink) profileLink.href=`https://www.campulsehub.com/model/${x.username}`;
@@ -3882,6 +3919,19 @@ function loadModalAnalytics(x){
   document.getElementById('man-viewers').textContent=x.num_users>0?fmt(x.num_users):'—';
   document.getElementById('man-followers').textContent=x.num_followers?fmt(x.num_followers):'—';
   document.getElementById('man-rank').textContent=rank>=0?'#'+(rank+1):'—';
+  // spoken_languages y current_show desde API CB
+  const manLangEl=document.getElementById('man-lang');
+  if(manLangEl){
+    const langs=(x.spoken_languages||'').trim();
+    manLangEl.textContent=langs||'—';
+  }
+  const manShowEl=document.getElementById('man-show-status');
+  if(manShowEl){
+    const sh=x.current_show||'public';
+    const showLabels={'public':'Público','private':'Privado 🔒','group':'Grupal 👥','away':'Away ⏸'};
+    manShowEl.textContent=showLabels[sh]||sh;
+    manShowEl.className='man-kpi-val'+(sh==='private'||sh==='group'?' man-kpi-priv':sh==='away'?' man-kpi-away':'');
+  }
 
   // Follower trend card
   const ftSec=document.getElementById('man-follower-section');
