@@ -3393,6 +3393,11 @@ function pinnedCardHtml(x,badge){
   const lexyBadge=isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':'';
   const pinnedBadge=!isLexy&&badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':!isLexy&&badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
   const isLivePinned=(x.num_users||0)>0;
+  // room_subject para crd-sub
+  const subjectRaw=(x.room_subject||'').trim();
+  const subjectShort=subjectRaw.length>38?subjectRaw.slice(0,36)+'…':subjectRaw;
+  const metaLine=[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ');
+  const crdSubContent=subjectShort||metaLine||'&nbsp;';
   return `<article class="crd${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLivePinned?1:0}">
   <div class="crd-media">
     ${imgTag}
@@ -3511,7 +3516,7 @@ function cardHtml(x,mode='grid'){
   ${mode==='carousel'?favBtn:''}
   <div class="crd-body">
     <div class="crd-name${isLexy?' crd-name-lexy':''}">${x.display_name||x.username}</div>
-    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+    <div class="crd-sub" title="${subjectRaw}">${crdSubContent}</div>
   </div>
 </article>`;
 }
