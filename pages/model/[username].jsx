@@ -396,19 +396,27 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           </div>
         </div>
 
-        {/* EMBED MOBILE */}
-        {isLive && (
-          <div className="mob-embed-section">
+        {/* EMBED MOBILE — Embed Top Chat Room (siempre visible) */}
+        <div className="mob-embed-section">
+          {isLive && (
             <div className="mob-embed-lbl"><span className="cmp-live-dot"/>En vivo · {currentViewers?.toLocaleString("es")} viewers</div>
-            <div className="cmp-embed-wrap">
-              <iframe src={`https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=0f1014&disable_sound=0&mobileRedirect=never`}
-                className="cmp-embed-frame" allow="autoplay; fullscreen; encrypted-media"
-                allowFullScreen frameBorder="0" scrolling="no" referrerPolicy="no-referrer-when-downgrade"
-                title={`${name} en vivo en Chaturbate`}/>
-            </div>
-            <p className="mob-embed-note">Al ver el stream en CampulseHub, apoyas a {name} directamente.</p>
+          )}
+          <div className="cmp-embed-wrap">
+            <iframe
+              src={`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1`}
+              className="cmp-embed-frame"
+              height="480px"
+              width="850px"
+              frameBorder="0"
+              scrolling="no"
+              title={`${name} en Chaturbate`}
+            />
           </div>
-        )}
+          <p className="mob-embed-note">
+            Stream en vivo desde Chaturbate ·{" "}
+            <a href={`https://chaturbate.com/in/?tour=dTm0&campaign=rI8z3&track=fullscreen`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+          </p>
+        </div>
 
         {/* SPARKLINE */}
         {sparkData.length>=2 && (
@@ -586,21 +594,31 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
             ? `🔴 Ver en vivo — ${currentViewers?.toLocaleString("es")} viewers ahora`
             : "Ver sala en Chaturbate →"}
         </a>
-        {isLive && (
-          <div>
+        {/* EMBED — Embed Top Chat Room (siempre visible) */}
+        <div style={{marginTop:8}}>
+          {isLive && (
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:".75rem"}}>
               <span className="cmp-live-dot"/>
               <span style={{fontSize:".8125rem",color:"var(--txt2)",fontWeight:600}}>En vivo ahora · {currentViewers?.toLocaleString("es")} viewers</span>
             </div>
-            <div className="cmp-embed-wrap">
-              <iframe src={`https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=0f1014&disable_sound=0&mobileRedirect=never`}
-                className="cmp-embed-frame" allow="autoplay; fullscreen; encrypted-media"
-                allowFullScreen frameBorder="0" scrolling="no" referrerPolicy="no-referrer-when-downgrade"
-                title={`${name} en vivo en Chaturbate`}/>
-            </div>
-            <p className="cmp-embed-note">Al ver el stream en CampulseHub, apoyas a {name} directamente.</p>
+          )}
+          <div className="cmp-embed-wrap">
+            <iframe
+              src={`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1`}
+              className="cmp-embed-frame"
+              height="480px"
+              width="850px"
+              frameBorder="0"
+              className="code"
+              scrolling="no"
+              title={`${name} en Chaturbate`}
+            />
           </div>
-        )}
+          <p className="cmp-embed-note">
+            Stream en vivo desde Chaturbate ·{" "}
+            <a href={`https://chaturbate.com/in/?tour=dTm0&campaign=rI8z3&track=fullscreen`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+          </p>
+        </div>
         {bestHours.length>0 && (<>
           <div className="cmp-sec">Mejores horarios (EST)</div>
           {bestHours.slice(0,5).map((h,i)=>(
