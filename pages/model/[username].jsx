@@ -239,9 +239,10 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
             </div>
             <div className="cmp-embed-wrap">
               <iframe
-                src={`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=never&embed_video_only=1&room=${username}`}
+                src={`https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=0f1014&disable_sound=0&mobileRedirect=never`}
                 className="cmp-embed-frame"
-                allow="autoplay; fullscreen; encrypted-media; microphone; camera"
+                width="100%" height="100%"
+                allow="autoplay; fullscreen; encrypted-media"
                 allowFullScreen frameBorder="0" scrolling="no"
                 referrerPolicy="no-referrer-when-downgrade"
                 title={`${name} en vivo en Chaturbate`}
