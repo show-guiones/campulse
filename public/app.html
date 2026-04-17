@@ -2699,6 +2699,7 @@ body.modal-open .mob-explore-nav{display:none!important}
           <span>Conectando sala…</span>
         </div>
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
+          width="100%" height="100%"
           allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
           allowFullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
@@ -3627,6 +3628,17 @@ function renderList(r){
 }
 
 /* ═══════════════════════════════════════════
+   EMBED URL HELPER
+   - tour 6o0b = Female (sala específica con room=)
+   - mobileRedirect=never → el iframe se renderiza en móvil sin redirigir a la app
+   - width/height se controlan por CSS, no por atributos del iframe
+═══════════════════════════════════════════ */
+function buildEmbedSrc(username){
+  const ts = Date.now();
+  return `https://cbxyz.com/in/?tour=6o0b&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=never&embed_video_only=1&room=${username}&t=${ts}`;
+}
+
+/* ═══════════════════════════════════════════
    MODAL
 ═══════════════════════════════════════════ */
 let prevCd=null,prevSec=30;
@@ -3721,7 +3733,7 @@ function openMod(u){
       // Cargar con audio activo — controles nativos de CB disponibles para volumen
       frame.onload = null;
       frame.removeEventListener('load', onEmbedLoad);
-      frame.src = `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
+      frame.src = buildEmbedSrc(u);
       frame.addEventListener('load', onEmbedLoad);
     }
   } else {
@@ -3786,7 +3798,7 @@ function activateEmbed(u){
   frame.onload=null;
   frame.removeEventListener('load', onEmbedLoad);
   // Cargar con audio activo — usuario controla volumen con controles nativos de CB
-  frame.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
+  frame.src=buildEmbedSrc(u);
   frame.addEventListener('load', onEmbedLoad);
 }
 
@@ -4494,11 +4506,11 @@ function openDualView(uA,uB){
   // Cargar iframes con audio activo — controles nativos de CB disponibles
   setTimeout(()=>{
     if(frameA){
-      frameA.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uA}&t=${Date.now()}`;
+      frameA.src=buildEmbedSrc(uA);
       frameA.onload=()=>{ frameA.onload=null; setTimeout(()=>{ if(wrapA) wrapA.classList.add('stream-ready'); },2000); };
     }
     if(frameB){
-      frameB.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uB}&t=${Date.now()}`;
+      frameB.src=buildEmbedSrc(uB);
       frameB.onload=()=>{ frameB.onload=null; setTimeout(()=>{ if(wrapB) wrapB.classList.add('stream-ready'); },2000); };
     }
   },120);
@@ -4552,7 +4564,7 @@ function swapDualConfirm(slot, newUsername){
     if(wrapEl) wrapEl.classList.remove('stream-ready');
     frame.onload = null; // cancelar cualquier handler pendiente del slot anterior
     // Nueva sala siempre silenciada — el usuario debe presionar el botón para audio
-    frame.src = `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${newUsername}&t=${Date.now()}`;
+    frame.src = buildEmbedSrc(newUsername);
     frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrapEl) wrapEl.classList.add('stream-ready'); }, 2500); };
   }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
