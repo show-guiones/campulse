@@ -14,6 +14,23 @@ const GENDER_INFO = {
   trans:{  name:"Trans",nameEs:"Trans",emoji:"⚧️",keywords:"trans chaturbate, modelos trans chaturbate, webcam trans",accent:"var(--trans)" },
 };
 
+// Embed Chaturbate: Full Video Mode por género
+// tour=4auy → Full Video Mode (cámara activa más popular del género)
+const GENDER_EMBED_TOUR = {
+  female: "4auy",   // Full Video Mode: Female
+  male:   "4auy",   // Full Video Mode: Male
+  couple: "4auy",   // Full Video Mode: Couple
+  trans:  "4auy",   // Full Video Mode: Trans
+};
+
+// Parámetro "type" que Chaturbate usa para filtrar por género en Full Video Mode
+const GENDER_CB_TYPE = {
+  female: "female",
+  male:   "male",
+  couple: "couple",
+  trans:  "trans",
+};
+
 const COUNTRY_NAMES = {
   CO:"Colombia",MX:"México",AR:"Argentina",CL:"Chile",PE:"Perú",VE:"Venezuela",EC:"Ecuador",
   US:"Estados Unidos",ES:"España",BR:"Brasil",RO:"Rumania",RU:"Rusia",DE:"Alemania",FR:"Francia",
@@ -100,7 +117,7 @@ export default function GenderTypePage({ data }) {
         </nav>
 
         <nav className="cmp-bc">
-          <a href="/">Campulse</a>
+          <a href="/app.html">Campulse</a>
           <span className="cmp-bc-sep">›</span>
           <a href="/gender">Géneros</a>
           <span className="cmp-bc-sep">›</span>
@@ -113,7 +130,7 @@ export default function GenderTypePage({ data }) {
         </div>
 
         {/* Affiliate CTA */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=lexy_fox2`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
+        <a href={`https://chaturbate.com/in/?tour=4auy&campaign=rI8z3&track=default&type=${GENDER_CB_TYPE[gender]||gender}`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
           🔴 Ver {name} en vivo ahora →
         </a>
 
@@ -145,6 +162,28 @@ export default function GenderTypePage({ data }) {
             );
           })}
         </div>
+
+        {/* EMBED — Top de género en vivo */}
+        <section style={{marginTop:40,marginBottom:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+            <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
+            <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>{name} más popular en vivo ahora</span>
+          </div>
+          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",paddingTop:"56.25%"}}>
+            <iframe
+              src={`https://cbxyz.com/in/?tour=${GENDER_EMBED_TOUR[gender]||"4auy"}&campaign=rI8z3&track=embed&signup_notice=1&disable_sound=1&mobileRedirect=never&type=${GENDER_CB_TYPE[gender]||gender}`}
+              style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
+              height="480px"
+              width="850px"
+              frameBorder="0"
+              scrolling="no"
+            />
+          </div>
+          <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
+            Stream en vivo desde Chaturbate ·{" "}
+            <a href={`https://chaturbate.com/in/?tour=4auy&campaign=rI8z3&track=embed&type=${GENDER_CB_TYPE[gender]||gender}`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+          </p>
+        </section>
 
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>{name} en Chaturbate</h2>
