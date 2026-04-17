@@ -1247,6 +1247,46 @@ header{
 .man-ft-badge.up{background:rgba(34,199,122,.15);color:var(--grn)}
 .man-ft-badge.neutral{background:rgba(255,255,255,.07);color:var(--txt3)}
 
+/* ── STATBATE EARNINGS ── */
+.stb-section{margin-bottom:1rem}
+.stb-loading{font-size:.65rem;color:var(--txt3);padding:.4rem 0}
+.stb-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:.45rem;margin-bottom:.55rem}
+.stb-kpi{
+  background:var(--surf);border-radius:12px;
+  padding:.55rem .45rem;text-align:center;
+  border:1px solid var(--bdr);transition:border-color .15s
+}
+.stb-kpi:hover{border-color:var(--bdr2)}
+.stb-kpi-val{display:block;font-size:1.05rem;font-weight:800;color:var(--grn);line-height:1.1}
+.stb-kpi-lbl{display:block;font-size:.55rem;color:var(--txt3);margin-top:2px;line-height:1.3}
+.stb-chart{display:flex;align-items:flex-end;gap:2px;height:44px;margin-top:.4rem}
+.stb-bar{
+  flex:1;border-radius:2px 2px 0 0;
+  background:rgba(34,199,122,.25);
+  transition:background .15s;cursor:default;
+  min-height:2px;position:relative
+}
+.stb-bar:hover{background:rgba(34,199,122,.55)}
+.stb-bar-tip{
+  position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);
+  background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;
+  font-size:.55rem;color:var(--txt);padding:2px 5px;white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .1s;z-index:5
+}
+.stb-bar:hover .stb-bar-tip{opacity:1}
+.stb-top{margin-top:.5rem}
+.stb-top-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.28rem .4rem;border-radius:8px;font-size:.65rem;
+  border-bottom:1px solid var(--bdr)
+}
+.stb-top-row:last-child{border-bottom:none}
+.stb-top-row:nth-child(odd){background:var(--surf)}
+.stb-top-name{color:var(--txt);font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stb-top-total{color:var(--grn);font-weight:700;margin-left:.5rem}
+.stb-top-avg{color:var(--txt3);font-size:.58rem;margin-left:.4rem}
+.stb-err{font-size:.62rem;color:var(--txt3);padding:.3rem 0}
+
 /* Days grid */
 .man-days{display:flex;flex-wrap:wrap;gap:3px}
 .man-day{
@@ -2806,6 +2846,12 @@ body.modal-open .mob-explore-nav{display:none!important}
           </div>
         </div>
 
+        <!-- Ingresos Statbate -->
+        <div class="man-section stb-section" id="stb-section" style="display:none">
+          <div class="man-title">💰 Ingresos estimados (Statbate)</div>
+          <div id="stb-body"><div class="stb-loading">Cargando datos de ingresos…</div></div>
+        </div>
+
         <!-- Seguidores / tendencia -->
         <div class="man-section" id="man-follower-section" style="display:none">
           <div class="man-title">👥 Seguidores</div>
@@ -3393,11 +3439,6 @@ function pinnedCardHtml(x,badge){
   const lexyBadge=isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':'';
   const pinnedBadge=!isLexy&&badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':!isLexy&&badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
   const isLivePinned=(x.num_users||0)>0;
-  // room_subject para crd-sub
-  const subjectRaw=(x.room_subject||'').trim();
-  const subjectShort=subjectRaw.length>38?subjectRaw.slice(0,36)+'…':subjectRaw;
-  const metaLine=[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ');
-  const crdSubContent=subjectShort||metaLine||'&nbsp;';
   return `<article class="crd${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLivePinned?1:0}">
   <div class="crd-media">
     ${imgTag}
@@ -3516,7 +3557,7 @@ function cardHtml(x,mode='grid'){
   ${mode==='carousel'?favBtn:''}
   <div class="crd-body">
     <div class="crd-name${isLexy?' crd-name-lexy':''}">${x.display_name||x.username}</div>
-    <div class="crd-sub" title="${subjectRaw}">${crdSubContent}</div>
+    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
   </div>
 </article>`;
 }
@@ -3911,6 +3952,135 @@ function toggleModalReport(){
   loadModalAnalytics(active);
 }
 
+/* ══════════════════════════════════════════════════
+   STATBATE INTEGRATION
+   ══════════════════════════════════════════════════ */
+
+// Cache: username → statbate numeric id (persisted en localStorage)
+const STB_CACHE_KEY = 'stb_id_cache_v1';
+function _stbReadCache(){
+  try{ return JSON.parse(localStorage.getItem(STB_CACHE_KEY)||'{}'); }catch(e){return{};}
+}
+function _stbWriteCache(obj){
+  try{ localStorage.setItem(STB_CACHE_KEY, JSON.stringify(obj)); }catch(e){}
+}
+
+// Resolve username → statbate room ID via /search/1/{username}
+// Returns numeric string or null
+async function getStatbateId(username){
+  const cache = _stbReadCache();
+  if(cache[username]) return cache[username];
+  try{
+    // Use a CORS proxy or direct fetch — statbate.com may or may not allow cross-origin GET
+    // The search page returns HTML; we look for data-modal-id on the income link
+    const res = await fetch(`https://statbate.com/search/1/${encodeURIComponent(username)}`, {
+      signal: AbortSignal.timeout(6000)
+    });
+    if(!res.ok) return null;
+    const html = await res.text();
+    // The page renders: data-modal-id=NNNN  or  /search/1/username link with id in modal trigger
+    const m = html.match(/data-modal-id[=\s'"]+(\d+)/i);
+    if(!m) return null;
+    const id = m[1];
+    const obj = _stbReadCache();
+    obj[username] = id;
+    _stbWriteCache(obj);
+    return id;
+  }catch(e){ return null; }
+}
+
+// Render the Statbate earnings panel inside #stb-body
+async function loadStatbateEarnings(username){
+  const sec  = document.getElementById('stb-section');
+  const body = document.getElementById('stb-body');
+  if(!sec || !body) return;
+
+  sec.style.display = '';
+  body.innerHTML = '<div class="stb-loading">Buscando ID del modelo…</div>';
+
+  const id = await getStatbateId(username);
+  if(!id){
+    body.innerHTML = '<div class="stb-err">Sin datos de Statbate para este modelo.</div>';
+    return;
+  }
+
+  body.innerHTML = '<div class="stb-loading">Cargando ingresos…</div>';
+  try{
+    const res = await fetch('https://statbate.com/public/info.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `id=${encodeURIComponent(id)}&type=income`,
+      signal: AbortSignal.timeout(8000)
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+
+    // ── KPIs ──
+    const totalUSD = data.amount ? `$${Number(data.amount.replace(/,/g,'')).toLocaleString()}` : '—';
+    let kpisHtml = `
+      <div class="stb-kpis">
+        <div class="stb-kpi"><span class="stb-kpi-val">${totalUSD}</span><span class="stb-kpi-lbl">ingresos históricos est.</span></div>
+        <div class="stb-kpi"><span class="stb-kpi-val" id="stb-month-val">—</span><span class="stb-kpi-lbl">último mes est.</span></div>
+      </div>`;
+
+    // ── Mini bar chart (últimos 30 días) ──
+    let chartHtml = '';
+    if(data.chart){
+      try{
+        const pts = typeof data.chart === 'string' ? JSON.parse(data.chart) : data.chart;
+        if(Array.isArray(pts) && pts.length > 0){
+          const vals = pts.map(p=>parseFloat(p.value)||0);
+          const maxV = Math.max(...vals, 0.01);
+          // Sum for last-month KPI
+          const monthTotal = vals.reduce((s,v)=>s+v,0);
+          kpisHtml = kpisHtml.replace('id="stb-month-val">—', `id="stb-month-val">$${Math.round(monthTotal).toLocaleString()}`);
+          const bars = vals.slice().reverse().map((v, i)=>{
+            const pct = Math.round((v/maxV)*100);
+            const date = pts[pts.length-1-i]?.date || '';
+            return `<div class="stb-bar" style="height:${Math.max(pct,3)}%" title="">
+              <div class="stb-bar-tip">${date}<br>$${v.toFixed(0)}</div>
+            </div>`;
+          }).join('');
+          chartHtml = `<div class="stb-chart">${bars}</div>
+            <div style="font-size:.55rem;color:var(--txt3);margin-top:.2rem;text-align:right">últimos 30 días · USD estimado</div>`;
+        }
+      }catch(e){}
+    }
+
+    // ── Top donadores (parsear HTML table de data.table) ──
+    let topHtml = '';
+    if(data.table && data.table.trim()){
+      // data.table es HTML de <tr> con <td>nombre</td><td>$total</td><td>$avg</td>
+      const tmp = document.createElement('tbody');
+      tmp.innerHTML = data.table;
+      const rows = [...tmp.querySelectorAll('tr')].slice(0,5);
+      if(rows.length){
+        const rowsHtml = rows.map(tr=>{
+          const tds = tr.querySelectorAll('td');
+          if(tds.length < 2) return '';
+          const name = tds[0].textContent.trim() || '—';
+          const total = tds[1].textContent.trim() || '—';
+          const avg   = tds[2] ? tds[2].textContent.trim() : '';
+          return `<div class="stb-top-row">
+            <span class="stb-top-name">${name}</span>
+            <span class="stb-top-total">${total}</span>
+            ${avg?`<span class="stb-top-avg">avg ${avg}</span>`:''}
+          </div>`;
+        }).filter(Boolean).join('');
+        if(rowsHtml){
+          topHtml = `<div style="font-size:.6rem;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin:.55rem 0 .25rem">Top donadores (30 días)</div>
+            <div class="stb-top">${rowsHtml}</div>`;
+        }
+      }
+    }
+
+    body.innerHTML = kpisHtml + chartHtml + topHtml;
+
+  }catch(e){
+    body.innerHTML = '<div class="stb-err">No se pudo cargar Statbate en este momento.</div>';
+  }
+}
+
 function loadModalAnalytics(x){
   const u=x.username;
   // Fallback: enrich x with live data from rooms array if stats are missing
@@ -3957,6 +4127,9 @@ function loadModalAnalytics(x){
   // Tags
   const tagsEl=document.getElementById('man-tags');
   if(tagsEl) tagsEl.innerHTML=(x.tags||[]).slice(0,8).map(t=>`<span class="man-tag">#${t}</span>`).join('')||'<span class="man-tag" style="color:var(--txt3)">Sin tags</span>';
+
+  // Statbate earnings (async, non-blocking)
+  loadStatbateEarnings(u);
 
   // Weekly KPIs placeholder
   const wkEl=document.getElementById('man-weekly-kpis');
@@ -4657,6 +4830,11 @@ function closeMod(e){
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); wrap.classList.remove('stream-ready'); }
   const analyticsPanel=document.getElementById('modal-analytics');
   if(analyticsPanel) analyticsPanel.style.display='none';
+  // Reset Statbate panel
+  const stbSec=document.getElementById('stb-section');
+  const stbBody=document.getElementById('stb-body');
+  if(stbSec) stbSec.style.display='none';
+  if(stbBody) stbBody.innerHTML='<div class="stb-loading">Cargando datos de ingresos…</div>';
   const heroEl=document.getElementById('modal-hero');
   if(heroEl) heroEl.classList.remove('embed-active');
 }
