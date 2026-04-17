@@ -2166,6 +2166,47 @@ header{
   color:var(--hot);font-weight:700;
 }
 body.modal-open{overflow:hidden!important}
+/* ── REP-VIEW SALA EN VIVO embed ── */
+.rp-live-badge{
+  display:inline-block;margin-left:.4rem;
+  font-size:.62rem;font-weight:700;letter-spacing:.04em;
+  color:var(--hot);animation:pulse 1.2s infinite;vertical-align:middle
+}
+.rp-live-acts{display:flex;gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap}
+.rp-live-acts .btn-sec{flex:1;min-width:80px;font-size:.72rem;padding:.4rem .5rem}
+.rp-embed-wrap{
+  position:relative;width:100%;
+  height:220px;border-radius:12px;overflow:hidden;
+  background:#000;margin-bottom:.6rem
+}
+@media(min-width:480px){.rp-embed-wrap{height:280px}}
+.rp-embed-loading{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:#000;color:rgba(255,255,255,.5);font-size:.75rem;gap:.4rem;
+  z-index:2;transition:opacity .4s
+}
+.rp-embed-wrap.video-ready .rp-embed-loading{opacity:0;pointer-events:none}
+.rp-embed-frame{
+  position:absolute;
+  top:-44px;left:0;
+  width:100%;
+  height:calc(100% + 44px + 80px);
+  border:none;display:block
+}
+.rp-embed-overlay{
+  position:absolute;bottom:0;left:0;
+  width:80px;height:52px;z-index:3;cursor:pointer
+}
+.rp-live-stats{display:flex;gap:.5rem;flex-wrap:wrap}
+.rp-live-stat{
+  background:var(--surf2);border-radius:8px;
+  padding:.3rem .55rem;font-size:.72rem;
+  display:flex;flex-direction:column;gap:.1rem;flex:1;min-width:70px
+}
+.rp-live-stat-val{font-weight:700;font-size:.95rem;color:var(--txt)}
+.rp-live-stat-lbl{color:var(--txt3);font-size:.62rem}
+
 </style>
 <!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js" defer></script>
@@ -2545,6 +2586,47 @@ body.modal-open{overflow:hidden!important}
       </div>
       <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.6rem;line-height:1.5">Estos son los tags que tienen las personas que te buscan. ¡Asegúrate de que reflejen tu contenido!</p>
       <div class="rep-tags" id="rp-tags"></div>
+    </div>
+
+    <!-- SALA EN VIVO — embed de la modelo en rep-view -->
+    <div class="rep-section" id="rp-live-section" style="display:none">
+      <div class="rep-section-head">
+        <div class="rep-section-title">
+          <span class="ico">📡</span> Sala en vivo
+          <span class="rp-live-badge" id="rp-live-badge">● EN VIVO</span>
+        </div>
+      </div>
+      <!-- CTA tipo modal -->
+      <a id="rp-go-live-btn" href="#" target="_blank" rel="noopener" class="btn-go" style="margin-bottom:.6rem;display:flex">
+        <span class="btn-go-ico">▶</span>
+        <span id="rp-go-live-txt">Entrar en vivo ahora</span>
+        <span class="btn-go-arrow">→</span>
+      </a>
+      <!-- Acciones rápidas tipo modal -->
+      <div class="rp-live-acts">
+        <button class="btn-sec" id="rp-fav-live-btn" onclick="favModFromReport()">
+          <span id="rp-fav-live-icon">♥</span><span id="rp-fav-live-txt">Favorita</span>
+        </button>
+        <button class="btn-sec btn-sec-dual" onclick="openDualFromReport()" title="Ver 2 salas en simultáneo">
+          ⊞ <span>2 salas</span>
+        </button>
+        <a id="rp-page-btn" href="#" target="_blank" rel="noopener" class="btn-sec" style="text-decoration:none">
+          🔗 <span>Ver página</span>
+        </a>
+      </div>
+      <!-- Embed del stream -->
+      <div class="rp-embed-wrap" id="rp-embed-wrap">
+        <div class="rp-embed-loading" id="rp-embed-loading">
+          <div class="embed-loading-spinner"></div>
+          <span>Conectando sala…</span>
+        </div>
+        <iframe id="rp-embed-frame" class="rp-embed-frame" src="about:blank"
+          allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
+          allowfullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="rp-embed-overlay" onclick="window.open(document.getElementById('rp-go-live-btn').href,'_blank')"></div>
+      </div>
+      <!-- Stats rápidos -->
+      <div class="rp-live-stats" id="rp-live-stats"></div>
     </div>
 
     <div id="besttimes-container" style="display:none"></div>
@@ -4573,7 +4655,110 @@ function resetModelSearch(){
   document.getElementById('model-report').style.display='none';
   document.getElementById('model-username-input').value='';
   curModel=null;
+  // Clear rep embed
+  const rpf=document.getElementById('rp-embed-frame');
+  if(rpf) rpf.src='about:blank';
+  const rpsec=document.getElementById('rp-live-section');
+  if(rpsec) rpsec.style.display='none';
+  const rpw=document.getElementById('rp-embed-wrap');
+  if(rpw) rpw.classList.remove('video-ready');
 }
+/* ═══ REP-VIEW EMBED EN VIVO ═══ */
+function loadRepEmbed(u, room){
+  const sec   = document.getElementById('rp-live-section');
+  const frame = document.getElementById('rp-embed-frame');
+  const wrap  = document.getElementById('rp-embed-wrap');
+  const badge = document.getElementById('rp-live-badge');
+  const ctaBtn= document.getElementById('rp-go-live-btn');
+  const ctaTxt= document.getElementById('rp-go-live-txt');
+  const pageBtn=document.getElementById('rp-page-btn');
+  const statsEl=document.getElementById('rp-live-stats');
+  const favBtn= document.getElementById('rp-fav-live-btn');
+  const favIco= document.getElementById('rp-fav-live-icon');
+  const favTxt= document.getElementById('rp-fav-live-txt');
+
+  if(!sec||!frame) return;
+
+  const isLive = room && room.num_users > 0;
+
+  // Mostrar sección siempre (en vivo u offline)
+  sec.style.display = 'block';
+
+  // CTA link
+  const roomUrl = `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
+  if(ctaBtn) ctaBtn.href = roomUrl;
+  if(pageBtn) pageBtn.href = `https://campulsehub.com/model/${u}`;
+
+  // Badge + CTA text
+  if(badge) badge.style.display = isLive ? 'inline-block' : 'none';
+  if(ctaTxt) ctaTxt.textContent = isLive ? 'Entrar en vivo ahora' : 'Ver perfil en Chaturbate';
+
+  // Fav button state
+  if(favBtn && favIco && favTxt){
+    const isFav = favs.includes(u);
+    favBtn.classList.toggle('active', isFav);
+    favIco.textContent = isFav ? '♥' : '♡';
+    favTxt.textContent = isFav ? 'Guardada' : 'Favorita';
+  }
+
+  // Stats chips
+  if(statsEl && room){
+    const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>b.num_users-a.num_users);
+    const rank = sorted.findIndex(r=>r.username===u);
+    if(isLive){
+      statsEl.innerHTML=`
+        <div class="rp-live-stat"><span class="rp-live-stat-val">${fmt(room.num_users)}</span><span class="rp-live-stat-lbl">viewers ahora</span></div>
+        <div class="rp-live-stat"><span class="rp-live-stat-val">${room.num_followers?fmt(room.num_followers):'—'}</span><span class="rp-live-stat-lbl">seguidores</span></div>
+        ${rank>=0?`<div class="rp-live-stat"><span class="rp-live-stat-val">#${rank+1}</span><span class="rp-live-stat-lbl">puesto live</span></div>`:''}
+      `;
+    } else {
+      statsEl.innerHTML='';
+    }
+  }
+
+  // Reset wrap state
+  if(wrap) wrap.classList.remove('video-ready');
+  frame.src='about:blank';
+
+  if(isLive){
+    // Cargar embed de la sala de la modelo
+    setTimeout(()=>{
+      frame.onload = function(){
+        setTimeout(()=>{ if(wrap) wrap.classList.add('video-ready'); }, 2000);
+        frame.onload=null;
+      };
+      frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
+    }, 300);
+  }
+}
+
+function favModFromReport(){
+  if(!curModel) return;
+  const u = curModel.username || curModel;
+  const idx = favs.indexOf(u);
+  if(idx>=0) favs.splice(idx,1); else favs.push(u);
+  try{ localStorage.setItem('favs', JSON.stringify(favs)); }catch(e){}
+  // Update rep-view fav button
+  const isFav = favs.includes(u);
+  const btn=document.getElementById('rp-fav-live-btn');
+  const ico=document.getElementById('rp-fav-live-icon');
+  const txt=document.getElementById('rp-fav-live-txt');
+  if(btn) btn.classList.toggle('active', isFav);
+  if(ico) ico.textContent = isFav ? '♥' : '♡';
+  if(txt) txt.textContent = isFav ? 'Guardada' : 'Favorita';
+  // Also sync main fav button if modal is open
+  if(typeof updateFavBtn==='function') updateFavBtn(u);
+  renderAll();
+}
+
+function openDualFromReport(){
+  if(!curModel) return;
+  const u = typeof curModel==='string' ? curModel : (curModel.username||curModel);
+  closeMod && closeMod();
+  openMod(u);
+  setTimeout(()=>{ showDualPicker && showDualPicker(); }, 350);
+}
+
 
 async function searchModel(){
   const u=document.getElementById('model-username-input').value.trim().toLowerCase();
@@ -4621,6 +4806,9 @@ async function loadModelReport(room,username){
   if(room&&room.num_users>0){dot.style.background='var(--hot)';stxt.style.color='var(--hot)';stxt.textContent='En vivo ahora';}
   else{dot.style.background='var(--txt3)';stxt.style.color='var(--txt3)';stxt.textContent='Offline en este momento';}
   document.getElementById('rp-link').href=`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
+
+  // -- REP-VIEW EMBED EN VIVO --
+  loadRepEmbed(u, room);
 
   // Rank
   const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
