@@ -2176,13 +2176,13 @@ header{
   .modal-hero{height:200px}
   /* mhero-v2 SIN embed: thumbnail/info normal */
   .modal-hero.mhero-v2{position:relative;height:56dvh;min-height:280px;max-height:65dvh;flex-shrink:0;overflow:hidden}
-  /* mhero-v2 CON embed activo: expande para que el video 16:9 quepa sin recorte.
-     56dvh ≈ altura base — el aspect-ratio 16:9 garantiza que el ancho 100vw
-     rellene correctamente sin desbordarse ni cortarse en ningún móvil. */
-  .modal-hero.mhero-v2.embed-active{height:56.25vw;min-height:200px;max-height:65dvh}
-  /* embed-wrap: llena el padre que ahora tiene posición y dimensiones reales */
+  /* mhero-v2 CON embed activo: mismo approach que pagina de modelo —
+     padding-bottom:56.25% calcula la altura sobre el ANCHO REAL del contenedor (no del viewport),
+     asi el ratio 16:9 es perfecto sin recortes sin importar padding/margenes del modal. */
+  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:56.25%!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
+  /* embed-wrap: absolute sobre el padre que ya tiene altura por padding-bottom */
   .modal-hero.mhero-v2 .embed-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}
-  /* iframe: 100% del wrap — sin transform ni crop en móvil */
+  /* iframe: 100% del wrap — sin transform ni crop en movil */
   .modal-hero.mhero-v2 .embed-wrap .embed-frame{position:absolute!important;inset:0!important;top:0!important;left:0!important;width:100%!important;height:100%!important;transform:none!important}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
@@ -2196,10 +2196,10 @@ header{
   .grid{grid-template-columns:repeat(3,1fr);gap:.22rem}
   .carousel-scroll .crd{width:95px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
-  /* Modal hero en móviles muy pequeños — usa el mismo approach 16:9 */
+  /* Modal hero en moviles muy pequeños — mismo approach padding-bottom que pagina de modelo */
   .modal-hero{height:220px!important}
   .modal-hero.mhero-v2{height:52dvh!important;min-height:220px!important}
-  .modal-hero.mhero-v2.embed-active{height:56.25vw!important;min-height:180px!important;max-height:60dvh!important}
+  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:56.25%!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
 }
