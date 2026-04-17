@@ -3,16 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>CampulseHub — Explora Modelos en Vivo</title>
-<meta name="description" content="Descubre modelos en vivo en CampulseHub. Transmisiones en directo, perfiles verificados y estadísticas en tiempo real.">
-<meta name="keywords" content="modelos en vivo, webcam, chaturbate, colombia, españa, latina, lexy fox">
-<meta property="og:title" content="CampulseHub — Explora Modelos en Vivo">
-<meta property="og:description" content="Las mejores modelos en vivo ahora mismo. Actualización en tiempo real.">
+<link rel="canonical" href="https://www.campulsehub.com/app">
+<title>CampulseHub — Estadísticas de Modelos Chaturbate en Tiempo Real</title>
+<meta name="description" content="CampulseHub rastrea en tiempo real las estadísticas de modelos de Chaturbate: viewers en vivo, seguidores, historial y ranking. Descubre quién está online ahora mismo.">
+<meta name="keywords" content="estadísticas chaturbate, modelos chaturbate en vivo, viewers chaturbate, ranking chaturbate, modelos latinas, webcam colombia, modelos chaturbate españa">
+<meta property="og:title" content="CampulseHub — Estadísticas de Modelos Chaturbate en Tiempo Real">
+<meta property="og:description" content="Estadísticas en tiempo real de modelos Chaturbate: viewers, seguidores, ranking y horarios. Más de 3000 modelos monitoreadas.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://campulsehub.com/app">
+<meta property="og:url" content="https://www.campulsehub.com/app">
+<meta property="og:site_name" content="CampulseHub">
+<meta property="og:image" content="https://www.campulsehub.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CampulseHub — Estadísticas Chaturbate en Tiempo Real">
+<meta name="twitter:description" content="Viewers en vivo, ranking y estadísticas de modelos Chaturbate. Actualización cada 2 horas.">
 <meta name="robots" content="index,follow">
 <link rel="alternate" type="application/rss+xml" title="CampulseHub Live Feed" href="/api/rss">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfilePage","name":"lexy_fox2 en CampulseHub","url":"https://campulsehub.com/model/lexy_fox2","mainEntity":{"@type":"Person","name":"lexy_fox2","jobTitle":"Modelo en vivo","worksFor":{"@type":"Organization","name":"CampulseHub"}}}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "CampulseHub",
+  "url": "https://www.campulsehub.com",
+  "description": "Estadísticas en tiempo real de modelos de Chaturbate: viewers, seguidores, ranking y horarios de transmisión.",
+  "inLanguage": "es",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://www.campulsehub.com/model/{username}",
+    "query-input": "required name=username"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "CampulseHub",
+  "url": "https://www.campulsehub.com",
+  "description": "Plataforma de estadísticas en tiempo real para modelos de Chaturbate en España, Colombia y Latinoamérica.",
+  "areaServed": ["ES","CO","MX","AR","CL"]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -756,20 +786,6 @@ header{
 }
 .modal-hero:hover .live-preview-img{transform:scale(1.03)}
 
-/* Gradiente sutil solo en la parte baja para el texto */
-.modal-hero-grad{
-  position:absolute;inset:0;
-  background:linear-gradient(
-    to top,
-    rgba(14,15,18,1) 0%,
-    rgba(14,15,18,.6) 30%,
-    rgba(14,15,18,.1) 55%,
-    transparent 75%
-  );
-  transition:opacity .25s;pointer-events:none
-}
-.mhero-v2.embed-active .modal-hero-grad{opacity:0}
-
 /* Play overlay — pequeño, elegante, no tapa la imagen */
 .live-preview-wrap{position:relative;height:100%}
 .live-play-btn{
@@ -817,46 +833,43 @@ header{
    36px exactos en todos los viewports desktop + móvil)
 ══════════════════════════════════════════════════════ */
 :root{
-  /* ── Crop MODAL sala en vivo ──
-     Medidas exactas del embed de Chaturbate:
-     top: 36px (header CB: logo + nombre de modelo)
-     bot: 178px = 114px (barra inferior tokens/tips) + 64px (+17mm extra según UX) */
-  --cb-crop-top: 36px;
-  --cb-crop-bot: 178px;
+  /* ── Embed CB: sin crop — mostramos la experiencia completa ──
+     El usuario ve: video + controles de volumen + goal bar + chat (desktop) */
+  --cb-crop-top: 0px;
+  --cb-crop-bot: 0px;
 }
-@media(max-width:480px){
-  :root{ --cb-crop-top:36px; --cb-crop-bot:178px; }
-}
-@media(max-width:380px){
-  :root{ --cb-crop-top:36px; --cb-crop-bot:170px; }
-}
-/* Desktop: header 44px + barra inferior 110px (medición exacta F12: 04/06/2026) */
-@media(orientation:landscape),(min-width:640px){
-  :root{
-    --cb-crop-top: 44px;
-    --cb-crop-bot: 110px;
+/* ── EMBED COMPLETO: iframe 100% del contenedor, sin crop, experiencia CB nativa ── */
+/* Desktop: columna izquierda del modal grid — iframe full */
+@media(min-width:640px){
+  .mhero-v2 .embed-wrap{
+    overflow:hidden!important;
+    position:absolute!important;
+    inset:0!important;
+  }
+  /* Desktop: crop chat de CB — iframe 136% de ancho, chat queda fuera del overflow:hidden */
+  .mhero-v2 .embed-wrap .embed-frame{
+    position:absolute!important;
+    top:0!important;
+    left:-1%!important;
+    width:136%!important;
+    height:100%!important;
+    transform:none!important;
   }
 }
-/* ── PATCH F12 04/06/2026 ── Modal web: forzar crop correcto del iframe ── */
-@media(orientation:landscape),(min-width:640px){
-  .mhero-v2 .embed-wrap .embed-frame{
-    top:-44px!important;
-    left:0!important;width:100%!important;
-    height:calc(100% + 44px + 110px)!important;
+/* Movil: iframe al 100% — CB mobile no muestra chat lateral */
+@media(max-width:639px){
+  .mhero-v2 .embed-wrap{
+    overflow:hidden;
+    position:absolute;
+    inset:0;
   }
-}
-/* ── PATCH F12 04/06/2026 ── Modal móvil: forzar crop correcto (top era +19px) ── */
-@media(max-width:639px) and (orientation:portrait){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px!important;
-    left:0!important;width:100%!important;
-    height:calc(100% + 36px + 178px)!important;
-  }
-}
-@media(max-width:380px) and (orientation:portrait){
-  .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px!important;
-    height:calc(100% + 36px + 170px)!important;
+    position:absolute!important;
+    top:0!important;
+    left:0!important;
+    width:100%!important;
+    height:100%!important;
+    transform:none!important;
   }
 }
 
@@ -909,39 +922,7 @@ header{
 /* ═══ OVERLAY AFILIADO MODAL — libera zona de volumen nativo ═══ */
 /* WEB: crop-bot=110px oculta el volumen CB → overlay cubre 100% del embed-wrap */
 /* MÓVIL: bottom:56px libera zona de volumen CB (medición real: 169px=225−56 ✅) */
-.embed-affiliate-overlay{
-  position:absolute;
-  top:0; left:0; right:0;
-  bottom:56px; /* móvil: libera zona volumen CB */
-  z-index:7;
-  cursor:pointer;
-  background:transparent;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-  overscroll-behavior:none;
-  clip-path:polygon(72px 0,100% 0,100% 100%,72px 100%,72px 0);
-}
-/* Desktop: volumen CB ya oculto por crop-bot=110px → cubre 100% */
-@media(orientation:landscape),(min-width:640px){
-  .embed-affiliate-overlay{
-    bottom:0!important;
-    clip-path:none!important;
-  }
-  .embed-affiliate-overlay-left{
-    display:none!important;
-  }
-}
-.embed-affiliate-overlay-left{
-  position:absolute;
-  top:0; left:0;
-  width:72px;
-  bottom:56px;
-  z-index:7;
-  cursor:pointer;
-  background:transparent;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
+
 
 /* Name & meta over hero */
 .modal-hero-info{
@@ -969,27 +950,27 @@ header{
 .modal-sub{font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.15rem}
 
 /* ── BODY ── */
-.modal-body{padding:.7rem .9rem .85rem;background:var(--bg2);overflow-y:auto}
+.modal-body{padding:.5rem .9rem .7rem;background:var(--bg2);overflow-y:auto}
 
 /* Stats row */
 .modal-stats-row{
-  display:flex;gap:.4rem;margin-bottom:.65rem;
+  display:flex;gap:.4rem;margin-bottom:.4rem;
   font-size:.67rem;color:var(--txt2);align-items:center;flex-wrap:wrap
 }
 .modal-stat-item{display:flex;align-items:center;gap:.2rem}
 .modal-stat-val{font-weight:700;color:var(--txt)}
 
 /* CTA */
-.modal-acts{display:block;margin-bottom:.55rem;position:sticky;bottom:0;z-index:10;background:var(--modal-bg,rgba(18,19,26,.98));padding:.5rem 0 .3rem}
+.modal-acts{display:block;margin-bottom:.75rem;position:static;padding:0}
 .btn-go{
   width:100%;
   background:var(--hot);
-  color:#fff;border:none;border-radius:14px;
-  padding:.9rem 1rem;min-height:52px;
-  font-size:.95rem;font-weight:800;letter-spacing:-.01em;
+  color:#fff;border:none;border-radius:16px;
+  padding:1rem 1.1rem;min-height:56px;
+  font-size:1rem;font-weight:800;letter-spacing:-.01em;
   display:flex;align-items:center;justify-content:center;gap:.5rem;
   transition:all .18s;cursor:pointer;text-decoration:none;
-  box-shadow:0 4px 22px rgba(232,48,90,.4);
+  box-shadow:0 6px 28px rgba(232,48,90,.45);
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .btn-go:hover{filter:brightness(1.08);box-shadow:0 6px 28px rgba(232,48,90,.58);transform:translateY(-1px)}
@@ -999,12 +980,12 @@ header{
 .btn-go:hover .btn-go-arrow{transform:translateX(3px);opacity:1}
 
 /* Secondaries */
-.modal-secondary{display:flex;gap:.4rem;margin-top:.4rem}
+.modal-secondary{display:flex;gap:.5rem;margin-top:.6rem}
 .btn-sec{
   flex:1;background:var(--surf);border:1px solid var(--bdr);
-  border-radius:11px;color:var(--txt2);
-  font-family:inherit;font-size:.7rem;font-weight:600;
-  padding:.5rem;min-height:40px;display:flex;align-items:center;justify-content:center;gap:.3rem;
+  border-radius:13px;color:var(--txt2);
+  font-family:inherit;font-size:.74rem;font-weight:600;
+  padding:.65rem .5rem;min-height:46px;display:flex;align-items:center;justify-content:center;gap:.35rem;
   transition:all .15s;cursor:pointer;
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
@@ -1037,26 +1018,29 @@ header{
    MODAL V2 — video hero + analytics
 ═══════════════════════════════════════════ */
 .modal-v2{
-  max-height:92dvh;
+  max-height:96dvh;
   height:auto;
   overflow:hidden;
   overflow-x:hidden;
   display:flex;
   flex-direction:column;
   touch-action:pan-y;
+  border-radius:24px 24px 0 0;
 }
+/* ── HERO rediseñado: 16/9 compacto, máx 210px en móvil ── */
 .mhero-v2{
   position:relative;
   flex-shrink:0;
   width:100%;
-  /* aspect-ratio controla el alto proporcional — sin max-height que lo contradiga */
-  aspect-ratio:16/9;
+  /* Móvil: sin aspect-ratio fijo — altura según contenido CB (incluye controles) */
+  height:56dvh;
+  min-height:280px;
+  max-height:62dvh;
   overflow:hidden;
   background:#000;
   touch-action:auto;
   user-select:none;
   -webkit-user-select:none;
-  /* Sin height ni max-height: el navegador calcula alto = ancho * 9/16 */
 }
 /* ── Thumbnail del modelo como fondo — siempre visible, nunca blanco ── */
 .mhero-v2 .hero-thumb{
@@ -1074,23 +1058,22 @@ header{
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
   overflow:hidden;
-  pointer-events:auto;touch-action:none;
-  overscroll-behavior:none;
-  -webkit-overflow-scrolling:auto;
+  pointer-events:auto;touch-action:pan-y;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
   background:#000;
   scrollbar-width:none;-ms-overflow-style:none;
 }
 .mhero-v2 .embed-wrap::-webkit-scrollbar{display:none;width:0;height:0}
-/* ── Sala en vivo: recorta el header de Chaturbate por arriba (44px)
-   y oculta la barra de controles inferior (48px). Con aspect-ratio:16/9
-   el contenedor ya no incluye el chat ni tokens — solo el video puro.
-   Móvil sin aspect-ratio: crop bot mayor para ocultar UI completa de CB. ── */
+/* ── Sala en vivo: el embed de CB incluye video+chat juntos.
+   En desktop: iframe se hace 136% de ancho (left:-1%) para que el
+   overflow:hidden del wrap recorte el chat del lado derecho (~35%).
+   En movil: sin crop (CB mobile no muestra chat lateral). ── */
 .mhero-v2 .embed-wrap .embed-frame{
   position:absolute;
-  top:calc(-1 * var(--cb-crop-top));
-  left:0;right:0;
-  width:100%;
-  height:calc(100% + var(--cb-crop-top) + var(--cb-crop-bot));
+  top:0;left:-1%;
+  width:136%;
+  height:100%;
   border:none;display:block;
   overflow:hidden;
   pointer-events:auto;
@@ -1098,29 +1081,52 @@ header{
   overscroll-behavior:none;
   scrolling:no;
 }
-/* Móvil ≤480px: top 36px + bot 114px = oculta header y controles CB */
-@media(max-width:480px){
+@media(max-width:639px){
   .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px;
-    height:calc(100% + 36px + 114px);
-  }
-}
-/* Móvil pequeño (≤380px): igual que 480, bot reducido 106px */
-@media(max-width:380px){
-  .mhero-v2 .embed-wrap .embed-frame{
-    top:-36px;
-    height:calc(100% + 36px + 106px);
+    left:0;
+    width:100%;
   }
 }
 .mhero-v2 #mhero-img-wrap{position:absolute;inset:0;z-index:2;overflow:hidden}
 .mhero-v2 #mhero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+/* Gradiente: visible solo cuando NO hay embed (muestra thumbnail) */
 .mhero-v2 .modal-hero-grad{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,rgba(0,0,0,.85));z-index:6;pointer-events:none}
-.mhi-v2{position:absolute;bottom:.6rem;left:.75rem;z-index:7;pointer-events:none}
+.mhero-v2.embed-active .modal-hero-grad{display:none}
+/* Máscaras CB: desactivadas — el crop geométrico ya oculta las barras */
+.mhero-v2 .cb-mask-top{ display:none !important; }
+.mhero-v2 .cb-mask-bot{ display:none !important; }
+/* Info overlay: oculto cuando hay embed activo — ya está en el mstrip debajo */
+.mhi-v2{position:absolute;bottom:.5rem;left:.75rem;z-index:7;pointer-events:none}
+.mhero-v2.embed-active .mhi-v2{ display:none; }
+/* Stats chips: ocultos cuando hay embed activo */
 .mhero-stats{
   position:absolute;top:.55rem;right:.55rem;z-index:7;
   display:flex;flex-direction:column;align-items:flex-end;gap:.25rem;
   pointer-events:none;
 }
+.mhero-v2.embed-active .mhero-stats{ display:none; }
+.mstrip-v2{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem .9rem .45rem;
+  background:var(--bg2);
+  border-top:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid var(--bdr);
+  flex-shrink:0;
+  min-height:44px;
+}
+.mstrip-name{
+  font-size:.95rem;font-weight:700;color:var(--txt);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mstrip-sub{font-size:.65rem;color:var(--txt2);margin-top:.1rem}
+.mstrip-live{
+  flex-shrink:0;
+  background:var(--hot);color:#fff;
+  font-size:.6rem;font-weight:700;letter-spacing:.07em;
+  padding:3px 8px;border-radius:6px;text-transform:uppercase;
+  display:none;
+}
+.mstrip-live.visible{display:block}
 .mhero-stat-chip{
   background:rgba(0,0,0,.7);border-radius:20px;
   padding:3px 9px;font-size:.65rem;font-weight:700;color:#fff;
@@ -1134,14 +1140,16 @@ header{
   overflow-y:auto;
   overflow-x:hidden;
   overscroll-behavior:contain;
-  /* iOS: prevent rubber-band from revealing white bg */
   -webkit-overflow-scrolling:touch;
   scroll-behavior:smooth;
-  padding:.75rem .9rem 2rem;
+  padding:.9rem 1rem 3rem;
   background:var(--bg2);
 }
 /* No phantom spacer below modal */
 .modal-v2::after{display:none}
+
+/* ── CHAT COLUMN — columna central del modal desktop ── */
+
 
 /* ── ANALYTICS PANEL — redesigned ── */
 .modal-analytics{margin-top:.6rem}
@@ -1490,46 +1498,24 @@ header{
 }
 
 .dv-swap-btn{
-  /* FIX DEFINITIVO: position:fixed para salir del stacking context del iframe.
-     Los iframes con pointer-events:auto capturan todos los clicks en su área física
-     en Chrome, ignorando overflow:hidden y z-index de hermanos.
-     Con position:fixed el botón está en el root stacking context — siempre encima. */
   position:fixed;
-  z-index:750;  /* encima del dual-view-bg (700) */
-  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
-  color:#fff;font-size:.62rem;font-weight:700;
-  padding:4px 10px;border-radius:6px;cursor:pointer;
-  backdrop-filter:blur(6px);transition:background .15s, opacity .2s;
-  pointer-events:auto;
+  background:rgba(0,0,0,.75);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:8px;
+  color:#fff;
+  font-size:.72rem;font-weight:700;
+  padding:.32rem .65rem;
+  cursor:pointer;
+  z-index:750;
+  display:none;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
-  /* Oculto por defecto — JS lo posiciona al abrir el dual view */
-  display:none;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
 }
 .dv-swap-btn:hover{background:var(--hot)}
 
-/* Botón de audio para dual view — position:fixed via JS (mismo motivo que swap-btn) */
-.dv-audio-btn{
-  position:fixed;
-  z-index:750;
-  background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.25);
-  color:#fff;font-size:.75rem;font-weight:700;
-  padding:4px 8px;border-radius:6px;cursor:pointer;
-  backdrop-filter:blur(6px);transition:background .15s, opacity .2s;
-  pointer-events:auto;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-  display:none; /* JS lo posiciona y muestra */
-  line-height:1;
-}
-.dv-audio-btn:hover{background:rgba(232,48,90,.85);}
-.dv-audio-btn.active{background:rgba(232,48,90,.92);border-color:var(--hot);}
-/* Cuando dual view está abierto, JS pone display:flex */
-.dual-view-bg[style*="flex"] ~ * .dv-swap-btn{ display:flex; }
-.dv-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-overflow-scrolling:auto;scrollbar-width:none;-ms-overflow-style:none;}
-@media(orientation:landscape),(min-width:640px){
-  .dv-panels{flex-direction:row}
-}
+
 .dv-panel-label{
   position:absolute;top:.4rem;left:.5rem;z-index:10;
   background:rgba(0,0,0,.7);border-radius:8px;padding:2px 8px;
@@ -1550,42 +1536,7 @@ header{
    2. Excluye bottom-left 72×56px (control de volumen nativo de CB)
    3. Excluye los últimos 110px inferiores (barra tokens/tips — ya oculta por crop)
    Al hacer clic en el video → link afiliado. Volumen → interacción nativa CB. */
-.dv-affiliate-overlay{
-  position:absolute;
-  /* Empieza en top:0, termina antes de la zona de volumen/tokens */
-  top:0; left:0; right:0;
-  /* No llega hasta el fondo — deja libre la zona inferior donde está el volumen */
-  bottom:56px;  /* 56px desde abajo = exactamente donde empieza el área del volumen */
-  z-index:7;
-  cursor:pointer;
-  background:transparent;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-  overscroll-behavior:none;
-  /* FIX botón "Cambiar": excluye esquina top-right (zona del swap-btn: ~90px × 42px)
-     y excluye columna izquierda 72px (zona volumen CB) */
-  clip-path:polygon(
-    72px 0,
-    calc(100% - 90px) 0,   /* deja libre el swap-btn (top-right 90px) */
-    calc(100% - 90px) 42px,/* altura del área del swap-btn */
-    100% 42px,
-    100% 100%,
-    72px 100%,
-    72px 0
-  );
-}
-/* Complemento del overlay: cubre la parte superior izquierda (encima del volumen) */
-.dv-affiliate-overlay-left{
-  position:absolute;
-  top:0; left:0;
-  width:72px;
-  bottom:56px; /* no cubre donde está el volumen */
-  z-index:7;
-  cursor:pointer;
-  background:transparent;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
+
 
 /* Capa negra sobre los iframes de dual view hasta que el stream cargue */
 .dv-embed-wrap::before{
@@ -1603,10 +1554,11 @@ header{
    El overflow:hidden del dv-embed-wrap recorta la UI de CB.
 
    MÓVIL: CB embed muestra video arriba + UI inferior → crop top 36px + bot 114px
-   DESKTOP: CB embed 3 col → crop top 44px + bot 106px + offset lateral
+   DESKTOP: CB embed 3 col → crop top 44px + bot 175px (cubre goal+tokens+promo+camtocam+enviar)
    ══════════════════════════════════════════════════════════ */
 
-/* BASE — móvil portrait: top −36px | embed-wrap=259px → frame=259+36+106=401px ✅
+/* BASE — móvil portrait: crop-bot 175px oculta 5 filas UI CB (goal+tokens+promo+camtocam+enviar)
+   DESKTOP: iframe 500px wide → frame height 500px (281+44+175) — mismo crop-bot 175px
    FIX6: position:absolute relativo a dv-embed-wrap (position:relative)
    FIX5: top=−36px corrige el bug de top=−2px (frame-a) y top=+259px (frame-b) */
 .dv-frame{
@@ -1614,7 +1566,7 @@ header{
   top:-36px;
   left:0; right:0;
   width:100%;
-  height:calc(100% + 36px + 106px); /* 259+36+106=401px medición real ✅ */
+  height:calc(100% + 36px + 175px); /* crop-bot 175px cubre todas las barras CB */
   border:none; display:block;
   overflow:hidden;
   pointer-events:auto;
@@ -1622,7 +1574,7 @@ header{
   overscroll-behavior:none;
 }
 @media(max-width:380px){
-  .dv-frame{ height:calc(100% + 36px + 98px); }
+  .dv-frame{ height:calc(100% + 36px + 175px); }
 }
 
 /* DESKTOP: CB muestra chat lateral cuando iframe width >= ~560px
@@ -1651,8 +1603,9 @@ header{
     top:-44px !important;
     left:0 !important;
     width:500px !important;
-    /* height proporcional: 500*(9/16)+44+110 = 281+154 = 435px */
-    height:calc(281px + 44px + 110px) !important; /* 435px */
+    /* height: 500*(9/16)+44+175 = 281+219 = 500px
+       crop-bot 175px cubre: goal bar (~42px) + tokens bar (~42px) + Promocionar+CamToCam+Enviar (~91px) */
+    height:calc(281px + 44px + 175px) !important; /* 500px */
     /* Escalar para llenar el panel completo */
     transform-origin: top left !important;
     transform: scale(var(--dv-panel-scale, 1)) !important;
@@ -1665,13 +1618,13 @@ header{
     position:absolute!important;
     top:-36px!important;
     left:0!important;right:0!important;width:100%!important;
-    height:calc(100% + 36px + 106px)!important;
+    height:calc(100% + 36px + 175px)!important;
     border:none!important;display:block!important;
     overflow:hidden!important;pointer-events:auto!important;
   }
 }
 @media(max-width:380px) and (orientation:portrait){
-  .dv-frame{ height:calc(100% + 36px + 98px)!important; }
+  .dv-frame{ height:calc(100% + 36px + 175px)!important; }
 }
 
 /* móvil: dv-embed-wrap DEBE ser position:relative para que el frame sea relativo a él */
@@ -2038,6 +1991,17 @@ header{
 .compare-fill{height:100%;border-radius:3px;transition:width .8s ease}
 
 /* ═══ CHART CONTAINERS ═══ */
+.cmp-tooltip{
+  position:fixed;background:var(--surf2);border:1px solid var(--bdr2);
+  border-radius:8px;padding:.35rem .6rem;font-size:.68rem;color:var(--txt);
+  pointer-events:none;z-index:9999;display:none;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,.3)
+}
+.heat-grid{display:grid;grid-template-columns:28px repeat(24,1fr);gap:2px;margin-top:.5rem}
+.heat-label{font-size:.55rem;color:var(--txt3);display:flex;align-items:center;justify-content:flex-end;padding-right:3px}
+.heat-hour-label{font-size:.5rem;color:var(--txt3);text-align:center}
+.heat-cell{height:18px;border-radius:3px;cursor:pointer;transition:transform .1s}
+.heat-cell:hover{transform:scale(1.2);z-index:2;position:relative}
 .chart-wrap{
   width:100%;overflow:hidden;position:relative;
   height:120px;margin-top:.3rem
@@ -2054,34 +2018,135 @@ header{
   padding:3px 10px;font-size:.65rem;color:var(--txt2)
 }
 
+
+/* ── DESKTOP MODAL: panel derecho ── */
+@media(min-width:601px){
+  /* Header dentro del panel derecho: nombre + badge */
+  .mdesktop-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:.5rem;
+    margin-bottom:.8rem;
+    padding-bottom:.75rem;
+    border-bottom:1px solid var(--bdr);
+    flex-shrink:0;
+  }
+  .mdesktop-header .mstrip-name{font-size:1.05rem;font-weight:800;color:var(--txt)}
+  .mdesktop-header .mstrip-sub{font-size:.68rem;color:var(--txt2);margin-top:.15rem}
+  .mdesktop-header .mstrip-live{display:block!important}
+  /* En móvil ocultar el header extra */
+}
+@media(max-width:600px){
+  .mdesktop-header{display:none}
+}
+
+
+@media(min-width:601px){
+  /* CTA + actions in right panel */
+  .modal.modal-v2 .modal-acts{
+    margin-bottom:.6rem;
+    margin-top:0;
+  }
+  .modal.modal-v2 .btn-go{
+    font-size:.9rem;
+    padding:.65rem 1rem;
+    border-radius:12px;
+  }
+  .modal.modal-v2 .modal-secondary.msec-v2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:.4rem;
+    margin-bottom:.7rem;
+  }
+  .modal.modal-v2 .btn-sec{
+    border-radius:10px;
+    font-size:.72rem;
+    padding:.5rem .6rem;
+    justify-content:center;
+  }
+  /* Analytics fills remaining space */
+  .modal.modal-v2 .modal-analytics{
+    margin-top:.2rem;
+  }
+}
+
 /* ═══════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════ */
 @media(min-width:601px){
   .modal-bg{align-items:center;padding:1.5rem}
-  .modal{border-radius:20px;max-height:92dvh;max-width:640px;width:100%}
-  .modal-hero{height:400px}
-  /* mhero-v2 usa aspect-ratio — no sobreescribir con height fija */
-  .modal-hero.mhero-v2{height:auto}
   .modal::before{display:none}
-  /* modal-v2 en desktop: toma el alto de su contenido, sin espacios blancos */
-  .modal-v2{
-    height:auto;
-    max-height:92dvh;
+
+  /* ── MODAL DESKTOP: 3 columnas video|chat|info ── */
+  .modal.modal-v2{
     border-radius:20px;
-    /* flex column: hero fijo arriba, body scrollea abajo */
+    max-height:88dvh;
+    width:min(960px,96vw);
+    max-width:960px;
+    height:90dvh;
+    display:grid;
+    grid-template-columns:1fr 340px;
+    grid-template-rows:1fr;
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* Cerrar — esquina superior derecha del modal */
+  .modal.modal-v2 .modal-close{
+    position:absolute;top:.6rem;right:.6rem;
+    z-index:50;
+    background:rgba(0,0,0,.7);
+    border:1px solid rgba(255,255,255,.15);
+    backdrop-filter:blur(8px);
+  }
+
+  /* VIDEO: columna izquierda — ocupa toda la altura del modal */
+  .modal-hero.mhero-v2{
+    grid-column:1;
+    grid-row:1;
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-height:none;
+    aspect-ratio:unset;
+    border-radius:20px 0 0 20px;
+    overflow:hidden;
+    background:#000;
+  }
+
+  /* INFO: columna derecha — stack vertical con scroll */
+  .mstrip-v2,.mbody-v2{
+    grid-column:2;
+  }
+  /* Ocultar strip separado — la info va directo en el panel derecho */
+  .mstrip-v2{
+    display:none;
+  }
+  /* Sin chat — mbody ocupa col 2 */
+  .mbody-v2{
+    grid-column:2;
+  }
+  /* Panel derecho: header sticky + scroll */
+  .mbody-v2{
+    grid-row:1;
     display:flex;
     flex-direction:column;
-  }
-  /* Hero 16:9: en desktop el modal es 500px → aspect-ratio da 281px exactos
-     No sobreescribir con max-height — dejar que aspect-ratio lo controle */
-  /* Body ocupa el espacio restante hasta el límite del modal */
-  .mbody-v2{
-    flex:1;
+    height:100%;
     min-height:0;
-    max-height:calc(92dvh - 360px);
+    max-height:none;
     overflow-y:auto;
+    overflow-x:hidden;
+    padding:.9rem 1rem 1.5rem;
+    background:var(--bg2);
+    border-left:1px solid var(--bdr);
+    border-radius:0 20px 20px 0;
+    scrollbar-width:thin;
+    scrollbar-color:var(--bdr) transparent;
   }
+
+  /* Nombre+badge arriba en panel derecho — se lee con el contenido del mbody */
+  .modal-v2 .modal-acts{margin-top:auto;padding-top:.5rem}
 }
 @media(max-width:900px){
   .drawer{display:none}
@@ -2106,10 +2171,10 @@ header{
   .rep-search{padding:1.5rem 1rem}
   .rep-search-title{font-size:1.6rem}
   .modal-bg{padding:0;align-items:flex-end}
-  .modal{border-radius:24px 24px 0 0;max-height:94dvh;width:100%}
-  .modal-v2{border-radius:24px 24px 0 0;height:auto;max-height:94dvh}
-  .modal-hero{height:320px}
-  .modal-hero.mhero-v2{height:auto}
+  .modal{border-radius:24px 24px 0 0;max-height:96dvh;width:100%}
+  .modal-v2{border-radius:24px 24px 0 0;height:96dvh;max-height:96dvh;display:flex;flex-direction:column}
+  .modal-hero{height:200px}
+  .modal-hero.mhero-v2{height:56dvh;min-height:260px;max-height:62dvh;flex-shrink:0}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar-top{padding:.35rem .7rem;top:40px}
@@ -2123,7 +2188,7 @@ header{
   .carousel-scroll .crd{width:95px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
   /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
-  .modal-hero{height:240px!important}
+  .modal-hero{height:260px!important}
   .modal-hero.mhero-v2{height:auto!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
@@ -2166,46 +2231,55 @@ header{
   color:var(--hot);font-weight:700;
 }
 body.modal-open{overflow:hidden!important}
-/* ── REP-VIEW SALA EN VIVO embed ── */
-.rp-live-badge{
-  display:inline-block;margin-left:.4rem;
-  font-size:.62rem;font-weight:700;letter-spacing:.04em;
-  color:var(--hot);animation:pulse 1.2s infinite;vertical-align:middle
+
+/* ── Sidebar Explorar nav ── */
+.explore-nav{display:flex;flex-direction:column;gap:2px;margin-top:.3rem}
+.explore-link{
+  display:flex;align-items:center;gap:.45rem;
+  padding:.38rem .5rem;border-radius:6px;
+  font-size:.72rem;color:var(--txt2);text-decoration:none;
+  transition:background .15s,color .15s;
 }
-.rp-live-acts{display:flex;gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap}
-.rp-live-acts .btn-sec{flex:1;min-width:80px;font-size:.72rem;padding:.4rem .5rem}
-.rp-embed-wrap{
-  position:relative;width:100%;
-  height:220px;border-radius:12px;overflow:hidden;
-  background:#000;margin-bottom:.6rem
+.explore-link:hover{background:var(--surf2);color:var(--txt)}
+
+/* ── Mobile bottom Explorar nav ── */
+.mob-explore-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--surf);border-top:1px solid var(--bdr);
+  z-index:400;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding:0 .25rem env(safe-area-inset-bottom);
 }
-@media(min-width:480px){.rp-embed-wrap{height:280px}}
-.rp-embed-loading{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  background:#000;color:rgba(255,255,255,.5);font-size:.75rem;gap:.4rem;
-  z-index:2;transition:opacity .4s
+.mob-explore-nav::-webkit-scrollbar{display:none}
+.mob-explore-nav{
+  display:none;
+  flex-direction:row;
+  align-items:stretch;
 }
-.rp-embed-wrap.video-ready .rp-embed-loading{opacity:0;pointer-events:none}
-.rp-embed-frame{
-  position:absolute;
-  top:-44px;left:0;
-  width:100%;
-  height:calc(100% + 44px + 80px);
-  border:none;display:block
+.mob-enav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;flex-shrink:0;
+  padding:.45rem .6rem;
+  text-decoration:none;color:var(--txt2);
+  font-size:.58rem;line-height:1;
+  transition:color .15s;
+  min-width:52px;
 }
-.rp-embed-overlay{
-  position:absolute;bottom:0;left:0;
-  width:80px;height:52px;z-index:3;cursor:pointer
+.mob-enav-item:hover,.mob-enav-item:active{color:var(--txt)}
+.mob-enav-ico{font-size:1.15rem;line-height:1}
+.mob-enav-lbl{white-space:nowrap}
+
+/* Show mobile nav only on mobile/tablet, hide on desktop where sidebar is visible */
+@media(max-width:900px){
+  .mob-explore-nav{display:flex}
+  /* Push content up so bottom nav doesn't cover cards */
+  .page{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
 }
-.rp-live-stats{display:flex;gap:.5rem;flex-wrap:wrap}
-.rp-live-stat{
-  background:var(--surf2);border-radius:8px;
-  padding:.3rem .55rem;font-size:.72rem;
-  display:flex;flex-direction:column;gap:.1rem;flex:1;min-width:70px
-}
-.rp-live-stat-val{font-weight:700;font-size:.95rem;color:var(--txt)}
-.rp-live-stat-lbl{color:var(--txt3);font-size:.62rem}
+/* Hide mobile nav when modal is open to avoid overlap */
+body.modal-open .mob-explore-nav{display:none!important}
 
 </style>
 <!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
@@ -2313,6 +2387,20 @@ body.modal-open{overflow:hidden!important}
     <div class="drawer-sec">
       <div class="drawer-lbl">Tags populares</div>
       <div id="sd-tag-list" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.3rem"></div>
+    </div>
+    <div class="drawer-div"></div>
+    <div class="drawer-sec">
+      <div class="drawer-lbl">Explorar</div>
+      <nav class="explore-nav">
+        <a class="explore-link" href="https://www.campulsehub.com/top/latinas" target="_blank">🔥 Top Latinas</a>
+        <a class="explore-link" href="https://www.campulsehub.com/top/colombia" target="_blank">🇨🇴 Top Colombia</a>
+        <a class="explore-link" href="https://www.campulsehub.com/top/mexico" target="_blank">🇲🇽 Top México</a>
+        <a class="explore-link" href="https://www.campulsehub.com/top/espana" target="_blank">🇪🇸 Top España</a>
+        <a class="explore-link" href="https://www.campulsehub.com/country" target="_blank">🌍 Por país</a>
+        <a class="explore-link" href="https://www.campulsehub.com/gender" target="_blank">⚧ Por género</a>
+        <a class="explore-link" href="https://www.campulsehub.com/language" target="_blank">💬 Por idioma</a>
+        <a class="explore-link" href="https://www.campulsehub.com/search" target="_blank">🔍 Buscar modelos</a>
+      </nav>
     </div>
   </aside>
 
@@ -2588,47 +2676,6 @@ body.modal-open{overflow:hidden!important}
       <div class="rep-tags" id="rp-tags"></div>
     </div>
 
-    <!-- SALA EN VIVO — embed de la modelo en rep-view -->
-    <div class="rep-section" id="rp-live-section" style="display:none">
-      <div class="rep-section-head">
-        <div class="rep-section-title">
-          <span class="ico">📡</span> Sala en vivo
-          <span class="rp-live-badge" id="rp-live-badge">● EN VIVO</span>
-        </div>
-      </div>
-      <!-- CTA tipo modal -->
-      <a id="rp-go-live-btn" href="#" target="_blank" rel="noopener" class="btn-go" style="margin-bottom:.6rem;display:flex">
-        <span class="btn-go-ico">▶</span>
-        <span id="rp-go-live-txt">Entrar en vivo ahora</span>
-        <span class="btn-go-arrow">→</span>
-      </a>
-      <!-- Acciones rápidas tipo modal -->
-      <div class="rp-live-acts">
-        <button class="btn-sec" id="rp-fav-live-btn" onclick="favModFromReport()">
-          <span id="rp-fav-live-icon">♥</span><span id="rp-fav-live-txt">Favorita</span>
-        </button>
-        <button class="btn-sec btn-sec-dual" onclick="openDualFromReport()" title="Ver 2 salas en simultáneo">
-          ⊞ <span>2 salas</span>
-        </button>
-        <a id="rp-page-btn" href="#" target="_blank" rel="noopener" class="btn-sec" style="text-decoration:none">
-          🔗 <span>Ver página</span>
-        </a>
-      </div>
-      <!-- Embed del stream -->
-      <div class="rp-embed-wrap" id="rp-embed-wrap">
-        <div class="rp-embed-loading" id="rp-embed-loading">
-          <div class="embed-loading-spinner"></div>
-          <span>Conectando sala…</span>
-        </div>
-        <iframe id="rp-embed-frame" class="rp-embed-frame" src="about:blank"
-          allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
-          allowfullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <div class="rp-embed-overlay" onclick="window.open(document.getElementById('rp-go-live-btn').href,'_blank')"></div>
-      </div>
-      <!-- Stats rápidos -->
-      <div class="rp-live-stats" id="rp-live-stats"></div>
-    </div>
-
     <div id="besttimes-container" style="display:none"></div>
   </div>
 </div>
@@ -2654,13 +2701,13 @@ body.modal-open{overflow:hidden!important}
         <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
           allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
           allowFullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <!-- Overlay afiliado: link a sala, libera zona volumen CB (bottom-left 72×56px) -->
-        <div class="embed-affiliate-overlay" onclick="openActiveRoomAffiliate()"></div>
-        <div class="embed-affiliate-overlay-left" onclick="openActiveRoomAffiliate()"></div>
       </div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
       <div class="modal-hero-grad"></div>
+      <!-- Máscaras negras que tapan header y barras de CB -->
+      <div class="cb-mask-top"></div>
+      <div class="cb-mask-bot"></div>
       <!-- Info overlay en vivo -->
       <div class="modal-hero-info mhi-v2">
         <div id="m-live-pill"></div>
@@ -2670,12 +2717,32 @@ body.modal-open{overflow:hidden!important}
       <!-- Stats en hero — viewers destacados -->
       <div class="mhero-stats" id="mhero-stats"></div>
     </div>
+
+
     <!-- Botón de audio: position:fixed, fuera del árbol hero — escapa de todos overflow:hidden -->
+
+    <!-- Strip info: nombre + badge debajo del video, fuera del hero -->
+    <div class="mstrip-v2" id="mstrip-v2">
+      <div class="mstrip-info">
+        <div class="mstrip-name" id="mstrip-name"></div>
+        <div class="mstrip-sub" id="mstrip-sub"></div>
+      </div>
+      <div class="mstrip-live" id="mstrip-live"></div>
+    </div>
 
     <!-- BODY scrollable -->
     <div class="modal-body mbody-v2">
 
-      <!-- CTA PRINCIPAL sticky -->
+      <!-- DESKTOP: header info arriba del panel derecho -->
+      <div class="mdesktop-header">
+        <div>
+          <div class="mstrip-name" id="mstrip-name-d"></div>
+          <div class="mstrip-sub" id="mstrip-sub-d"></div>
+        </div>
+        <div class="mstrip-live" id="mstrip-live-d"></div>
+      </div>
+
+      <!-- CTA PRINCIPAL -->
       <div class="modal-acts">
         <a id="m-link" href="#" target="_blank" rel="noopener" class="btn-go">
           <span class="btn-go-ico" id="m-cta-ico">▶</span>
@@ -2696,6 +2763,10 @@ body.modal-open{overflow:hidden!important}
         <button class="btn-sec" onclick="openModelReportFromModal()" title="Ver mi reporte completo">
           👤 <span>Reporte</span>
         </button>
+
+        <a id="m-profile-link" class="btn-sec" href="#" target="_blank" rel="noopener" title="Ver página completa de la modelo en CampulseHub" style="text-decoration:none;display:inline-flex;align-items:center;gap:.3rem">
+          📄 <span>Ver página</span>
+        </a>
       </div>
 
       <!-- ANALYTICS PANEL — días conexión + views destacados -->
@@ -2767,40 +2838,66 @@ body.modal-open{overflow:hidden!important}
 <!-- ═══ DUAL PICKER — selector visual de segunda sala ═══ -->
 <div class="dual-picker-bg" id="dual-picker-bg" onclick="closeDualPicker(event)">
   <div class="dual-picker" onclick="event.stopPropagation()">
+    <!-- Header -->
     <div class="dp-header">
-      <span class="dp-title">⊞ Ver 2 salas en simultáneo</span>
-      <button class="dp-close" onclick="closeDualPicker()">✕</button>
+      <span class="dp-title" id="dp-title-txt">&#8862; Ver 2 salas en simult&#225;neo</span>
+      <button class="dp-close" onclick="closeDualPicker()">&#x2715;</button>
     </div>
-    <p class="dp-hint">Elige una segunda sala para ver junto a <strong id="dp-current-name">esta</strong></p>
-    <div class="dp-search-row">
-      <input class="dp-input" id="dp-input" type="text" placeholder="Buscar modelo…" oninput="renderDpGrid()" onkeydown="if(event.key==='Enter')openDualFromInput()">
-      <button class="dp-go" onclick="openDualFromInput()">Abrir →</button>
+    <!-- Género nav — idéntico al catálogo -->
+    <div class="gender-nav" id="dp-gnav" style="border-bottom:1px solid var(--bdr);margin:0 -.9rem .0rem;padding:0 .9rem">
+      <button class="gnav-btn active" data-dpg="" onclick="dpSetGender(this,'')"><span class="gnav-ico">&#127760;</span>Todas</button>
+      <div class="gnav-div"></div>
+      <button class="gnav-btn" data-dpg="f" onclick="dpSetGender(this,'f')"><span class="gnav-ico">&#128105;</span>Mujeres</button>
+      <button class="gnav-btn" data-dpg="m" onclick="dpSetGender(this,'m')"><span class="gnav-ico">&#128104;</span>Hombres</button>
+      <button class="gnav-btn" data-dpg="c" onclick="dpSetGender(this,'c')"><span class="gnav-ico">&#128107;</span>Parejas</button>
+      <button class="gnav-btn" data-dpg="t" onclick="dpSetGender(this,'t')"><span class="gnav-ico">&#9895;</span>Trans</button>
     </div>
-    <!-- DP Filters -->
-    <div class="dp-filters" id="dp-filters">
-      <div class="dp-filter-row">
-        <span class="dp-filter-lbl">Género</span>
-        <button class="dp-chip dp-gf active" data-dpg="" onclick="dpSetGender(this,'')">Todas</button>
-        <button class="dp-chip dp-gf" data-dpg="f" onclick="dpSetGender(this,'f')">♀ Mujeres</button>
-        <button class="dp-chip dp-gf" data-dpg="m" onclick="dpSetGender(this,'m')">♂ Hombres</button>
-        <button class="dp-chip dp-gf" data-dpg="c" onclick="dpSetGender(this,'c')">⚭ Parejas</button>
-        <button class="dp-chip dp-gf" data-dpg="t" onclick="dpSetGender(this,'t')">⚧ Trans</button>
+    <!-- Search + Sort sticky -->
+    <div style="display:flex;gap:.4rem;position:sticky;top:0;z-index:10;background:var(--bg2);padding:.5rem 0 .4rem;margin-bottom:0">
+      <div class="srch" style="flex:1">
+        <span class="srch-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/></svg></span>
+        <input id="dp-input" type="text" placeholder="Buscar modelo&#8230;" oninput="renderDpGrid()" onkeydown="if(event.key==='Enter')openDualFromInput()" style="background:transparent;border:none;outline:none;color:var(--txt);font-size:.8rem;flex:1;padding:0;font-family:inherit;width:100%">
       </div>
-      <div class="dp-filter-row">
-        <span class="dp-filter-lbl">Filtros</span>
-        <button class="dp-chip" id="dp-fav" onclick="dpToggle('dpFav',this)">♥ Favs</button>
-        <button class="dp-chip" id="dp-hd"  onclick="dpToggle('dpHD',this)">HD</button>
-        <button class="dp-chip" id="dp-co"  onclick="dpToggle('dpCo',this)">🇨🇴 Colombia</button>
-      </div>
-      <div class="dp-filter-row">
-        <span class="dp-filter-lbl">Edad</span>
-        <button class="dp-chip dp-chip-age" data-dpa="18-21" onclick="dpSetAge(this,'18-21')">18–21</button>
-        <button class="dp-chip dp-chip-age" data-dpa="22-25" onclick="dpSetAge(this,'22-25')">22–25</button>
-        <button class="dp-chip dp-chip-age" data-dpa="26-30" onclick="dpSetAge(this,'26-30')">26–30</button>
-        <button class="dp-chip dp-chip-age" data-dpa="31-40" onclick="dpSetAge(this,'31-40')">31–40</button>
-        <button class="dp-chip dp-chip-age" data-dpa="40+"   onclick="dpSetAge(this,'40+')">40+</button>
+      <select class="sort-sel" id="dp-sort" onchange="renderDpGrid()">
+        <option value="viewers">&#8595; Viewers</option>
+        <option value="followers">&#8595; Seguidores</option>
+        <option value="age_asc">M&#225;s j&#243;venes</option>
+        <option value="new">Nuevas</option>
+      </select>
+      <button class="dp-go" onclick="openDualFromInput()">Abrir &#8594;</button>
+    </div>
+    <!-- Filter chips — igual al catálogo -->
+    <div class="filter-bar" style="padding:.3rem 0 .4rem;margin-bottom:.3rem;border-bottom:1px solid var(--bdr)">
+      <button class="qchip" id="dp-fav" onclick="dpToggle('dpFav',this)">&#9829; Favs</button>
+      <button class="qchip" id="dp-hd"  onclick="dpToggle('dpHD',this)">HD</button>
+      <button class="qchip" id="dp-co"  onclick="dpToggle('dpCo',this)">&#127464;&#127476; Colombia</button>
+      <div class="fb-sep"></div>
+      <button class="qchip dp-chip-age" data-dpa="18-21" onclick="dpSetAge(this,'18-21')">18&#8211;21</button>
+      <button class="qchip dp-chip-age" data-dpa="22-25" onclick="dpSetAge(this,'22-25')">22&#8211;25</button>
+      <button class="qchip dp-chip-age" data-dpa="26-30" onclick="dpSetAge(this,'26-30')">26&#8211;30</button>
+      <button class="qchip dp-chip-age" data-dpa="31-40" onclick="dpSetAge(this,'31-40')">31&#8211;40</button>
+      <button class="qchip dp-chip-age" data-dpa="40+"   onclick="dpSetAge(this,'40+')">40+</button>
+      <div id="dp-active-filters" style="display:none;align-items:center;gap:.4rem">
+        <div class="fb-sep"></div>
+        <span id="dp-filter-summary" style="font-size:.65rem;color:var(--hot);font-weight:700;white-space:nowrap"></span>
+        <button onclick="_dpClearAllFilters()" style="background:none;border:none;color:var(--txt3);font-size:.7rem;cursor:pointer;padding:2px 4px;border-radius:4px" title="Limpiar filtros">&#x2715;</button>
       </div>
     </div>
+    <!-- Tag strip colapsable — igual al catálogo -->
+    <div style="display:flex;align-items:center;padding:.2rem 0 .0rem;border-bottom:1px solid var(--bdr);gap:.5rem;margin-bottom:.4rem">
+      <button class="tag-strip-toggle" id="dp-tag-btn" onclick="_dpToggleTagStrip()">
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 3h8M2.5 5.5h5M4 8h2"/></svg>
+        Tags
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5L5 6.5L8 3.5"/></svg>
+      </button>
+      <div id="dp-tag-preview" style="display:flex;gap:.3rem;overflow:hidden;flex:1"></div>
+    </div>
+    <div class="tag-strip" id="dp-tag-strip">
+      <div id="dp-tag-list" style="display:flex;flex-wrap:wrap;gap:.3rem"></div>
+    </div>
+    <!-- Contador resultados -->
+    <div style="font-size:.65rem;color:var(--txt3);margin-bottom:.4rem;padding-top:.1rem" id="dp-count"></div>
+    <!-- Grid de modelos -->
     <div class="dp-grid" id="dp-grid"></div>
   </div>
 </div>
@@ -2824,16 +2921,13 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div class="dv-affiliate-overlay" onclick="window.open(document.getElementById('dv-link-a')?.href||'#','_blank','noopener')"></div>
-          <div class="dv-affiliate-overlay-left" onclick="window.open(document.getElementById('dv-link-a')?.href||'#','_blank','noopener')"></div>
+
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
         </div>
         <!-- CTA flotante desktop -->
         <a id="dv-float-link-a" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala A ↗</a>
-        <!-- Botón audio propio — position:fixed via JS para salir del stacking context del iframe -->
-        <button class="dv-audio-btn" id="dv-audio-a" onclick="toggleDvAudio('a')" title="Activar/silenciar audio panel A">🔇</button>
       </div>
       <!-- Panel B -->
       <div class="dv-panel" id="dv-panel-b">
@@ -2844,16 +2938,13 @@ body.modal-open{overflow:hidden!important}
             allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
             scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <div class="dv-affiliate-overlay" onclick="window.open(document.getElementById('dv-link-b')?.href||'#','_blank','noopener')"></div>
-          <div class="dv-affiliate-overlay-left" onclick="window.open(document.getElementById('dv-link-b')?.href||'#','_blank','noopener')"></div>
+
         </div>
         <div class="dv-panel-actions">
           <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
         </div>
         <!-- CTA flotante desktop -->
         <a id="dv-float-link-b" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala B ↗</a>
-        <!-- Botón audio propio -->
-        <button class="dv-audio-btn" id="dv-audio-b" onclick="toggleDvAudio('b')" title="Activar/silenciar audio panel B">🔇</button>
       </div>
     </div>
   </div>
@@ -2929,7 +3020,7 @@ async function loadFeatured(){
 }
 // Returns FEATURED list with LEXY in top-4 (only if online), subtle rotation every 2 min
 function buildFeaturedOrder(){
-  const lexyOnline=rooms.some(r=>r.username===LEXY&&r.num_users>0);
+  const lexyOnline=rooms.some(r=>r.username===LEXY&&r.num_users>0)||window._lexyLive===true;
   const base=FEATURED.filter(u=>u!==LEXY);
   if(!lexyOnline) return base; // LEXY not online → exclude from featured
   const slot=Math.floor(Date.now()/120000)%4; // 0-3, rotates every 2 min
@@ -3034,6 +3125,43 @@ async function load(){
       maxV=Math.max(...rooms.map(r=>r.num_users||0),1);
       _rankCache=buildRankCache(rooms);
       loaded=true;
+      // Verificar si lexy_fox2 está en vivo:
+      // 1) Primero busca en el catálogo ya cargado (tiempo real de CB)
+      // 2) Si no está, consulta /api/rooms?username=lexy_fox2 (proxy CB en tiempo real)
+      // 3) Fallback: /api/model-live (Supabase, puede tener hasta 3h de retraso)
+      (async()=>{
+        try{
+          // Paso 1: ya está en rooms (el catálogo CB la listó)
+          let lexyRoom=rooms.find(r=>r.username==='lexy_fox2');
+          if(!lexyRoom){
+            // Paso 2: consultar CB en tiempo real vía proxy
+            const cbRes=await fetch('/api/rooms?username=lexy_fox2&limit=1').catch(()=>null);
+            if(cbRes&&cbRes.ok){
+              const cbData=await cbRes.json().catch(()=>null);
+              const cbRoom=Array.isArray(cbData?.results)?cbData.results.find(r=>r.username==='lexy_fox2'):null;
+              if(cbRoom&&(cbRoom.num_users||0)>0){lexyRoom=cbRoom;}
+            }
+          }
+          if(!lexyRoom){
+            // Paso 3: fallback Supabase
+            const sbRes=await fetch('/api/model-live?username=lexy_fox2').catch(()=>null);
+            const sbData=sbRes&&sbRes.ok?await sbRes.json().catch(()=>null):null;
+            if(sbData&&sbData.online){
+              lexyRoom={username:'lexy_fox2',display_name:'Lexy',num_users:sbData.num_users||1,country:'CO',gender:'f',tags:[],spoken_languages:'Spanish'};
+            }
+          }
+          if(lexyRoom&&(lexyRoom.num_users||0)>0){
+            window._lexyLive=true;
+            window._lexyViewers=lexyRoom.num_users||1;
+            if(!rooms.some(r=>r.username==='lexy_fox2')){
+              rooms.unshift({username:'lexy_fox2',display_name:lexyRoom.display_name||'Lexy',num_users:lexyRoom.num_users||1,country:'CO',gender:'f',tags:lexyRoom.tags||[],spoken_languages:'Spanish'});
+              maxV=Math.max(maxV,lexyRoom.num_users||1);
+              _rankCache=buildRankCache(rooms);
+            }
+            updateAll();
+          }
+        }catch(e){}
+      })();
       updateAll();
       document.getElementById('ts-label').textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
       if(btn) btn.classList.remove('spin');
@@ -3534,7 +3662,26 @@ function openMod(u){
   // Name + CTA
   document.getElementById('m-name').textContent=x.display_name||x.username;
   document.getElementById('m-disp').textContent=x.username!==x.display_name?'@'+x.username:'';
-  document.getElementById('m-link').href=`https://es.chaturbate.com/${x.username}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${x.username}&tour=LQps&track=default`;
+  // Populate info strip below video
+  const mstripName=document.getElementById('mstrip-name');
+  const mstripSub=document.getElementById('mstrip-sub');
+  const mstripLive=document.getElementById('mstrip-live');
+  if(mstripName) mstripName.textContent=x.display_name||x.username;
+  if(mstripSub) mstripSub.textContent=x.username!==x.display_name?'@'+x.username:'';
+  if(mstripLive){
+    mstripLive.textContent=x.num_users>0?'● EN VIVO':'';
+    mstripLive.classList.toggle('visible',x.num_users>0);
+  }
+  // Sync desktop right-panel header
+  const dName=document.getElementById('mstrip-name-d');
+  const dSub=document.getElementById('mstrip-sub-d');
+  const dLive=document.getElementById('mstrip-live-d');
+  if(dName) dName.textContent=x.display_name||x.username;
+  if(dSub) dSub.textContent=x.username!==x.display_name?'@'+x.username:'';
+  if(dLive){dLive.textContent=x.num_users>0?'● EN VIVO':'';dLive.classList.toggle('visible',x.num_users>0);}
+  document.getElementById('m-link').href=`https://es.chaturbate.com/${x.username}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${x.username}&tour=LQps&track=default`;
+  const profileLink=document.getElementById('m-profile-link');
+  if(profileLink) profileLink.href=`https://www.campulsehub.com/model/${x.username}`;
   const ctaTxt=document.getElementById('m-cta-txt');
   const ctaIco=document.getElementById('m-cta-ico');
   if(ctaTxt) ctaTxt.textContent=x.num_users>0?'Entrar en vivo ahora':'Ver perfil en Chaturbate';
@@ -3563,6 +3710,7 @@ function openMod(u){
     if(imgWrap) imgWrap.innerHTML='';
     const _heroEl=document.getElementById('modal-hero');
     if(_heroEl) _heroEl.classList.add('embed-active');
+    // Mostrar chat column en desktop
     if(embedWrap){
       const loading=document.getElementById('embed-loading');
       if(loading) loading.classList.remove('hidden');
@@ -3573,7 +3721,7 @@ function openMod(u){
       // Cargar con audio activo — controles nativos de CB disponibles para volumen
       frame.onload = null;
       frame.removeEventListener('load', onEmbedLoad);
-      frame.src = `https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never&t=${Date.now()}`;
+      frame.src = `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
       frame.addEventListener('load', onEmbedLoad);
     }
   } else {
@@ -3581,12 +3729,13 @@ function openMod(u){
     const _heroElOff=document.getElementById('modal-hero');
     if(_heroElOff) _heroElOff.classList.remove('embed-active');
     if(embedWrap) embedWrap.classList.remove('active');
+    // Ocultar chat column cuando está offline
     if(imgWrap) imgWrap.innerHTML=`
       <div class="mhp-wrap">
         <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
         <div class="mhp-name">${x.display_name||u}</div>
         <div class="mhp-offline"><div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>Offline en este momento</div>
-        <a href="https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
+        <a href="https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
       </div>`;
   }
 
@@ -3610,6 +3759,20 @@ function updateFavBtn(u){
 // startLivePreview kept as stub (no longer used for modal, kept for compatibility)
 function startLivePreview(x){}
 
+function _setModalEmbedScale(){
+  // Embed ahora es 100% del contenedor — sin scale artificial
+  // Esta función se mantiene para compatibilidad con llamadas existentes
+  const frame = document.getElementById('live-embed-frame');
+  const wrap = document.getElementById('mhero-embed-wrap');
+  if(frame){
+    frame.style.width = '';
+    frame.style.height = '';
+    frame.style.transform = '';
+  }
+  if(wrap) wrap.style.height = '';
+}
+window.addEventListener('resize', _setModalEmbedScale);
+
 function activateEmbed(u){
   const wrap=document.getElementById('mhero-embed-wrap');
   const frame=document.getElementById('live-embed-frame');
@@ -3617,11 +3780,13 @@ function activateEmbed(u){
   if(!wrap||!frame)return;
   clearInterval(prevCd);
   wrap.classList.add('active');
+  // Scale noop — iframe es 100% CSS, no requiere cálculo JS
+  _setModalEmbedScale();
   if(loading) loading.classList.remove('hidden');
   frame.onload=null;
   frame.removeEventListener('load', onEmbedLoad);
   // Cargar con audio activo — usuario controla volumen con controles nativos de CB
-  frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never&t=${Date.now()}`;
+  frame.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
   frame.addEventListener('load', onEmbedLoad);
 }
 
@@ -3647,7 +3812,7 @@ function onEmbedLoad(){
 function openActiveRoomAffiliate(){
   if(!active) return;
   const u=active.username;
-  const url=`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
+  const url=`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`;
   window.open(url,'_blank','noopener');
 }
 function deactivateEmbed(){
@@ -3718,10 +3883,33 @@ function loadModalAnalytics(x){
   if(daysEl) daysEl.innerHTML='<span style="font-size:.65rem;color:var(--txt3)">Cargando…</span>';
   const chartCanvas=document.getElementById('man-chart');
 
-  fetch(`/api/history?username=${encodeURIComponent(u)}`)
-    .then(r=>r.ok?r.json():null)
-    .then(raw=>{
-      if(!raw||!daysEl)return;
+  // Fetch history + best_hours en paralelo para tener horarios reales
+  Promise.all([
+    fetch(`/api/history?username=${encodeURIComponent(u)}`).then(r=>r.ok?r.json():null),
+    fetch(`/api/best-hours?username=${encodeURIComponent(u)}`).then(r=>r.ok?r.json():null)
+  ]).then(([raw, bestHoursRaw])=>{
+      if((!raw&&!bestHoursRaw)||!daysEl)return; // solo salir si AMBAS APIs fallan
+
+      // Construir hourly real desde best_hours: {dow: {hour: avg_viewers}}
+      // Construir hourly real desde best_hours
+      // IMPORTANTE: best_hours usa Python weekday() 0=Lun, JS usa getDay() 0=Dom
+      // Conversión: jsDow = (pythonDow + 1) % 7
+      let hourlyReal = null;
+      if(Array.isArray(bestHoursRaw) && bestHoursRaw.length>0){
+        hourlyReal = {};
+        bestHoursRaw.forEach(d=>{
+          // CRÍTICO: forzar enteros para evitar bugs de string vs number en lookup
+          const jsDow = ((parseInt(d.day_of_week,10) + 1) % 7); // Python Mon=0 → JS Mon=1, Sun=0
+          const h     = parseInt(d.hour_est,10);                  // forzar número
+          if(isNaN(jsDow)||isNaN(h)) return;
+          if(!hourlyReal[jsDow]) hourlyReal[jsDow]={};
+          // Acumular avg_viewers (puede haber varios registros por dow/hour tras múltiples upserts)
+          // CRÍTICO: si avg_viewers es 0 o null, usar 1 como centinela — el registro existe = hay actividad real
+          const viewers = Math.max(parseFloat(d.avg_viewers)||0, 1);
+          if(!hourlyReal[jsDow][h] || viewers > hourlyReal[jsDow][h])
+            hourlyReal[jsDow][h] = viewers;
+        });
+      }
 
       // La API devuelve un array de snapshots: [{captured_at, num_users, ...}]
       // Convertir a data.daily = {"YYYY-MM-DD": maxViewers del día}
@@ -3734,7 +3922,10 @@ function loadModalAnalytics(x){
           const v=snap.num_users||0;
           if(!dailyMap[key]||v>dailyMap[key]) dailyMap[key]=v;
         });
-        data={daily:dailyMap};
+        data={daily:dailyMap, hourly:hourlyReal};
+      } else {
+        // history falló pero best_hours puede tener datos — usar objeto vacío
+        data={daily:{}, hourly:hourlyReal};
       }
 
       // Build last-30-days array
@@ -3765,6 +3956,22 @@ function loadModalAnalytics(x){
       days.forEach(d=>{
         if(d.val>0){dowTotals[d.dow]+=d.val;dowCounts[d.dow]++;}
       });
+      // CRÍTICO: rooms_snapshot tiene límite 1000 rows — si la modelo tiene muchos
+      // snapshots, dowCounts puede ser 0 aunque best_hours sí tenga datos reales.
+      // Enriquecer dowCounts usando best_hours como fuente de verdad.
+      if(hourlyReal){
+        Object.keys(hourlyReal).forEach(jsDow=>{
+          const dw=parseInt(jsDow);
+          const hrs=hourlyReal[dw];
+          if(hrs&&Object.keys(hrs).length>0){
+            const maxV=Math.max(...Object.values(hrs),0);
+            if(maxV>0&&dowCounts[dw]===0){
+              dowCounts[dw]=1;
+              dowTotals[dw]=maxV;
+            }
+          }
+        });
+      }
       const dowAvg=dowTotals.map((t,i)=>dowCounts[i]>0?Math.round(t/dowCounts[i]):0);
       const bestDow=dowAvg.indexOf(Math.max(...dowAvg));
 
@@ -3801,25 +4008,34 @@ function loadModalAnalytics(x){
       const schedEl=document.getElementById('man-schedule');
       if(schedSec&&schedEl){
         // Determine active days (at least 1 appearance in 30d)
-        const hasActivity=dowCounts.some(c=>c>0)||(hourly&&Object.keys(hourly).length>0);
+        const hasActivity=dowCounts.some(c=>c>0)||(hourlyReal&&Object.keys(hourlyReal).length>0);
         if(hasActivity){
           schedSec.style.display='';
           // Estimate broadcast hour ranges from data.hourly if available
           // If not, use common streaming patterns based on day activity
           const hourly=data.hourly||null; // {dow: {hour: viewers}}
           const HOUR_RANGES=buildHourRanges(hourly,dowCounts,dowAvg,bestDow);
-          const isDayActiveP=(i)=>dowCounts[i]>0||(hourly&&hourly[i]&&Object.values(hourly[i]).some(v=>v>0));
+          // Un día es "activo" si dowCounts lo tiene O si hourlyReal tiene datos para ese día
+          const isDayActive=(i)=>{
+            if(dowCounts[i]>0) return true;
+            if(hourlyReal&&hourlyReal[i]&&Object.values(hourlyReal[i]).some(v=>v>0)) return true;
+            return false;
+          };
           schedEl.innerHTML=DOW_NAMES.map((name,i)=>{
-            if(!isDayActiveP(i)) return '';
-            const isBest=i===bestDow&&(dowAvg[i]>0||(hourly&&hourly[i]));
-            const range=HOUR_RANGES[i]||{label:'Horario variable',dots:[1,1,1,0,0,0,0,0],isReal:false};
+            if(!isDayActive(i)) return '';
+            const isBest=i===bestDow&&(dowAvg[i]>0||(hourlyReal&&hourlyReal[i]));
+            const isActive=true;
+            const range=HOUR_RANGES[i]||{label:'Horario variable',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:false,peakLabel:null};
             const dotHtml=range.dots.map(v=>`<div class="man-sched-dot ${v>0.6?'on':v>0.2?'mid':''}"></div>`).join('');
-            return `<div class="man-sched-row ${isBest?'best':'active'}">
+            const subLabel=range.isReal
+              ? (range.peakLabel?`<small style="color:var(--neon)">${range.peakLabel}</small>`:`<small>hora EST</small>`)
+              : `<small style="color:var(--txt3)">hora EST</small>`;
+            return `<div class="man-sched-row ${isBest?'best':isActive?'active':''}">
               <div class="man-sched-day">${name}</div>
-              <div class="man-sched-hours">${range.label}<small>aprox.</small></div>
+              <div class="man-sched-hours">${range.label}${subLabel}</div>
               <div class="man-sched-bar">${dotHtml}</div>
             </div>`;
-          }).filter(Boolean).join('');
+          }).filter(Boolean).join('')+'<div style="font-size:.58rem;color:var(--txt3);margin-top:.4rem">⏰ Horario EST = Colombia/Perú. Basado en transmisiones reales de los últimos 30 días.</div>';
         } else {
           schedSec.style.display='none';
         }
@@ -3839,57 +4055,73 @@ function loadModalAnalytics(x){
     });
 }
 
-// Build estimated hour ranges per day-of-week
-// Uses hourly data if available, otherwise derives from day activity levels
+// Build REAL hour ranges per day-of-week from best_hours data
+// hourly = {jsDow: {hour_est(EST): avg_viewers}} — datos reales de Supabase
+// Handles midnight-crossing sessions correctly via gap-rotation algorithm
 function buildHourRanges(hourly,dowCounts,dowAvg,bestDow){
   const ranges={};
-  // Standard streaming hour blocks: morning(6-10), afternoon(12-16), evening(17-21), night(22-02)
-  const BLOCKS=[
-    {label:'Mañana',start:6,end:10},
-    {label:'Tarde',start:14,end:18},
-    {label:'Noche',start:19,end:23},
-    {label:'Madrugada',start:23,end:2}
-  ];
+  const fmt=h=>{
+    if(h===0)return'12am';
+    if(h<12)return`${h}am`;
+    if(h===12)return'12pm';
+    return`${h-12}pm`;
+  };
+  // CRITICO: normalizar keys a enteros — Supabase puede devolver hour_est como string
+  // causando que hrs[9] sea undefined aunque hrs["9"] tenga el valor correcto.
+  function normalizeHrs(rawHrs){
+    if(!rawHrs) return null;
+    const n={};
+    Object.entries(rawHrs).forEach(([k,v])=>{
+      const key=parseInt(k,10);
+      if(!isNaN(key)) n[key]=parseFloat(v)||0;
+    });
+    return n;
+  }
   for(let dow=0;dow<7;dow++){
-    if(dowCounts[dow]===0){ranges[dow]=null;continue;}
-    if(hourly&&hourly[dow]){
-      // We have real hourly data
-      const hrs=hourly[dow];
+    // Buscar datos del día, aceptando tanto clave numérica como string
+    const rawDay = hourly && (hourly[dow]!==undefined ? hourly[dow] : hourly[String(dow)]);
+    const hrs = rawDay ? normalizeHrs(rawDay) : null;
+    const hasData = hrs && Object.keys(hrs).length>0;
+
+    // Si no hay datos reales Y dowCounts también es 0: día inactivo, skip
+    if(!hasData && dowCounts[dow]===0){
+      ranges[dow]=null;
+      continue;
+    }
+
+    if(hasData){
       const maxH=Math.max(...Object.values(hrs),1);
-      // Find the contiguous peak block
+      // Horas activas (>=5% del pico), ordenadas 0-23
       const active=[];
-      for(let h=0;h<24;h++){
-        const v=(hrs[h]||0)/maxH;
-        if(v>0.2) active.push(h);
+      for(let h=0;h<24;h++){if((hrs[h]||0)/maxH>=0.05)active.push(h);}
+      if(!active.length){
+        ranges[dow]={label:'Horario irregular',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:true,peakLabel:null};
+        continue;
       }
-      if(active.length>0){
-        const startH=active[0];
-        const endH=active[active.length-1];
-        const fmt12=h=>h===0?'12am':h<12?`${h}am`:h===12?'12pm':`${h-12}pm`;
-        const dots=[];
-        for(let h=startH;h<=Math.min(endH,startH+7);h++){
-          dots.push((hrs[h]||0)/maxH);
-        }
-        while(dots.length<8) dots.push(0);
-        ranges[dow]={label:`${fmt12(startH)}–${fmt12((endH+1)%24)}`,dots};
-      } else {
-        ranges[dow]={label:'Horario variable',dots:[.5,.5,.5,0,0,0,0,0]};
+      // Peak hour
+      const peakH=parseInt(Object.entries(hrs).reduce((a,b)=>+b[1]>+a[1]?b:a)[0]);
+      // Rotacion por mayor hueco — maneja cruce de medianoche
+      if(active.length>1){
+        const gaps=active.map((h,i)=>((active[(i+1)%active.length]-h+24)%24));
+        const bigIdx=gaps.indexOf(Math.max(...gaps));
+        const rotStart=(bigIdx+1)%active.length;
+        const rotated=active.slice(rotStart).concat(active.slice(0,rotStart));
+        active.length=0;
+        rotated.forEach(h=>active.push(h));
       }
+      const startH=active[0];
+      const endH=active[active.length-1];
+      const spanEnd=(endH+1)%24;
+      // Dots: 8 slots from startH (wrapping)
+      const dots=[];
+      for(let i=0;i<8;i++){
+        const h=(startH+i)%24;
+        dots.push((hrs[h]||0)/maxH);
+      }
+      ranges[dow]={label:`${fmt(startH)}–${fmt(spanEnd)}`,peakLabel:`pico ${fmt(peakH)}`,dots,isReal:true};
     } else {
-      // No hourly data — assign plausible window based on activity level
-      // Higher activity days get prime-time evening slots
-      const pct=dowAvg[dow]/Math.max(...dowAvg,1);
-      let label,dots;
-      if(dow===bestDow){
-        label='7pm–11pm'; dots=[.3,.7,1,1,.9,.6,.3,.1];
-      } else if(pct>0.6){
-        label='8pm–12am'; dots=[.1,.4,.9,1,1,.7,.4,.2];
-      } else if(pct>0.3){
-        label='9pm–1am'; dots=[0,.2,.6,1,1,.8,.5,.2];
-      } else {
-        label='Horario variable'; dots=[.2,.4,.5,.4,.3,.2,.1,0];
-      }
-      ranges[dow]={label,dots};
+      // dowCounts[dow]>0 pero sin datos de hora exacta
+      ranges[dow]={label:'Activo este dia',dots:[.3,.3,.3,.3,.3,.3,.3,.3],isReal:false,peakLabel:null};
     }
   }
   return ranges;
@@ -3923,11 +4155,12 @@ function drawMiniChart(canvas,vals){
 
 /* ── DUAL PICKER — local filter state (isolated from main catalog) ── */
 let _dpSlot=null; // 'a'|'b'|null — set by swapDualSlot
-let _dpGender='', _dpFav=false, _dpHD=false, _dpCo=false, _dpAge='';
+let _dpGender='', _dpFav=false, _dpHD=false, _dpCo=false, _dpAge='', _dpActiveTag='';
 
 function dpSetGender(btn,g){
   _dpGender=g;
-  document.querySelectorAll('.dp-gf').forEach(b=>b.classList.toggle('active',b.dataset.dpg===g));
+  document.querySelectorAll('#dp-gnav .gnav-btn[data-dpg]').forEach(b=>b.classList.toggle('active',b.dataset.dpg===g));
+  _dpRenderTagList();
   renderDpGrid();
 }
 function dpToggle(stateKey,btn){
@@ -3935,29 +4168,89 @@ function dpToggle(stateKey,btn){
   if(stateKey==='dpHD')   _dpHD=!_dpHD;
   if(stateKey==='dpCo')   _dpCo=!_dpCo;
   btn.classList.toggle('active');
+  _dpUpdateFilterSummary();
+  _dpRenderTagList();
   renderDpGrid();
 }
 function dpSetAge(btn,r){
   _dpAge=_dpAge===r?'':r;
   document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.toggle('active',b.dataset.dpa===_dpAge));
+  _dpUpdateFilterSummary();
   renderDpGrid();
 }
-function _dpResetFilters(){
-  _dpGender='';_dpFav=false;_dpHD=false;_dpCo=false;_dpAge='';
-  document.querySelectorAll('.dp-gf').forEach(b=>b.classList.toggle('active',b.dataset.dpg===''));
+function _dpSetTag(t){
+  _dpActiveTag=_dpActiveTag===t?'':t;
+  _dpRenderTagList();
+  _dpUpdateFilterSummary();
+  renderDpGrid();
+}
+function _dpUpdateFilterSummary(){
+  const parts=[];
+  if(_dpFav) parts.push('Favs');
+  if(_dpHD) parts.push('HD');
+  if(_dpCo) parts.push('\uD83C\uDDE8\uD83C\uDDF4');
+  if(_dpAge) parts.push(_dpAge);
+  if(_dpActiveTag) parts.push('#'+_dpActiveTag);
+  const wrap=document.getElementById('dp-active-filters');
+  const label=document.getElementById('dp-filter-summary');
+  if(wrap&&label){wrap.style.display=parts.length?'flex':'none';label.textContent=parts.join(' \u00b7 ');}
+}
+function _dpRenderTagList(){
+  // Compute tags from currently visible rooms (same gender filter applied)
+  const tagCount={};
+  rooms.filter(r=>r.num_users&&(!_dpGender||r.gender===_dpGender)).forEach(r=>(r.tags||[]).forEach(t=>{tagCount[t]=(tagCount[t]||0)+1;}));
+  const topTags=Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,24);
+  const tagHtml=topTags.map(([t,c])=>
+    `<span class="tag-chip${_dpActiveTag===t?' active':''}" onclick="_dpSetTag('${t}')" style="cursor:pointer">#${t}<span class="tag-count">${c}</span></span>`
+  ).join('');
+  const listEl=document.getElementById('dp-tag-list');
+  if(listEl) listEl.innerHTML=tagHtml||'<span style="font-size:.65rem;color:var(--txt3)">Sin tags disponibles</span>';
+  const preview=document.getElementById('dp-tag-preview');
+  if(preview) preview.innerHTML=topTags.slice(0,5).map(([t])=>
+    `<span class="tag-chip${_dpActiveTag===t?' active':''}" style="pointer-events:none;opacity:.65">#${t}</span>`
+  ).join('');
+}
+function _dpToggleTagStrip(){
+  const strip=document.getElementById('dp-tag-strip');
+  const btn=document.getElementById('dp-tag-btn');
+  if(!strip||!btn) return;
+  const isOpen=strip.classList.toggle('open');
+  btn.classList.toggle('open',isOpen);
+}
+function _dpClearAllFilters(){
+  _dpGender='';_dpFav=false;_dpHD=false;_dpCo=false;_dpAge='';_dpActiveTag='';
+  document.querySelectorAll('#dp-gnav .gnav-btn[data-dpg]').forEach(b=>b.classList.toggle('active',b.dataset.dpg===''));
   ['dp-fav','dp-hd','dp-co'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.remove('active'));
   const inp=document.getElementById('dp-input');if(inp)inp.value='';
+  const srt=document.getElementById('dp-sort');if(srt)srt.value='viewers';
+  _dpUpdateFilterSummary();
+  _dpRenderTagList();
+  renderDpGrid();
+}
+function _dpResetFilters(){
+  _dpGender='';_dpFav=false;_dpHD=false;_dpCo=false;_dpAge='';_dpActiveTag='';
+  document.querySelectorAll('#dp-gnav .gnav-btn[data-dpg]').forEach(b=>b.classList.toggle('active',b.dataset.dpg===''));
+  ['dp-fav','dp-hd','dp-co'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.querySelectorAll('.dp-chip-age').forEach(b=>b.classList.remove('active'));
+  const inp=document.getElementById('dp-input');if(inp)inp.value='';
+  const srt=document.getElementById('dp-sort');if(srt)srt.value='viewers';
+  // Close tag strip
+  document.getElementById('dp-tag-strip')?.classList.remove('open');
+  document.getElementById('dp-tag-btn')?.classList.remove('open','active');
+  _dpUpdateFilterSummary();
 }
 
 function renderDpGrid(){
   const dpGrid=document.getElementById('dp-grid');
   if(!dpGrid) return;
-  // Determine excluded username based on context
+  // Excluded username: the other slot already loaded, or the active modal
   const excludeUser = _dpSlot
     ? (document.getElementById('dv-frame-'+(_dpSlot==='a'?'b':'a'))?.src||'').match(/embed\/([^/?]+)/)?.[1]||''
     : (active?.username||'');
   const q=(document.getElementById('dp-input')?.value||'').trim().toLowerCase();
+  const sortVal=(document.getElementById('dp-sort')?.value)||'viewers';
+
   let list=[...rooms].filter(r=>{
     if(!r.num_users) return false;
     if(r.username===excludeUser) return false;
@@ -3965,6 +4258,7 @@ function renderDpGrid(){
     if(_dpFav && !favs.includes(r.username)) return false;
     if(_dpHD && !r.is_hd) return false;
     if(_dpCo && r.country!=='CO') return false;
+    if(_dpActiveTag && !(r.tags||[]).includes(_dpActiveTag)) return false;
     if(_dpAge){
       const age=r.age; if(!age) return false;
       if(_dpAge==='18-21'&&(age<18||age>21)) return false;
@@ -3978,7 +4272,17 @@ function renderDpGrid(){
       if(!hay.includes(q)) return false;
     }
     return true;
-  }).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+  });
+
+  // Sort — same logic as main catalog
+  if(sortVal==='viewers') list.sort((a,b)=>(b.num_users||0)-(a.num_users||0));
+  else if(sortVal==='followers') list.sort((a,b)=>(b.num_followers||0)-(a.num_followers||0));
+  else if(sortVal==='age_asc') list.sort((a,b)=>(a.age||99)-(b.age||99));
+  else if(sortVal==='new') list.sort((a,b)=>new Date(b.start_time||0)-new Date(a.start_time||0));
+
+  // Counter
+  const countEl=document.getElementById('dp-count');
+  if(countEl) countEl.textContent=list.length?`${list.length} sala${list.length!==1?'s':''} en vivo`:'';
 
   if(!list.length){
     dpGrid.innerHTML='<p style="grid-column:1/-1;font-size:.72rem;color:var(--txt3);padding:.5rem">Sin resultados</p>';
@@ -3991,7 +4295,7 @@ function renderDpGrid(){
     return `<div class="dp-card" onclick="${cb}">
       <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
         onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
-      <div class="dp-card-vw">👀 ${fmt(r.num_users)}</div>
+      <div class="dp-card-vw">\uD83D\uDC40 ${fmt(r.num_users)}</div>
       <div class="dp-card-name">${r.display_name||r.username}</div>
     </div>`;
   }).join('');
@@ -4001,12 +4305,11 @@ function showDualPicker(){
   if(!active)return;
   _dpSlot=null;
   _dpResetFilters();
-  const bg=document.getElementById('dual-picker-bg');
-  const nameEl=document.getElementById('dp-current-name');
-  if(nameEl) nameEl.textContent=active.display_name||active.username;
-  const hint=bg?.querySelector('.dp-hint');
-  if(hint) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
+  const titleEl=document.getElementById('dp-title-txt');
+  if(titleEl) titleEl.textContent='⊞ Ver 2 salas — junto a '+(active.display_name||active.username);
+  _dpRenderTagList();
   renderDpGrid();
+  const bg=document.getElementById('dual-picker-bg');
   if(bg){bg.style.display='flex';requestAnimationFrame(()=>bg.classList.add('open'));}
 }
 
@@ -4017,8 +4320,6 @@ function closeDualPicker(e){
   _dpSlot=null;
   bg.classList.remove('open');
   bg.style.display='none';
-  const hint=bg.querySelector('.dp-hint');
-  if(hint&&active) hint.innerHTML=`Elige una segunda sala para ver junto a <strong id="dp-current-name">${active.display_name||active.username}</strong>`;
 }
 
 function filterDpList(q){ renderDpGrid(); }
@@ -4100,7 +4401,7 @@ let _modalAudioActive = false;
 function openDvSlot(slot){
   const u=dvSlotUser[slot];
   if(!u) return;
-  window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');
+  window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');
 }
 /* ── FIX: posiciona los botones "Cambiar" con position:fixed
    Chrome no respeta z-index de elementos hermanos cuando un iframe tiene pointer-events:auto.
@@ -4148,66 +4449,14 @@ function _positionSwapBtns(){
     btnSwapB.style.width = SWAP_W + 'px';
   }
 
-  // Botones de audio — esquina inferior derecha de cada panel
-  const AUDIO_W = 36, AUDIO_PAD_BOT = 6, AUDIO_PAD_RIGHT = 6;
-  const btnAudioA = document.getElementById('dv-audio-a');
-  const btnAudioB = document.getElementById('dv-audio-b');
-  if(btnAudioA){
-    btnAudioA.style.display = 'block';
-    btnAudioA.style.top  = (rA.bottom - AUDIO_PAD_BOT - 30) + 'px';
-    btnAudioA.style.left = (rA.right  - AUDIO_PAD_RIGHT - AUDIO_W) + 'px';
-    btnAudioA.style.width = AUDIO_W + 'px';
-  }
-  if(btnAudioB){
-    btnAudioB.style.display = 'block';
-    btnAudioB.style.top  = (rB.bottom - AUDIO_PAD_BOT - 30) + 'px';
-    btnAudioB.style.left = (rB.right  - AUDIO_PAD_RIGHT - AUDIO_W) + 'px';
-    btnAudioB.style.width = AUDIO_W + 'px';
-  }
 }
 function _hideSwapBtns(){
   document.querySelectorAll('.dv-swap-btn').forEach(b => b.style.display = 'none');
-  document.querySelectorAll('.dv-audio-btn').forEach(b => b.style.display = 'none');
+
 }
 
 /* Estado de audio por slot */
-const _dvAudio = { a: false, b: false }; // false = muted, true = con audio
-
-function toggleDvAudio(slot){
-  _dvAudio[slot] = !_dvAudio[slot];
-  const btn = document.getElementById('dv-audio-' + slot);
-  const frame = document.getElementById('dv-frame-' + slot);
-  const user = dvSlotUser[slot];
-  if(!user || !frame) return;
-  
-  // Recargar el iframe con/sin audio — CB cachea el estado de audio
-  const wrap = frame.closest('.dv-embed-wrap');
-  if(wrap) wrap.classList.remove('stream-ready');
-  const sound = _dvAudio[slot] ? '1' : '0';
-  // Silenciar el otro slot si activamos audio en este
-  if(_dvAudio[slot]){
-    const other = slot === 'a' ? 'b' : 'a';
-    if(_dvAudio[other]){
-      _dvAudio[other] = false;
-      const otherBtn = document.getElementById('dv-audio-' + other);
-      const otherFrame = document.getElementById('dv-frame-' + other);
-      const otherUser = dvSlotUser[other];
-      if(otherBtn) { otherBtn.textContent = '🔇'; otherBtn.classList.remove('active'); }
-      if(otherFrame && otherUser){
-        const otherWrap = otherFrame.closest('.dv-embed-wrap');
-        if(otherWrap) otherWrap.classList.remove('stream-ready');
-        otherFrame.src = `https://chaturbate.com/embed/${otherUser}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
-        otherFrame.onload = ()=>{ otherFrame.onload=null; setTimeout(()=>{ if(otherWrap) otherWrap.classList.add('stream-ready'); }, 2500); };
-      }
-    }
-  }
-  frame.src = `https://chaturbate.com/embed/${user}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=${_dvAudio[slot]?'0':'1'}&mobileRedirect=never&t=${Date.now()}`;
-  frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrap) wrap.classList.add('stream-ready'); }, 2500); };
-  if(btn){ 
-    btn.textContent = _dvAudio[slot] ? '🔊' : '🔇'; 
-    btn.classList.toggle('active', _dvAudio[slot]);
-  }
-}
+// Audio manejado nativamente por CB
 // Reposicionar en resize y orientación
 window.addEventListener('resize', () => { _positionSwapBtns(); _updateDvScale(); });
 window.addEventListener('orientationchange', () => setTimeout(_positionSwapBtns, 300));
@@ -4218,12 +4467,7 @@ function openDualView(uA,uB){
   const _mf=document.getElementById('live-embed-frame');
   if(_mf){ _mf.src='about:blank'; }
   dvSlotUser.a=uA; dvSlotUser.b=uB;
-  // Resetear estado de audio
-  _dvAudio.a=false; _dvAudio.b=false;
-  ['a','b'].forEach(s=>{
-    const ab=document.getElementById('dv-audio-'+s);
-    if(ab){ab.textContent='🔇';ab.classList.remove('active');}
-  });
+  // Audio manejado nativamente por CB iframe
   const bg=document.getElementById('dual-view-bg');
   const frameA=document.getElementById('dv-frame-a');
   const frameB=document.getElementById('dv-frame-b');
@@ -4231,7 +4475,7 @@ function openDualView(uA,uB){
   const lblB=document.getElementById('dv-label-b');
   const linkA=document.getElementById('dv-link-a');
   const linkB=document.getElementById('dv-link-b');
-  const mkAffLink=(u)=>`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
+  const mkAffLink=(u)=>`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`;
   const rA=rooms.find(r=>r.username===uA)||{username:uA};
   const rB=rooms.find(r=>r.username===uB)||{username:uB};
   if(lblA) lblA.textContent=rA.display_name||uA;
@@ -4250,11 +4494,11 @@ function openDualView(uA,uB){
   // Cargar iframes con audio activo — controles nativos de CB disponibles
   setTimeout(()=>{
     if(frameA){
-      frameA.src=`https://chaturbate.com/embed/${uA}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never&t=${Date.now()}`;
+      frameA.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uA}&t=${Date.now()}`;
       frameA.onload=()=>{ frameA.onload=null; setTimeout(()=>{ if(wrapA) wrapA.classList.add('stream-ready'); },2000); };
     }
     if(frameB){
-      frameB.src=`https://chaturbate.com/embed/${uB}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never&t=${Date.now()}`;
+      frameB.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uB}&t=${Date.now()}`;
       frameB.onload=()=>{ frameB.onload=null; setTimeout(()=>{ if(wrapB) wrapB.classList.add('stream-ready'); },2000); };
     }
   },120);
@@ -4275,21 +4519,18 @@ function closeDualView(){
   document.querySelectorAll('.dv-embed-wrap').forEach(w=>w.classList.remove('stream-ready'));
   if(bg) bg.style.display='none';
   document.body.style.overflow='';
-  _dvAudio.a=false; _dvAudio.b=false;
   _hideSwapBtns(); // FIX: ocultar botones fixed al cerrar
 }
 
 /* ── SWAP SLOT: change one room without closing dual view ── */
 function swapDualSlot(slot){
-  // Si este slot tenía audio activo, limpiar mutex
-  if(_dvAudioState[slot]){ _dvAudioState[slot]=false; if(_dvActiveAudioSlot===slot) _dvActiveAudioSlot=null; }
-  const _ab=document.getElementById('dv-audio-'+slot); if(_ab){_ab.classList.remove('active');_ab.textContent='🔇 Audio';}
   const bg = document.getElementById('dual-picker-bg');
   if(!bg) return;
   _dpSlot = slot;
   _dpResetFilters();
-  const hint = bg.querySelector('.dp-hint');
-  if(hint) hint.innerHTML = `Elige la sala para reemplazar el <strong>Panel ${slot.toUpperCase()}</strong>`;
+  const titleEl = document.getElementById('dp-title-txt');
+  if(titleEl) titleEl.textContent = '⇄ Cambiar Panel ' + slot.toUpperCase();
+  _dpRenderTagList();
   renderDpGrid();
   bg.style.display = 'flex';
   requestAnimationFrame(() => bg.classList.add('open'));
@@ -4298,17 +4539,6 @@ function swapDualConfirm(slot, newUsername){
   if(!slot || !newUsername) return;
   closeDualPicker(); // cierra sin evento — sin guard
 
-  // Reset completo del estado de audio del slot anterior antes del swap
-  _dvAudioState[slot] = false;
-  if(_dvActiveAudioSlot === slot) _dvActiveAudioSlot = null;
-  if(_audioOwner === 'dv-' + slot) _audioOwner = null;
-  const _swapBtn = document.getElementById('dv-audio-' + slot);
-  if(_swapBtn){ _swapBtn.classList.remove('active','pending'); _swapBtn.textContent = '🔇 Audio'; }
-
-  // Resetear audio del slot reemplazado
-  _dvAudio[slot] = false;
-  const _sab = document.getElementById('dv-audio-' + slot);
-  if(_sab){_sab.textContent='🔇';_sab.classList.remove('active');}
   // Actualizar username del slot ANTES de cargar el iframe
   dvSlotUser[slot] = newUsername;
 
@@ -4316,13 +4546,13 @@ function swapDualConfirm(slot, newUsername){
   const lblEl  = document.getElementById('dv-label-'  + slot);
   const linkEl = document.getElementById('dv-link-'   + slot);
   const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
-  const mkAffLink = u => `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
+  const mkAffLink = u => `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`;
   if(frame){
     const wrapEl = frame.closest('.dv-embed-wrap');
     if(wrapEl) wrapEl.classList.remove('stream-ready');
     frame.onload = null; // cancelar cualquier handler pendiente del slot anterior
     // Nueva sala siempre silenciada — el usuario debe presionar el botón para audio
-    frame.src = `https://chaturbate.com/embed/${newUsername}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=0&mobileRedirect=never&t=${Date.now()}`;
+    frame.src = `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${newUsername}&t=${Date.now()}`;
     frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrapEl) wrapEl.classList.add('stream-ready'); }, 2500); };
   }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
@@ -4407,7 +4637,7 @@ function setGender(btn,g){
   document.querySelectorAll('.g-btn[data-g]').forEach(b=>b.classList.toggle('active',b.dataset.g===g));
   renderCarousels();renderOnFilter();
 }
-function openInCB(u){window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');}
+function openInCB(u){window.open(`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`,'_blank','noopener');}
 function toggleFavFilter(btn){
   onlyFavs=!onlyFavs;
   document.querySelectorAll('#sd-fv,#tb-fv').forEach(b=>b.classList.toggle('active',onlyFavs));
@@ -4655,110 +4885,7 @@ function resetModelSearch(){
   document.getElementById('model-report').style.display='none';
   document.getElementById('model-username-input').value='';
   curModel=null;
-  // Clear rep embed
-  const rpf=document.getElementById('rp-embed-frame');
-  if(rpf) rpf.src='about:blank';
-  const rpsec=document.getElementById('rp-live-section');
-  if(rpsec) rpsec.style.display='none';
-  const rpw=document.getElementById('rp-embed-wrap');
-  if(rpw) rpw.classList.remove('video-ready');
 }
-/* ═══ REP-VIEW EMBED EN VIVO ═══ */
-function loadRepEmbed(u, room){
-  const sec   = document.getElementById('rp-live-section');
-  const frame = document.getElementById('rp-embed-frame');
-  const wrap  = document.getElementById('rp-embed-wrap');
-  const badge = document.getElementById('rp-live-badge');
-  const ctaBtn= document.getElementById('rp-go-live-btn');
-  const ctaTxt= document.getElementById('rp-go-live-txt');
-  const pageBtn=document.getElementById('rp-page-btn');
-  const statsEl=document.getElementById('rp-live-stats');
-  const favBtn= document.getElementById('rp-fav-live-btn');
-  const favIco= document.getElementById('rp-fav-live-icon');
-  const favTxt= document.getElementById('rp-fav-live-txt');
-
-  if(!sec||!frame) return;
-
-  const isLive = room && room.num_users > 0;
-
-  // Mostrar sección siempre (en vivo u offline)
-  sec.style.display = 'block';
-
-  // CTA link
-  const roomUrl = `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
-  if(ctaBtn) ctaBtn.href = roomUrl;
-  if(pageBtn) pageBtn.href = `https://campulsehub.com/model/${u}`;
-
-  // Badge + CTA text
-  if(badge) badge.style.display = isLive ? 'inline-block' : 'none';
-  if(ctaTxt) ctaTxt.textContent = isLive ? 'Entrar en vivo ahora' : 'Ver perfil en Chaturbate';
-
-  // Fav button state
-  if(favBtn && favIco && favTxt){
-    const isFav = favs.includes(u);
-    favBtn.classList.toggle('active', isFav);
-    favIco.textContent = isFav ? '♥' : '♡';
-    favTxt.textContent = isFav ? 'Guardada' : 'Favorita';
-  }
-
-  // Stats chips
-  if(statsEl && room){
-    const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>b.num_users-a.num_users);
-    const rank = sorted.findIndex(r=>r.username===u);
-    if(isLive){
-      statsEl.innerHTML=`
-        <div class="rp-live-stat"><span class="rp-live-stat-val">${fmt(room.num_users)}</span><span class="rp-live-stat-lbl">viewers ahora</span></div>
-        <div class="rp-live-stat"><span class="rp-live-stat-val">${room.num_followers?fmt(room.num_followers):'—'}</span><span class="rp-live-stat-lbl">seguidores</span></div>
-        ${rank>=0?`<div class="rp-live-stat"><span class="rp-live-stat-val">#${rank+1}</span><span class="rp-live-stat-lbl">puesto live</span></div>`:''}
-      `;
-    } else {
-      statsEl.innerHTML='';
-    }
-  }
-
-  // Reset wrap state
-  if(wrap) wrap.classList.remove('video-ready');
-  frame.src='about:blank';
-
-  if(isLive){
-    // Cargar embed de la sala de la modelo
-    setTimeout(()=>{
-      frame.onload = function(){
-        setTimeout(()=>{ if(wrap) wrap.classList.add('video-ready'); }, 2000);
-        frame.onload=null;
-      };
-      frame.src=`https://chaturbate.com/embed/${u}/?tour=LQps&campaign=rI8z3&bgcolor=000000&disable_sound=1&mobileRedirect=never&t=${Date.now()}`;
-    }, 300);
-  }
-}
-
-function favModFromReport(){
-  if(!curModel) return;
-  const u = curModel.username || curModel;
-  const idx = favs.indexOf(u);
-  if(idx>=0) favs.splice(idx,1); else favs.push(u);
-  try{ localStorage.setItem('favs', JSON.stringify(favs)); }catch(e){}
-  // Update rep-view fav button
-  const isFav = favs.includes(u);
-  const btn=document.getElementById('rp-fav-live-btn');
-  const ico=document.getElementById('rp-fav-live-icon');
-  const txt=document.getElementById('rp-fav-live-txt');
-  if(btn) btn.classList.toggle('active', isFav);
-  if(ico) ico.textContent = isFav ? '♥' : '♡';
-  if(txt) txt.textContent = isFav ? 'Guardada' : 'Favorita';
-  // Also sync main fav button if modal is open
-  if(typeof updateFavBtn==='function') updateFavBtn(u);
-  renderAll();
-}
-
-function openDualFromReport(){
-  if(!curModel) return;
-  const u = typeof curModel==='string' ? curModel : (curModel.username||curModel);
-  closeMod && closeMod();
-  openMod(u);
-  setTimeout(()=>{ showDualPicker && showDualPicker(); }, 350);
-}
-
 
 async function searchModel(){
   const u=document.getElementById('model-username-input').value.trim().toLowerCase();
@@ -4805,10 +4932,7 @@ async function loadModelReport(room,username){
   const stxt=document.getElementById('rp-status-txt');
   if(room&&room.num_users>0){dot.style.background='var(--hot)';stxt.style.color='var(--hot)';stxt.textContent='En vivo ahora';}
   else{dot.style.background='var(--txt3)';stxt.style.color='var(--txt3)';stxt.textContent='Offline en este momento';}
-  document.getElementById('rp-link').href=`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&join_overlay=1&room=${u}&tour=LQps&track=default`;
-
-  // -- REP-VIEW EMBED EN VIVO --
-  loadRepEmbed(u, room);
+  document.getElementById('rp-link').href=`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`;
 
   // Rank
   const sorted=[...rooms].filter(r=>r.num_users>0).sort((a,b)=>(b.num_users||0)-(a.num_users||0));
@@ -4892,6 +5016,7 @@ async function loadHistoricalData(username,room){
     renderTrendChart(data,dayAvgs,avg,peak,data.length);
     renderFollowersChart(data);
     renderScheduleSection(data);
+    loadBestHoursHeatmap(username);
   }catch(e){
     el('rp-avg','—');el('rp-peak','—');
     // Show friendly error in charts
@@ -4904,32 +5029,40 @@ function renderTrendChart(data,dayAvgs,avg,peak,snaps){
   const cont=document.getElementById('heatmap-container');
   if(!cont)return;
   if(!data.length){cont.innerHTML='<div class="chart-no-data">Aún no hay suficientes datos. ¡Empieza a transmitir!</div>';return;}
-  const w=cont.clientWidth||280,h=110;
+  const w=cont.clientWidth||280,h=130;
   const vals=dayAvgs.map(d=>d.avg);
+  const days=dayAvgs.map(d=>d.day);
   const mx=Math.max(...vals,1);
   const pts=vals.map((v,i)=>{
     const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
-    const y=h-12-(v/mx)*(h-24);
+    const y=h-20-(v/mx)*(h-36);
     return`${x},${y}`;
   }).join(' ');
+  // Puntos interactivos
+  const circles=vals.map((v,i)=>{
+    const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
+    const y=h-20-(v/mx)*(h-36);
+    const isPeak=v===peak&&vals.length>1;
+    return`<circle class="chart-dot" cx="${x}" cy="${y}" r="${isPeak?5:3.5}"
+      fill="${isPeak?'var(--gold)':'var(--hot)'}" stroke="var(--bg2)" stroke-width="1.5"
+      data-val="${v}" data-day="${days[i]||''}"
+      onmouseenter="showTT(event,'${days[i]||''}: ${fmt(v)} viewers')"
+      onmouseleave="hideTT()"/>`;
+  }).join('');
   cont.innerHTML=`<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="overflow:visible">
     <defs>
       <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="var(--hot)" stop-opacity=".35"/>
+        <stop offset="0%" stop-color="var(--hot)" stop-opacity=".3"/>
         <stop offset="100%" stop-color="var(--hot)" stop-opacity="0"/>
       </linearGradient>
     </defs>
     ${vals.length>1?`<polygon points="${pts} ${w-8},${h} 8,${h}" fill="url(#grad)"/>
     <polyline points="${pts}" fill="none" stroke="var(--hot)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`:''}
-    ${vals.map((v,i)=>{
-      const x=i/(Math.max(vals.length-1,1))*(w-16)+8;
-      const y=h-12-(v/mx)*(h-24);
-      return v===peak&&vals.length>1?`<circle cx="${x}" cy="${y}" r="4" fill="var(--gold)" stroke="var(--bg2)" stroke-width="2"/>`:'';
-    }).join('')}
+    ${circles}
   </svg>
   <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--txt3);margin-top:.2rem;padding:0 2px">
     <span>${dayAvgs[0]?.day.substring(5)||''}</span>
-    <span style="color:var(--txt2)">Promedio: <strong style="color:var(--txt)">${fmt(avg)}</strong></span>
+    <span style="color:var(--txt2)">Promedio: <strong style="color:var(--txt)">${fmt(avg)}</strong> · Pico: <strong style="color:var(--gold)">${fmt(peak)}</strong></span>
     <span>${dayAvgs[dayAvgs.length-1]?.day.substring(5)||''}</span>
   </div>`;
 }
@@ -4939,17 +5072,28 @@ function renderFollowersChart(data){
   if(!cont)return;
   const fdata=data.filter(d=>d.num_followers>0);
   if(fdata.length<2){cont.innerHTML='<div class="chart-no-data">Pocos datos de seguidores aún</div>';return;}
-  const w=cont.clientWidth||280,h=110;
+  const w=cont.clientWidth||280,h=130;
   const vals=fdata.map(d=>d.num_followers);
+  const dates=fdata.map(d=>d.captured_at?.substring(0,10)||'');
   const mn=Math.min(...vals),mx=Math.max(...vals,mn+1);
   const pts=vals.map((v,i)=>{
     const x=i/(vals.length-1)*(w-16)+8;
-    const y=h-12-((v-mn)/(mx-mn))*(h-24);
+    const y=h-20-((v-mn)/(mx-mn))*(h-36);
     return`${x},${y}`;
   }).join(' ');
   const diff=vals[vals.length-1]-vals[0];
   const diffColor=diff>=0?'var(--grn)':'var(--hot)';
   const diffSign=diff>=0?'+':'';
+  // puntos interactivos (solo cada N para no saturar)
+  const step=Math.max(1,Math.floor(vals.length/20));
+  const circles=vals.map((v,i)=>{
+    if(i%step!==0&&i!==vals.length-1)return'';
+    const x=i/(vals.length-1)*(w-16)+8;
+    const y=h-20-((v-mn)/(mx-mn))*(h-36);
+    return`<circle cx="${x}" cy="${y}" r="3" fill="var(--grn)" stroke="var(--bg2)" stroke-width="1.5"
+      onmouseenter="showTT(event,'${dates[i]}: ${fmt(v)} seguidores')"
+      onmouseleave="hideTT()"/>`;
+  }).join('');
   cont.innerHTML=`<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem">
     <span style="font-size:1.2rem;font-weight:800;color:var(--txt)">${fmt(vals[vals.length-1])}</span>
     <span style="font-size:.72rem;font-weight:700;color:${diffColor}">${diffSign}${fmt(diff)} en 30d</span>
@@ -4963,6 +5107,7 @@ function renderFollowersChart(data){
     </defs>
     <polygon points="${pts} ${w-8},${h} 8,${h}" fill="url(#gradF)"/>
     <polyline points="${pts}" fill="none" stroke="var(--grn)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${circles}
   </svg>`;
 }
 
@@ -5000,6 +5145,64 @@ function renderScheduleSection(data){
     bestEl.style.display='inline-flex';
   }
   document.getElementById('schedule-hero-section').style.display='block';
+}
+
+function showTT(e,txt){
+  const t=document.getElementById('cmp-tt');
+  if(!t)return;
+  t.textContent=txt;t.style.display='block';
+  t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-28)+'px';
+}
+function hideTT(){const t=document.getElementById('cmp-tt');if(t)t.style.display='none';}
+
+async function loadBestHoursHeatmap(username){
+  const cont=document.getElementById('besttimes-container');
+  if(!cont)return;
+  try{
+    const res=await fetch(`/api/best-hours?username=${encodeURIComponent(username)}`);
+    const data=await res.json();
+    if(!Array.isArray(data)||!data.length){cont.style.display='none';return;}
+    const DAYS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+    // Build 7x24 grid
+    const grid={};
+    data.forEach(d=>{
+      const key=`${d.day_of_week}_${d.hour_est}`;
+      grid[key]={avg:d.avg_viewers||0,peak:d.peak_viewers||0,n:d.sample_count||0};
+    });
+    const maxAvg=Math.max(...data.map(d=>d.avg_viewers||0),1);
+    // Hour labels row
+    let html='<div class="heat-grid">';
+    html+='<div class="heat-label"></div>';
+    for(let h=0;h<24;h++)html+=`<div class="heat-hour-label">${h<10?'0'+h:h}</div>`;
+    // Day rows
+    for(let d=0;d<7;d++){
+      html+=`<div class="heat-label">${DAYS[d]}</div>`;
+      for(let h=0;h<24;h++){
+        const cell=grid[`${d}_${h}`]||{avg:0,peak:0,n:0};
+        const intensity=cell.avg/maxAvg;
+        const alpha=cell.avg>0?0.12+intensity*0.88:0.04;
+        const bg=cell.avg>0?`rgba(232,48,90,${alpha.toFixed(2)})`:'rgba(255,255,255,0.04)';
+        const tip=cell.avg>0?`${DAYS[d]} ${h<10?'0'+h:h}:00 — ${Math.round(cell.avg)} avg · ${Math.round(cell.peak)} pico (${cell.n} muestras)`:`${DAYS[d]} ${h<10?'0'+h:h}:00 — sin datos`;
+        html+=`<div class="heat-cell" style="background:${bg}"
+          onmouseenter="showTT(event,'${tip.replace(/'/g,'&#39;')}')"
+          onmouseleave="hideTT()"></div>`;
+      }
+    }
+    html+='</div>';
+    html+=`<div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-size:.6rem;color:var(--txt3)">
+      <div style="width:40px;height:10px;background:linear-gradient(to right,rgba(232,48,90,.12),rgba(232,48,90,1));border-radius:3px"></div>
+      <span>Menor → Mayor audiencia</span>
+    </div>`;
+    cont.innerHTML=`<div class="rep-section">
+      <div class="rep-section-head">
+        <div class="rep-section-title"><span class="ico">🔥</span> ¿Cuándo transmitir? Heatmap real</div>
+        <div class="rep-section-badge">últimos 30 días</div>
+      </div>
+      <p style="font-size:.72rem;color:var(--txt2);margin-bottom:.5rem;line-height:1.5">Cada celda es una hora del día. Más rojo = más viewers históricos. Pasa el cursor para ver el detalle.</p>
+      ${html}
+    </div>`;
+    cont.style.display='block';
+  }catch(e){cont.style.display='none';}
 }
 
 async function loadStatbateIncome(username){
@@ -5133,5 +5336,39 @@ setInterval(load, 5*60*1000); // auto-refresh each 5 min
 load();
 // Reposicionar botón de audio si cambia el tamaño de ventana/orientación
 </script>
+<div class="cmp-tooltip" id="cmp-tt"></div>
+
+<!-- ═══ MOBILE BOTTOM EXPLORE NAV ═══ -->
+<nav class="mob-explore-nav" id="mob-explore-nav">
+  <a class="mob-enav-item" href="https://www.campulsehub.com/top/latinas" target="_blank">
+    <span class="mob-enav-ico">🔥</span>
+    <span class="mob-enav-lbl">Latinas</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/top/colombia" target="_blank">
+    <span class="mob-enav-ico">🇨🇴</span>
+    <span class="mob-enav-lbl">Colombia</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/top/mexico" target="_blank">
+    <span class="mob-enav-ico">🇲🇽</span>
+    <span class="mob-enav-lbl">México</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/country" target="_blank">
+    <span class="mob-enav-ico">🌍</span>
+    <span class="mob-enav-lbl">Países</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/gender" target="_blank">
+    <span class="mob-enav-ico">⚧</span>
+    <span class="mob-enav-lbl">Género</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/language" target="_blank">
+    <span class="mob-enav-ico">💬</span>
+    <span class="mob-enav-lbl">Idioma</span>
+  </a>
+  <a class="mob-enav-item" href="https://www.campulsehub.com/search" target="_blank">
+    <span class="mob-enav-ico">🔍</span>
+    <span class="mob-enav-lbl">Buscar</span>
+  </a>
+</nav>
+
 </body>
 </html>
