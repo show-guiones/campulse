@@ -315,7 +315,7 @@ export default function TagPage({ tag, models }) {
             <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
             <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>En vivo ahora en Chaturbate</span>
           </div>
-          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",height:"56dvh",minHeight:280,maxHeight:"62dvh"}}>
+          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",paddingBottom:"56.25%",height:0}}>
             <iframe
               src={`https://chaturbate.com/in/?tour=dTm0&campaign=rI8z3&track=tag_${tag}&disable_sound=1&mobileRedirect=auto&embed_video_only=1`}
               style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
