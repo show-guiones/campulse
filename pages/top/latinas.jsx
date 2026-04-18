@@ -220,11 +220,12 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
             <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
             <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>Latina más popular en vivo ahora</span>
           </div>
-          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",paddingTop:"56.25%"}}>
+          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",height:"56dvh",minHeight:280,maxHeight:"62dvh"}}>
             <iframe
-              src="https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=top_latinas&disable_sound=1&mobileRedirect=auto&embed_video_only=1"
+              src="https://chaturbate.com/in/?tour=dTm0&campaign=rI8z3&track=top_latinas&disable_sound=1&mobileRedirect=never&embed_video_only=1"
               style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
               allow="autoplay; fullscreen; encrypted-media"
+              allowFullScreen
               scrolling="no"
             />
           </div>
