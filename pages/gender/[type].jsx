@@ -163,7 +163,7 @@ export default function GenderTypePage({ data }) {
           <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)"}}>
             <iframe
               src={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=default&c=15&p=1&gender=${GENDER_CB_PARAM[gender]||"f"}`}
-              style={{width:"100%",height:600,border:"none",display:"block"}}
+              style={{width:"100%",height:"56dvh",minHeight:280,maxHeight:"62dvh",border:"none",display:"block"}}
               frameBorder="0"
               scrolling="yes"
             />
