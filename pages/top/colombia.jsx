@@ -1,7 +1,7 @@
 // pages/top/colombia.jsx — Top modelos colombianas en Chaturbate en vivo
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav} from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const LEXY = "lexy_fox2";
@@ -240,6 +240,9 @@ export default function TopColombiaPage({ models, isLiveData, fetchedAt }) {
             </p>
           )}
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/top/latinas" className="cmp-footer-link">← Top Latinas</a>

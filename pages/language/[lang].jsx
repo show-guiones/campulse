@@ -1,7 +1,7 @@
 // pages/language/[lang].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -196,6 +196,9 @@ export default function LanguagePage({ data }) {
             </p>
           )}
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/language" className="cmp-footer-link">← Ver otros idiomas</a>

@@ -1,7 +1,7 @@
 // pages/gender/[type].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const SUPPORTED_GENDERS = ["female","male","couple","trans"];
@@ -186,6 +186,9 @@ export default function GenderTypePage({ data }) {
             </p>
           )}
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/gender" className="cmp-footer-link">← Ver todos los géneros</a>

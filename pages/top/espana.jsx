@@ -1,7 +1,7 @@
 // pages/top/espana.jsx — Top modelos españolas en Chaturbate en vivo
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav} from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const AFF = "rI8z3";
@@ -186,6 +186,9 @@ export default function TopEspanaPage({ models, isLiveData }) {
             Explora también el <a href="/top/latinas" style={{color:"var(--neon)"}}>ranking de latinas</a>, <a href="/top/colombia" style={{color:"var(--neon)"}}>top colombianas</a> o <a href="/top/mexico" style={{color:"var(--neon)"}}>top mexicanas</a>.
           </p>
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/top/mexico" className="cmp-footer-link">← Top México</a>

@@ -1,7 +1,7 @@
 // pages/country/[code].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -203,6 +203,9 @@ export default function CountryPage({ code, codeUC, name, models, fetchError }) 
             </p>
           )}
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links" style={{marginTop:"2rem"}}>
           <a href="/country" className="cmp-footer-link">← Ver modelos de otros países</a>

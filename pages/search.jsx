@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import { useState } from "react";
-import { DS_CSS, Logo, BottomNav } from "../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA } from "../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -156,6 +156,9 @@ export default function SearchPage() {
             </div>
           </div>
         )}
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/" className="cmp-footer-link">← Volver al inicio</a>

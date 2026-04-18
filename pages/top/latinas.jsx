@@ -1,7 +1,7 @@
 // pages/top/latinas.jsx — En vivo tiempo real, 1 request, fallback Supabase
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav} from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const LEXY = "lexy_fox2";
@@ -245,6 +245,9 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
             </p>
           )}
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/gender/female" className="cmp-footer-link">← Ver todas las chicas</a>

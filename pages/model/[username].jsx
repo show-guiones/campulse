@@ -1,7 +1,7 @@
 // pages/model/[username].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA } from "../../campulse-design-system";
 
 const LANG_VARIANTS = {
   spanish:["spanish","español","espanol","es"],english:["english","inglés","ingles","en"],
@@ -300,10 +300,13 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
         </>)}
 
         {/* FOOTER LINKS */}
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
         <div className="cmp-footer-links">
           {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-footer-link">{flag} Ver más modelos de {countryName} →</a>}
           {langSlug && <a href={`/language/${langSlug}`} className="cmp-footer-link">🗣 Ver modelos en {langName} →</a>}
-          <a href="/" className="cmp-footer-link" style={{marginTop:4}}>← Volver al inicio</a>
+          <a href="/app.html" className="cmp-footer-link" style={{marginTop:4}}>← Ver todas las modelos en vivo</a>
         </div>
       </div>
     </>

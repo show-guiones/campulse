@@ -1,6 +1,6 @@
 // pages/404.jsx — Campulse design system, logo a /app.html
 import Head from "next/head";
-import { DS_CSS, Logo } from "../campulse-design-system";
+import { DS_CSS, Logo, AppCTA } from "../campulse-design-system";
 
 export default function NotFound() {
   return (
@@ -35,6 +35,7 @@ export default function NotFound() {
             {[{href:"/gender/female",l:"♀ Chicas"},{href:"/gender/male",l:"♂ Chicos"},{href:"/country/co",l:"🇨🇴 Colombia"},{href:"/country/es",l:"🇪🇸 España"},{href:"/language/spanish",l:"🗣 Español"},{href:"/tag/latina",l:"#latina"}].map(x=>(<a key={x.href} href={x.href} className="cmp-tag-link">{x.l}</a>))}
           </div>
         </div>
+        <AppCTA />
       </div>
     </>
   );

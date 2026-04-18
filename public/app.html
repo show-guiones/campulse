@@ -2338,6 +2338,26 @@ body.modal-open{overflow:hidden!important}
 /* Hide mobile nav when modal is open to avoid overlap */
 body.modal-open .mob-explore-nav{display:none!important}
 
+/* APP CTA BANNER */
+@keyframes appCtaShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@keyframes appCtaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes appCtaPulse{0%,100%{opacity:1}50%{opacity:.55}}
+.app-cta-banner{display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(232,48,90,.12) 0%,rgba(124,92,191,.14) 50%,rgba(56,182,212,.1) 100%);border:1px solid rgba(232,48,90,.28);border-radius:16px;padding:1.125rem 1.375rem;margin:1.5rem 0;text-decoration:none;cursor:pointer;transition:border-color .25s,transform .2s,box-shadow .25s;}
+.app-cta-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);animation:appCtaShimmer 3.2s ease-in-out infinite;pointer-events:none;}
+.app-cta-banner:hover{border-color:rgba(232,48,90,.5);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,48,90,.15),0 2px 8px rgba(0,0,0,.4);}
+.app-cta-left{display:flex;align-items:center;gap:.875rem;flex:1;min-width:0}
+.app-cta-icon{width:44px;height:44px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,var(--hot),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1.25rem;animation:appCtaFloat 3s ease-in-out infinite;box-shadow:0 4px 14px rgba(232,48,90,.3);}
+.app-cta-text{flex:1;min-width:0}
+.app-cta-title{font-size:.9375rem;font-weight:800;color:var(--txt);letter-spacing:-.02em;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.app-cta-sub{font-size:.75rem;color:var(--txt2);line-height:1.35}
+.app-cta-sub strong{color:var(--neon)}
+.app-cta-badge{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.app-cta-counter{font-size:1.25rem;font-weight:900;color:var(--hot);letter-spacing:-.04em;line-height:1;animation:appCtaPulse 2.4s ease-in-out infinite;}
+.app-cta-counter-lbl{font-size:.6rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;text-align:center}
+.app-cta-arrow{flex-shrink:0;width:32px;height:32px;border-radius:10px;background:var(--hot);display:flex;align-items:center;justify-content:center;font-size:.875rem;box-shadow:0 3px 10px rgba(232,48,90,.35);transition:transform .2s;}
+.app-cta-banner:hover .app-cta-arrow{transform:translateX(3px)}
+@media(max-width:480px){.app-cta-banner{padding:.875rem 1rem;gap:.75rem}.app-cta-badge{display:none}}
+
 </style>
 <!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js" defer></script>
@@ -2899,6 +2919,22 @@ body.modal-open .mob-explore-nav{display:none!important}
           <div class="man-tags" id="man-tags"></div>
         </div>
 
+        <!-- CTA todas las modelos -->
+        <a href="/app.html" class="app-cta-banner" style="margin-top:1.25rem;margin-bottom:.5rem">
+          <div class="app-cta-left">
+            <div class="app-cta-icon">📡</div>
+            <div class="app-cta-text">
+              <div class="app-cta-title">Ver todas las modelos en vivo</div>
+              <div class="app-cta-sub">Dashboard completo · Ranking · <strong>Estadísticas en tiempo real</strong></div>
+            </div>
+          </div>
+          <div class="app-cta-badge">
+            <div class="app-cta-counter" id="app-cta-count">3000+</div>
+            <div class="app-cta-counter-lbl">modelos<br>ahora</div>
+          </div>
+          <div class="app-cta-arrow">→</div>
+        </a>
+
       </div>
 
     </div>
@@ -3372,6 +3408,9 @@ function renderOnFilter(){
 
 function updateStats(){
   const views=rooms.reduce((s,r)=>s+(r.num_users||0),0);
+  // Update AppCTA counter
+  const ctaCount=document.getElementById('app-cta-count');
+  if(ctaCount&&rooms.length>0) ctaCount.textContent=rooms.length.toLocaleString('es')+'+';
   const avg=rooms.length?Math.round(views/rooms.length):0;
   const peak=Math.max(...rooms.map(r=>r.num_users||0),0);
   // sidebar stats

@@ -92,9 +92,29 @@ button{font-family:inherit;cursor:pointer}
 .cmp-footer-link:hover{color:var(--neon)}
 
 /* ── EMBED ── */
-.cmp-embed-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:14px;background:#111;border:1px solid var(--bdr);margin-bottom:1rem}
+.cmp-embed-wrap{position:relative;height:56dvh;min-height:280px;max-height:62dvh;overflow:hidden;border-radius:14px;background:#111;border:1px solid var(--bdr);margin-bottom:1rem}
 .cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px}
 .cmp-embed-note{font-size:.75rem;color:var(--txt3);text-align:center;margin-bottom:1.5rem}
+
+/* CTA APP BANNER */
+@keyframes cmpShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@keyframes cmpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes cmpCounterPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.cmp-app-cta{display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(232,48,90,.12) 0%,rgba(124,92,191,.14) 50%,rgba(56,182,212,.1) 100%);border:1px solid rgba(232,48,90,.28);border-radius:16px;padding:1.125rem 1.375rem;margin:1.5rem 0;text-decoration:none;transition:border-color .25s,transform .2s,box-shadow .25s;cursor:pointer;}
+.cmp-app-cta::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);animation:cmpShimmer 3.2s ease-in-out infinite;pointer-events:none;}
+.cmp-app-cta:hover{border-color:rgba(232,48,90,.5);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,48,90,.15),0 2px 8px rgba(0,0,0,.4);}
+.cmp-app-cta-left{display:flex;align-items:center;gap:.875rem;flex:1;min-width:0}
+.cmp-app-cta-icon{width:44px;height:44px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,var(--hot),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1.25rem;animation:cmpFloat 3s ease-in-out infinite;box-shadow:0 4px 14px rgba(232,48,90,.3);}
+.cmp-app-cta-text{flex:1;min-width:0}
+.cmp-app-cta-title{font-size:.9375rem;font-weight:800;color:var(--txt);letter-spacing:-.02em;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmp-app-cta-sub{font-size:.75rem;color:var(--txt2);line-height:1.35}
+.cmp-app-cta-sub strong{color:var(--neon)}
+.cmp-app-cta-badge{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.cmp-app-cta-counter{font-size:1.25rem;font-weight:900;color:var(--hot);letter-spacing:-.04em;line-height:1;animation:cmpCounterPulse 2.4s ease-in-out infinite;}
+.cmp-app-cta-counter-lbl{font-size:.6rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;text-align:center}
+.cmp-app-cta-arrow{flex-shrink:0;width:32px;height:32px;border-radius:10px;background:var(--hot);display:flex;align-items:center;justify-content:center;font-size:.875rem;box-shadow:0 3px 10px rgba(232,48,90,.35);transition:transform .2s;}
+.cmp-app-cta:hover .cmp-app-cta-arrow{transform:translateX(3px)}
+@media(max-width:480px){.cmp-app-cta{padding:.875rem 1rem;gap:.75rem}.cmp-app-cta-badge{display:none}}
 
 /* ── SPARK ── */
 .cmp-spark{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:1.125rem 1.25rem;margin-bottom:1.5rem}
@@ -140,7 +160,7 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
-  .cmp-embed-wrap{padding-bottom:calc(56.25% + 20mm)}
+  .cmp-embed-wrap{height:52dvh;min-height:260px;max-height:58dvh}
 }
 
 /* ── BOTTOM NAV MÓVIL ── */
@@ -197,6 +217,30 @@ export function BottomNav({ active }) {
         ))}
       </div>
     </nav>
+  );
+}
+
+
+// AppCTA - Banner visual que lleva a app.html (todas las modelos en vivo)
+export function AppCTA({ liveCount }) {
+  const count = liveCount ?? "3000+";
+  return (
+    <a href="/app.html" className="cmp-app-cta">
+      <div className="cmp-app-cta-left">
+        <div className="cmp-app-cta-icon">📡</div>
+        <div className="cmp-app-cta-text">
+          <div className="cmp-app-cta-title">Ver todas las modelos en vivo</div>
+          <div className="cmp-app-cta-sub">
+            Dashboard completo · Ranking · <strong>Estadísticas en tiempo real</strong>
+          </div>
+        </div>
+      </div>
+      <div className="cmp-app-cta-badge">
+        <div className="cmp-app-cta-counter">{count}</div>
+        <div className="cmp-app-cta-counter-lbl">modelos<br/>ahora</div>
+      </div>
+      <div className="cmp-app-cta-arrow">→</div>
+    </a>
   );
 }
 

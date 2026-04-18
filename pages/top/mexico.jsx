@@ -1,7 +1,7 @@
 // pages/top/mexico.jsx — Top modelos mexicanas en Chaturbate en vivo
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav} from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const LEXY = "lexy_fox2";
@@ -191,6 +191,9 @@ export default function TopMexicoPage({ models, isLiveData }) {
             Explora también el <a href="/top/latinas" style={{color:"var(--neon)"}}>ranking completo de latinas</a> o el <a href="/top/colombia" style={{color:"var(--neon)"}}>top de colombianas</a>.
           </p>
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/top/colombia" className="cmp-footer-link">← Top Colombia</a>

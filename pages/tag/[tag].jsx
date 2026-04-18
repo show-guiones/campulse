@@ -4,7 +4,7 @@
 
 import Head from "next/head";
 import { useState } from "react";
-import { DS_CSS, Logo, BottomNav } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -352,6 +352,9 @@ export default function TagPage({ tag, models }) {
             </div>
           </section>
         )}
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links" style={{ marginTop: "2.5rem" }}>
           <a href="/app.html" className="cmp-footer-link">← Inicio</a>

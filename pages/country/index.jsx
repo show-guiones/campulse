@@ -1,7 +1,7 @@
 // pages/country/index.jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -124,6 +124,9 @@ export default function CountriesPage({ countries }) {
             Los datos se actualizan cada 2 horas con el número de viewers, seguidores y los mejores horarios.
           </p>
         </section>
+        {/* CTA APP - todas las modelos */}
+        <AppCTA />
+
 
         <div className="cmp-footer-links">
           <a href="/gender" className="cmp-footer-link">Ver por género →</a>
