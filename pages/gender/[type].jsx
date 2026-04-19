@@ -1,7 +1,7 @@
 // pages/gender/[type].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo, AppCTA } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA, CtaAfiliado } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const SUPPORTED_GENDERS = ["female","male","couple","trans"];
@@ -121,7 +121,7 @@ export default function GenderTypePage({ data }) {
         </div>
 
         {/* Affiliate CTA */}
-        <a href={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=cta_top&gender=${GENDER_CB_PARAM[gender]||"f"}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
+        <CtaAfiliado gender={GENDER_CB_PARAM[gender]||"f"} track="gender_top" label={`🔴 Ver ${nameEs.toLowerCase()} en vivo →`} live />
           🔴 Ver {name} en vivo ahora →
         </a>
 
@@ -170,7 +170,7 @@ export default function GenderTypePage({ data }) {
           </div>
           <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
             Stream en vivo desde Chaturbate ·{" "}
-            <a href={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=fullscreen_gender_${gender}&gender=${GENDER_CB_PARAM[gender]||"f"}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+            <a href={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=fullscreen_gender_${gender}&gender=${GENDER_CB_PARAM[gender]||"f"}&mobile_site=1`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
           </p>
         </section>
 
