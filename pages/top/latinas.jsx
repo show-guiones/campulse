@@ -178,7 +178,7 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           ))}
         </div>
 
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=default&room=${LEXY}`} target="_blank" rel="noopener noreferrer" className="cmp-cta-live">
+        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=default&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta-live">
           🔴 Ver latinas en vivo ahora →
         </a>
 
@@ -214,6 +214,11 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           </div>
         )}
 
+        {/* CTA 2 — Refuerzo post-lista */}
+        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=latinas_mid&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
+          🎥 Ver más latinas en Chaturbate →
+        </a>
+
         {/* EMBED — Top Female en vivo */}
         <section style={{marginTop:40,marginBottom:8}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
@@ -231,7 +236,7 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           </div>
           <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
             Stream en vivo desde Chaturbate ·{" "}
-            <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=top_latinas" target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+            <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=top_latinas&mobileRedirect=mobile" target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
           </p>
         </section>
 
@@ -246,6 +251,11 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
             </p>
           )}
         </section>
+        {/* CTA 3 — Antes del footer */}
+        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=latinas_footer&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta" style={{marginBottom:8}}>
+          🔴 Entrar a Chaturbate ahora →
+        </a>
+
         {/* CTA APP - todas las modelos */}
         <AppCTA />
 
