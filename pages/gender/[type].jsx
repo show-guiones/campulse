@@ -122,8 +122,6 @@ export default function GenderTypePage({ data }) {
 
         {/* Affiliate CTA */}
         <CtaAfiliado gender={GENDER_CB_PARAM[gender]||"f"} track="gender_top" label={`🔴 Ver ${nameEs.toLowerCase()} en vivo →`} live />
-          🔴 Ver {name} en vivo ahora →
-        </a>
 
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {models.map((m,i)=>{
