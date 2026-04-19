@@ -121,7 +121,7 @@ export default function GenderTypePage({ data }) {
         </div>
 
         {/* Affiliate CTA */}
-        <a href={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=cta_top&gender=${GENDER_CB_PARAM[gender]||"f"}`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
+        <a href={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=cta_top&gender=${GENDER_CB_PARAM[gender]||"f"}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
           🔴 Ver {name} en vivo ahora →
         </a>
 
@@ -170,7 +170,7 @@ export default function GenderTypePage({ data }) {
           </div>
           <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
             Stream en vivo desde Chaturbate ·{" "}
-            <a href={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=fullscreen_gender_${gender}&gender=${GENDER_CB_PARAM[gender]||"f"}`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+            <a href={`https://chaturbate.com/in/?tour=x1Rd&campaign=rI8z3&track=fullscreen_gender_${gender}&gender=${GENDER_CB_PARAM[gender]||"f"}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
           </p>
         </section>
 
