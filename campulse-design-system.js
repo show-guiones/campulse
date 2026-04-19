@@ -271,3 +271,66 @@ export function Logo() {
     </a>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// affLink — construye URL afiliado con mobile_site=1 en móvil, tour link en desktop
+// REGLA: chaturbate.com/in/ no fuerza vista móvil aunque lleve mobileRedirect=mobile
+// La única URL que garantiza vista móvil con afiliado es la URL directa con mobile_site=1
+// ─────────────────────────────────────────────────────────────────────────────
+export function affLink({ room = null, gender = null, tag = null, track = "default", campaign = "rI8z3" }) {
+  if (typeof window === "undefined") {
+    // SSR: devolver tour link genérico (se reescribirá en cliente)
+    if (room) return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&room=${room}`;
+    if (gender) return `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}`;
+    return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}`;
+  }
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || window.innerWidth <= 768;
+
+  if (isMobile) {
+    // URL directa → fuerza vista móvil con afiliado
+    if (room) return `https://chaturbate.com/${room}/?campaign=${campaign}&tour=LQps&track=${track}&mobile_site=1`;
+    if (gender) return `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}&mobile_site=1`;
+    // Sin room específico: landing de tour en modo móvil
+    return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&mobile_site=1`;
+  }
+  // Desktop: tour link estándar
+  if (room) return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&room=${room}`;
+  if (gender) return `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}`;
+  return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}`;
+}
+
+// CtaAfiliado — botón CTA que reescribe su href en el cliente para mobile
+// Uso: <CtaAfiliado room="lexy_fox2" track="model_top" live />
+// Props: room, gender, tag, track, campaign, live (bool), label, className, style
+export function CtaAfiliado({ room=null, gender=null, track="default", campaign="rI8z3", live=false, label=null, className=null, style={} }) {
+  const defaultLabel = live ? "🔴 Ver en vivo ahora →" : "🎥 Ver en Chaturbate →";
+  const text = label || defaultLabel;
+  const cls = className || (live ? "cmp-cta-live" : "cmp-cta");
+  // SSR href (desktop fallback, se actualiza en useEffect)
+  const ssrHref = room
+    ? `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&room=${room}`
+    : gender
+      ? `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}`
+      : `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}`;
+
+  // En cliente usamos data-aff para re-hidratar el href correcto
+  const handleClick = (e) => {
+    const href = affLink({ room, gender, track, campaign });
+    e.currentTarget.href = href;
+  };
+
+  return (
+    <a
+      href={ssrHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cls}
+      style={style}
+      onClick={handleClick}
+      onMouseEnter={(e) => { e.currentTarget.href = affLink({ room, gender, track, campaign }); }}
+    >
+      {text}
+    </a>
+  );
+}
