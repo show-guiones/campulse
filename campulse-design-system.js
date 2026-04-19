@@ -160,8 +160,24 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
-  .cmp-embed-wrap{height:64dvh;min-height:340px;max-height:70dvh;overflow:hidden;contain:strict}
-  .cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;display:block;max-width:100%;overflow:hidden}
+  .cmp-embed-wrap{
+    height:64dvh;
+    min-height:340px;
+    max-height:70dvh;
+    overflow:hidden;
+    clip-path:inset(0 round 10px);
+    border-radius:10px;
+    margin-left:-1.25rem;
+    margin-right:-1.25rem;
+    width:calc(100% + 2.5rem);
+  }
+  .cmp-embed-frame{
+    position:absolute;top:0;left:0;
+    width:100%;height:100%;
+    border-radius:0;
+    display:block;
+    border:none;
+  }
 }
 
 /* ── BOTTOM NAV MÓVIL ── */
