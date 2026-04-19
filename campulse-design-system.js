@@ -160,8 +160,8 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
-  .cmp-embed-wrap{height:52dvh;min-height:240px;max-height:58dvh;overflow:hidden;contain:strict}
-  .cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;display:block;max-width:100%}
+  .cmp-embed-wrap{height:64dvh;min-height:340px;max-height:70dvh;overflow:hidden;contain:strict}
+  .cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;display:block;max-width:100%;overflow:hidden}
 }
 
 /* ── BOTTOM NAV MÓVIL ── */
