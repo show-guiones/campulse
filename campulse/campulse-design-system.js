@@ -92,9 +92,29 @@ button{font-family:inherit;cursor:pointer}
 .cmp-footer-link:hover{color:var(--neon)}
 
 /* ── EMBED ── */
-.cmp-embed-wrap{position:relative;width:100%;height:46dvh;min-height:224px;max-height:52dvh;overflow:hidden;border-radius:14px;background:#111;border:1px solid var(--bdr);margin-bottom:1rem}
-.cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px;display:block}
+.cmp-embed-wrap{position:relative;height:48dvh;min-height:240px;max-height:54dvh;overflow:hidden;border-radius:14px;background:#111;border:1px solid var(--bdr);margin-bottom:1rem}
+.cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px}
 .cmp-embed-note{font-size:.75rem;color:var(--txt3);text-align:center;margin-bottom:1.5rem}
+
+/* CTA APP BANNER */
+@keyframes cmpShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@keyframes cmpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes cmpCounterPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.cmp-app-cta{display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(232,48,90,.12) 0%,rgba(124,92,191,.14) 50%,rgba(56,182,212,.1) 100%);border:1px solid rgba(232,48,90,.28);border-radius:16px;padding:1.125rem 1.375rem;margin:1.5rem 0;text-decoration:none;transition:border-color .25s,transform .2s,box-shadow .25s;cursor:pointer;}
+.cmp-app-cta::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);animation:cmpShimmer 3.2s ease-in-out infinite;pointer-events:none;}
+.cmp-app-cta:hover{border-color:rgba(232,48,90,.5);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,48,90,.15),0 2px 8px rgba(0,0,0,.4);}
+.cmp-app-cta-left{display:flex;align-items:center;gap:.875rem;flex:1;min-width:0}
+.cmp-app-cta-icon{width:44px;height:44px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,var(--hot),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1.25rem;animation:cmpFloat 3s ease-in-out infinite;box-shadow:0 4px 14px rgba(232,48,90,.3);}
+.cmp-app-cta-text{flex:1;min-width:0}
+.cmp-app-cta-title{font-size:.9375rem;font-weight:800;color:var(--txt);letter-spacing:-.02em;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmp-app-cta-sub{font-size:.75rem;color:var(--txt2);line-height:1.35}
+.cmp-app-cta-sub strong{color:var(--neon)}
+.cmp-app-cta-badge{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.cmp-app-cta-counter{font-size:1.25rem;font-weight:900;color:var(--hot);letter-spacing:-.04em;line-height:1;animation:cmpCounterPulse 2.4s ease-in-out infinite;}
+.cmp-app-cta-counter-lbl{font-size:.6rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;text-align:center}
+.cmp-app-cta-arrow{flex-shrink:0;width:32px;height:32px;border-radius:10px;background:var(--hot);display:flex;align-items:center;justify-content:center;font-size:.875rem;box-shadow:0 3px 10px rgba(232,48,90,.35);transition:transform .2s;}
+.cmp-app-cta:hover .cmp-app-cta-arrow{transform:translateX(3px)}
+@media(max-width:480px){.cmp-app-cta{padding:.875rem 1rem;gap:.75rem}.cmp-app-cta-badge{display:none}}
 
 /* ── SPARK ── */
 .cmp-spark{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:1.125rem 1.25rem;margin-bottom:1.5rem}
@@ -140,17 +160,177 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
-  .cmp-embed-wrap{width:100%;height:66dvh;min-height:336px;max-height:72dvh;border-radius:10px}
-  .cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;display:block}
+  .cmp-embed-wrap{height:62dvh;min-height:298px;max-height:68dvh}
+}
+
+/* ── BOTTOM NAV MÓVIL ── */
+.cmp-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(15,16,20,.97);
+  border-top:1px solid var(--bdr);
+  z-index:1000;
+  padding:6px 0 env(safe-area-inset-bottom,6px);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.cmp-bottom-nav-inner{
+  display:flex;align-items:flex-start;justify-content:space-around;
+  max-width:540px;margin:0 auto;padding:0 4px;
+}
+.cmp-bottom-nav-item{
+  display:flex;flex-direction:column;align-items:center;
+  gap:2px;flex:1;
+  color:var(--txt3);font-size:.6rem;font-weight:500;
+  text-decoration:none;padding:4px 2px;
+  transition:color .18s;
+  letter-spacing:.01em;line-height:1.2;
+  min-width:0;
+}
+.cmp-bottom-nav-item:hover,.cmp-bottom-nav-item.active{color:var(--neon)}
+.cmp-bottom-nav-icon{font-size:1.2rem;line-height:1}
+.cmp-page-body{padding-bottom:72px}
+@media(max-width:540px){
+  .cmp-bottom-nav{display:block}
 }
 `;
 
-// Logo JSX component — mirrors app.html .logo markup
+// BottomNav — barra de navegación fija inferior, solo móvil
+export function BottomNav({ active }) {
+  const items = [
+    { href:"/top/latinas", icon:"🔥", label:"Latinas" },
+    { href:"/country/co",  icon:"🇨🇴", label:"Colombia" },
+    { href:"/country/mx",  icon:"🇲🇽", label:"México" },
+    { href:"/country",     icon:"🌍", label:"Países" },
+    { href:"/gender",      icon:"⚧", label:"Género" },
+    { href:"/language",    icon:"💬", label:"Idioma" },
+    { href:"/search",      icon:"🔍", label:"Buscar" },
+  ];
+  return (
+    <nav className="cmp-bottom-nav">
+      <div className="cmp-bottom-nav-inner">
+        {items.map(it=>(
+          <a key={it.href} href={it.href} className={`cmp-bottom-nav-item${active===it.href?" active":""}`}>
+            <span className="cmp-bottom-nav-icon">{it.icon}</span>
+            <span>{it.label}</span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+
+// AppCTA - Banner visual que lleva a app.html (todas las modelos en vivo)
+export function AppCTA({ liveCount }) {
+  const count = liveCount ?? "3000+";
+  return (
+    <a href="/app.html" className="cmp-app-cta">
+      <div className="cmp-app-cta-left">
+        <div className="cmp-app-cta-icon">📡</div>
+        <div className="cmp-app-cta-text">
+          <div className="cmp-app-cta-title">Ver todas las modelos en vivo</div>
+          <div className="cmp-app-cta-sub">
+            Dashboard completo · Ranking · <strong>Estadísticas en tiempo real</strong>
+          </div>
+        </div>
+      </div>
+      <div className="cmp-app-cta-badge">
+        <div className="cmp-app-cta-counter">{count}</div>
+        <div className="cmp-app-cta-counter-lbl">modelos<br/>ahora</div>
+      </div>
+      <div className="cmp-app-cta-arrow">→</div>
+    </a>
+  );
+}
+
+// Logo JSX component — Campulse brand mark
 export function Logo() {
   return (
-    <a href="/" className="cmp-logo">
-      <span className="cmp-logo-icon">CP</span>
-      <span className="cmp-logo-name">Campulse<em>Hub</em></span>
+    <a href="/app.html" className="cmp-logo" style={{ gap: ".55rem" }}>
+      <span className="cmp-logo-icon" style={{
+        background: "linear-gradient(135deg,#e8305a 0%,#7c5cbf 100%)",
+        boxShadow: "0 2px 10px rgba(232,48,90,.25)",
+        borderRadius: "10px",
+        width: "32px",
+        height: "32px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: ".6rem",
+        fontWeight: 900,
+        color: "#fff",
+        letterSpacing: "-.03em",
+        flexShrink: 0,
+      }}>
+        CP
+      </span>
+      <span className="cmp-logo-name" style={{ fontSize: "1.075rem", fontWeight: 800, letterSpacing: "-.03em" }}>
+        Campulse<em style={{ color: "var(--neon)", fontStyle: "normal" }}>Hub</em>
+      </span>
+    </a>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// affLink — construye URL afiliado con mobile_site=1 en móvil, tour link en desktop
+// REGLA: chaturbate.com/in/ no fuerza vista móvil aunque lleve mobileRedirect=mobile
+// La única URL que garantiza vista móvil con afiliado es la URL directa con mobile_site=1
+// ─────────────────────────────────────────────────────────────────────────────
+export function affLink({ room = null, gender = null, tag = null, track = "default", campaign = "rI8z3" }) {
+  if (typeof window === "undefined") {
+    // SSR: devolver tour link genérico (se reescribirá en cliente)
+    if (room) return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&room=${room}`;
+    if (gender) return `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}`;
+    return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}`;
+  }
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || window.innerWidth <= 768;
+
+  if (isMobile) {
+    // URL directa → fuerza vista móvil con afiliado
+    if (room) return `https://chaturbate.com/${room}/?campaign=${campaign}&tour=LQps&track=${track}&mobile_site=1`;
+    if (gender) return `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}&mobile_site=1`;
+    // Sin room específico: landing de tour en modo móvil
+    return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&mobile_site=1`;
+  }
+  // Desktop: tour link estándar
+  if (room) return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&room=${room}`;
+  if (gender) return `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}`;
+  return `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}`;
+}
+
+// CtaAfiliado — botón CTA que reescribe su href en el cliente para mobile
+// Uso: <CtaAfiliado room="lexy_fox2" track="model_top" live />
+// Props: room, gender, tag, track, campaign, live (bool), label, className, style
+export function CtaAfiliado({ room=null, gender=null, track="default", campaign="rI8z3", live=false, label=null, className=null, style={} }) {
+  const defaultLabel = live ? "🔴 Ver en vivo ahora →" : "🎥 Ver en Chaturbate →";
+  const text = label || defaultLabel;
+  const cls = className || (live ? "cmp-cta-live" : "cmp-cta");
+  // SSR href (desktop fallback, se actualiza en useEffect)
+  const ssrHref = room
+    ? `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}&room=${room}`
+    : gender
+      ? `https://chaturbate.com/in/?tour=x1Rd&campaign=${campaign}&track=${track}&gender=${gender}`
+      : `https://chaturbate.com/in/?tour=LQps&campaign=${campaign}&track=${track}`;
+
+  // En cliente usamos data-aff para re-hidratar el href correcto
+  const handleClick = (e) => {
+    const href = affLink({ room, gender, track, campaign });
+    e.currentTarget.href = href;
+  };
+
+  return (
+    <a
+      href={ssrHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cls}
+      style={style}
+      onClick={handleClick}
+      onMouseEnter={(e) => { e.currentTarget.href = affLink({ room, gender, track, campaign }); }}
+    >
+      {text}
     </a>
   );
 }
