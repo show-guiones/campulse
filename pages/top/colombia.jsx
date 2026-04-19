@@ -1,7 +1,7 @@
 // pages/top/colombia.jsx — Top modelos colombianas en Chaturbate en vivo
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA, CtaAfiliado } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const LEXY = "lexy_fox2";
@@ -185,9 +185,7 @@ export default function TopColombiaPage({ models, isLiveData, fetchedAt }) {
           ))}
         </div>
 
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${AFF}&track=default&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta-live">
-          🔴 Ver colombianas en vivo ahora →
-        </a>
+        <CtaAfiliado room={LEXY} track="colombia_top" campaign={AFF} live label="🔴 Ver colombianas en vivo ahora →" />
 
         {ordered.length === 0 ? (
           <p style={{textAlign:"center",color:"var(--txt3)",padding:"48px 0",fontSize:".875rem"}}>No hay modelos colombianas disponibles en este momento. Vuelve pronto.</p>
@@ -225,11 +223,6 @@ export default function TopColombiaPage({ models, isLiveData, fetchedAt }) {
           </div>
         )}
 
-        {/* CTA 2 — Post lista */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${AFF}&track=colombia_mid&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
-          🎥 Ver más colombianas en Chaturbate →
-        </a>
-
         {/* SEO block */}
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos colombianas en Chaturbate</h2>
@@ -245,11 +238,6 @@ export default function TopColombiaPage({ models, isLiveData, fetchedAt }) {
             </p>
           )}
         </section>
-        {/* CTA 3 — Footer afiliado */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${AFF}&track=colombia_footer&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta" style={{marginBottom:8}}>
-          🔴 Entrar a Chaturbate ahora →
-        </a>
-
         {/* CTA APP - todas las modelos */}
         <AppCTA />
 

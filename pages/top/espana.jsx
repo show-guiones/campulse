@@ -1,7 +1,7 @@
 // pages/top/espana.jsx — Top modelos españolas en Chaturbate en vivo
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA, CtaAfiliado } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const AFF = "rI8z3";
@@ -143,9 +143,7 @@ export default function TopEspanaPage({ models, isLiveData }) {
           ))}
         </div>
 
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${AFF}&track=default&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta-live">
-          🔴 Ver españolas en vivo ahora →
-        </a>
+        <CtaAfiliado track="espana_top" campaign={AFF} live label="🔴 Ver españolas en vivo ahora →" />
 
         {models.length === 0 ? (
           <p style={{textAlign:"center",color:"var(--txt3)",padding:"48px 0",fontSize:".875rem"}}>No hay modelos españolas disponibles en este momento. Vuelve pronto.</p>
@@ -177,11 +175,6 @@ export default function TopEspanaPage({ models, isLiveData }) {
           </div>
         )}
 
-        {/* CTA 2 — Post lista */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${AFF}&track=espana_mid&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
-          🎥 Ver más españolas en Chaturbate →
-        </a>
-
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos españolas en Chaturbate</h2>
           <p style={{color:"var(--txt2)",fontSize:".875rem",lineHeight:1.7}}>
@@ -191,11 +184,6 @@ export default function TopEspanaPage({ models, isLiveData }) {
             Explora también el <a href="/top/latinas" style={{color:"var(--neon)"}}>ranking de latinas</a>, <a href="/top/colombia" style={{color:"var(--neon)"}}>top colombianas</a> o <a href="/top/mexico" style={{color:"var(--neon)"}}>top mexicanas</a>.
           </p>
         </section>
-        {/* CTA 3 — Footer */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${AFF}&track=espana_footer&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta" style={{marginBottom:8}}>
-          🔴 Entrar a Chaturbate ahora →
-        </a>
-
         {/* CTA APP - todas las modelos */}
         <AppCTA />
 

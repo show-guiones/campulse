@@ -1,7 +1,7 @@
 // pages/top/latinas.jsx — En vivo tiempo real, 1 request, fallback Supabase
 
 import Head from "next/head";
-import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA, CtaAfiliado } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 const LEXY = "lexy_fox2";
@@ -178,9 +178,7 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           ))}
         </div>
 
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=default&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta-live">
-          🔴 Ver latinas en vivo ahora →
-        </a>
+        <CtaAfiliado room={LEXY} track="latinas_top" campaign={CAMPAIGN} live label="🔴 Ver latinas en vivo ahora →" />
 
         {ordered.length === 0 ? (
           <p style={{textAlign:"center",color:"var(--txt3)",padding:"48px 0",fontSize:".875rem"}}>No hay modelos latinas disponibles en este momento. Vuelve pronto.</p>
@@ -214,11 +212,6 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           </div>
         )}
 
-        {/* CTA 2 — Refuerzo post-lista */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=latinas_mid&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
-          🎥 Ver más latinas en Chaturbate →
-        </a>
-
         {/* EMBED — Top Female en vivo */}
         <section style={{marginTop:40,marginBottom:8}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
@@ -236,7 +229,7 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
           </div>
           <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
             Stream en vivo desde Chaturbate ·{" "}
-            <a href="https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=top_latinas&mobileRedirect=mobile" target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+            <a href="https://chaturbate.com/lexy_fox2/?campaign=rI8z3&tour=LQps&track=top_latinas_full&mobile_site=1" target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
           </p>
         </section>
 
@@ -251,11 +244,6 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
             </p>
           )}
         </section>
-        {/* CTA 3 — Antes del footer */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=${CAMPAIGN}&track=latinas_footer&room=${LEXY}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta" style={{marginBottom:8}}>
-          🔴 Entrar a Chaturbate ahora →
-        </a>
-
         {/* CTA APP - todas las modelos */}
         <AppCTA />
 
