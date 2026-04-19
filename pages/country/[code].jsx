@@ -1,7 +1,7 @@
 // pages/country/[code].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo, AppCTA } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA, CtaAfiliado } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -143,11 +143,6 @@ export default function CountryPage({ code, codeUC, name, models, fetchError }) 
           <p className="cmp-page-sub">Top {models.length} modelos ordenadas por viewers promedio · últimos 30 días</p>
         </div>
 
-        {/* CTA 1 — Arriba de la lista */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=country_top_${code}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta-live">
-          🔴 Ver modelos de {name} en vivo →
-        </a>
-
         {/* MODEL LIST */}
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
           {models.map((m,i)=>{
@@ -175,11 +170,6 @@ export default function CountryPage({ code, codeUC, name, models, fetchError }) 
           })}
         </div>
 
-        {/* CTA 2 — Post lista */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=country_mid_${code}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
-          🎥 Ver más modelos en Chaturbate →
-        </a>
-
         {/* SEO SECTION */}
         {/* EMBED — Top Female en vivo (contextual al país) */}
         <section style={{marginTop:40,marginBottom:8}}>
@@ -197,7 +187,7 @@ export default function CountryPage({ code, codeUC, name, models, fetchError }) 
           </div>
           <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
             Stream en vivo desde Chaturbate ·{" "}
-            <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=country_${code}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+            <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=country_full_${code}&mobile_site=1`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
           </p>
         </section>
 
@@ -213,11 +203,6 @@ export default function CountryPage({ code, codeUC, name, models, fetchError }) 
             </p>
           )}
         </section>
-        {/* CTA 3 — Footer */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=country_footer_${code}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta" style={{marginBottom:8}}>
-          🔴 Entrar a Chaturbate ahora →
-        </a>
-
         {/* CTA APP - todas las modelos */}
         <AppCTA />
 
