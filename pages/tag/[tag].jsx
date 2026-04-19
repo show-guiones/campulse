@@ -4,7 +4,7 @@
 
 import Head from "next/head";
 import { useState } from "react";
-import { DS_CSS, Logo, BottomNav, AppCTA } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA, CtaAfiliado } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -325,7 +325,7 @@ export default function TagPage({ tag, models }) {
           </div>
           <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
             Stream en vivo desde Chaturbate ·{" "}
-            <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=tag_${tag}&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
+            <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=tag_full_${tag}&mobile_site=1`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
           </p>
         </section>
 
