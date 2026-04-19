@@ -139,7 +139,7 @@ export default function LanguagePage({ data }) {
 
         {/* Affiliate CTA */}
         {!empty && (
-          <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=lexy_fox2`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
+          <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=lang_top&room=lexy_fox2&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
             Ver modelos en {name} en vivo →
           </a>
         )}
