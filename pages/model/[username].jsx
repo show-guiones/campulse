@@ -24,6 +24,10 @@ function countryCodeToFlag(code) {
   if (!code||code.length!==2) return "";
   return code.toUpperCase().split("").map(c=>String.fromCodePoint(0x1f1e0+c.charCodeAt(0)-65)).join("");
 }
+// Helper: link afiliado con mobileRedirect=mobile para botones CTA
+function affLink(room, track="default") {
+  return `https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=${track}&room=${room}&mobileRedirect=mobile`;
+}
 
 function Sparkline({ data, width=360, height=64 }) {
   if (!data||data.length<2) return null;
@@ -162,7 +166,6 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
       </Head>
 
       <div className="cmp-page">
-        {/* NAV */}
         <nav className="cmp-nav">
           <Logo/>
           <div className="cmp-nav-links">
@@ -172,7 +175,6 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           </div>
         </nav>
 
-        {/* BREADCRUMB */}
         <nav className="cmp-bc">
           <a href="/">Campulse</a>
           {countryName && countryCode && (<><span className="cmp-bc-sep">›</span><a href={`/country/${countryCode.toLowerCase()}`}>{flag} {countryName}</a></>)}
@@ -180,10 +182,8 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           <span style={{color:"var(--txt2)"}}>{name}</span>
         </nav>
 
-        {/* HEADER */}
         <div className="cmp-page-header" style={{borderBottom:"1px solid var(--bdr)"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:"1rem",flexWrap:"wrap"}}>
-            {/* Avatar */}
             <div style={{width:60,height:60,borderRadius:14,background:"linear-gradient(135deg,rgba(56,182,212,.15),rgba(124,92,191,.15))",border:"1px solid rgba(56,182,212,.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.5rem",fontWeight:800,color:"var(--neon)",flexShrink:0}}>
               {(name[0]||"?").toUpperCase()}
             </div>
@@ -202,7 +202,6 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           </div>
         </div>
 
-        {/* METRICS */}
         <div className="cmp-metrics">
           {[["Viewers ahora",viewers],["Seguidores",followers],["Peak viewers",peakViewers],["Snapshots",snapCount||null]].map(([label,val])=>(
             <div key={label} className="cmp-metric">
@@ -212,7 +211,6 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           ))}
         </div>
 
-        {/* SPARKLINE */}
         {sparkData.length>=2 && (
           <div className="cmp-spark">
             <div className="cmp-spark-header">
@@ -223,8 +221,8 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           </div>
         )}
 
-        {/* CTA AFFILIATE */}
-        <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=default&room=${username}`}
+        {/* ── CTA 1: Principal (arriba, antes del embed) ── */}
+        <a href={affLink(username, "model_top")}
           target="_blank" rel="noopener noreferrer"
           className={isLive?"cmp-cta-live":"cmp-cta"}>
           {isLive ? "🔴 Ver sala en vivo" : "Ver sala en Chaturbate →"}
@@ -249,6 +247,12 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
               />
             </div>
             <p className="cmp-embed-note">Al ver el stream en Campulse, apoyas a {name} directamente.</p>
+            {/* ── CTA 2: Bajo el embed ── */}
+            <a href={affLink(username, "model_embed")}
+              target="_blank" rel="noopener noreferrer"
+              style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginTop:10,padding:"11px 16px",borderRadius:10,background:"rgba(232,48,90,.08)",border:"1px solid rgba(232,48,90,.25)",color:"var(--hot)",fontWeight:700,fontSize:".875rem",textDecoration:"none"}}>
+              🔔 Seguir a {name} en Chaturbate →
+            </a>
           </div>
         )}
 
@@ -261,6 +265,12 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
               <span className="cmp-hour-val">{Math.round(h.avg_viewers)} viewers</span>
             </div>
           ))}
+          {/* ── CTA 3: Contextual post-horarios ── */}
+          <a href={affLink(username, "model_hours")}
+            target="_blank" rel="noopener noreferrer"
+            style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginTop:10,padding:"10px 16px",borderRadius:10,background:"rgba(56,182,212,.06)",border:"1px solid rgba(56,182,212,.2)",color:"var(--neon)",fontWeight:600,fontSize:".8125rem",textDecoration:"none"}}>
+            📅 Ir a la sala en el mejor horario →
+          </a>
         </>)}
 
         {/* HISTORY */}
@@ -299,9 +309,14 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
           )}
         </>)}
 
-        {/* FOOTER LINKS */}
-        {/* CTA APP - todas las modelos */}
         <AppCTA />
+
+        {/* ── CTA 4: Footer afiliado ── */}
+        <a href={affLink(username, "model_footer")}
+          target="_blank" rel="noopener noreferrer"
+          className="cmp-cta" style={{marginBottom:0}}>
+          🎥 Ver a {name} en Chaturbate →
+        </a>
 
         <div className="cmp-footer-links">
           {countryName && countryCode && <a href={`/country/${countryCode.toLowerCase()}`} className="cmp-footer-link">{flag} Ver más modelos de {countryName} →</a>}
