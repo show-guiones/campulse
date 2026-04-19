@@ -92,7 +92,7 @@ button{font-family:inherit;cursor:pointer}
 .cmp-footer-link:hover{color:var(--neon)}
 
 /* ── EMBED ── */
-.cmp-embed-wrap{position:relative;height:48dvh;min-height:240px;max-height:54dvh;overflow:hidden;border-radius:14px;background:#111;border:1px solid var(--bdr);margin-bottom:1rem}
+.cmp-embed-wrap{position:relative;height:50dvh;min-height:250px;max-height:56dvh;overflow:hidden;border-radius:14px;background:#111;border:1px solid var(--bdr);margin-bottom:1rem}
 .cmp-embed-frame{position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px}
 .cmp-embed-note{font-size:.75rem;color:var(--txt3);text-align:center;margin-bottom:1.5rem}
 
@@ -160,7 +160,7 @@ button{font-family:inherit;cursor:pointer}
   .cmp-metrics{gap:8px} .cmp-metric{min-width:90px}
   .cmp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .cmp-cat-grid{grid-template-columns:1fr 1fr}
-  .cmp-embed-wrap{height:62dvh;min-height:298px;max-height:68dvh}
+  .cmp-embed-wrap{height:58dvh;min-height:270px;max-height:64dvh}
 }
 
 /* ── BOTTOM NAV MÓVIL ── */
