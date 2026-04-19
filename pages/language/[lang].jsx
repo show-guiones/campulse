@@ -1,7 +1,7 @@
 // pages/language/[lang].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo, AppCTA } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA, CtaAfiliado } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -139,9 +139,7 @@ export default function LanguagePage({ data }) {
 
         {/* Affiliate CTA */}
         {!empty && (
-          <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=lang_top&room=lexy_fox2&mobileRedirect=mobile`} target="_blank" rel="noopener noreferrer" className="cmp-cta">
-            Ver modelos en {name} en vivo →
-          </a>
+          <CtaAfiliado room="lexy_fox2" track="lang_top" label={`🔴 Ver modelos en ${name} en vivo →`} live />
         )}
 
         {empty ? (
