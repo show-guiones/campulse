@@ -3796,8 +3796,12 @@ function openMod(u){
   // Thumbnail de fondo — siempre visible, evita cualquier espacio blanco
   const heroThumb=document.getElementById('hero-thumb');
   if(heroThumb){
+    heroThumb.style.visibility='';
     heroThumb.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
-    heroThumb.onerror=()=>{ heroThumb.src=`https://thumb.live.mmcdn.com/ri/${u}.jpg`; };
+    heroThumb.onerror=()=>{
+      heroThumb.onerror=()=>{ heroThumb.style.visibility='hidden'; heroThumb.src=''; };
+      heroThumb.src=`https://thumb.live.mmcdn.com/ri/${u}.jpg`;
+    };
   }
 
   // Name + CTA
