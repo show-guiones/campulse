@@ -3713,24 +3713,26 @@ function openMod(u){
   updateFavBtn(x.username);
 
   if(x.num_users>0){
-    // AUTO-EMBED: mostrar video directamente
-    if(imgWrap) imgWrap.innerHTML='';
+    // NO AUTO-EMBED: mostrar thumbnail con overlay de play — iframe carga solo al hacer click
+    if(imgWrap) imgWrap.innerHTML=`
+      <div class="mhp-play-wrap" onclick="startEmbed('${u}')" style="
+        position:absolute;inset:0;z-index:4;display:flex;
+        align-items:center;justify-content:center;cursor:pointer;
+        background:rgba(0,0,0,.18);
+      ">
+        <div style="
+          width:64px;height:64px;border-radius:50%;
+          background:rgba(232,48,90,.92);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 4px 24px rgba(0,0,0,.5);
+          transition:transform .15s,background .15s;
+        " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><polygon points="6,3 20,12 6,21"/></svg>
+        </div>
+      </div>`;
     const _heroEl=document.getElementById('modal-hero');
-    if(_heroEl) _heroEl.classList.add('embed-active');
-    // Mostrar chat column en desktop
-    if(embedWrap){
-      const loading=document.getElementById('embed-loading');
-      if(loading) loading.classList.remove('hidden');
-      embedWrap.classList.add('active');
-    }
-    // Mostrar y posicionar botón de audio (position:fixed — necesita coords de viewport)
-    if(frame){
-      // Cargar con audio activo — controles nativos de CB disponibles para volumen
-      frame.onload = null;
-      frame.removeEventListener('load', onEmbedLoad);
-      frame.src = `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
-      frame.addEventListener('load', onEmbedLoad);
-    }
+    if(_heroEl) _heroEl.classList.remove('embed-active');
+    if(embedWrap) embedWrap.classList.remove('active');
   } else {
     // OFFLINE: mostrar imagen de perfil
     const _heroElOff=document.getElementById('modal-hero');
@@ -3757,6 +3759,25 @@ function openMod(u){
   // mini card player removed
 }
 
+function startEmbed(u){
+  const frame=document.getElementById('live-embed-frame');
+  const embedWrap=document.getElementById('mhero-embed-wrap');
+  const imgWrap=document.getElementById('mhero-img-wrap');
+  const heroEl=document.getElementById('modal-hero');
+  if(imgWrap) imgWrap.innerHTML='';
+  if(heroEl) heroEl.classList.add('embed-active');
+  if(embedWrap){
+    const loading=document.getElementById('embed-loading');
+    if(loading) loading.classList.remove('hidden');
+    embedWrap.classList.add('active');
+  }
+  if(frame){
+    frame.onload=null;
+    frame.removeEventListener('load',onEmbedLoad);
+    frame.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
+    frame.addEventListener('load',onEmbedLoad);
+  }
+}
 function updateFavBtn(u){
   const fv=favs.includes(u);
   document.getElementById('m-fav-btn').classList.toggle('active',fv);
