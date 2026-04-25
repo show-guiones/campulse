@@ -882,6 +882,7 @@ header{
 .embed-wrap.active{display:block}
 .embed-frame{
   width:100%;height:100%;border:none;display:block;
+  background:#000; /* evita fondo blanco cuando iframe carga o falla */
   pointer-events:auto; /* permite interacción nativa con controles CB (volumen, etc) */
   overflow:hidden;overscroll-behavior:none;touch-action:none;
   scrollbar-width:none;-ms-overflow-style:none;
@@ -2688,6 +2689,8 @@ body.modal-open .mob-explore-nav{display:none!important}
       <!-- Thumbnail siempre visible detrás — nunca espacio blanco -->
       <div class="hero-thumb" id="hero-thumb" aria-hidden="true"></div>
       <div class="embed-wrap" id="mhero-embed-wrap">
+        <!-- Capa negra permanente detrás del iframe — evita fondo blanco de CB -->
+        <div style="position:absolute;inset:0;background:#000;z-index:0;pointer-events:none"></div>
         <div class="embed-loading" id="embed-loading">
           <div class="embed-loading-spinner"></div>
           <span>Conectando sala…</span>
@@ -3809,7 +3812,7 @@ function onEmbedLoad(){
     }, 2200);
   } else {
     // Carga inicial — mantener negro hasta que Chaturbate renderice frames reales
-    if(wrap) setTimeout(()=>{ wrap.classList.add('video-ready'); }, 2500);
+    if(wrap) setTimeout(()=>{ wrap.classList.add('video-ready'); }, 6000);
   }
 }
 /* Abre la sala activa con URL de afiliado completa cuando el usuario toca el video */
