@@ -778,7 +778,7 @@ header{
 }
 /* mhero-v2 usa aspect-ratio — no imponer height fija para evitar espacio en blanco */
 .modal-hero.mhero-v2{
-  height:auto;overflow-x:hidden;
+  height:auto;overflow-x:hidden;background:#000;
 }
 .modal-hero img,.live-preview-img{
   width:100%;height:100%;object-fit:cover;
@@ -1045,15 +1045,9 @@ header{
 /* ── Thumbnail del modelo como fondo — siempre visible, nunca blanco ── */
 .mhero-v2 .hero-thumb{
   position:absolute;inset:0;z-index:2;
-  width:100%;height:100%;object-fit:cover;display:block;
-  /* Ocultar cuando src está vacío para evitar placeholder blanco del browser */
-  background:#000;
-  color:transparent; /* oculta el alt text */
-}
-/* Sin src válido el img se colapsa visualmente sin mostrar blanco */
-.mhero-v2 .hero-thumb:not([src]), 
-.mhero-v2 .hero-thumb[src=""] {
-  visibility:hidden;
+  width:100%;height:100%;
+  background:#000 center/cover no-repeat;
+  /* Como es un div, nunca hay ícono de imagen rota */
 }
 .mhero-v2 .embed-wrap{
   position:absolute;inset:0;z-index:5;
@@ -2692,7 +2686,7 @@ body.modal-open .mob-explore-nav{display:none!important}
     <!-- VIDEO HERO — embed automático al abrir -->
     <div class="modal-hero mhero-v2" id="modal-hero">
       <!-- Thumbnail siempre visible detrás — nunca espacio blanco -->
-      <img class="hero-thumb" id="hero-thumb" src="" alt="" aria-hidden="true">
+      <div class="hero-thumb" id="hero-thumb" aria-hidden="true"></div>
       <div class="embed-wrap" id="mhero-embed-wrap">
         <div class="embed-loading" id="embed-loading">
           <div class="embed-loading-spinner"></div>
@@ -3652,15 +3646,21 @@ function openMod(u){
   const loadingEl=document.getElementById('embed-loading');
   if(loadingEl) loadingEl.classList.remove('hidden');
 
-  // Thumbnail de fondo — siempre visible, evita cualquier espacio blanco
+  // Thumbnail de fondo — como div con background-image, nunca muestra ícono roto
   const heroThumb=document.getElementById('hero-thumb');
   if(heroThumb){
-    heroThumb.style.visibility='';
-    heroThumb.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
-    heroThumb.onerror=()=>{
-      heroThumb.onerror=()=>{ heroThumb.style.visibility='hidden'; heroThumb.src=''; };
-      heroThumb.src=`https://thumb.live.mmcdn.com/ri/${u}.jpg`;
+    const tryThumb=(urls,i)=>{
+      if(i>=urls.length){ heroThumb.style.backgroundImage='none'; return; }
+      const img=new Image();
+      img.onload=()=>{ heroThumb.style.backgroundImage=`url('${urls[i]}')`; };
+      img.onerror=()=>{ tryThumb(urls,i+1); };
+      img.src=urls[i];
     };
+    heroThumb.style.backgroundImage='none';
+    tryThumb([
+      `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+      `https://thumb.live.mmcdn.com/ri/${u}.jpg`
+    ],0);
   }
 
   // Name + CTA
