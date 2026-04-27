@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Bloquear rutas de API (excepto sitemap)
+Disallow: /api/
+Allow: /api/sitemap
+
+# Bloquear admin
+Disallow: /admin-featured.html
+
+Sitemap: https://www.campulsehub.com/sitemap.xml
