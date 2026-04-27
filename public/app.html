@@ -720,33 +720,20 @@ header{
 @keyframes slidemodal{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .modal-bg.open{animation:fademodal .18s ease}
 
-/* ── DUAL MODAL (dos modelos en simultáneo) ── */
+
 #modal2-bg{z-index:510}
-.dual-active #modal-bg,
-.dual-active #modal2-bg{
-  align-items:center;
-  padding:1rem;
-}
-.dual-active .modal{
-  border-radius:20px;
-  max-height:88dvh;
-}
+
+
+
 @media(min-width:820px){
   /* Desktop: side by side */
-  .dual-active #modal-bg{
-    background:rgba(0,0,0,.88);
-    justify-content:center;
-    gap:1rem;
-  }
-  .dual-active .modal{
-    max-width:440px;
-    flex:1 1 440px;
-  }
+
+
 }
 @media(max-width:819px){
   /* Mobile/tablet: stack vertically, second modal slides from bottom */
-  .dual-active #modal-bg{padding:0;align-items:flex-end}
-  .dual-active #modal2-bg{padding:0;align-items:flex-end;background:transparent;pointer-events:none}
+
+
   #modal2-bg .modal{pointer-events:all;max-height:60dvh}
 }
 
@@ -1274,23 +1261,12 @@ header{
 .man-tag{background:rgba(255,255,255,.07);border-radius:8px;padding:2px 8px;font-size:.62rem;color:var(--txt2)}
 
 /* ═══════════════════════════════════════════
-   DUAL PICKER
-═══════════════════════════════════════════ */
-.dual-picker-bg{
-  display:none;position:fixed;inset:0;z-index:800;
-  background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
-  align-items:flex-end;justify-content:center;padding:0;
-}
-.dual-picker-bg.open{display:flex}
-.dual-picker{
-  width:100%;max-width:520px;
-  background:var(--bg2);border-radius:24px 24px 0 0;
-  padding:1rem .9rem 1.5rem;
-  animation:slidemodal .28s cubic-bezier(.22,1,.36,1);
-  max-height:80dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
-}
+ ═══════════════════════════════════════════ */
+
+
+
 .dp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
-.dp-title{font-size:.9rem;font-weight:800;color:var(--txt)}
+
 .dp-close{background:none;border:none;color:var(--txt2);font-size:1.1rem;cursor:pointer;padding:.2rem .4rem}
 .dp-hint{font-size:.72rem;color:var(--txt2);margin-bottom:.7rem}
 .dp-hint strong{color:var(--txt)}
@@ -1351,20 +1327,12 @@ header{
 .dp-chip-age.active{background:var(--neon)!important;border-color:var(--neon)!important;color:#000!important}
 
 /* ═══════════════════════════════════════════
-   DUAL VIEW — dos streams
+
 ═══════════════════════════════════════════ */
-.dual-view-bg{
-  position:fixed;inset:0;z-index:700;
-  /* FIX responsividad: forzar dimensiones exactas del viewport */
-  width:100dvw;height:100dvh;
-  background:#000;display:flex;flex-direction:column;
-  overflow:hidden;overscroll-behavior:none;touch-action:none;
-  -webkit-overflow-scrolling:auto;
-  scrollbar-width:none;-ms-overflow-style:none;
-}
-.dual-view-bg::-webkit-scrollbar{display:none;width:0;height:0}
-/* FIX: dual-view ocupa exactamente el contenedor (100dvh garantizado) */
-.dual-view{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden;touch-action:none;overscroll-behavior:none;flex:1;}
+
+
+
+
 .dv-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:.5rem .75rem;background:rgba(12,13,16,.95);
@@ -1380,14 +1348,14 @@ header{
    ══════════════════════════════════════════════════════ */
 @media(orientation:landscape),(min-width:640px){
 
-  /* Ocultar header interno del dual-view */
+  
   .dv-header{ display:none; }
 
   /* FIX medición 04/06/26: panel-actions restaba 48px al embed-wrap */
   .dv-panel-actions{ display:none!important; }
   /* FIX responsividad desktop: sin header, panels deben ocupar 100dvh */
   .dv-panels{ height:100dvh; min-height:0; }
-  .dv-panel{ flex:1;position:relative;overflow:hidden;background:#000;height:100%; }
+
   /* embed-wrap ocupa el panel completo (641px sin actions) */
   .dv-embed-wrap{
     position:absolute!important;inset:0!important;
@@ -1395,44 +1363,13 @@ header{
   }
 
   /* Botón cerrar flotante — esquina superior izquierda para no chocar con swap-btn */
-  .dv-float-close{
-    display:flex;
-    position:fixed;top:.75rem;left:.75rem;z-index:900;
-    background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.22);
-    border-radius:20px;padding:5px 14px;
-    align-items:center;gap:.4rem;
-    cursor:pointer;color:#fff;font-size:.72rem;font-weight:700;
-    backdrop-filter:blur(8px);
-    transition:opacity .25s, background .15s;
-    opacity:0;
-    pointer-events:none;
-  }
-  .dual-view-bg:hover .dv-float-close,
-  .dual-view-bg:focus-within .dv-float-close{
-    opacity:1;pointer-events:auto;
-  }
+
+
   .dv-float-close:hover{ background:rgba(232,48,90,.82); }
 
   /* Links CTA flotantes por panel — aparecen en hover del panel */
-  .dv-float-cta{
-    display:flex;
-    position:absolute;bottom:.75rem;left:50%;
-    transform:translateX(-50%);
-    z-index:20;
-    background:rgba(232,48,90,.88);
-    border:none;border-radius:8px;
-    color:#fff;font-size:.7rem;font-weight:700;
-    padding:5px 16px;white-space:nowrap;
-    text-decoration:none;
-    opacity:0;
-    transition:opacity .2s;
-    pointer-events:none;
-    backdrop-filter:blur(6px);
-    -webkit-tap-highlight-color:transparent;
-  }
-  .dv-panel:hover .dv-float-cta{
-    opacity:1;pointer-events:auto;
-  }
+
+
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1440,29 +1377,13 @@ header{
    ═══════════════════════════════════════════════════════════════ */
 @media(orientation:portrait) and (max-width:639px){
   /* Ocultar float-close desktop */
-  .dv-float-close{ display:none !important; }
+
 
   /* Ocultar la barra de acciones separada — el CTA flota sobre el video */
   .dv-panel-actions{ display:none !important; }
 
   /* El CTA flota sobre el video, siempre visible en móvil */
-  .dv-float-cta{
-    display:flex !important;
-    position:absolute;
-    bottom:.6rem;left:50%;
-    transform:translateX(-50%);
-    z-index:20;
-    background:rgba(232,48,90,.92);
-    border:none;border-radius:8px;
-    color:#fff;font-size:.72rem;font-weight:700;
-    padding:6px 20px;white-space:nowrap;
-    text-decoration:none;
-    opacity:1 !important;
-    pointer-events:auto !important;
-    backdrop-filter:blur(6px);
-    -webkit-tap-highlight-color:transparent;
-    box-shadow:0 2px 12px rgba(232,48,90,.4);
-  }
+
 
   /* Header ultra-compacto en móvil */
   .dv-header{ padding:.3rem .6rem; }
@@ -1479,13 +1400,7 @@ header{
     overflow:hidden;
   }
   /* Cada panel = exactamente la mitad */
-  .dv-panel{
-    flex:0 0 50%;
-    height:50%;
-    max-height:50%;
-    overflow:hidden;
-    position:relative;
-  }
+
   /* El embed-wrap llena TODO el panel */
   .dv-embed-wrap{
     position:absolute !important;
@@ -1539,7 +1454,7 @@ header{
    Al hacer clic en el video → link afiliado. Volumen → interacción nativa CB. */
 
 
-/* Capa negra sobre los iframes de dual view hasta que el stream cargue */
+
 .dv-embed-wrap::before{
   content:'';
   position:absolute;inset:0;z-index:3;
@@ -2757,9 +2672,6 @@ body.modal-open .mob-explore-nav{display:none!important}
         <button class="btn-sec" id="m-fav-btn" onclick="favMod()">
           <span id="m-fav-icon">♥</span><span id="m-fav-txt">Favorita</span>
         </button>
-        <button class="btn-sec btn-sec-dual" onclick="showDualPicker()" title="Ver 2 salas en simultáneo">
-          ⊞ <span>2 salas</span>
-        </button>
         
         <button class="btn-sec" onclick="openModelReportFromModal()" title="Ver mi reporte completo">
           👤 <span>Reporte</span>
@@ -2836,120 +2748,7 @@ body.modal-open .mob-explore-nav{display:none!important}
   </div>
 </div>
 
-<!-- ═══ DUAL PICKER — selector visual de segunda sala ═══ -->
-<div class="dual-picker-bg" id="dual-picker-bg" onclick="closeDualPicker(event)">
-  <div class="dual-picker" onclick="event.stopPropagation()">
-    <!-- Header -->
-    <div class="dp-header">
-      <span class="dp-title" id="dp-title-txt">&#8862; Ver 2 salas en simult&#225;neo</span>
-      <button class="dp-close" onclick="closeDualPicker()">&#x2715;</button>
-    </div>
-    <!-- Género nav — idéntico al catálogo -->
-    <div class="gender-nav" id="dp-gnav" style="border-bottom:1px solid var(--bdr);margin:0 -.9rem .0rem;padding:0 .9rem">
-      <button class="gnav-btn active" data-dpg="" onclick="dpSetGender(this,'')"><span class="gnav-ico">&#127760;</span>Todas</button>
-      <div class="gnav-div"></div>
-      <button class="gnav-btn" data-dpg="f" onclick="dpSetGender(this,'f')"><span class="gnav-ico">&#128105;</span>Mujeres</button>
-      <button class="gnav-btn" data-dpg="m" onclick="dpSetGender(this,'m')"><span class="gnav-ico">&#128104;</span>Hombres</button>
-      <button class="gnav-btn" data-dpg="c" onclick="dpSetGender(this,'c')"><span class="gnav-ico">&#128107;</span>Parejas</button>
-      <button class="gnav-btn" data-dpg="t" onclick="dpSetGender(this,'t')"><span class="gnav-ico">&#9895;</span>Trans</button>
-    </div>
-    <!-- Search + Sort sticky -->
-    <div style="display:flex;gap:.4rem;position:sticky;top:0;z-index:10;background:var(--bg2);padding:.5rem 0 .4rem;margin-bottom:0">
-      <div class="srch" style="flex:1">
-        <span class="srch-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11l3 3"/></svg></span>
-        <input id="dp-input" type="text" placeholder="Buscar modelo&#8230;" oninput="renderDpGrid()" onkeydown="if(event.key==='Enter')openDualFromInput()" style="background:transparent;border:none;outline:none;color:var(--txt);font-size:.8rem;flex:1;padding:0;font-family:inherit;width:100%">
-      </div>
-      <select class="sort-sel" id="dp-sort" onchange="renderDpGrid()">
-        <option value="viewers">&#8595; Viewers</option>
-        <option value="followers">&#8595; Seguidores</option>
-        <option value="age_asc">M&#225;s j&#243;venes</option>
-        <option value="new">Nuevas</option>
-      </select>
-      <button class="dp-go" onclick="openDualFromInput()">Abrir &#8594;</button>
-    </div>
-    <!-- Filter chips — igual al catálogo -->
-    <div class="filter-bar" style="padding:.3rem 0 .4rem;margin-bottom:.3rem;border-bottom:1px solid var(--bdr)">
-      <button class="qchip" id="dp-fav" onclick="dpToggle('dpFav',this)">&#9829; Favs</button>
-      <button class="qchip" id="dp-hd"  onclick="dpToggle('dpHD',this)">HD</button>
-      <button class="qchip" id="dp-co"  onclick="dpToggle('dpCo',this)">&#127464;&#127476; Colombia</button>
-      <div class="fb-sep"></div>
-      <button class="qchip dp-chip-age" data-dpa="18-21" onclick="dpSetAge(this,'18-21')">18&#8211;21</button>
-      <button class="qchip dp-chip-age" data-dpa="22-25" onclick="dpSetAge(this,'22-25')">22&#8211;25</button>
-      <button class="qchip dp-chip-age" data-dpa="26-30" onclick="dpSetAge(this,'26-30')">26&#8211;30</button>
-      <button class="qchip dp-chip-age" data-dpa="31-40" onclick="dpSetAge(this,'31-40')">31&#8211;40</button>
-      <button class="qchip dp-chip-age" data-dpa="40+"   onclick="dpSetAge(this,'40+')">40+</button>
-      <div id="dp-active-filters" style="display:none;align-items:center;gap:.4rem">
-        <div class="fb-sep"></div>
-        <span id="dp-filter-summary" style="font-size:.65rem;color:var(--hot);font-weight:700;white-space:nowrap"></span>
-        <button onclick="_dpClearAllFilters()" style="background:none;border:none;color:var(--txt3);font-size:.7rem;cursor:pointer;padding:2px 4px;border-radius:4px" title="Limpiar filtros">&#x2715;</button>
-      </div>
-    </div>
-    <!-- Tag strip colapsable — igual al catálogo -->
-    <div style="display:flex;align-items:center;padding:.2rem 0 .0rem;border-bottom:1px solid var(--bdr);gap:.5rem;margin-bottom:.4rem">
-      <button class="tag-strip-toggle" id="dp-tag-btn" onclick="_dpToggleTagStrip()">
-        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 3h8M2.5 5.5h5M4 8h2"/></svg>
-        Tags
-        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5L5 6.5L8 3.5"/></svg>
-      </button>
-      <div id="dp-tag-preview" style="display:flex;gap:.3rem;overflow:hidden;flex:1"></div>
-    </div>
-    <div class="tag-strip" id="dp-tag-strip">
-      <div id="dp-tag-list" style="display:flex;flex-wrap:wrap;gap:.3rem"></div>
-    </div>
-    <!-- Contador resultados -->
-    <div style="font-size:.65rem;color:var(--txt3);margin-bottom:.4rem;padding-top:.1rem" id="dp-count"></div>
-    <!-- Grid de modelos -->
-    <div class="dp-grid" id="dp-grid"></div>
-  </div>
-</div>
 
-<!-- ═══ DUAL VIEW — dos salas lado a lado ═══ -->
-<div class="dual-view-bg" id="dual-view-bg" style="display:none">
-  <!-- Botón cerrar flotante para desktop (se oculta en móvil) -->
-  <button class="dv-float-close" onclick="closeDualView()">✕ Cerrar</button>
-  <div class="dual-view">
-    <div class="dv-header">
-      <span class="dv-title">⊞ Vista doble</span>
-      <button class="dv-close" onclick="closeDualView()">✕ Cerrar</button>
-    </div>
-    <div class="dv-panels">
-      <!-- Panel A -->
-      <div class="dv-panel" id="dv-panel-a">
-        <div class="dv-panel-label" id="dv-label-a">—</div>
-        <button class="dv-swap-btn" onclick="swapDualSlot('a')" title="Cambiar sala A">⇄ Cambiar</button>
-        <div class="dv-embed-wrap">
-          <iframe id="dv-frame-a" class="dv-frame" src="about:blank"
-            allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
-            scrolling="no"
-            referrerpolicy="no-referrer-when-downgrade"></iframe>
-
-        </div>
-        <div class="dv-panel-actions">
-          <a id="dv-link-a" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala A ↗</a>
-        </div>
-        <!-- CTA flotante desktop -->
-        <a id="dv-float-link-a" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala A ↗</a>
-      </div>
-      <!-- Panel B -->
-      <div class="dv-panel" id="dv-panel-b">
-        <div class="dv-panel-label" id="dv-label-b">—</div>
-        <button class="dv-swap-btn" onclick="swapDualSlot('b')" title="Cambiar sala B">⇄ Cambiar</button>
-        <div class="dv-embed-wrap">
-          <iframe id="dv-frame-b" class="dv-frame" src="about:blank"
-            allow="autoplay *; fullscreen *; encrypted-media *" allowFullscreen
-            scrolling="no"
-            referrerpolicy="no-referrer-when-downgrade"></iframe>
-
-        </div>
-        <div class="dv-panel-actions">
-          <a id="dv-link-b" href="#" target="_blank" rel="noopener" class="dv-cta">Entrar sala B ↗</a>
-        </div>
-        <!-- CTA flotante desktop -->
-        <a id="dv-float-link-b" href="#" target="_blank" rel="noopener" class="dv-float-cta">Entrar sala B ↗</a>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -4196,8 +3995,7 @@ function drawMiniChart(canvas,vals){
   ctx.strokeStyle='rgb(232,48,90)';ctx.lineWidth=2;ctx.stroke();
 }
 
-/* ── DUAL PICKER — local filter state (isolated from main catalog) ── */
-let _dpSlot=null; // 'a'|'b'|null — set by swapDualSlot
+
 let _dpGender='', _dpFav=false, _dpHD=false, _dpCo=false, _dpAge='', _dpActiveTag='';
 
 function dpSetGender(btn,g){
@@ -4333,8 +4131,8 @@ function renderDpGrid(){
   }
   dpGrid.innerHTML=list.map(r=>{
     const cb=_dpSlot
-      ? `swapDualConfirm('${_dpSlot}','${r.username}')`
-      : `openDualView('${active?.username||''}','${r.username}');closeDualPicker()`;
+      ? `window.open('https://chaturbate.com/'+r.username+'/?campaign=rI8z3','_blank')`
+      : `window.open('https://chaturbate.com/'+r.username+'/?campaign=rI8z3','_blank')`;
     return `<div class="dp-card" onclick="${cb}">
       <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous"
         onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
@@ -4344,38 +4142,12 @@ function renderDpGrid(){
   }).join('');
 }
 
-function showDualPicker(){
-  if(!active)return;
-  _dpSlot=null;
-  _dpResetFilters();
-  const titleEl=document.getElementById('dp-title-txt');
-  if(titleEl) titleEl.textContent='⊞ Ver 2 salas — junto a '+(active.display_name||active.username);
-  _dpRenderTagList();
-  renderDpGrid();
-  const bg=document.getElementById('dual-picker-bg');
-  if(bg){bg.style.display='flex';requestAnimationFrame(()=>bg.classList.add('open'));}
-}
 
-function closeDualPicker(e){
-  if(e && e.currentTarget === e.target && e.target.id !== 'dual-picker-bg') return;
-  const bg=document.getElementById('dual-picker-bg');
-  if(!bg)return;
-  _dpSlot=null;
-  bg.classList.remove('open');
-  bg.style.display='none';
-}
 
 function filterDpList(q){ renderDpGrid(); }
 
-function openDualFromInput(){
-  const inp=document.getElementById('dp-input');
-  const u=(inp?.value||'').trim().toLowerCase();
-  if(!u)return;
-  openDualView(active?.username||'',u);
-  closeDualPicker();
-}
 
-/* ── DUAL VIEW ── */
+
 let dvSlotUser={a:'',b:''};
 
 /* ── Audio helpers: URL builder, localStorage prefs, fade reload ── */
@@ -4435,7 +4207,7 @@ function _reloadEmbedWithFade(frame, wrap, u, withAudio){
 
 
 
-/* ── MODAL AUDIO — mismo patrón que Dual View ── */
+/* ── MODAL AUDIO ── */
 let _modalAudioActive = false;
 
 /* Posiciona el botón de audio justo encima del borde inferior del hero.
@@ -4467,7 +4239,6 @@ function _updateDvScale(){
 }
 
 function _positionSwapBtns(){
-  const bg = document.getElementById('dual-view-bg');
   if(!bg || bg.style.display === 'none' || !bg.style.display) return;
   const panelA = document.getElementById('dv-panel-a');
   const panelB = document.getElementById('dv-panel-b');
@@ -4504,91 +4275,11 @@ function _hideSwapBtns(){
 window.addEventListener('resize', () => { _positionSwapBtns(); _updateDvScale(); });
 window.addEventListener('orientationchange', () => setTimeout(_positionSwapBtns, 300));
 
-function openDualView(uA,uB){
-  if(!uA||!uB)return;
-  // Destruir iframe del modal para evitar audio duplicado
-  const _mf=document.getElementById('live-embed-frame');
-  if(_mf){ _mf.src='about:blank'; _mf.remove(); }
-  dvSlotUser.a=uA; dvSlotUser.b=uB;
-  // Audio manejado nativamente por CB iframe
-  const bg=document.getElementById('dual-view-bg');
-  const frameA=document.getElementById('dv-frame-a');
-  const frameB=document.getElementById('dv-frame-b');
-  const lblA=document.getElementById('dv-label-a');
-  const lblB=document.getElementById('dv-label-b');
-  const linkA=document.getElementById('dv-link-a');
-  const linkB=document.getElementById('dv-link-b');
-  const mkAffLink=(u)=>`https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`;
-  const rA=rooms.find(r=>r.username===uA)||{username:uA};
-  const rB=rooms.find(r=>r.username===uB)||{username:uB};
-  if(lblA) lblA.textContent=rA.display_name||uA;
-  if(lblB) lblB.textContent=rB.display_name||uB;
-  if(linkA){linkA.href=mkAffLink(uA);linkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
-  if(linkB){linkB.href=mkAffLink(uB);linkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
-  const floatLinkA=document.getElementById('dv-float-link-a');
-  const floatLinkB=document.getElementById('dv-float-link-b');
-  if(floatLinkA){floatLinkA.href=mkAffLink(uA);floatLinkA.textContent=`Entrar con ${rA.display_name||uA} ↗`;}
-  if(floatLinkB){floatLinkB.href=mkAffLink(uB);floatLinkB.textContent=`Entrar con ${rB.display_name||uB} ↗`;}
-  const wrapA=document.getElementById('dv-panel-a')?.querySelector('.dv-embed-wrap');
-  const wrapB=document.getElementById('dv-panel-b')?.querySelector('.dv-embed-wrap');
-  if(wrapA) wrapA.classList.remove('stream-ready');
-  if(wrapB) wrapB.classList.remove('stream-ready');
-  if(bg) bg.style.display='flex';
-  // Cargar iframes con audio activo — controles nativos de CB disponibles
-  setTimeout(()=>{
-    if(frameA){
-      frameA.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uA}&t=${Date.now()}`;
-      frameA.onload=()=>{ frameA.onload=null; setTimeout(()=>{ if(wrapA) wrapA.classList.add('stream-ready'); },2000); };
-    }
-    if(frameB){
-      frameB.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uB}&t=${Date.now()}`;
-      frameB.onload=()=>{ frameB.onload=null; setTimeout(()=>{ if(wrapB) wrapB.classList.add('stream-ready'); },2000); };
-    }
-  },120);
-  document.body.style.overflow='hidden';
-  closeDualPicker();
-  document.getElementById('modal-bg')?.classList.remove('open');
-  // Posicionar botones "Cambiar" con position:fixed (fix iframe pointer-events en Chrome)
-  requestAnimationFrame(() => setTimeout(() => { _updateDvScale(); _positionSwapBtns(); }, 80));
-}
 
 
-function closeDualView(){
-  const bg=document.getElementById('dual-view-bg');
-  const frameA=document.getElementById('dv-frame-a');
-  const frameB=document.getElementById('dv-frame-b');
-  if(frameA){ frameA.onload=null; frameA.src='about:blank'; }
-  if(frameB){ frameB.onload=null; frameB.src='about:blank'; }
-  document.querySelectorAll('.dv-embed-wrap').forEach(w=>w.classList.remove('stream-ready'));
-  if(bg) bg.style.display='none';
-  document.body.style.overflow='';
-  _hideSwapBtns(); // FIX: ocultar botones fixed al cerrar
-}
 
-/* ── SWAP SLOT: change one room without closing dual view ── */
-function swapDualSlot(slot){
-  const bg = document.getElementById('dual-picker-bg');
-  if(!bg) return;
-  _dpSlot = slot;
-  _dpResetFilters();
-  const titleEl = document.getElementById('dp-title-txt');
-  if(titleEl) titleEl.textContent = '⇄ Cambiar Panel ' + slot.toUpperCase();
-  _dpRenderTagList();
-  renderDpGrid();
-  bg.style.display = 'flex';
-  requestAnimationFrame(() => bg.classList.add('open'));
-}
-function swapDualConfirm(slot, newUsername){
-  if(!slot || !newUsername) return;
-  closeDualPicker(); // cierra sin evento — sin guard
 
-  // Actualizar username del slot ANTES de cargar el iframe
-  dvSlotUser[slot] = newUsername;
-
-  const frame  = document.getElementById('dv-frame-'  + slot);
-  const lblEl  = document.getElementById('dv-label-'  + slot);
-  const linkEl = document.getElementById('dv-link-'   + slot);
-  const r = rooms.find(r => r.username === newUsername) || { username: newUsername };
+;
   const mkAffLink = u => `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`;
   if(frame){
     const wrapEl = frame.closest('.dv-embed-wrap');
@@ -4621,9 +4312,7 @@ function closeMod(e){
 }
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    closeDualView();
-    closeDualPicker();
-    closeMod();
+      closeMod();
   }
 });
 
