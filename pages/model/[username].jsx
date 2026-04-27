@@ -234,7 +234,13 @@ export default function ModelPage({ username,history,bestHours,country,gender,di
               <span className="cmp-live-dot"/>
               <span style={{fontSize:".8125rem",color:"var(--txt2)",fontWeight:600}}>En vivo ahora · {viewers?.toLocaleString("es")} viewers</span>
             </div>
-            <LiveEmbed room={username} viewers={viewers} name={name} track="embed_play"/>
+            <a
+              href={`https://es.chaturbate.com/${username}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${username}&tour=LQps&track=model_embed`}
+              target="_blank" rel="noopener noreferrer"
+              style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,width:"100%",padding:"1rem",background:"linear-gradient(135deg,#e8305a,#c42049)",color:"#fff",fontWeight:700,fontSize:"1rem",borderRadius:12,textDecoration:"none",boxShadow:"0 4px 18px rgba(232,48,90,.4)",marginBottom:".5rem"}}
+            >
+              ▶ Ver en vivo en Chaturbate
+            </a>
             <p className="cmp-embed-note">Al ver el stream en Campulse, apoyas a {name} directamente.</p>
           </div>
         )}
