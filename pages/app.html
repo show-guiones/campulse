@@ -774,7 +774,8 @@ header{
 .modal-hero{
   position:relative;
   height:340px;
-  overflow:hidden;cursor:pointer;flex-shrink:0
+  overflow:hidden;cursor:pointer;flex-shrink:0;
+  background:linear-gradient(135deg,#1a0a1e 0%,#0f1014 100%)
 }
 /* mhero-v2 usa aspect-ratio — no imponer height fija para evitar espacio en blanco */
 .modal-hero.mhero-v2{
@@ -3362,7 +3363,8 @@ function pinnedCardHtml(x,badge){
   const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
   const isTop3=rank>=0&&rank<3;
   const isHot=rank>=0&&rank<10&&!isTop3;
-  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="https://thumb.live.mmcdn.com/riw/${x.username}.jpg" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="https://thumb.live.mmcdn.com/riw/${x.username}.jpg" alt="${x.username}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+
   const lexyBadge=isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':'';
   const pinnedBadge=!isLexy&&badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':!isLexy&&badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
   const isLivePinned=(x.num_users||0)>0;
@@ -3451,7 +3453,7 @@ function cardHtml(x,mode='grid'){
     `https://thumb.live.mmcdn.com/riw/${x.username}.jpg`,
     `https://thumb.live.mmcdn.com/ri/${x.username}.jpg`
   ];
-  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
   const isNew=(x.num_followers||9999)<500;
   const isLive=(x.num_users||0)>0;
@@ -3497,6 +3499,7 @@ function imgFallback(img){
   const t=parseInt(img.dataset.t||0)+1;
   if(t<srcs.length){
     img.dataset.t=t;
+    img.referrerPolicy='no-referrer';
     img.src=srcs[t];
     img.onload=()=>img.classList.add('loaded');
   } else {
@@ -3612,7 +3615,7 @@ function renderList(r){
   const b=document.getElementById('lb');
   if(!r.length){b.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ico">🔍</div><p>Sin resultados</p></div></td></tr>`;return;}
   b.innerHTML=r.map(x=>`<tr onclick="openInCB('${x.username}')">
-    <td>${x.image_url?`<img class="l-av" src="${x.image_url}" loading="lazy" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`:`<div class="l-av-ph">👤</div>`}</td>
+    <td>${x.image_url?`<img class="l-av" src="${x.image_url}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`:`<div class="l-av-ph">👤</div>`}</td>
     <td><div class="l-name">${x.display_name||x.username}</div><div class="l-sub">@${x.username}</div></td>
     <td><span class="gpill gp-${x.gender}">${GL[x.gender]||'—'}</span></td>
     <td><span class="mono">${fmt(x.num_users||0)}</span><span class="vbar-w"><span class="vbar-f" style="width:${Math.round((x.num_users||0)/maxV*100)}%"></span></span></td>
@@ -3655,12 +3658,14 @@ function openMod(u){
     const tryThumb=(urls,i)=>{
       if(i>=urls.length){ heroThumb.style.backgroundImage='none'; return; }
       const img=new Image();
+      img.referrerPolicy='no-referrer';
       img.onload=()=>{ heroThumb.style.backgroundImage=`url('${urls[i]}')`; };
       img.onerror=()=>{ tryThumb(urls,i+1); };
       img.src=urls[i];
     };
     heroThumb.style.backgroundImage='none';
     tryThumb([
+      x.image_url||`https://thumb.live.mmcdn.com/riw/${u}.jpg`,
       `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
       `https://thumb.live.mmcdn.com/ri/${u}.jpg`
     ],0);
@@ -3741,7 +3746,7 @@ function openMod(u){
     // Ocultar chat column cuando está offline
     if(imgWrap) imgWrap.innerHTML=`
       <div class="mhp-wrap">
-        <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
+        <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" referrerpolicy="no-referrer" crossorigin="anonymous" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
         <div class="mhp-name">${x.display_name||u}</div>
         <div class="mhp-offline"><div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>Offline en este momento</div>
         <a href="https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
@@ -4321,7 +4326,7 @@ function renderDpGrid(){
       ? `swapDualConfirm('${_dpSlot}','${r.username}')`
       : `openDualView('${active?.username||''}','${r.username}');closeDualPicker()`;
     return `<div class="dp-card" onclick="${cb}">
-      <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
+      <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous"
         onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
       <div class="dp-card-vw">\uD83D\uDC40 ${fmt(r.num_users)}</div>
       <div class="dp-card-name">${r.display_name||r.username}</div>
@@ -4952,6 +4957,8 @@ async function loadModelReport(room,username){
 
   // Profile
   const img=document.getElementById('rp-img');
+  img.referrerPolicy='no-referrer';
+  img.crossOrigin='anonymous';
   img.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
   img.onerror=()=>{img.src='';img.style.display='none';};
   el('rp-name',room?.display_name||u||'—');
@@ -5326,6 +5333,7 @@ async function adminLoadList(){
         <div class="admin-item-pos">${item.position}</div>
         <img class="admin-item-thumb"
           src="https://thumb.live.mmcdn.com/riw/${item.username}.jpg"
+          referrerpolicy="no-referrer" crossorigin="anonymous"
           onerror="this.src='https://thumb.live.mmcdn.com/ri/${item.username}.jpg'"
           alt="${item.username}">
         <div class="admin-item-info">
