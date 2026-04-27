@@ -355,27 +355,14 @@ export function LiveEmbed({ room, viewers=null, name=null, campaign="rI8z3", tra
 
   function handleClick(e) {
     e.preventDefault();
-    if (mobileHref) {
-      window.open(mobileHref, "_blank", "noopener,noreferrer");
-    } else {
-      setExpanded(true);
-    }
+    const url = mobileHref || desktopHref;
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   if (expanded) {
-    return (
-      <div className="cmp-live-embed cmp-live-embed--expanded">
-        <iframe
-          src={`https://chaturbate.com/embed/${room}/?tour=LQps&campaign=${campaign}&bgcolor=0f1014&disable_sound=0&mobileRedirect=never`}
-          width="100%" height="100%"
-          allow="autoplay; fullscreen; encrypted-media"
-          allowFullScreen frameBorder="0" scrolling="no"
-          referrerPolicy="no-referrer-when-downgrade"
-          title={`${displayName} en vivo en Chaturbate`}
-          style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none",borderRadius:14,display:"block"}}
-        />
-      </div>
-    );
+    // No usamos iframe — Chaturbate bloquea embeds externos (X-Frame-Options: sameorigin)
+    // Redirigir al link de afiliado directamente
+    window.open(desktopHref, "_blank", "noopener,noreferrer");
   }
 
   return (
