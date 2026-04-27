@@ -2700,9 +2700,7 @@ body.modal-open .mob-explore-nav{display:none!important}
           <div class="embed-loading-spinner"></div>
           <span>Conectando sala…</span>
         </div>
-        <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
-          allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
-          allowFullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <!-- iframe se crea dinámicamente en startEmbed() y se destruye en closeMod() — nunca en el DOM sin uso -->
       </div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
@@ -3643,11 +3641,11 @@ function openMod(u){
 
   // Reset audio button state
 
-  // Reset
-  const frame=document.getElementById('live-embed-frame');
+  // Reset — destruir iframe si existe (fue creado dinámicamente por startEmbed)
   const embedWrap=document.getElementById('mhero-embed-wrap');
   const imgWrap=document.getElementById('mhero-img-wrap');
-  if(frame) frame.src='about:blank';
+  const oldFrame=document.getElementById('live-embed-frame');
+  if(oldFrame){ oldFrame.src='about:blank'; oldFrame.remove(); }
   if(embedWrap){
     embedWrap.classList.remove('active');
     embedWrap.classList.remove('video-ready');
@@ -3769,7 +3767,6 @@ function openMod(u){
 }
 
 function startEmbed(u){
-  const frame=document.getElementById('live-embed-frame');
   const embedWrap=document.getElementById('mhero-embed-wrap');
   const imgWrap=document.getElementById('mhero-img-wrap');
   const heroEl=document.getElementById('modal-hero');
@@ -3778,13 +3775,21 @@ function startEmbed(u){
   if(embedWrap){
     const loading=document.getElementById('embed-loading');
     if(loading) loading.classList.remove('hidden');
-    embedWrap.classList.add('active');
-  }
-  if(frame){
-    frame.onload=null;
-    frame.removeEventListener('load',onEmbedLoad);
+    // Destruir iframe previo si existe
+    const oldFrame=document.getElementById('live-embed-frame');
+    if(oldFrame){ oldFrame.src='about:blank'; oldFrame.remove(); }
+    // Crear iframe fresco — nunca estuvo en el DOM hasta este momento
+    const frame=document.createElement('iframe');
+    frame.id='live-embed-frame';
+    frame.className='embed-frame';
+    frame.allow='autoplay *; fullscreen *; encrypted-media *; microphone *; camera *';
+    frame.allowFullscreen=true;
+    frame.scrolling='no';
+    frame.referrerPolicy='no-referrer-when-downgrade';
     frame.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
     frame.addEventListener('load',onEmbedLoad);
+    embedWrap.appendChild(frame);
+    embedWrap.classList.add('active');
   }
 }
 function updateFavBtn(u){
@@ -3856,7 +3861,7 @@ function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
   const frame=document.getElementById('live-embed-frame');
   const loading=document.getElementById('embed-loading');
-  if(frame) frame.src='about:blank';
+  if(frame){ frame.src='about:blank'; frame.remove(); } // destruir iframe completamente
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); }
   if(loading) loading.classList.remove('hidden');
 }
@@ -4502,7 +4507,7 @@ function openDualView(uA,uB){
   if(!uA||!uB)return;
   // Destruir iframe del modal para evitar audio duplicado
   const _mf=document.getElementById('live-embed-frame');
-  if(_mf){ _mf.src='about:blank'; }
+  if(_mf){ _mf.src='about:blank'; _mf.remove(); }
   dvSlotUser.a=uA; dvSlotUser.b=uB;
   // Audio manejado nativamente por CB iframe
   const bg=document.getElementById('dual-view-bg');
@@ -4606,7 +4611,7 @@ function closeMod(e){
   clearInterval(prevCd);
   const frame=document.getElementById('live-embed-frame');
   const wrap=document.getElementById('mhero-embed-wrap');
-  if(frame){ frame.src='about:blank'; }
+  if(frame){ frame.src='about:blank'; frame.remove(); } // destruir iframe — se crea de nuevo en startEmbed
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); wrap.classList.remove('stream-ready'); }
   const analyticsPanel=document.getElementById('modal-analytics');
   if(analyticsPanel) analyticsPanel.style.display='none';
@@ -4821,9 +4826,7 @@ document.getElementById('vl').addEventListener('click',()=>{
 // ref-btn puede no existir en versiones sin botón de refresh
 const _refBtn=document.getElementById('ref-btn');
 if(_refBtn) _refBtn.addEventListener('click',load);
-// Conectar iframe onload via JS para evitar race condition con definición de onEmbedLoad
-const _embedFrame=document.getElementById('live-embed-frame');
-if(_embedFrame) _embedFrame.addEventListener('load',onEmbedLoad);
+// Nota: el iframe live-embed-frame se crea dinámicamente en startEmbed() — no existe en el DOM aquí
 
 /* ═══════════════════════════════════════════
    DRAWER / HAMBURGER
