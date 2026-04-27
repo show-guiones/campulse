@@ -338,7 +338,6 @@ export function LiveEmbed({ room, viewers=null, name=null, campaign="rI8z3", tra
   const thumbFallback = `https://thumb.live.mmcdn.com/n/${room}.jpg`;
   const [imgSrc, setImgSrc]     = useState(thumbUrl);
   const [imgOk,  setImgOk]      = useState(true);
-  const [expanded, setExpanded] = useState(false);
   const [mobileHref, setMobileHref] = useState(null);
 
   useEffect(() => {
@@ -357,12 +356,6 @@ export function LiveEmbed({ room, viewers=null, name=null, campaign="rI8z3", tra
     e.preventDefault();
     const url = mobileHref || desktopHref;
     window.open(url, "_blank", "noopener,noreferrer");
-  }
-
-  if (expanded) {
-    // No usamos iframe — Chaturbate bloquea embeds externos (X-Frame-Options: sameorigin)
-    // Redirigir al link de afiliado directamente
-    window.open(desktopHref, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -403,7 +396,7 @@ export function LiveEmbed({ room, viewers=null, name=null, campaign="rI8z3", tra
               {viewers.toLocaleString("es")} viewers en vivo
             </span>
           )}
-          <span className="cmp-live-embed__cta">Ver en vivo \u2192</span>
+          <span className="cmp-live-embed__cta">Ver en vivo →</span>
         </div>
       </div>
     </a>
