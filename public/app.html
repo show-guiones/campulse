@@ -4066,63 +4066,16 @@ let _modalAudioActive = false;
    Chrome no respeta z-index de elementos hermanos cuando un iframe tiene pointer-events:auto.
    La única solución es sacar los botones del stacking context del iframe usando position:fixed. ── */
 
-function _positionSwapBtns(){
-  if(!bg || bg.style.display === 'none' || !bg.style.display) return;
-  const panelA = document.getElementById('dv-panel-a');
-  const panelB = document.getElementById('dv-panel-b');
-  if(!panelA || !panelB) return;
-  const rA = panelA.getBoundingClientRect();
-  const rB = panelB.getBoundingClientRect();
-
-  // Botones "Cambiar" — esquina superior derecha de cada panel
-  const SWAP_W = 74, SWAP_PAD_TOP = 6, SWAP_PAD_RIGHT = 6;
-  const btnSwapA = document.querySelector('#dv-panel-a .dv-swap-btn');
-  const btnSwapB = document.querySelector('#dv-panel-b .dv-swap-btn');
-  if(btnSwapA){
-    btnSwapA.style.display = 'block';
-    btnSwapA.style.top  = (rA.top  + SWAP_PAD_TOP) + 'px';
-    btnSwapA.style.left = (rA.right - SWAP_PAD_RIGHT - SWAP_W) + 'px';
-    btnSwapA.style.width = SWAP_W + 'px';
-  }
-  if(btnSwapB){
-    btnSwapB.style.display = 'block';
-    btnSwapB.style.top  = (rB.top  + SWAP_PAD_TOP) + 'px';
-    btnSwapB.style.left = (rB.right - SWAP_PAD_RIGHT - SWAP_W) + 'px';
-    btnSwapB.style.width = SWAP_W + 'px';
-  }
-
-}
-function _hideSwapBtns(){
-  document.querySelectorAll('.dv-swap-btn').forEach(b => b.style.display = 'none');
-
-}
 
 /* Estado de audio por slot */
 // Audio manejado nativamente por CB
 // Reposicionar en resize y orientación
-window.addEventListener('resize', () => { _positionSwapBtns(); _updateDvScale(); });
-window.addEventListener('orientationchange', () => setTimeout(_positionSwapBtns, 300));
 
 
 
 
 
 ;
-  const mkAffLink = u => `https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default`;
-  if(frame){
-    const wrapEl = frame.closest('.dv-embed-wrap');
-    if(wrapEl) wrapEl.classList.remove('stream-ready');
-    frame.onload = null; // cancelar cualquier handler pendiente del slot anterior
-    // Nueva sala siempre silenciada — el usuario debe presionar el botón para audio
-    frame.src = `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${newUsername}&t=${Date.now()}`;
-    frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrapEl) wrapEl.classList.add('stream-ready'); }, 2500); };
-  }
-  if(lblEl)  lblEl.textContent = r.display_name || newUsername;
-  if(linkEl){ linkEl.href = mkAffLink(newUsername); linkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
-  // Sincronizar link flotante desktop
-  const floatLinkEl = document.getElementById('dv-float-link-' + slot);
-  if(floatLinkEl){ floatLinkEl.href = mkAffLink(newUsername); floatLinkEl.textContent = `Entrar con ${r.display_name||newUsername} ↗`; }
-}
 function closeMod(e){
   // FIX B2: siempre destruir — no depender de e.target para matar el iframe
   if(e && e.target && e.target!==document.getElementById('modal-bg') && !e.target.classList?.contains('modal-close')) return;
