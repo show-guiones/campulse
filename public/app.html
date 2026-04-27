@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="canonical" href="https://www.campulsehub.com/app">
 <title>CampulseHub — Estadísticas de Modelos Chaturbate en Tiempo Real</title>
 <meta name="description" content="CampulseHub rastrea en tiempo real las estadísticas de modelos de Chaturbate: viewers en vivo, seguidores, historial y ranking. Descubre quién está online ahora mismo.">
@@ -546,10 +549,6 @@ header{
 .bdg-fire{background:rgba(0,0,0,.5);color:var(--hot)}
 .bdg-hd{background:rgba(0,229,255,.2);border:1px solid rgba(0,229,255,.4);color:var(--neon)}
 .bdg-new{background:rgba(0,232,148,.2);border:1px solid rgba(0,232,148,.4);color:var(--grn)}
-.bdg-away{background:rgba(255,193,7,.18);border:1px solid rgba(255,193,7,.4);color:#ffc107}
-.bdg-priv{background:rgba(232,48,90,.18);border:1px solid rgba(232,48,90,.4);color:var(--hot)}
-.bdg-away{background:rgba(255,193,7,.18);border:1px solid rgba(255,193,7,.4);color:#ffc107}
-.bdg-priv{background:rgba(232,48,90,.18);border:1px solid rgba(232,48,90,.4);color:var(--hot)}
 
 /* fav btn */
 .crd-fav{
@@ -778,11 +777,12 @@ header{
 .modal-hero{
   position:relative;
   height:340px;
-  overflow:hidden;cursor:pointer;flex-shrink:0
+  overflow:hidden;cursor:pointer;flex-shrink:0;
+  background:linear-gradient(135deg,#1a0a1e 0%,#0f1014 100%)
 }
 /* mhero-v2 usa aspect-ratio — no imponer height fija para evitar espacio en blanco */
 .modal-hero.mhero-v2{
-  height:auto;overflow-x:hidden;
+  height:auto;overflow-x:hidden;background:#000;
 }
 .modal-hero img,.live-preview-img{
   width:100%;height:100%;object-fit:cover;
@@ -886,6 +886,7 @@ header{
 .embed-wrap.active{display:block}
 .embed-frame{
   width:100%;height:100%;border:none;display:block;
+  background:#000; /* evita fondo blanco cuando iframe carga o falla */
   pointer-events:auto; /* permite interacción nativa con controles CB (volumen, etc) */
   overflow:hidden;overscroll-behavior:none;touch-action:none;
   scrollbar-width:none;-ms-overflow-style:none;
@@ -1049,17 +1050,12 @@ header{
 /* ── Thumbnail del modelo como fondo — siempre visible, nunca blanco ── */
 .mhero-v2 .hero-thumb{
   position:absolute;inset:0;z-index:2;
-  width:100%;height:100%;object-fit:cover;display:block;
-  /* Ocultar cuando src está vacío para evitar placeholder blanco del browser */
-  background:#000;
-  color:transparent; /* oculta el alt text */
-}
-/* Sin src válido el img se colapsa visualmente sin mostrar blanco */
-.mhero-v2 .hero-thumb:not([src]), 
-.mhero-v2 .hero-thumb[src=""] {
-  visibility:hidden;
+  width:100%;height:100%;
+  background:#000 center/cover no-repeat;
+  /* Como es un div, nunca hay ícono de imagen rota */
 }
 .mhero-v2 .embed-wrap{
+  display:none;
   position:absolute;inset:0;z-index:5;
   overflow:hidden;
   pointer-events:auto;touch-action:pan-y;
@@ -1179,8 +1175,6 @@ header{
 }
 .man-kpi:hover{border-color:var(--bdr2)}
 .man-kpi-val{display:block;font-size:1.05rem;font-weight:800;color:var(--txt);line-height:1.1}
-.man-kpi-priv{color:var(--hot)!important}
-.man-kpi-away{color:#ffc107!important}
 .man-kpi-lbl{display:block;font-size:.55rem;color:var(--txt3);margin-top:2px;line-height:1.3}
 
 /* ── SCHEDULE SECTION ── */
@@ -1246,46 +1240,6 @@ header{
 }
 .man-ft-badge.up{background:rgba(34,199,122,.15);color:var(--grn)}
 .man-ft-badge.neutral{background:rgba(255,255,255,.07);color:var(--txt3)}
-
-/* ── STATBATE EARNINGS ── */
-.stb-section{margin-bottom:1rem}
-.stb-loading{font-size:.65rem;color:var(--txt3);padding:.4rem 0}
-.stb-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:.45rem;margin-bottom:.55rem}
-.stb-kpi{
-  background:var(--surf);border-radius:12px;
-  padding:.55rem .45rem;text-align:center;
-  border:1px solid var(--bdr);transition:border-color .15s
-}
-.stb-kpi:hover{border-color:var(--bdr2)}
-.stb-kpi-val{display:block;font-size:1.05rem;font-weight:800;color:var(--grn);line-height:1.1}
-.stb-kpi-lbl{display:block;font-size:.55rem;color:var(--txt3);margin-top:2px;line-height:1.3}
-.stb-chart{display:flex;align-items:flex-end;gap:2px;height:44px;margin-top:.4rem}
-.stb-bar{
-  flex:1;border-radius:2px 2px 0 0;
-  background:rgba(34,199,122,.25);
-  transition:background .15s;cursor:default;
-  min-height:2px;position:relative
-}
-.stb-bar:hover{background:rgba(34,199,122,.55)}
-.stb-bar-tip{
-  position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);
-  background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;
-  font-size:.55rem;color:var(--txt);padding:2px 5px;white-space:nowrap;
-  pointer-events:none;opacity:0;transition:opacity .1s;z-index:5
-}
-.stb-bar:hover .stb-bar-tip{opacity:1}
-.stb-top{margin-top:.5rem}
-.stb-top-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.28rem .4rem;border-radius:8px;font-size:.65rem;
-  border-bottom:1px solid var(--bdr)
-}
-.stb-top-row:last-child{border-bottom:none}
-.stb-top-row:nth-child(odd){background:var(--surf)}
-.stb-top-name{color:var(--txt);font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.stb-top-total{color:var(--grn);font-weight:700;margin-left:.5rem}
-.stb-top-avg{color:var(--txt3);font-size:.58rem;margin-left:.4rem}
-.stb-err{font-size:.62rem;color:var(--txt3);padding:.3rem 0}
 
 /* Days grid */
 .man-days{display:flex;flex-wrap:wrap;gap:3px}
@@ -2220,17 +2174,7 @@ header{
   .modal{border-radius:24px 24px 0 0;max-height:96dvh;width:100%}
   .modal-v2{border-radius:24px 24px 0 0;height:96dvh;max-height:96dvh;display:flex;flex-direction:column}
   .modal-hero{height:200px}
-  /* mhero-v2 SIN embed: thumbnail/info normal */
-  .modal-hero.mhero-v2{position:relative;height:56dvh;min-height:280px;max-height:65dvh;flex-shrink:0;overflow:hidden}
-  /* mhero-v2 CON embed activo: mismo approach que pagina de modelo —
-     padding-bottom:56.25% calcula la altura sobre el ANCHO REAL del contenedor (no del viewport),
-     asi el ratio 16:9 es perfecto sin recortes sin importar padding/margenes del modal.
-     +26mm de altura extra para la zona de video en movil. */
-  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:calc(56.25% + 26mm)!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
-  /* embed-wrap: absolute sobre el padre que ya tiene altura por padding-bottom */
-  .modal-hero.mhero-v2 .embed-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}
-  /* iframe: 100% del wrap — sin transform ni crop en movil */
-  .modal-hero.mhero-v2 .embed-wrap .embed-frame{position:absolute!important;inset:0!important;top:0!important;left:0!important;width:100%!important;height:100%!important;transform:none!important}
+  .modal-hero.mhero-v2{height:56dvh;min-height:260px;max-height:62dvh;flex-shrink:0}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .sched-grid{grid-template-columns:repeat(7,1fr)}
   .filter-bar-top{padding:.35rem .7rem;top:40px}
@@ -2243,10 +2187,9 @@ header{
   .grid{grid-template-columns:repeat(3,1fr);gap:.22rem}
   .carousel-scroll .crd{width:95px;flex-shrink:0}
   .carousel-scroll .crd .crd-media,.carousel-scroll .crd .crd-img,.carousel-scroll .crd .crd-ph{height:127px}
-  /* Modal hero en moviles muy pequeños — mismo approach padding-bottom que pagina de modelo */
-  .modal-hero{height:220px!important}
-  .modal-hero.mhero-v2{height:52dvh!important;min-height:220px!important}
-  .modal-hero.mhero-v2.embed-active{position:relative!important;height:0!important;padding-bottom:calc(56.25% + 26mm)!important;max-height:none!important;min-height:0!important;overflow:hidden!important}
+  /* Modal hero más pequeño en móviles muy pequeños para que CTA quede visible */
+  .modal-hero{height:260px!important}
+  .modal-hero.mhero-v2{height:auto!important}
   /* Nombre más compacto */
   .modal-name{font-size:1.1rem!important}
 }
@@ -2337,26 +2280,6 @@ body.modal-open{overflow:hidden!important}
 }
 /* Hide mobile nav when modal is open to avoid overlap */
 body.modal-open .mob-explore-nav{display:none!important}
-
-/* APP CTA BANNER */
-@keyframes appCtaShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
-@keyframes appCtaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-@keyframes appCtaPulse{0%,100%{opacity:1}50%{opacity:.55}}
-.app-cta-banner{display:flex;align-items:center;justify-content:space-between;gap:1rem;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(232,48,90,.12) 0%,rgba(124,92,191,.14) 50%,rgba(56,182,212,.1) 100%);border:1px solid rgba(232,48,90,.28);border-radius:16px;padding:1.125rem 1.375rem;margin:1.5rem 0;text-decoration:none;cursor:pointer;transition:border-color .25s,transform .2s,box-shadow .25s;}
-.app-cta-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);animation:appCtaShimmer 3.2s ease-in-out infinite;pointer-events:none;}
-.app-cta-banner:hover{border-color:rgba(232,48,90,.5);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,48,90,.15),0 2px 8px rgba(0,0,0,.4);}
-.app-cta-left{display:flex;align-items:center;gap:.875rem;flex:1;min-width:0}
-.app-cta-icon{width:44px;height:44px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,var(--hot),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1.25rem;animation:appCtaFloat 3s ease-in-out infinite;box-shadow:0 4px 14px rgba(232,48,90,.3);}
-.app-cta-text{flex:1;min-width:0}
-.app-cta-title{font-size:.9375rem;font-weight:800;color:var(--txt);letter-spacing:-.02em;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.app-cta-sub{font-size:.75rem;color:var(--txt2);line-height:1.35}
-.app-cta-sub strong{color:var(--neon)}
-.app-cta-badge{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.app-cta-counter{font-size:1.25rem;font-weight:900;color:var(--hot);letter-spacing:-.04em;line-height:1;animation:appCtaPulse 2.4s ease-in-out infinite;}
-.app-cta-counter-lbl{font-size:.6rem;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;text-align:center}
-.app-cta-arrow{flex-shrink:0;width:32px;height:32px;border-radius:10px;background:var(--hot);display:flex;align-items:center;justify-content:center;font-size:.875rem;box-shadow:0 3px 10px rgba(232,48,90,.35);transition:transform .2s;}
-.app-cta-banner:hover .app-cta-arrow{transform:translateX(3px)}
-@media(max-width:480px){.app-cta-banner{padding:.875rem 1rem;gap:.75rem}.app-cta-badge{display:none}}
 
 </style>
 <!-- hls.js: reproductor HLS nativo, sin iframe, sin X-Frame-Options -->
@@ -2769,16 +2692,15 @@ body.modal-open .mob-explore-nav{display:none!important}
     <!-- VIDEO HERO — embed automático al abrir -->
     <div class="modal-hero mhero-v2" id="modal-hero">
       <!-- Thumbnail siempre visible detrás — nunca espacio blanco -->
-      <img class="hero-thumb" id="hero-thumb" src="" alt="" aria-hidden="true">
+      <div class="hero-thumb" id="hero-thumb" aria-hidden="true"></div>
       <div class="embed-wrap" id="mhero-embed-wrap">
+        <!-- Capa negra permanente detrás del iframe — evita fondo blanco de CB -->
+        <div style="position:absolute;inset:0;background:#000;z-index:0;pointer-events:none"></div>
         <div class="embed-loading" id="embed-loading">
           <div class="embed-loading-spinner"></div>
           <span>Conectando sala…</span>
         </div>
-        <iframe id="live-embed-frame" class="embed-frame" src="about:blank"
-          width="100%" height="100%"
-          allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *"
-          allowFullscreen scrolling="no" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <!-- iframe se crea dinámicamente en startEmbed() y se destruye en closeMod() — nunca en el DOM sin uso -->
       </div>
       <!-- fallback imagen si offline -->
       <div id="mhero-img-wrap"></div>
@@ -2804,7 +2726,6 @@ body.modal-open .mob-explore-nav{display:none!important}
       <div class="mstrip-info">
         <div class="mstrip-name" id="mstrip-name"></div>
         <div class="mstrip-sub" id="mstrip-sub"></div>
-        <div class="mstrip-subject" id="mstrip-subject" style="display:none;font-size:.6rem;color:var(--txt3);margin-top:.15rem;line-height:1.3;font-style:italic"></div>
       </div>
       <div class="mstrip-live" id="mstrip-live"></div>
     </div>
@@ -2817,7 +2738,6 @@ body.modal-open .mob-explore-nav{display:none!important}
         <div>
           <div class="mstrip-name" id="mstrip-name-d"></div>
           <div class="mstrip-sub" id="mstrip-sub-d"></div>
-          <div class="mstrip-subject" id="mstrip-subject-d" style="display:none;font-size:.6rem;color:var(--txt3);margin-top:.15rem;line-height:1.3;font-style:italic"></div>
         </div>
         <div class="mstrip-live" id="mstrip-live-d"></div>
       </div>
@@ -2855,21 +2775,11 @@ body.modal-open .mob-explore-nav{display:none!important}
         <!-- KPIs ahora mismo -->
         <div class="man-section">
           <div class="man-title">📊 Ahora mismo</div>
-          <div class="man-kpis" id="man-kpis" style="grid-template-columns:repeat(3,1fr)">
+          <div class="man-kpis" id="man-kpis">
             <div class="man-kpi"><span class="man-kpi-val" id="man-viewers">—</span><span class="man-kpi-lbl">viewers ahora</span></div>
             <div class="man-kpi"><span class="man-kpi-val" id="man-followers">—</span><span class="man-kpi-lbl">seguidores</span></div>
             <div class="man-kpi"><span class="man-kpi-val" id="man-rank">—</span><span class="man-kpi-lbl">puesto live</span></div>
           </div>
-          <div class="man-kpis" id="man-kpis-extra" style="grid-template-columns:repeat(2,1fr);margin-top:.35rem">
-            <div class="man-kpi"><span class="man-kpi-val" id="man-lang" style="font-size:.72rem">—</span><span class="man-kpi-lbl">idioma</span></div>
-            <div class="man-kpi"><span class="man-kpi-val" id="man-show-status" style="font-size:.72rem">—</span><span class="man-kpi-lbl">tipo de show</span></div>
-          </div>
-        </div>
-
-        <!-- Ingresos Statbate -->
-        <div class="man-section stb-section" id="stb-section" style="display:none">
-          <div class="man-title">💰 Ingresos estimados (Statbate)</div>
-          <div id="stb-body"><div class="stb-loading">Cargando datos de ingresos…</div></div>
         </div>
 
         <!-- Seguidores / tendencia -->
@@ -2918,22 +2828,6 @@ body.modal-open .mob-explore-nav{display:none!important}
           <div class="man-title">🏷️ Tags activos</div>
           <div class="man-tags" id="man-tags"></div>
         </div>
-
-        <!-- CTA todas las modelos -->
-        <a href="/app.html" class="app-cta-banner" style="margin-top:1.25rem;margin-bottom:.5rem">
-          <div class="app-cta-left">
-            <div class="app-cta-icon">📡</div>
-            <div class="app-cta-text">
-              <div class="app-cta-title">Ver todas las modelos en vivo</div>
-              <div class="app-cta-sub">Dashboard completo · Ranking · <strong>Estadísticas en tiempo real</strong></div>
-            </div>
-          </div>
-          <div class="app-cta-badge">
-            <div class="app-cta-counter" id="app-cta-count">3000+</div>
-            <div class="app-cta-counter-lbl">modelos<br>ahora</div>
-          </div>
-          <div class="app-cta-arrow">→</div>
-        </a>
 
       </div>
 
@@ -3408,9 +3302,6 @@ function renderOnFilter(){
 
 function updateStats(){
   const views=rooms.reduce((s,r)=>s+(r.num_users||0),0);
-  // Update AppCTA counter
-  const ctaCount=document.getElementById('app-cta-count');
-  if(ctaCount&&rooms.length>0) ctaCount.textContent=rooms.length.toLocaleString('es')+'+';
   const avg=rooms.length?Math.round(views/rooms.length):0;
   const peak=Math.max(...rooms.map(r=>r.num_users||0),0);
   // sidebar stats
@@ -3474,14 +3365,11 @@ function pinnedCardHtml(x,badge){
   const rank=_rankCache?(_rankCache.get(x.username)??-1):-1;
   const isTop3=rank>=0&&rank<3;
   const isHot=rank>=0&&rank<10&&!isTop3;
-  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="https://thumb.live.mmcdn.com/riw/${x.username}.jpg" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="https://thumb.live.mmcdn.com/riw/${x.username}.jpg" alt="${x.username}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+
   const lexyBadge=isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':'';
   const pinnedBadge=!isLexy&&badge==='featured'?'<div class="crd-featured-badge">⭐ Destacada</div>':!isLexy&&badge==='fav'?'<div class="crd-fav-badge">♥ Fav</div>':'';
   const isLivePinned=(x.num_users||0)>0;
-  const subjectRaw=(x.room_subject||'').trim();
-  const subjectShort=subjectRaw.length>38?subjectRaw.slice(0,36)+'…':subjectRaw;
-  const metaLinePinned=[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ');
-  const crdSubContent=subjectShort||metaLinePinned||'&nbsp;';
   return `<article class="crd${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLivePinned?1:0}">
   <div class="crd-media">
     ${imgTag}
@@ -3497,7 +3385,7 @@ function pinnedCardHtml(x,badge){
   </div>
   <div class="crd-body">
     <div class="crd-name">${x.display_name||x.username}</div>
-    <div class="crd-sub" title="${subjectRaw}">${crdSubContent}</div>
+    <div class="crd-sub">${[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ')||'&nbsp;'}</div>
   </div>
 </article>`;
 }
@@ -3567,19 +3455,10 @@ function cardHtml(x,mode='grid'){
     `https://thumb.live.mmcdn.com/riw/${x.username}.jpg`,
     `https://thumb.live.mmcdn.com/ri/${x.username}.jpg`
   ];
-  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
+  const imgTag=`<img class="crd-img" data-u="${x.username}" data-t="0" src="${imgSrcs[0]}" alt="${x.username}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="imgFallback(this)" onload="this.classList.add('loaded')">`;
   const phTag=`<div class="crd-ph">${(x.display_name||x.username).substring(0,2).toUpperCase()}</div>`;
-  // is_new: usar campo real de CB; fallback heurístico si no viene
-  const isNew=x.is_new!=null?x.is_new:(x.num_followers||9999)<500;
+  const isNew=(x.num_followers||9999)<500;
   const isLive=(x.num_users||0)>0;
-  const showStatus=x.current_show||'public';
-  const isAway=showStatus==='away';
-  const isPriv=showStatus==='private'||showStatus==='group';
-  // room_subject truncado (max 38 chars) para crd-sub
-  const subjectRaw=(x.room_subject||'').trim();
-  const subjectShort=subjectRaw.length>38?subjectRaw.slice(0,36)+'…':subjectRaw;
-  const metaLine=[x.country,x.age?x.age+'a':null].filter(Boolean).join(' · ');
-  const crdSubContent=subjectShort||metaLine||'&nbsp;';
   const favBtn = `<button class="crd-fav${fv?' is-fav':''}" onclick="toggleFav(event,'${x.username}')">♥</button>`;
   return `<article class="crd${mode==='carousel'?' crd-sm':''}${isLexy?' crd-lexy':''}" onclick="openMod('${x.username}')" data-username="${x.username}" data-live="${isLive?1:0}">
   <div class="crd-media">
@@ -3590,8 +3469,6 @@ function cardHtml(x,mode='grid'){
       ${!isLexy&&isHot?'<span class="bdg bdg-fire">🔥</span>':''}
       ${x.is_hd?'<span class="bdg bdg-hd">HD</span>':''}
       ${isNew&&!isLexy?'<span class="bdg bdg-new">NEW</span>':''}
-      ${isAway?'<span class="bdg bdg-away">AWAY</span>':''}
-      ${isPriv?'<span class="bdg bdg-priv">'+(showStatus==='group'?'GRUPO':'PRIVADO')+'</span>':''}
     </div>
     ${isLexy?'<div class="crd-lexy-badge">✦ TOP</div>':''}
     ${mode!=='carousel'?favBtn:''}
@@ -3624,6 +3501,7 @@ function imgFallback(img){
   const t=parseInt(img.dataset.t||0)+1;
   if(t<srcs.length){
     img.dataset.t=t;
+    img.referrerPolicy='no-referrer';
     img.src=srcs[t];
     img.onload=()=>img.classList.add('loaded');
   } else {
@@ -3739,7 +3617,7 @@ function renderList(r){
   const b=document.getElementById('lb');
   if(!r.length){b.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ico">🔍</div><p>Sin resultados</p></div></td></tr>`;return;}
   b.innerHTML=r.map(x=>`<tr onclick="openInCB('${x.username}')">
-    <td>${x.image_url?`<img class="l-av" src="${x.image_url}" loading="lazy" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`:`<div class="l-av-ph">👤</div>`}</td>
+    <td>${x.image_url?`<img class="l-av" src="${x.image_url}" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.outerHTML='<div class=l-av-ph>👤</div>'">`:`<div class="l-av-ph">👤</div>`}</td>
     <td><div class="l-name">${x.display_name||x.username}</div><div class="l-sub">@${x.username}</div></td>
     <td><span class="gpill gp-${x.gender}">${GL[x.gender]||'—'}</span></td>
     <td><span class="mono">${fmt(x.num_users||0)}</span><span class="vbar-w"><span class="vbar-f" style="width:${Math.round((x.num_users||0)/maxV*100)}%"></span></span></td>
@@ -3748,23 +3626,6 @@ function renderList(r){
     <td style="font-size:.68rem;color:var(--txt3)">${x.country||'—'}</td>
     <td><button class="crd-fav${favs.includes(x.username)?' is-fav':''}" style="position:static;width:26px;height:26px;border-radius:50%" onclick="toggleFav(event,'${x.username}')">♥</button></td>
   </tr>`).join('');
-}
-
-/* ═══════════════════════════════════════════
-   EMBED URL HELPER
-   - tour 6o0b = Female (sala específica con room=)
-   - mobileRedirect=never → el iframe se renderiza en móvil sin redirigir a la app
-   - width/height se controlan por CSS, no por atributos del iframe
-═══════════════════════════════════════════ */
-function buildEmbedSrc(username){
-  /* chaturbate.com/embed/USERNAME/ → carga SIEMPRE la sala exacta de la modelo seleccionada.
-     tour=LQps → tour de sala en vivo directa (no catálogo — respeta el username en la URL).
-     mobileRedirect=never → el iframe se renderiza en móvil sin redirigir a la app nativa.
-     t= → cache-bust para forzar nueva sesión al cambiar de sala.
-     IMPORTANTE: cbxyz.com/in/?tour=dTm0 es un tour de catálogo "Top Female" que IGNORA
-     el parámetro room= y muestra sala aleatoria — por eso se cambió a embed directo. */
-  const ts = Date.now();
-  return `https://chaturbate.com/embed/${username}/?tour=LQps&campaign=rI8z3&bgcolor=0f1014&disable_sound=1&mobileRedirect=never&t=${ts}`;
 }
 
 /* ═══════════════════════════════════════════
@@ -3780,11 +3641,11 @@ function openMod(u){
 
   // Reset audio button state
 
-  // Reset
-  const frame=document.getElementById('live-embed-frame');
+  // Reset — destruir iframe si existe (fue creado dinámicamente por startEmbed)
   const embedWrap=document.getElementById('mhero-embed-wrap');
   const imgWrap=document.getElementById('mhero-img-wrap');
-  if(frame) frame.src='about:blank';
+  const oldFrame=document.getElementById('live-embed-frame');
+  if(oldFrame){ oldFrame.src='about:blank'; oldFrame.remove(); }
   if(embedWrap){
     embedWrap.classList.remove('active');
     embedWrap.classList.remove('video-ready');
@@ -3793,15 +3654,23 @@ function openMod(u){
   const loadingEl=document.getElementById('embed-loading');
   if(loadingEl) loadingEl.classList.remove('hidden');
 
-  // Thumbnail de fondo — siempre visible, evita cualquier espacio blanco
+  // Thumbnail de fondo — como div con background-image, nunca muestra ícono roto
   const heroThumb=document.getElementById('hero-thumb');
   if(heroThumb){
-    heroThumb.style.visibility='';
-    heroThumb.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
-    heroThumb.onerror=()=>{
-      heroThumb.onerror=()=>{ heroThumb.style.visibility='hidden'; heroThumb.src=''; };
-      heroThumb.src=`https://thumb.live.mmcdn.com/ri/${u}.jpg`;
+    const tryThumb=(urls,i)=>{
+      if(i>=urls.length){ heroThumb.style.backgroundImage='none'; return; }
+      const img=new Image();
+      img.referrerPolicy='no-referrer';
+      img.onload=()=>{ heroThumb.style.backgroundImage=`url('${urls[i]}')`; };
+      img.onerror=()=>{ tryThumb(urls,i+1); };
+      img.src=urls[i];
     };
+    heroThumb.style.backgroundImage='none';
+    tryThumb([
+      x.image_url||`https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+      `https://thumb.live.mmcdn.com/riw/${u}.jpg`,
+      `https://thumb.live.mmcdn.com/ri/${u}.jpg`
+    ],0);
   }
 
   // Name + CTA
@@ -3813,13 +3682,6 @@ function openMod(u){
   const mstripLive=document.getElementById('mstrip-live');
   if(mstripName) mstripName.textContent=x.display_name||x.username;
   if(mstripSub) mstripSub.textContent=x.username!==x.display_name?'@'+x.username:'';
-  // room_subject debajo del nombre (solo si está en vivo y tiene tema)
-  const mstripSubject=document.getElementById('mstrip-subject');
-  if(mstripSubject){
-    const subj=(x.room_subject||'').trim();
-    mstripSubject.textContent=subj.length>60?subj.slice(0,58)+'…':subj;
-    mstripSubject.style.display=subj?'block':'none';
-  }
   if(mstripLive){
     mstripLive.textContent=x.num_users>0?'● EN VIVO':'';
     mstripLive.classList.toggle('visible',x.num_users>0);
@@ -3831,13 +3693,6 @@ function openMod(u){
   if(dName) dName.textContent=x.display_name||x.username;
   if(dSub) dSub.textContent=x.username!==x.display_name?'@'+x.username:'';
   if(dLive){dLive.textContent=x.num_users>0?'● EN VIVO':'';dLive.classList.toggle('visible',x.num_users>0);}
-  // room_subject en desktop header
-  const dSubject=document.getElementById('mstrip-subject-d');
-  if(dSubject){
-    const subj=(x.room_subject||'').trim();
-    dSubject.textContent=subj.length>70?subj.slice(0,68)+'…':subj;
-    dSubject.style.display=subj?'block':'none';
-  }
   document.getElementById('m-link').href=`https://es.chaturbate.com/${x.username}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${x.username}&tour=LQps&track=default`;
   const profileLink=document.getElementById('m-profile-link');
   if(profileLink) profileLink.href=`https://www.campulsehub.com/model/${x.username}`;
@@ -3865,24 +3720,26 @@ function openMod(u){
   updateFavBtn(x.username);
 
   if(x.num_users>0){
-    // AUTO-EMBED: mostrar video directamente
-    if(imgWrap) imgWrap.innerHTML='';
+    // NO AUTO-EMBED: mostrar thumbnail con overlay de play — iframe carga solo al hacer click
+    if(imgWrap) imgWrap.innerHTML=`
+      <div class="mhp-play-wrap" onclick="startEmbed('${u}')" style="
+        position:absolute;inset:0;z-index:4;display:flex;
+        align-items:center;justify-content:center;cursor:pointer;
+        background:rgba(0,0,0,.18);
+      ">
+        <div style="
+          width:64px;height:64px;border-radius:50%;
+          background:rgba(232,48,90,.92);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 4px 24px rgba(0,0,0,.5);
+          transition:transform .15s,background .15s;
+        " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><polygon points="6,3 20,12 6,21"/></svg>
+        </div>
+      </div>`;
     const _heroEl=document.getElementById('modal-hero');
-    if(_heroEl) _heroEl.classList.add('embed-active');
-    // Mostrar chat column en desktop
-    if(embedWrap){
-      const loading=document.getElementById('embed-loading');
-      if(loading) loading.classList.remove('hidden');
-      embedWrap.classList.add('active');
-    }
-    // Mostrar y posicionar botón de audio (position:fixed — necesita coords de viewport)
-    if(frame){
-      // Cargar con audio activo — controles nativos de CB disponibles para volumen
-      frame.onload = null;
-      frame.removeEventListener('load', onEmbedLoad);
-      frame.src = buildEmbedSrc(u);
-      frame.addEventListener('load', onEmbedLoad);
-    }
+    if(_heroEl) _heroEl.classList.remove('embed-active');
+    if(embedWrap) embedWrap.classList.remove('active');
   } else {
     // OFFLINE: mostrar imagen de perfil
     const _heroElOff=document.getElementById('modal-hero');
@@ -3891,7 +3748,7 @@ function openMod(u){
     // Ocultar chat column cuando está offline
     if(imgWrap) imgWrap.innerHTML=`
       <div class="mhp-wrap">
-        <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
+        <img src="https://thumb.live.mmcdn.com/riw/${u}.jpg" referrerpolicy="no-referrer" crossorigin="anonymous" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--bdr)" onerror="this.style.display='none'">
         <div class="mhp-name">${x.display_name||u}</div>
         <div class="mhp-offline"><div style="width:6px;height:6px;border-radius:50%;background:var(--txt3)"></div>Offline en este momento</div>
         <a href="https://es.chaturbate.com/${u}/?campaign=rI8z3&disable_sound=0&hide_chat=1&room=${u}&tour=LQps&track=default" target="_blank" rel="noopener" class="mhp-cta">🔔 Seguir en Chaturbate →</a>
@@ -3909,6 +3766,32 @@ function openMod(u){
   // mini card player removed
 }
 
+function startEmbed(u){
+  const embedWrap=document.getElementById('mhero-embed-wrap');
+  const imgWrap=document.getElementById('mhero-img-wrap');
+  const heroEl=document.getElementById('modal-hero');
+  if(imgWrap) imgWrap.innerHTML='';
+  if(heroEl) heroEl.classList.add('embed-active');
+  if(embedWrap){
+    const loading=document.getElementById('embed-loading');
+    if(loading) loading.classList.remove('hidden');
+    // Destruir iframe previo si existe
+    const oldFrame=document.getElementById('live-embed-frame');
+    if(oldFrame){ oldFrame.src='about:blank'; oldFrame.remove(); }
+    // Crear iframe fresco — nunca estuvo en el DOM hasta este momento
+    const frame=document.createElement('iframe');
+    frame.id='live-embed-frame';
+    frame.className='embed-frame';
+    frame.allow='autoplay *; fullscreen *; encrypted-media *; microphone *; camera *';
+    frame.allowFullscreen=true;
+    frame.scrolling='no';
+    frame.referrerPolicy='no-referrer-when-downgrade';
+    frame.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
+    frame.addEventListener('load',onEmbedLoad);
+    embedWrap.appendChild(frame);
+    embedWrap.classList.add('active');
+  }
+}
 function updateFavBtn(u){
   const fv=favs.includes(u);
   document.getElementById('m-fav-btn').classList.toggle('active',fv);
@@ -3945,7 +3828,7 @@ function activateEmbed(u){
   frame.onload=null;
   frame.removeEventListener('load', onEmbedLoad);
   // Cargar con audio activo — usuario controla volumen con controles nativos de CB
-  frame.src=buildEmbedSrc(u);
+  frame.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${u}&t=${Date.now()}`;
   frame.addEventListener('load', onEmbedLoad);
 }
 
@@ -3964,7 +3847,7 @@ function onEmbedLoad(){
     }, 2200);
   } else {
     // Carga inicial — mantener negro hasta que Chaturbate renderice frames reales
-    if(wrap) setTimeout(()=>{ wrap.classList.add('video-ready'); }, 2500);
+    if(wrap) setTimeout(()=>{ wrap.classList.add('video-ready'); }, 6000);
   }
 }
 /* Abre la sala activa con URL de afiliado completa cuando el usuario toca el video */
@@ -3978,7 +3861,7 @@ function deactivateEmbed(){
   const wrap=document.getElementById('mhero-embed-wrap');
   const frame=document.getElementById('live-embed-frame');
   const loading=document.getElementById('embed-loading');
-  if(frame) frame.src='about:blank';
+  if(frame){ frame.src='about:blank'; frame.remove(); } // destruir iframe completamente
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); }
   if(loading) loading.classList.remove('hidden');
 }
@@ -3999,134 +3882,6 @@ function toggleModalReport(){
   loadModalAnalytics(active);
 }
 
-/* ══════════════════════════════════════════════════
-   STATBATE INTEGRATION
-   ══════════════════════════════════════════════════ */
-
-// Cache: username → statbate numeric id (persisted en localStorage)
-const STB_CACHE_KEY = 'stb_id_cache_v1';
-function _stbReadCache(){
-  try{ return JSON.parse(localStorage.getItem(STB_CACHE_KEY)||'{}'); }catch(e){return{};}
-}
-function _stbWriteCache(obj){
-  try{ localStorage.setItem(STB_CACHE_KEY, JSON.stringify(obj)); }catch(e){}
-}
-
-// Resolve username → statbate room ID via /search/1/{username}
-// Returns numeric string or null
-async function getStatbateId(username){
-  const cache = _stbReadCache();
-  if(cache[username]) return cache[username];
-  try{
-    // Use a CORS proxy or direct fetch — statbate.com may or may not allow cross-origin GET
-    // The search page returns HTML; we look for data-modal-id on the income link
-    const res = await fetch(`https://statbate.com/search/1/${encodeURIComponent(username)}`, {
-      signal: AbortSignal.timeout(6000)
-    });
-    if(!res.ok) return null;
-    const html = await res.text();
-    // The page renders: data-modal-id=NNNN  or  /search/1/username link with id in modal trigger
-    const m = html.match(/data-modal-id[=\s'"]+(\d+)/i);
-    if(!m) return null;
-    const id = m[1];
-    const obj = _stbReadCache();
-    obj[username] = id;
-    _stbWriteCache(obj);
-    return id;
-  }catch(e){ return null; }
-}
-
-// Render the Statbate earnings panel inside #stb-body
-async function loadStatbateEarnings(username){
-  const sec  = document.getElementById('stb-section');
-  const body = document.getElementById('stb-body');
-  if(!sec || !body) return;
-
-  // Verificar primero si statbate.com está disponible antes de mostrar la sección
-  const id = await getStatbateId(username);
-  if(!id){
-    sec.style.display = 'none';
-    return;
-  }
-
-  sec.style.display = '';
-  body.innerHTML = '<div class="stb-loading">Cargando ingresos…</div>';
-  try{
-    const res = await fetch('https://statbate.com/public/info.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `id=${encodeURIComponent(id)}&type=income`,
-      signal: AbortSignal.timeout(8000)
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-
-    // ── KPIs ──
-    const totalUSD = data.amount ? `$${Number(data.amount.replace(/,/g,'')).toLocaleString()}` : '—';
-    let kpisHtml = `
-      <div class="stb-kpis">
-        <div class="stb-kpi"><span class="stb-kpi-val">${totalUSD}</span><span class="stb-kpi-lbl">ingresos históricos est.</span></div>
-        <div class="stb-kpi"><span class="stb-kpi-val" id="stb-month-val">—</span><span class="stb-kpi-lbl">último mes est.</span></div>
-      </div>`;
-
-    // ── Mini bar chart (últimos 30 días) ──
-    let chartHtml = '';
-    if(data.chart){
-      try{
-        const pts = typeof data.chart === 'string' ? JSON.parse(data.chart) : data.chart;
-        if(Array.isArray(pts) && pts.length > 0){
-          const vals = pts.map(p=>parseFloat(p.value)||0);
-          const maxV = Math.max(...vals, 0.01);
-          // Sum for last-month KPI
-          const monthTotal = vals.reduce((s,v)=>s+v,0);
-          kpisHtml = kpisHtml.replace('id="stb-month-val">—', `id="stb-month-val">$${Math.round(monthTotal).toLocaleString()}`);
-          const bars = vals.slice().reverse().map((v, i)=>{
-            const pct = Math.round((v/maxV)*100);
-            const date = pts[pts.length-1-i]?.date || '';
-            return `<div class="stb-bar" style="height:${Math.max(pct,3)}%" title="">
-              <div class="stb-bar-tip">${date}<br>$${v.toFixed(0)}</div>
-            </div>`;
-          }).join('');
-          chartHtml = `<div class="stb-chart">${bars}</div>
-            <div style="font-size:.55rem;color:var(--txt3);margin-top:.2rem;text-align:right">últimos 30 días · USD estimado</div>`;
-        }
-      }catch(e){}
-    }
-
-    // ── Top donadores (parsear HTML table de data.table) ──
-    let topHtml = '';
-    if(data.table && data.table.trim()){
-      // data.table es HTML de <tr> con <td>nombre</td><td>$total</td><td>$avg</td>
-      const tmp = document.createElement('tbody');
-      tmp.innerHTML = data.table;
-      const rows = [...tmp.querySelectorAll('tr')].slice(0,5);
-      if(rows.length){
-        const rowsHtml = rows.map(tr=>{
-          const tds = tr.querySelectorAll('td');
-          if(tds.length < 2) return '';
-          const name = tds[0].textContent.trim() || '—';
-          const total = tds[1].textContent.trim() || '—';
-          const avg   = tds[2] ? tds[2].textContent.trim() : '';
-          return `<div class="stb-top-row">
-            <span class="stb-top-name">${name}</span>
-            <span class="stb-top-total">${total}</span>
-            ${avg?`<span class="stb-top-avg">avg ${avg}</span>`:''}
-          </div>`;
-        }).filter(Boolean).join('');
-        if(rowsHtml){
-          topHtml = `<div style="font-size:.6rem;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin:.55rem 0 .25rem">Top donadores (30 días)</div>
-            <div class="stb-top">${rowsHtml}</div>`;
-        }
-      }
-    }
-
-    body.innerHTML = kpisHtml + chartHtml + topHtml;
-
-  }catch(e){
-    sec.style.display = 'none';
-  }
-}
-
 function loadModalAnalytics(x){
   const u=x.username;
   // Fallback: enrich x with live data from rooms array if stats are missing
@@ -4140,19 +3895,6 @@ function loadModalAnalytics(x){
   document.getElementById('man-viewers').textContent=x.num_users>0?fmt(x.num_users):'—';
   document.getElementById('man-followers').textContent=x.num_followers?fmt(x.num_followers):'—';
   document.getElementById('man-rank').textContent=rank>=0?'#'+(rank+1):'—';
-  // spoken_languages y current_show desde API CB
-  const manLangEl=document.getElementById('man-lang');
-  if(manLangEl){
-    const langs=(x.spoken_languages||'').trim();
-    manLangEl.textContent=langs||'—';
-  }
-  const manShowEl=document.getElementById('man-show-status');
-  if(manShowEl){
-    const sh=x.current_show||'public';
-    const showLabels={'public':'Público','private':'Privado 🔒','group':'Grupal 👥','away':'Away ⏸'};
-    manShowEl.textContent=showLabels[sh]||sh;
-    manShowEl.className='man-kpi-val'+(sh==='private'||sh==='group'?' man-kpi-priv':sh==='away'?' man-kpi-away':'');
-  }
 
   // Follower trend card
   const ftSec=document.getElementById('man-follower-section');
@@ -4173,9 +3915,6 @@ function loadModalAnalytics(x){
   // Tags
   const tagsEl=document.getElementById('man-tags');
   if(tagsEl) tagsEl.innerHTML=(x.tags||[]).slice(0,8).map(t=>`<span class="man-tag">#${t}</span>`).join('')||'<span class="man-tag" style="color:var(--txt3)">Sin tags</span>';
-
-  // Statbate earnings (async, non-blocking)
-  loadStatbateEarnings(u);
 
   // Weekly KPIs placeholder
   const wkEl=document.getElementById('man-weekly-kpis');
@@ -4596,7 +4335,7 @@ function renderDpGrid(){
       ? `swapDualConfirm('${_dpSlot}','${r.username}')`
       : `openDualView('${active?.username||''}','${r.username}');closeDualPicker()`;
     return `<div class="dp-card" onclick="${cb}">
-      <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy"
+      <img src="https://thumb.live.mmcdn.com/riw/${r.username}.jpg" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous"
         onerror="this.src='https://thumb.live.mmcdn.com/ri/${r.username}.jpg'">
       <div class="dp-card-vw">\uD83D\uDC40 ${fmt(r.num_users)}</div>
       <div class="dp-card-name">${r.display_name||r.username}</div>
@@ -4768,7 +4507,7 @@ function openDualView(uA,uB){
   if(!uA||!uB)return;
   // Destruir iframe del modal para evitar audio duplicado
   const _mf=document.getElementById('live-embed-frame');
-  if(_mf){ _mf.src='about:blank'; }
+  if(_mf){ _mf.src='about:blank'; _mf.remove(); }
   dvSlotUser.a=uA; dvSlotUser.b=uB;
   // Audio manejado nativamente por CB iframe
   const bg=document.getElementById('dual-view-bg');
@@ -4797,11 +4536,11 @@ function openDualView(uA,uB){
   // Cargar iframes con audio activo — controles nativos de CB disponibles
   setTimeout(()=>{
     if(frameA){
-      frameA.src=buildEmbedSrc(uA);
+      frameA.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uA}&t=${Date.now()}`;
       frameA.onload=()=>{ frameA.onload=null; setTimeout(()=>{ if(wrapA) wrapA.classList.add('stream-ready'); },2000); };
     }
     if(frameB){
-      frameB.src=buildEmbedSrc(uB);
+      frameB.src=`https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${uB}&t=${Date.now()}`;
       frameB.onload=()=>{ frameB.onload=null; setTimeout(()=>{ if(wrapB) wrapB.classList.add('stream-ready'); },2000); };
     }
   },120);
@@ -4855,7 +4594,7 @@ function swapDualConfirm(slot, newUsername){
     if(wrapEl) wrapEl.classList.remove('stream-ready');
     frame.onload = null; // cancelar cualquier handler pendiente del slot anterior
     // Nueva sala siempre silenciada — el usuario debe presionar el botón para audio
-    frame.src = buildEmbedSrc(newUsername);
+    frame.src = `https://cbxyz.com/in/?tour=dTm0&campaign=rI8z3&track=embed&disable_sound=1&mobileRedirect=auto&embed_video_only=1&room=${newUsername}&t=${Date.now()}`;
     frame.onload = ()=>{ frame.onload=null; setTimeout(()=>{ if(wrapEl) wrapEl.classList.add('stream-ready'); }, 2500); };
   }
   if(lblEl)  lblEl.textContent = r.display_name || newUsername;
@@ -4872,15 +4611,10 @@ function closeMod(e){
   clearInterval(prevCd);
   const frame=document.getElementById('live-embed-frame');
   const wrap=document.getElementById('mhero-embed-wrap');
-  if(frame){ frame.src='about:blank'; }
+  if(frame){ frame.src='about:blank'; frame.remove(); } // destruir iframe — se crea de nuevo en startEmbed
   if(wrap){ wrap.classList.remove('active'); wrap.classList.remove('video-ready'); wrap.classList.remove('stream-ready'); }
   const analyticsPanel=document.getElementById('modal-analytics');
   if(analyticsPanel) analyticsPanel.style.display='none';
-  // Reset Statbate panel
-  const stbSec=document.getElementById('stb-section');
-  const stbBody=document.getElementById('stb-body');
-  if(stbSec) stbSec.style.display='none';
-  if(stbBody) stbBody.innerHTML='<div class="stb-loading">Cargando datos de ingresos…</div>';
   const heroEl=document.getElementById('modal-hero');
   if(heroEl) heroEl.classList.remove('embed-active');
 }
@@ -5092,9 +4826,7 @@ document.getElementById('vl').addEventListener('click',()=>{
 // ref-btn puede no existir en versiones sin botón de refresh
 const _refBtn=document.getElementById('ref-btn');
 if(_refBtn) _refBtn.addEventListener('click',load);
-// Conectar iframe onload via JS para evitar race condition con definición de onEmbedLoad
-const _embedFrame=document.getElementById('live-embed-frame');
-if(_embedFrame) _embedFrame.addEventListener('load',onEmbedLoad);
+// Nota: el iframe live-embed-frame se crea dinámicamente en startEmbed() — no existe en el DOM aquí
 
 /* ═══════════════════════════════════════════
    DRAWER / HAMBURGER
@@ -5232,6 +4964,8 @@ async function loadModelReport(room,username){
 
   // Profile
   const img=document.getElementById('rp-img');
+  img.referrerPolicy='no-referrer';
+  img.crossOrigin='anonymous';
   img.src=`https://thumb.live.mmcdn.com/riw/${u}.jpg`;
   img.onerror=()=>{img.src='';img.style.display='none';};
   el('rp-name',room?.display_name||u||'—');
@@ -5606,6 +5340,7 @@ async function adminLoadList(){
         <div class="admin-item-pos">${item.position}</div>
         <img class="admin-item-thumb"
           src="https://thumb.live.mmcdn.com/riw/${item.username}.jpg"
+          referrerpolicy="no-referrer" crossorigin="anonymous"
           onerror="this.src='https://thumb.live.mmcdn.com/ri/${item.username}.jpg'"
           alt="${item.username}">
         <div class="admin-item-info">
