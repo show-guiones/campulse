@@ -214,7 +214,7 @@ export default function TopLatinasPage({ models, isLiveData, fetchedAt }) {
 
         {/* EMBED — Top Latina en vivo (thumbnail + CTA, sin iframe bloqueado) */}
         {ordered.length > 0 && (
-          <section style={{marginTop:40,marginBottom:8}}>
+          <section style={{marginTop:40,marginBottom:8,overflow:"hidden"}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
               <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
               <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>Latina más popular en vivo ahora</span>

@@ -97,7 +97,7 @@ button{font-family:inherit;cursor:pointer}
 .cmp-embed-note{font-size:.75rem;color:var(--txt3);text-align:center;margin-bottom:1.5rem}
 
 /* ── LIVE EMBED (thumbnail + overlay) ── */
-.cmp-live-embed{position:relative;height:54dvh;min-height:270px;max-height:60dvh;overflow:hidden;border-radius:14px;background:#0c0c0e;border:1px solid var(--bdr);margin-bottom:1rem;cursor:pointer;}
+.cmp-live-embed{display:block;box-sizing:border-box;position:relative;height:54dvh;min-height:270px;max-height:60dvh;overflow:hidden;border-radius:14px;background:#0c0c0e;border:1px solid var(--bdr);margin-bottom:1rem;cursor:pointer;}
 .cmp-live-embed__thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:14px;transition:transform .4s ease,filter .4s ease;}
 .cmp-live-embed__thumb-err{position:absolute;inset:0;background:linear-gradient(135deg,#0f1014 0%,#1a1022 100%);}
 .cmp-live-embed__overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:linear-gradient(to top,rgba(0,0,0,.78) 0%,rgba(0,0,0,.1) 60%,transparent 100%);border-radius:14px;transition:background .3s;}
