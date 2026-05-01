@@ -1,7 +1,7 @@
 // pages/country/[code].jsx — Redesign con design system app.html
 
 import Head from "next/head";
-import { DS_CSS, Logo, AppCTA, CtaAfiliado } from "../../campulse-design-system";
+import { DS_CSS, Logo, AppCTA, CtaAfiliado, LiveEmbed } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -171,25 +171,22 @@ export default function CountryPage({ code, codeUC, name, models, fetchError }) 
         </div>
 
         {/* SEO SECTION */}
-        {/* EMBED — Top Female en vivo (contextual al país) */}
-        <section style={{marginTop:40,marginBottom:8}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-            <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
-            <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>Modelo más popular en vivo ahora</span>
-          </div>
-          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",paddingBottom:"56.25%",height:0}}>
-            <iframe
-              src={`https://chaturbate.com/in/?tour=dTm0&campaign=rI8z3&track=country_${code}&disable_sound=1&mobileRedirect=auto&embed_video_only=1`}
-              style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
-              allow="autoplay; fullscreen; encrypted-media"
-              scrolling="no"
+        {/* EMBED — Top modelo en vivo (thumbnail + CTA, sin iframe bloqueado) */}
+        {top && (
+          <section style={{marginTop:40,marginBottom:8}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+              <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
+              <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>Modelo más popular en vivo ahora</span>
+            </div>
+            <LiveEmbed
+              room={top.username}
+              viewers={top.num_users}
+              name={top.display_name || top.username}
+              campaign="rI8z3"
+              track={`country_${code}`}
             />
-          </div>
-          <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
-            Stream en vivo desde Chaturbate ·{" "}
-            <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=country_full_${code}&mobile_site=1`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
-          </p>
-        </section>
+          </section>
+        )}
 
         <section style={{marginTop:48,padding:"1.5rem",background:"var(--surf)",borderRadius:14,border:"1px solid var(--bdr)"}}>
           <h2 style={{fontSize:"1.125rem",fontWeight:700,marginBottom:".75rem",color:"var(--txt)"}}>Modelos {demonym} en Chaturbate</h2>

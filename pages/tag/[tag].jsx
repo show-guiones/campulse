@@ -4,7 +4,7 @@
 
 import Head from "next/head";
 import { useState } from "react";
-import { DS_CSS, Logo, BottomNav, AppCTA, CtaAfiliado } from "../../campulse-design-system";
+import { DS_CSS, Logo, BottomNav, AppCTA, CtaAfiliado, LiveEmbed } from "../../campulse-design-system";
 
 const SITE = "https://www.campulsehub.com";
 
@@ -309,25 +309,22 @@ export default function TagPage({ tag, models }) {
           <EmptyState tag={tag} />
         )}
 
-        {/* EMBED — Top Female en vivo */}
-        <section style={{marginTop:32,marginBottom:8}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-            <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
-            <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>En vivo ahora en Chaturbate</span>
-          </div>
-          <div style={{borderRadius:12,overflow:"hidden",border:"1px solid var(--bdr)",background:"#000",position:"relative",paddingBottom:"56.25%",height:0}}>
-            <iframe
-              src={`https://chaturbate.com/in/?tour=dTm0&campaign=rI8z3&track=tag_${tag}&disable_sound=1&mobileRedirect=auto&embed_video_only=1`}
-              style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
-              allow="autoplay; fullscreen; encrypted-media"
-              scrolling="no"
+        {/* EMBED — Top modelo en vivo (thumbnail + CTA, sin iframe bloqueado) */}
+        {models.length > 0 && (
+          <section style={{marginTop:32,marginBottom:8}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+              <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",display:"inline-block"}}/>
+              <span style={{fontSize:".75rem",fontWeight:700,color:"var(--txt2)",letterSpacing:".06em",textTransform:"uppercase"}}>En vivo ahora en Chaturbate</span>
+            </div>
+            <LiveEmbed
+              room={models[0].username}
+              viewers={models[0].num_users}
+              name={models[0].display_name || models[0].username}
+              campaign="rI8z3"
+              track={`tag_${tag}`}
             />
-          </div>
-          <p style={{fontSize:".6875rem",color:"var(--txt3)",textAlign:"center",marginTop:6}}>
-            Stream en vivo desde Chaturbate ·{" "}
-            <a href={`https://chaturbate.com/in/?tour=LQps&campaign=rI8z3&track=tag_full_${tag}&mobile_site=1`} target="_blank" rel="noopener noreferrer" style={{color:"var(--neon)"}}>Ver en pantalla completa →</a>
-          </p>
-        </section>
+          </section>
+        )}
 
         {/* SEO */}
         <section className="tg-seo">
