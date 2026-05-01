@@ -202,17 +202,16 @@ button{font-family:inherit;cursor:pointer}
     border:none;
   }
   .cmp-live-embed{
-    height:64dvh;
-    min-height:340px;
-    max-height:70dvh;
-    clip-path:inset(0 round 10px);
-    border-radius:10px;
-    margin-left:-1.25rem;
-    margin-right:-1.25rem;
-    width:calc(100% + 2.5rem);
+    height:56dvh;
+    min-height:280px;
+    max-height:65dvh;
+    border-radius:12px;
+    margin-left:0;
+    margin-right:0;
+    width:100%;
   }
-  .cmp-live-embed__thumb{border-radius:0;}
-  .cmp-live-embed__play{width:60px;height:60px;}
+  .cmp-live-embed__thumb{border-radius:12px;}
+  .cmp-live-embed__play{width:64px;height:64px;}
   .cmp-live-embed__cta{font-size:.875rem;padding:.55rem 1.3rem;}
 }
 
